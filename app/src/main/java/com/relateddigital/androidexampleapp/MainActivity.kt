@@ -8,6 +8,5 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        val relatedDigitalInstance = RelatedDigital(this, "676D325830564761676D453D")
     }
 }

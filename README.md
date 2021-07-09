@@ -3,4 +3,6 @@ relateddigital-android
 
 # TODOs
 
- - Need to open a project on Firebase console and get google-services.json file.
+ - For each function in RelatedDigital.kt, check if the mandatory parameters are set first.
+ - Are app alias es mandatory?
+ - What is isIDFAEnabled?
