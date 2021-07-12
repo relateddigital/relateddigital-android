@@ -4,49 +4,81 @@ import android.content.Context
 import android.util.Log
 import com.google.gson.Gson
 import com.relateddigital.relateddigital_android.constants.Constants
+import com.relateddigital.relateddigital_android.model.LoadBalanceCookie
 import com.relateddigital.relateddigital_android.model.RelatedDigitalModel
+import com.relateddigital.relateddigital_android.util.AppUtils
 import com.relateddigital.relateddigital_android.util.SharedPref
 
 object RelatedDigital {
     private var model : RelatedDigitalModel? = null
+    private val loadBalanceCookie = LoadBalanceCookie()
     const val LOG_TAG : String = "RelatedDigital"
 
     @JvmStatic
     fun init(context: Context,
-             isPushNotificationEnabled: Boolean = false,
-             isInAppNotificationEnabled: Boolean = false,
-             isGeofenceEnabled: Boolean = false,
-             googleAppAlias: String,
-             huaweiAppAlias: String,
              organizationId: String,
              profileId: String,
-             dataSource: String,
-             requestTimeoutInSecond: Int = 30,
-             maxGeofenceCount: Int = 100) {
+             dataSource: String) {
 
-        model = RelatedDigitalModel(isPushNotificationEnabled,
-                isInAppNotificationEnabled, isGeofenceEnabled, googleAppAlias,
-                huaweiAppAlias, organizationId, profileId, dataSource,
-                requestTimeoutInSecond, maxGeofenceCount)
+        val modelStr = SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY,"")
+
+        model = if(modelStr.isEmpty()) {
+            createInitialModel(context)
+        } else {
+            Gson().fromJson(modelStr, RelatedDigitalModel::class.java)
+        }
+
+        model!!.setOrganizationId(context, organizationId)
+        model!!.setProfileId(context, profileId)
+        model!!.setDataSource(context, dataSource)
 
         model?.saveToSharedPrefs(context)
     }
 
+    private fun createInitialModel(context: Context): RelatedDigitalModel {
+        return RelatedDigitalModel(
+                organizationId = "",
+                profileId = "",
+                dataSource = "",
+                appVersion = AppUtils.getAppVersion(context),
+                osType = AppUtils.getOsType(),
+                osVersion = AppUtils.getOsVersion(),
+                sdkVersion = AppUtils.getSdkVersion(),
+                deviceType = AppUtils.getDeviceType(),
+                deviceName = AppUtils.getDeviceName(),
+                carrier = AppUtils.getCarrier(context),
+                identifierForVendor = AppUtils.getIdentifierForVendor(context),
+                local = AppUtils.getLocal(context),
+                userAgent = AppUtils.getUserAgent(),
+                cookieId = AppUtils.getCookieId(context),
+                visitorData = ""
+        )
+    }
+
     @JvmStatic
-    fun setIsPushNotificationEnabled(context: Context, isPushNotificationEnabled: Boolean) {
+    fun setIsPushNotificationEnabled(context: Context,
+                                     isPushNotificationEnabled: Boolean,
+                                     googleAppAlias: String,
+                                     huaweiAppAlias: String,
+                                     token: String) {
         if(model != null) {
             model!!.setIsPushNotificationEnabled(context, isPushNotificationEnabled)
+            model!!.setGoogleAppAlias(context, googleAppAlias)
+            model!!.setHuaweiAppAlias(context, huaweiAppAlias)
+            model!!.setToken(context, token)
         } else {
             if(!SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNullOrEmpty()) {
                 model = Gson().fromJson(SharedPref.readString(context,
                         Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
                 model!!.setIsPushNotificationEnabled(context, isPushNotificationEnabled)
+                model!!.setGoogleAppAlias(context, googleAppAlias)
+                model!!.setHuaweiAppAlias(context, huaweiAppAlias)
+                model!!.setToken(context, token)
             } else {
-                model = RelatedDigitalModel(isPushNotificationEnabled = isPushNotificationEnabled,
-                        isInAppNotificationEnabled = false, isGeofenceEnabled = false,
-                        googleAppAlias = "", huaweiAppAlias = "", organizationId = "",
-                        profileId = "", dataSource = "", requestTimeoutInSecond = 30,
-                        maxGeofenceCount = 100)
+                model = createInitialModel(context)
+                model!!.setGoogleAppAlias(context, googleAppAlias)
+                model!!.setHuaweiAppAlias(context, huaweiAppAlias)
+                model!!.setToken(context, token)
 
                 model?.saveToSharedPrefs(context)
             }
@@ -63,11 +95,8 @@ object RelatedDigital {
                         Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
                 model!!.setIsInAppNotificationEnabled(context, isInAppNotificationEnabled)
             } else {
-                model = RelatedDigitalModel(isPushNotificationEnabled = false,
-                        isInAppNotificationEnabled = isInAppNotificationEnabled, isGeofenceEnabled = false,
-                        googleAppAlias = "", huaweiAppAlias = "", organizationId = "",
-                        profileId = "", dataSource = "", requestTimeoutInSecond = 30,
-                        maxGeofenceCount = 100)
+                model = createInitialModel(context)
+                model!!.setIsInAppNotificationEnabled(context, isInAppNotificationEnabled)
 
                 model?.saveToSharedPrefs(context)
             }
@@ -84,11 +113,8 @@ object RelatedDigital {
                         Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
                 model!!.setIsGeofenceEnabled(context, isGeofenceEnabled)
             } else {
-                model = RelatedDigitalModel(isPushNotificationEnabled = false,
-                        isInAppNotificationEnabled = false, isGeofenceEnabled = isGeofenceEnabled,
-                        googleAppAlias = "", huaweiAppAlias = "", organizationId = "",
-                        profileId = "", dataSource = "", requestTimeoutInSecond = 30,
-                        maxGeofenceCount = 100)
+                model = createInitialModel(context)
+                model!!.setIsGeofenceEnabled(context, isGeofenceEnabled)
 
                 model?.saveToSharedPrefs(context)
             }
@@ -105,11 +131,8 @@ object RelatedDigital {
                         Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
                 model!!.setGoogleAppAlias(context, googleAppAlias)
             } else {
-                model = RelatedDigitalModel(isPushNotificationEnabled = false,
-                        isInAppNotificationEnabled = false, isGeofenceEnabled = false,
-                        googleAppAlias = googleAppAlias, huaweiAppAlias = "", organizationId = "",
-                        profileId = "", dataSource = "", requestTimeoutInSecond = 30,
-                        maxGeofenceCount = 100)
+                model = createInitialModel(context)
+                model!!.setGoogleAppAlias(context, googleAppAlias)
 
                 model?.saveToSharedPrefs(context)
             }
@@ -126,11 +149,8 @@ object RelatedDigital {
                         Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
                 model!!.setHuaweiAppAlias(context, huaweiAppAlias)
             } else {
-                model = RelatedDigitalModel(isPushNotificationEnabled = false,
-                        isInAppNotificationEnabled = false, isGeofenceEnabled = false,
-                        googleAppAlias = "", huaweiAppAlias = huaweiAppAlias, organizationId = "",
-                        profileId = "", dataSource = "", requestTimeoutInSecond = 30,
-                        maxGeofenceCount = 100)
+                model = createInitialModel(context)
+                model!!.setHuaweiAppAlias(context, huaweiAppAlias)
 
                 model?.saveToSharedPrefs(context)
             }
@@ -147,11 +167,8 @@ object RelatedDigital {
                         Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
                 model!!.setOrganizationId(context, organizationId)
             } else {
-                model = RelatedDigitalModel(isPushNotificationEnabled = false,
-                        isInAppNotificationEnabled = false, isGeofenceEnabled = false,
-                        googleAppAlias = "", huaweiAppAlias = "", organizationId = organizationId,
-                        profileId = "", dataSource = "", requestTimeoutInSecond = 30,
-                        maxGeofenceCount = 100)
+                model = createInitialModel(context)
+                model!!.setOrganizationId(context, organizationId)
 
                 model?.saveToSharedPrefs(context)
             }
@@ -168,11 +185,8 @@ object RelatedDigital {
                         Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
                 model!!.setProfileId(context, profileId)
             } else {
-                model = RelatedDigitalModel(isPushNotificationEnabled = false,
-                        isInAppNotificationEnabled = false, isGeofenceEnabled = false,
-                        googleAppAlias = "", huaweiAppAlias = "", organizationId = "",
-                        profileId = profileId, dataSource = "", requestTimeoutInSecond = 30,
-                        maxGeofenceCount = 100)
+                model = createInitialModel(context)
+                model!!.setProfileId(context, profileId)
 
                 model?.saveToSharedPrefs(context)
             }
@@ -189,11 +203,8 @@ object RelatedDigital {
                         Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
                 model!!.setDataSource(context, dataSource)
             } else {
-                model = RelatedDigitalModel(isPushNotificationEnabled = false,
-                        isInAppNotificationEnabled = false, isGeofenceEnabled = false,
-                        googleAppAlias = "", huaweiAppAlias = "", organizationId = "",
-                        profileId = "", dataSource = dataSource, requestTimeoutInSecond = 30,
-                        maxGeofenceCount = 100)
+                model = createInitialModel(context)
+                model!!.setDataSource(context, dataSource)
 
                 model?.saveToSharedPrefs(context)
             }
@@ -210,11 +221,8 @@ object RelatedDigital {
                         Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
                 model!!.setRequestTimeoutInSecond(context, requestTimeoutInSecond)
             } else {
-                model = RelatedDigitalModel(isPushNotificationEnabled = false,
-                        isInAppNotificationEnabled = false, isGeofenceEnabled = false,
-                        googleAppAlias = "", huaweiAppAlias = "", organizationId = "",
-                        profileId = "", dataSource = "", requestTimeoutInSecond = requestTimeoutInSecond,
-                        maxGeofenceCount = 100)
+                model = createInitialModel(context)
+                model!!.setRequestTimeoutInSecond(context, requestTimeoutInSecond)
 
                 model?.saveToSharedPrefs(context)
             }
@@ -231,15 +239,82 @@ object RelatedDigital {
                         Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
                 model!!.setMaxGeofenceCount(context, maxGeofenceCount)
             } else {
-                model = RelatedDigitalModel(isPushNotificationEnabled = false,
-                        isInAppNotificationEnabled = false, isGeofenceEnabled = false,
-                        googleAppAlias = "", huaweiAppAlias = "", organizationId = "",
-                        profileId = "", dataSource = "", requestTimeoutInSecond = 30,
-                        maxGeofenceCount = maxGeofenceCount)
+                model = createInitialModel(context)
+                model!!.setMaxGeofenceCount(context, maxGeofenceCount)
 
                 model?.saveToSharedPrefs(context)
             }
         }
+    }
+
+    @JvmStatic
+    fun setAdvertisingIdentifier(context: Context, advertisingIdentifier: String) {
+        if(model != null) {
+            model!!.setAdvertisingIdentifier(context, advertisingIdentifier)
+        } else {
+            if(!SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNullOrEmpty()) {
+                model = Gson().fromJson(SharedPref.readString(context,
+                        Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
+                model!!.setAdvertisingIdentifier(context, advertisingIdentifier)
+            } else {
+                model = createInitialModel(context)
+                model!!.setAdvertisingIdentifier(context, advertisingIdentifier)
+
+                model?.saveToSharedPrefs(context)
+            }
+        }
+    }
+
+    @JvmStatic
+    fun setExVisitorId(context: Context, exVisitorId: String) {
+        if(model != null) {
+            model!!.setExVisitorId(context, exVisitorId)
+        } else {
+            if(!SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNullOrEmpty()) {
+                model = Gson().fromJson(SharedPref.readString(context,
+                        Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
+                model!!.setExVisitorId(context, exVisitorId)
+            } else {
+                model = createInitialModel(context)
+                model!!.setExVisitorId(context, exVisitorId)
+
+                model?.saveToSharedPrefs(context)
+            }
+        }
+    }
+
+    @JvmStatic
+    fun setToken(context: Context, token: String) {
+        if(model != null) {
+            model!!.setToken(context, token)
+        } else {
+            if(!SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNullOrEmpty()) {
+                model = Gson().fromJson(SharedPref.readString(context,
+                        Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
+                model!!.setToken(context, token)
+            } else {
+                model = createInitialModel(context)
+                model!!.setToken(context, token)
+
+                model?.saveToSharedPrefs(context)
+            }
+        }
+    }
+
+    @JvmStatic
+    fun clearCookieId(context: Context) {
+        if(model!=null) {
+            model!!.setCookieId(context, "")
+        }
+        AppUtils.clearCookieId(context)
+    }
+
+    @JvmStatic
+    fun clearExVisitorId(context: Context) {
+        if(model!=null) {
+            model!!.setExVisitorId(context, "")
+        }
+        model!!.saveToSharedPrefs(context)
     }
 
     @JvmStatic
@@ -398,6 +473,236 @@ object RelatedDigital {
             } else {
                 Log.e(LOG_TAG, "maxGeofenceCount has never been set before!!")
                 100
+            }
+        }
+    }
+
+    @JvmStatic
+    fun getAppVersion(context: Context) : String{
+        return if(model!=null) {
+            model!!.getAppVersion()
+        } else {
+            if(!SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNullOrEmpty()) {
+                model = Gson().fromJson(SharedPref.readString(context,
+                        Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
+                model!!.getAppVersion()
+            } else {
+                AppUtils.getAppVersion(context)
+            }
+        }
+    }
+
+    @JvmStatic
+    fun getOsType(context: Context) : String{
+        return if(model!=null) {
+            model!!.getOsType()
+        } else {
+            if(!SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNullOrEmpty()) {
+                model = Gson().fromJson(SharedPref.readString(context,
+                        Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
+                model!!.getOsType()
+            } else {
+                AppUtils.getOsType()
+            }
+        }
+    }
+
+    @JvmStatic
+    fun getOsVersion(context: Context) : String{
+        return if(model!=null) {
+            model!!.getOsVersion()
+        } else {
+            if(!SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNullOrEmpty()) {
+                model = Gson().fromJson(SharedPref.readString(context,
+                        Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
+                model!!.getOsVersion()
+            } else {
+                AppUtils.getOsVersion()
+            }
+        }
+    }
+
+    @JvmStatic
+    fun getSdkVersion(context: Context) : String{
+        return if(model!=null) {
+            model!!.getSdkVersion()
+        } else {
+            if(!SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNullOrEmpty()) {
+                model = Gson().fromJson(SharedPref.readString(context,
+                        Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
+                model!!.getSdkVersion()
+            } else {
+                AppUtils.getSdkVersion()
+            }
+        }
+    }
+
+    @JvmStatic
+    fun getDeviceType(context: Context) : String{
+        return if(model!=null) {
+            model!!.getDeviceType()
+        } else {
+            if(!SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNullOrEmpty()) {
+                model = Gson().fromJson(SharedPref.readString(context,
+                        Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
+                model!!.getDeviceType()
+            } else {
+                AppUtils.getDeviceType()
+            }
+        }
+    }
+
+    @JvmStatic
+    fun getDeviceName(context: Context) : String{
+        return if(model!=null) {
+            model!!.getDeviceName()
+        } else {
+            if(!SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNullOrEmpty()) {
+                model = Gson().fromJson(SharedPref.readString(context,
+                        Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
+                model!!.getDeviceName()
+            } else {
+                AppUtils.getDeviceName()
+            }
+        }
+    }
+
+    @JvmStatic
+    fun getCarrier(context: Context) : String{
+        return if(model!=null) {
+            model!!.getCarrier()
+        } else {
+            if(!SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNullOrEmpty()) {
+                model = Gson().fromJson(SharedPref.readString(context,
+                        Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
+                model!!.getCarrier()
+            } else {
+                AppUtils.getCarrier(context)
+            }
+        }
+    }
+
+    @JvmStatic
+    fun getIdentifierForVendor(context: Context) : String{
+        return if(model!=null) {
+            model!!.getIdentifierForVendor()
+        } else {
+            if(!SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNullOrEmpty()) {
+                model = Gson().fromJson(SharedPref.readString(context,
+                        Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
+                model!!.getIdentifierForVendor()
+            } else {
+                AppUtils.getIdentifierForVendor(context)
+            }
+        }
+    }
+
+    @JvmStatic
+    fun getAdvertisingIdentifier(context: Context) : String{
+        return if(model!=null) {
+            model!!.getAdvertisingIdentifier()
+        } else {
+            if(!SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNullOrEmpty()) {
+                model = Gson().fromJson(SharedPref.readString(context,
+                        Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
+                model!!.getAdvertisingIdentifier()
+            } else {
+                Log.e(LOG_TAG, "advertisingIdentifier has never been set before!!")
+                ""
+            }
+        }
+    }
+
+    @JvmStatic
+    fun getLocal(context: Context) : String{
+        return if(model!=null) {
+            model!!.getLocal()
+        } else {
+            if(!SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNullOrEmpty()) {
+                model = Gson().fromJson(SharedPref.readString(context,
+                        Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
+                model!!.getLocal()
+            } else {
+                AppUtils.getLocal(context)
+            }
+        }
+    }
+
+    @JvmStatic
+    fun getExVisitorId(context: Context) : String{
+        return if(model!=null) {
+            model!!.getExVisitorId()
+        } else {
+            if(!SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNullOrEmpty()) {
+                model = Gson().fromJson(SharedPref.readString(context,
+                        Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
+                model!!.getExVisitorId()
+            } else {
+                Log.e(LOG_TAG, "exVisitorId has never been set before!!")
+                ""
+            }
+        }
+    }
+
+    @JvmStatic
+    fun getToken(context: Context) : String{
+        return if(model!=null) {
+            model!!.getToken()
+        } else {
+            if(!SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNullOrEmpty()) {
+                model = Gson().fromJson(SharedPref.readString(context,
+                        Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
+                model!!.getToken()
+            } else {
+                Log.e(LOG_TAG, "token has never been set before!!")
+                ""
+            }
+        }
+    }
+
+    @JvmStatic
+    fun getCookieId(context: Context) : String{
+        return if(model!=null) {
+            model!!.getCookieId()
+        } else {
+            if(!SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNullOrEmpty()) {
+                model = Gson().fromJson(SharedPref.readString(context,
+                        Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
+                model!!.getCookieId()
+            } else {
+                Log.e(LOG_TAG, "no cookieID is available!!")
+                ""
+            }
+        }
+    }
+
+    @JvmStatic
+    fun getUserAgent(context: Context) : String{
+        return if(model!=null) {
+            model!!.getUserAgent()
+        } else {
+            if(!SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNullOrEmpty()) {
+                model = Gson().fromJson(SharedPref.readString(context,
+                        Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
+                model!!.getUserAgent()
+            } else {
+                AppUtils.getUserAgent()
+            }
+        }
+    }
+
+    @JvmStatic
+    fun getVisitorData(context: Context) : String{
+        return if(model!=null) {
+            model!!.getVisitorData()
+        } else {
+            if(!SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNullOrEmpty()) {
+                model = Gson().fromJson(SharedPref.readString(context,
+                        Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
+                model!!.getVisitorData()
+            } else {
+                Log.e(LOG_TAG, "No visitor data gotten yet!!")
+                ""
             }
         }
     }

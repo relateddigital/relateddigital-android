@@ -59,5 +59,13 @@ class SharedPref {
             val sp = context.getSharedPreferences(appName, Context.MODE_PRIVATE)
             return sp.getLong(key, defaultValue)
         }
+
+        fun clearKey(context: Context, key: String){
+            val appName = context.packageName
+            val sp = context.getSharedPreferences(appName, Context.MODE_PRIVATE)
+            val spEditor = sp.edit()
+            spEditor.remove(key)
+            spEditor.apply()
+        }
     }
 }
