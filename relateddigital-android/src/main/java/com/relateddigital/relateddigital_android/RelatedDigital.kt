@@ -12,7 +12,7 @@ import com.relateddigital.relateddigital_android.util.SharedPref
 object RelatedDigital {
     private var model : RelatedDigitalModel? = null
     private val loadBalanceCookie = LoadBalanceCookie()
-    const val LOG_TAG : String = "RelatedDigital"
+    private const val LOG_TAG : String = "RelatedDigital"
 
     @JvmStatic
     fun init(context: Context,
