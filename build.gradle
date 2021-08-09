@@ -3,7 +3,7 @@ buildscript {
     ext.kotlin_version = "1.4.32"
     repositories {
         google()
-        jcenter()
+        mavenCentral()
         maven {url 'http://developer.huawei.com/repo/'}
     }
     dependencies {
@@ -21,7 +21,7 @@ buildscript {
 allprojects {
     repositories {
         google()
-        jcenter()
+        mavenCentral()
         maven {url 'http://developer.huawei.com/repo/'}
         maven { url 'https://jitpack.io' }
     }

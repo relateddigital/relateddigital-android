@@ -67,7 +67,7 @@ object RelatedDigital {
             model!!.setHuaweiAppAlias(context, huaweiAppAlias)
             model!!.setToken(context, token)
         } else {
-            if(!SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNullOrEmpty()) {
+            if(SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
                 model = Gson().fromJson(SharedPref.readString(context,
                         Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
                 model!!.setIsPushNotificationEnabled(context, isPushNotificationEnabled)
@@ -90,7 +90,7 @@ object RelatedDigital {
         if(model != null) {
             model!!.setIsInAppNotificationEnabled(context, isInAppNotificationEnabled)
         } else {
-            if(!SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNullOrEmpty()) {
+            if(SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
                 model = Gson().fromJson(SharedPref.readString(context,
                         Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
                 model!!.setIsInAppNotificationEnabled(context, isInAppNotificationEnabled)
@@ -108,7 +108,7 @@ object RelatedDigital {
         if(model != null) {
             model!!.setIsGeofenceEnabled(context, isGeofenceEnabled)
         } else {
-            if(!SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNullOrEmpty()) {
+            if(SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
                 model = Gson().fromJson(SharedPref.readString(context,
                         Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
                 model!!.setIsGeofenceEnabled(context, isGeofenceEnabled)
@@ -126,7 +126,7 @@ object RelatedDigital {
         if(model != null) {
             model!!.setGoogleAppAlias(context, googleAppAlias)
         } else {
-            if(!SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNullOrEmpty()) {
+            if(SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
                 model = Gson().fromJson(SharedPref.readString(context,
                         Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
                 model!!.setGoogleAppAlias(context, googleAppAlias)
@@ -144,7 +144,7 @@ object RelatedDigital {
         if(model != null) {
             model!!.setHuaweiAppAlias(context, huaweiAppAlias)
         } else {
-            if(!SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNullOrEmpty()) {
+            if(SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
                 model = Gson().fromJson(SharedPref.readString(context,
                         Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
                 model!!.setHuaweiAppAlias(context, huaweiAppAlias)
@@ -162,7 +162,7 @@ object RelatedDigital {
         if(model != null) {
             model!!.setOrganizationId(context, organizationId)
         } else {
-            if(!SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNullOrEmpty()) {
+            if(SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
                 model = Gson().fromJson(SharedPref.readString(context,
                         Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
                 model!!.setOrganizationId(context, organizationId)
@@ -180,7 +180,7 @@ object RelatedDigital {
         if(model != null) {
             model!!.setProfileId(context, profileId)
         } else {
-            if(!SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNullOrEmpty()) {
+            if(SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
                 model = Gson().fromJson(SharedPref.readString(context,
                         Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
                 model!!.setProfileId(context, profileId)
@@ -198,7 +198,7 @@ object RelatedDigital {
         if(model != null) {
             model!!.setDataSource(context, dataSource)
         } else {
-            if(!SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNullOrEmpty()) {
+            if(SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
                 model = Gson().fromJson(SharedPref.readString(context,
                         Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
                 model!!.setDataSource(context, dataSource)
@@ -216,7 +216,7 @@ object RelatedDigital {
         if(model != null) {
             model!!.setRequestTimeoutInSecond(context, requestTimeoutInSecond)
         } else {
-            if(!SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNullOrEmpty()) {
+            if(SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
                 model = Gson().fromJson(SharedPref.readString(context,
                         Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
                 model!!.setRequestTimeoutInSecond(context, requestTimeoutInSecond)
@@ -234,7 +234,7 @@ object RelatedDigital {
         if(model != null) {
             model!!.setMaxGeofenceCount(context, maxGeofenceCount)
         } else {
-            if(!SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNullOrEmpty()) {
+            if(SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
                 model = Gson().fromJson(SharedPref.readString(context,
                         Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
                 model!!.setMaxGeofenceCount(context, maxGeofenceCount)
@@ -252,7 +252,7 @@ object RelatedDigital {
         if(model != null) {
             model!!.setAdvertisingIdentifier(context, advertisingIdentifier)
         } else {
-            if(!SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNullOrEmpty()) {
+            if(SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
                 model = Gson().fromJson(SharedPref.readString(context,
                         Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
                 model!!.setAdvertisingIdentifier(context, advertisingIdentifier)
@@ -270,7 +270,7 @@ object RelatedDigital {
         if(model != null) {
             model!!.setExVisitorId(context, exVisitorId)
         } else {
-            if(!SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNullOrEmpty()) {
+            if(SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
                 model = Gson().fromJson(SharedPref.readString(context,
                         Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
                 model!!.setExVisitorId(context, exVisitorId)
@@ -288,7 +288,7 @@ object RelatedDigital {
         if(model != null) {
             model!!.setToken(context, token)
         } else {
-            if(!SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNullOrEmpty()) {
+            if(SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
                 model = Gson().fromJson(SharedPref.readString(context,
                         Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
                 model!!.setToken(context, token)
@@ -322,7 +322,7 @@ object RelatedDigital {
         return if(model!=null) {
             model!!.getIsPushNotificationEnabled()
         } else {
-            if(!SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNullOrEmpty()) {
+            if(SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
                 model = Gson().fromJson(SharedPref.readString(context,
                         Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
                 model!!.getIsPushNotificationEnabled()
@@ -338,7 +338,7 @@ object RelatedDigital {
         return if(model!=null) {
             model!!.getIsInAppNotificationEnabled()
         } else {
-            if(!SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNullOrEmpty()) {
+            if(SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
                 model = Gson().fromJson(SharedPref.readString(context,
                         Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
                 model!!.getIsInAppNotificationEnabled()
@@ -354,7 +354,7 @@ object RelatedDigital {
         return if(model!=null) {
             model!!.getIsGeofenceEnabled()
         } else {
-            if(!SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNullOrEmpty()) {
+            if(SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
                 model = Gson().fromJson(SharedPref.readString(context,
                         Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
                 model!!.getIsGeofenceEnabled()
@@ -370,7 +370,7 @@ object RelatedDigital {
         return if(model!=null) {
             model!!.getGoogleAppAlias()
         } else {
-            if(!SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNullOrEmpty()) {
+            if(SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
                 model = Gson().fromJson(SharedPref.readString(context,
                         Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
                 model!!.getGoogleAppAlias()
@@ -386,7 +386,7 @@ object RelatedDigital {
         return if(model!=null) {
             model!!.getHuaweiAppAlias()
         } else {
-            if(!SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNullOrEmpty()) {
+            if(SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
                 model = Gson().fromJson(SharedPref.readString(context,
                         Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
                 model!!.getHuaweiAppAlias()
@@ -402,7 +402,7 @@ object RelatedDigital {
         return if(model!=null) {
             model!!.getOrganizationId()
         } else {
-            if(!SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNullOrEmpty()) {
+            if(SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
                 model = Gson().fromJson(SharedPref.readString(context,
                         Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
                 model!!.getOrganizationId()
@@ -418,7 +418,7 @@ object RelatedDigital {
         return if(model!=null) {
             model!!.getProfileId()
         } else {
-            if(!SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNullOrEmpty()) {
+            if(SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
                 model = Gson().fromJson(SharedPref.readString(context,
                         Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
                 model!!.getProfileId()
@@ -434,7 +434,7 @@ object RelatedDigital {
         return if(model!=null) {
             model!!.getDataSource()
         } else {
-            if(!SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNullOrEmpty()) {
+            if(SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
                 model = Gson().fromJson(SharedPref.readString(context,
                         Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
                 model!!.getDataSource()
@@ -450,7 +450,7 @@ object RelatedDigital {
         return if(model!=null) {
             model!!.getRequestTimeoutInSecond()
         } else {
-            if(!SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNullOrEmpty()) {
+            if(SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
                 model = Gson().fromJson(SharedPref.readString(context,
                         Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
                 model!!.getRequestTimeoutInSecond()
@@ -466,7 +466,7 @@ object RelatedDigital {
         return if(model!=null) {
             model!!.getMaxGeofenceCount()
         } else {
-            if(!SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNullOrEmpty()) {
+            if(SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
                 model = Gson().fromJson(SharedPref.readString(context,
                         Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
                 model!!.getMaxGeofenceCount()
@@ -482,7 +482,7 @@ object RelatedDigital {
         return if(model!=null) {
             model!!.getAppVersion()
         } else {
-            if(!SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNullOrEmpty()) {
+            if(SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
                 model = Gson().fromJson(SharedPref.readString(context,
                         Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
                 model!!.getAppVersion()
@@ -497,7 +497,7 @@ object RelatedDigital {
         return if(model!=null) {
             model!!.getOsType()
         } else {
-            if(!SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNullOrEmpty()) {
+            if(SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
                 model = Gson().fromJson(SharedPref.readString(context,
                         Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
                 model!!.getOsType()
@@ -512,7 +512,7 @@ object RelatedDigital {
         return if(model!=null) {
             model!!.getOsVersion()
         } else {
-            if(!SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNullOrEmpty()) {
+            if(SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
                 model = Gson().fromJson(SharedPref.readString(context,
                         Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
                 model!!.getOsVersion()
@@ -527,7 +527,7 @@ object RelatedDigital {
         return if(model!=null) {
             model!!.getSdkVersion()
         } else {
-            if(!SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNullOrEmpty()) {
+            if(SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
                 model = Gson().fromJson(SharedPref.readString(context,
                         Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
                 model!!.getSdkVersion()
@@ -542,7 +542,7 @@ object RelatedDigital {
         return if(model!=null) {
             model!!.getDeviceType()
         } else {
-            if(!SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNullOrEmpty()) {
+            if(SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
                 model = Gson().fromJson(SharedPref.readString(context,
                         Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
                 model!!.getDeviceType()
@@ -557,7 +557,7 @@ object RelatedDigital {
         return if(model!=null) {
             model!!.getDeviceName()
         } else {
-            if(!SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNullOrEmpty()) {
+            if(SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
                 model = Gson().fromJson(SharedPref.readString(context,
                         Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
                 model!!.getDeviceName()
@@ -572,7 +572,7 @@ object RelatedDigital {
         return if(model!=null) {
             model!!.getCarrier()
         } else {
-            if(!SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNullOrEmpty()) {
+            if(SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
                 model = Gson().fromJson(SharedPref.readString(context,
                         Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
                 model!!.getCarrier()
@@ -587,7 +587,7 @@ object RelatedDigital {
         return if(model!=null) {
             model!!.getIdentifierForVendor()
         } else {
-            if(!SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNullOrEmpty()) {
+            if(SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
                 model = Gson().fromJson(SharedPref.readString(context,
                         Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
                 model!!.getIdentifierForVendor()
@@ -602,7 +602,7 @@ object RelatedDigital {
         return if(model!=null) {
             model!!.getAdvertisingIdentifier()
         } else {
-            if(!SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNullOrEmpty()) {
+            if(SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
                 model = Gson().fromJson(SharedPref.readString(context,
                         Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
                 model!!.getAdvertisingIdentifier()
@@ -618,7 +618,7 @@ object RelatedDigital {
         return if(model!=null) {
             model!!.getLocal()
         } else {
-            if(!SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNullOrEmpty()) {
+            if(SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
                 model = Gson().fromJson(SharedPref.readString(context,
                         Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
                 model!!.getLocal()
@@ -633,7 +633,7 @@ object RelatedDigital {
         return if(model!=null) {
             model!!.getExVisitorId()
         } else {
-            if(!SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNullOrEmpty()) {
+            if(SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
                 model = Gson().fromJson(SharedPref.readString(context,
                         Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
                 model!!.getExVisitorId()
@@ -649,7 +649,7 @@ object RelatedDigital {
         return if(model!=null) {
             model!!.getToken()
         } else {
-            if(!SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNullOrEmpty()) {
+            if(SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
                 model = Gson().fromJson(SharedPref.readString(context,
                         Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
                 model!!.getToken()
@@ -665,7 +665,7 @@ object RelatedDigital {
         return if(model!=null) {
             model!!.getCookieId()
         } else {
-            if(!SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNullOrEmpty()) {
+            if(SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
                 model = Gson().fromJson(SharedPref.readString(context,
                         Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
                 model!!.getCookieId()
@@ -681,7 +681,7 @@ object RelatedDigital {
         return if(model!=null) {
             model!!.getUserAgent()
         } else {
-            if(!SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNullOrEmpty()) {
+            if(SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
                 model = Gson().fromJson(SharedPref.readString(context,
                         Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
                 model!!.getUserAgent()
@@ -696,7 +696,7 @@ object RelatedDigital {
         return if(model!=null) {
             model!!.getVisitorData()
         } else {
-            if(!SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNullOrEmpty()) {
+            if(SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
                 model = Gson().fromJson(SharedPref.readString(context,
                         Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
                 model!!.getVisitorData()
