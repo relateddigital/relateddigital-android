@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="container_left_right_margin">32dp</dimen>
+    <dimen name="container_bottom_padding">32dp</dimen>
+    <dimen name="page_button_padding">8dp</dimen>
+    <dimen name="page_button_left_right_margin">4dp</dimen>
+    <dimen name="page_button_bottom_margin">32dp</dimen>
+    <dimen name="page_button_top_margin">32dp</dimen>
+    <dimen name="page_button_height">64dp</dimen>
+    <dimen name="page_button_text_size">16sp</dimen>
+    <dimen name="in_app_button_top_margin">8dp</dimen>
+    <dimen name="in_app_button_bottom_margin">8dp</dimen>
+    <dimen name="in_app_button_left_right_margin">4dp</dimen>
+    <dimen name="in_app_button_padding">4dp</dimen>
+    <dimen name="in_app_button_height">80dp</dimen>
+</resources>

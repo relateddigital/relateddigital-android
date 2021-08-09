@@ -1,18 +1,56 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:paddingStart="@dimen/container_left_right_margin"
+    android:paddingEnd="@dimen/container_left_right_margin"
     tools:context=".MainActivity">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hello World!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <Button
+        android:id="@+id/inAppNotificationPage"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/page_button_height"
+        android:layout_marginTop="@dimen/page_button_top_margin"
+        android:layout_marginBottom="@dimen/page_button_bottom_margin"
+        android:background="@drawable/rounded_corners_background"
+        android:padding="@dimen/page_button_padding"
+        android:text="@string/in_app_notification_page"
+        android:textSize="@dimen/page_button_text_size" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <Button
+        android:id="@+id/pushNotificationPage"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/page_button_height"
+        android:layout_marginTop="@dimen/page_button_top_margin"
+        android:layout_marginBottom="@dimen/page_button_bottom_margin"
+        android:background="@drawable/rounded_corners_background"
+        android:padding="@dimen/page_button_padding"
+        android:text="@string/push_notification_page"
+        android:textSize="@dimen/page_button_text_size" />
+
+    <Button
+        android:id="@+id/loginPage"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/page_button_height"
+        android:layout_marginTop="@dimen/page_button_top_margin"
+        android:layout_marginBottom="@dimen/page_button_bottom_margin"
+        android:background="@drawable/rounded_corners_background"
+        android:padding="@dimen/page_button_padding"
+        android:text="@string/login_page"
+        android:textSize="@dimen/page_button_text_size" />
+
+    <Button
+        android:id="@+id/storyPage"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/page_button_height"
+        android:layout_marginTop="@dimen/page_button_top_margin"
+        android:layout_marginBottom="@dimen/page_button_bottom_margin"
+        android:background="@drawable/rounded_corners_background"
+        android:padding="@dimen/page_button_padding"
+        android:text="@string/story_page"
+        android:textSize="@dimen/page_button_text_size" />
+
+</LinearLayout>

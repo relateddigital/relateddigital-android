@@ -1,3 +1,36 @@
 <resources>
     <string name="app_name">androidexampleapp</string>
+    <string name="main_page_label">Related Digital Android Demo</string>
+    <string name="in_app_notification_page_label">In-App Notification</string>
+    <string name="push_notification_page_label">Push Notification</string>
+    <string name="login_page_label">Login/Logout</string>
+    <string name="story_page_label">Story</string>
+    <string name="login_page">LOGIN PAGE</string>
+    <string name="story_page">STORY PAGE</string>
+    <string name="in_app_notification_page">IN-APP NOTIFICATION PAGE</string>
+    <string name="push_notification_page">PUSH NOTIFICATION PAGE</string>
+    <string name="custom_event_1">CUSTOM EVENT 1</string>
+    <string name="custom_event_2">CUSTOM EVENT 2</string>
+    <string name="custom_event_3">CUSTOM EVENT 3</string>
+    <string name="mini">MINI</string>
+    <string name="full">FULL</string>
+    <string name="full_image">FULL IMAGE</string>
+    <string name="image_button">IMAGE BUTTON</string>
+    <string name="image_text_button">IMAGE TEXT BUTTON</string>
+    <string name="smile_rating">SMILE RATING</string>
+    <string name="nps_with_numbers">NPS WITH NUMBERS</string>
+    <string name="nps">NPS</string>
+    <string name="alert_native">ALERT NATIVE</string>
+    <string name="alert_action_sheet">ALERT ACTION SHEET</string>
+    <string name="mail_subs_form">MAIL SUBS FORM</string>
+    <string name="scratch_to_win">SCRATCH TO WIN</string>
+    <string name="spin_to_win">SPIN TO WIN</string>
+    <string name="social_proof">SOCIAL PROOF</string>
+    <string name="countdown_timer">COUNTDOWN TIMER</string>
+    <string name="in_app_carousel">IN-APP CAROUSEL</string>
+    <string name="shake_to_win">SHAKE TO WIN</string>
+    <string name="app_tracker">APP TRACKER</string>
+    <string name="nps_1">NPS 1</string>
+    <string name="nps_2">NPS 2</string>
+    <string name="nps_3">NPS 3</string>
 </resources>

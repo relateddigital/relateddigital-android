@@ -1,0 +1,296 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    tools:context=".InAppNotificationActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="@dimen/in_app_button_bottom_margin"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/in_app_button_height"
+            android:layout_marginTop="@dimen/in_app_button_top_margin"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/fullButton"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="@dimen/in_app_button_left_right_margin"
+                android:layout_marginEnd="@dimen/in_app_button_left_right_margin"
+                android:layout_weight="1"
+                android:background="@drawable/rounded_corners_background"
+                android:padding="@dimen/in_app_button_padding"
+                android:text="@string/full" />
+
+            <Button
+                android:id="@+id/miniButton"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="@dimen/in_app_button_left_right_margin"
+                android:layout_marginEnd="@dimen/in_app_button_left_right_margin"
+                android:layout_weight="1"
+                android:background="@drawable/rounded_corners_background"
+                android:padding="@dimen/in_app_button_padding"
+                android:text="@string/mini" />
+
+            <Button
+                android:id="@+id/fullImageButton"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="@dimen/in_app_button_left_right_margin"
+                android:layout_marginEnd="@dimen/in_app_button_left_right_margin"
+                android:layout_weight="1"
+                android:background="@drawable/rounded_corners_background"
+                android:padding="@dimen/in_app_button_padding"
+                android:text="@string/full_image" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/in_app_button_height"
+            android:layout_marginTop="@dimen/in_app_button_bottom_margin"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/imageButtonButton"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="@dimen/in_app_button_left_right_margin"
+                android:layout_marginEnd="@dimen/in_app_button_left_right_margin"
+                android:layout_weight="1"
+                android:background="@drawable/rounded_corners_background"
+                android:padding="@dimen/in_app_button_padding"
+                android:text="@string/image_button" />
+
+            <Button
+                android:id="@+id/imageTextButtonButton"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="@dimen/in_app_button_left_right_margin"
+                android:layout_marginEnd="@dimen/in_app_button_left_right_margin"
+                android:layout_weight="1"
+                android:background="@drawable/rounded_corners_background"
+                android:padding="@dimen/in_app_button_padding"
+                android:text="@string/image_text_button" />
+
+            <Button
+                android:id="@+id/smileRatingButton"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="@dimen/in_app_button_left_right_margin"
+                android:layout_marginEnd="@dimen/in_app_button_left_right_margin"
+                android:layout_weight="1"
+                android:background="@drawable/rounded_corners_background"
+                android:padding="@dimen/in_app_button_padding"
+                android:text="@string/smile_rating" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/in_app_button_height"
+            android:layout_marginTop="@dimen/in_app_button_bottom_margin"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/npsWithNumbersButton"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="@dimen/in_app_button_left_right_margin"
+                android:layout_marginEnd="@dimen/in_app_button_left_right_margin"
+                android:layout_weight="1"
+                android:background="@drawable/rounded_corners_background"
+                android:padding="@dimen/in_app_button_padding"
+                android:text="@string/nps_with_numbers" />
+
+            <Button
+                android:id="@+id/npsButton"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="@dimen/in_app_button_left_right_margin"
+                android:layout_marginEnd="@dimen/in_app_button_left_right_margin"
+                android:layout_weight="1"
+                android:background="@drawable/rounded_corners_background"
+                android:padding="@dimen/in_app_button_padding"
+                android:text="@string/nps" />
+
+            <Button
+                android:id="@+id/nativeAlertButton"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="@dimen/in_app_button_left_right_margin"
+                android:layout_marginEnd="@dimen/in_app_button_left_right_margin"
+                android:layout_weight="1"
+                android:background="@drawable/rounded_corners_background"
+                android:padding="@dimen/in_app_button_padding"
+                android:text="@string/alert_native" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/in_app_button_height"
+            android:layout_marginTop="@dimen/in_app_button_bottom_margin"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/actionSheetButton"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="@dimen/in_app_button_left_right_margin"
+                android:layout_marginEnd="@dimen/in_app_button_left_right_margin"
+                android:layout_weight="1"
+                android:background="@drawable/rounded_corners_background"
+                android:padding="@dimen/in_app_button_padding"
+                android:text="@string/alert_action_sheet" />
+
+            <Button
+                android:id="@+id/mailSubsFormButton"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="@dimen/in_app_button_left_right_margin"
+                android:layout_marginEnd="@dimen/in_app_button_left_right_margin"
+                android:layout_weight="1"
+                android:background="@drawable/rounded_corners_background"
+                android:padding="@dimen/in_app_button_padding"
+                android:text="@string/mail_subs_form" />
+
+            <Button
+                android:id="@+id/scratchToWinButton"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="@dimen/in_app_button_left_right_margin"
+                android:layout_marginEnd="@dimen/in_app_button_left_right_margin"
+                android:layout_weight="1"
+                android:background="@drawable/rounded_corners_background"
+                android:padding="@dimen/in_app_button_padding"
+                android:text="@string/scratch_to_win" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/in_app_button_height"
+            android:layout_marginTop="@dimen/in_app_button_bottom_margin"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/spinToWinButton"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="@dimen/in_app_button_left_right_margin"
+                android:layout_marginEnd="@dimen/in_app_button_left_right_margin"
+                android:layout_weight="1"
+                android:background="@drawable/rounded_corners_background"
+                android:padding="@dimen/in_app_button_padding"
+                android:text="@string/spin_to_win" />
+
+            <Button
+                android:id="@+id/socialProofButton"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="@dimen/in_app_button_left_right_margin"
+                android:layout_marginEnd="@dimen/in_app_button_left_right_margin"
+                android:layout_weight="1"
+                android:background="@drawable/rounded_corners_background"
+                android:padding="@dimen/in_app_button_padding"
+                android:text="@string/social_proof" />
+
+            <Button
+                android:id="@+id/countdownTimerButton"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="@dimen/in_app_button_left_right_margin"
+                android:layout_marginEnd="@dimen/in_app_button_left_right_margin"
+                android:layout_weight="1"
+                android:background="@drawable/rounded_corners_background"
+                android:padding="@dimen/in_app_button_padding"
+                android:text="@string/countdown_timer" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/in_app_button_height"
+            android:layout_marginTop="@dimen/in_app_button_bottom_margin"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/inAppCarouselButton"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="@dimen/in_app_button_left_right_margin"
+                android:layout_marginEnd="@dimen/in_app_button_left_right_margin"
+                android:layout_weight="1"
+                android:background="@drawable/rounded_corners_background"
+                android:padding="@dimen/in_app_button_padding"
+                android:text="@string/in_app_carousel" />
+
+            <Button
+                android:id="@+id/shakeToWinButton"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="@dimen/in_app_button_left_right_margin"
+                android:layout_marginEnd="@dimen/in_app_button_left_right_margin"
+                android:layout_weight="1"
+                android:background="@drawable/rounded_corners_background"
+                android:padding="@dimen/in_app_button_padding"
+                android:text="@string/shake_to_win" />
+
+            <Button
+                android:id="@+id/appTrackerButton"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="@dimen/in_app_button_left_right_margin"
+                android:layout_marginEnd="@dimen/in_app_button_left_right_margin"
+                android:layout_weight="1"
+                android:background="@drawable/rounded_corners_background"
+                android:padding="@dimen/in_app_button_padding"
+                android:text="@string/app_tracker" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/in_app_button_height"
+            android:layout_marginTop="@dimen/in_app_button_bottom_margin"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/nps1Button"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="@dimen/in_app_button_left_right_margin"
+                android:layout_marginEnd="@dimen/in_app_button_left_right_margin"
+                android:layout_weight="1"
+                android:background="@drawable/rounded_corners_background"
+                android:padding="@dimen/in_app_button_padding"
+                android:text="@string/nps_1" />
+
+            <Button
+                android:id="@+id/nps2Button"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="@dimen/in_app_button_left_right_margin"
+                android:layout_marginEnd="@dimen/in_app_button_left_right_margin"
+                android:layout_weight="1"
+                android:background="@drawable/rounded_corners_background"
+                android:padding="@dimen/in_app_button_padding"
+                android:text="@string/nps_2" />
+
+            <Button
+                android:id="@+id/nps3Button"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="@dimen/in_app_button_left_right_margin"
+                android:layout_marginEnd="@dimen/in_app_button_left_right_margin"
+                android:layout_weight="1"
+                android:background="@drawable/rounded_corners_background"
+                android:padding="@dimen/in_app_button_padding"
+                android:text="@string/nps_3" />
+        </LinearLayout>
+
+    </LinearLayout>
+</ScrollView>

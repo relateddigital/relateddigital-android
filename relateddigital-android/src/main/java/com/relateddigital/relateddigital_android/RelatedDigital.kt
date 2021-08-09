@@ -1,5 +1,6 @@
 package com.relateddigital.relateddigital_android
 
+import android.app.Activity
 import android.content.Context
 import android.util.Log
 import com.google.gson.Gson
@@ -705,5 +706,10 @@ object RelatedDigital {
                 ""
             }
         }
+    }
+
+    @JvmStatic
+    fun customEvent(pageName: String, properties: HashMap<String, String>, parent: Activity?) {
+
     }
 }

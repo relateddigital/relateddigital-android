@@ -8,7 +8,8 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"
+    <uses-permission
+        android:name="android.permission.QUERY_ALL_PACKAGES"
         tools:ignore="QueryAllPackagesPermission" />
 
     <application
@@ -19,7 +20,26 @@
         android:roundIcon="@mipmap/ic_launcher"
         android:supportsRtl="true"
         android:theme="@style/Theme.Androidexampleapp">
-        <activity android:name=".MainActivity">
+        <activity
+            android:name=".InAppNotificationActivity"
+            android:label="@string/in_app_notification_page_label"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".StoryActivity"
+            android:label="@string/story_page_label"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".LoginActivity"
+            android:label="@string/login_page_label"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".PushNotificationActivity"
+            android:label="@string/push_notification_page_label"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".MainActivity"
+            android:label="@string/main_page_label"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
