@@ -7,12 +7,12 @@ import com.google.gson.Gson
 import com.relateddigital.relateddigital_android.constants.Constants
 import com.relateddigital.relateddigital_android.model.LoadBalanceCookie
 import com.relateddigital.relateddigital_android.model.RelatedDigitalModel
+import com.relateddigital.relateddigital_android.network.RequestHandler
 import com.relateddigital.relateddigital_android.util.AppUtils
 import com.relateddigital.relateddigital_android.util.SharedPref
 
 object RelatedDigital {
     private var model : RelatedDigitalModel? = null
-    private val loadBalanceCookie = LoadBalanceCookie()
     private const val LOG_TAG : String = "RelatedDigital"
 
     @JvmStatic
@@ -32,8 +32,6 @@ object RelatedDigital {
         model!!.setOrganizationId(context, organizationId)
         model!!.setProfileId(context, profileId)
         model!!.setDataSource(context, dataSource)
-
-        model?.saveToSharedPrefs(context)
     }
 
     private fun createInitialModel(context: Context): RelatedDigitalModel {
@@ -80,8 +78,6 @@ object RelatedDigital {
                 model!!.setGoogleAppAlias(context, googleAppAlias)
                 model!!.setHuaweiAppAlias(context, huaweiAppAlias)
                 model!!.setToken(context, token)
-
-                model?.saveToSharedPrefs(context)
             }
         }
     }
@@ -98,8 +94,6 @@ object RelatedDigital {
             } else {
                 model = createInitialModel(context)
                 model!!.setIsInAppNotificationEnabled(context, isInAppNotificationEnabled)
-
-                model?.saveToSharedPrefs(context)
             }
         }
     }
@@ -116,8 +110,6 @@ object RelatedDigital {
             } else {
                 model = createInitialModel(context)
                 model!!.setIsGeofenceEnabled(context, isGeofenceEnabled)
-
-                model?.saveToSharedPrefs(context)
             }
         }
     }
@@ -134,8 +126,6 @@ object RelatedDigital {
             } else {
                 model = createInitialModel(context)
                 model!!.setGoogleAppAlias(context, googleAppAlias)
-
-                model?.saveToSharedPrefs(context)
             }
         }
     }
@@ -152,8 +142,6 @@ object RelatedDigital {
             } else {
                 model = createInitialModel(context)
                 model!!.setHuaweiAppAlias(context, huaweiAppAlias)
-
-                model?.saveToSharedPrefs(context)
             }
         }
     }
@@ -170,8 +158,6 @@ object RelatedDigital {
             } else {
                 model = createInitialModel(context)
                 model!!.setOrganizationId(context, organizationId)
-
-                model?.saveToSharedPrefs(context)
             }
         }
     }
@@ -188,8 +174,6 @@ object RelatedDigital {
             } else {
                 model = createInitialModel(context)
                 model!!.setProfileId(context, profileId)
-
-                model?.saveToSharedPrefs(context)
             }
         }
     }
@@ -206,8 +190,6 @@ object RelatedDigital {
             } else {
                 model = createInitialModel(context)
                 model!!.setDataSource(context, dataSource)
-
-                model?.saveToSharedPrefs(context)
             }
         }
     }
@@ -224,8 +206,6 @@ object RelatedDigital {
             } else {
                 model = createInitialModel(context)
                 model!!.setRequestTimeoutInSecond(context, requestTimeoutInSecond)
-
-                model?.saveToSharedPrefs(context)
             }
         }
     }
@@ -242,8 +222,6 @@ object RelatedDigital {
             } else {
                 model = createInitialModel(context)
                 model!!.setMaxGeofenceCount(context, maxGeofenceCount)
-
-                model?.saveToSharedPrefs(context)
             }
         }
     }
@@ -260,8 +238,22 @@ object RelatedDigital {
             } else {
                 model = createInitialModel(context)
                 model!!.setAdvertisingIdentifier(context, advertisingIdentifier)
+            }
+        }
+    }
 
-                model?.saveToSharedPrefs(context)
+    @JvmStatic
+    fun setChannel(context: Context, channel: String) {
+        if(model != null) {
+            model!!.setChannel(context, channel)
+        } else {
+            if(SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
+                model = Gson().fromJson(SharedPref.readString(context,
+                        Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
+                model!!.setChannel(context, channel)
+            } else {
+                model = createInitialModel(context)
+                model!!.setChannel(context, channel)
             }
         }
     }
@@ -278,8 +270,6 @@ object RelatedDigital {
             } else {
                 model = createInitialModel(context)
                 model!!.setExVisitorId(context, exVisitorId)
-
-                model?.saveToSharedPrefs(context)
             }
         }
     }
@@ -296,8 +286,6 @@ object RelatedDigital {
             } else {
                 model = createInitialModel(context)
                 model!!.setToken(context, token)
-
-                model?.saveToSharedPrefs(context)
             }
         }
     }
@@ -315,7 +303,6 @@ object RelatedDigital {
         if(model!=null) {
             model!!.setExVisitorId(context, "")
         }
-        model!!.saveToSharedPrefs(context)
     }
 
     @JvmStatic
@@ -539,6 +526,21 @@ object RelatedDigital {
     }
 
     @JvmStatic
+    fun getChannel(context: Context) : String{
+        return if(model!=null) {
+            model!!.getChannel()
+        } else {
+            if(SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
+                model = Gson().fromJson(SharedPref.readString(context,
+                        Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
+                model!!.getChannel()
+            } else {
+                "ANDROID"
+            }
+        }
+    }
+
+    @JvmStatic
     fun getDeviceType(context: Context) : String{
         return if(model!=null) {
             model!!.getDeviceType()
@@ -662,7 +664,7 @@ object RelatedDigital {
     }
 
     @JvmStatic
-    fun getCookieId(context: Context) : String{
+    fun getCookieId(context: Context) : String?{
         return if(model!=null) {
             model!!.getCookieId()
         } else {
@@ -709,7 +711,12 @@ object RelatedDigital {
     }
 
     @JvmStatic
-    fun customEvent(pageName: String, properties: HashMap<String, String>, parent: Activity?) {
-
+    fun customEvent(context: Context, pageName: String, properties: HashMap<String, String>?,
+                    parent: Activity? = null) {
+        if(pageName.isNullOrEmpty()) {
+            Log.e(LOG_TAG, "pageName cannot be null or empty!!!")
+            return
+        }
+        RequestHandler().createRequest(context, model, pageName, properties, parent)
     }
 }

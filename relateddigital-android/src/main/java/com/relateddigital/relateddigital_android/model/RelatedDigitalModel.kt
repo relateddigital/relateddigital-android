@@ -5,6 +5,7 @@ import com.google.gson.Gson
 import com.relateddigital.relateddigital_android.constants.Constants
 import com.relateddigital.relateddigital_android.util.SharedPref
 import java.io.Serializable
+import java.util.*
 
 class RelatedDigitalModel(
         private var isPushNotificationEnabled: Boolean = false,
@@ -21,6 +22,7 @@ class RelatedDigitalModel(
         private var osType: String,
         private var osVersion: String,
         private var sdkVersion: String,
+        private var channel: String = "ANDROID",
         private var deviceType: String,
         private var deviceName: String,
         private var carrier: String,
@@ -29,7 +31,7 @@ class RelatedDigitalModel(
         private var local: String,
         private var exVisitorId: String = "",
         private var token: String = "",
-        private var cookieId: String,
+        private var cookieId: String?,
         private var userAgent: String,
         private var visitorData: String,
 ) : Serializable {
@@ -104,6 +106,11 @@ class RelatedDigitalModel(
         saveToSharedPrefs(context)
     }
 
+    fun setChannel(context: Context, channel: String) {
+        this.channel = channel
+        saveToSharedPrefs(context)
+    }
+
     fun setDeviceType(context: Context, deviceType: String) {
         this.deviceType = deviceType
         saveToSharedPrefs(context)
@@ -144,8 +151,12 @@ class RelatedDigitalModel(
         saveToSharedPrefs(context)
     }
 
-    fun setCookieId(context: Context, cookieId: String) {
-        this.cookieId = cookieId
+    fun setCookieId(context: Context, cookieId: String?) {
+        if (cookieId.isNullOrEmpty()) {
+            this.cookieId = UUID.randomUUID().toString()
+        } else{
+            this.cookieId = cookieId
+        }
         saveToSharedPrefs(context)
     }
 
@@ -215,6 +226,10 @@ class RelatedDigitalModel(
         return sdkVersion
     }
 
+    fun getChannel(): String {
+        return channel
+    }
+
     fun getDeviceType(): String {
         return deviceType
     }
@@ -247,7 +262,7 @@ class RelatedDigitalModel(
         return token
     }
 
-    fun getCookieId(): String {
+    fun getCookieId(): String? {
         return cookieId
     }
 
