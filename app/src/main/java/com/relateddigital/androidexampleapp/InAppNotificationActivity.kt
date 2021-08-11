@@ -111,9 +111,10 @@ class InAppNotificationActivity : AppCompatActivity() {
         val parameters = HashMap<String, String>()
         parameters["OM.inapptype"] = type
         RelatedDigital.customEvent(
-            pageName = "in-app",
-            properties = parameters,
-            parent = this@InAppNotificationActivity
+                context = applicationContext,
+                pageName = "in-app",
+                properties = parameters,
+                parent = this@InAppNotificationActivity
         )
     }
 }

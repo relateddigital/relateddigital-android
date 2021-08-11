@@ -243,22 +243,6 @@ object RelatedDigital {
     }
 
     @JvmStatic
-    fun setChannel(context: Context, channel: String) {
-        if(model != null) {
-            model!!.setChannel(context, channel)
-        } else {
-            if(SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
-                model = Gson().fromJson(SharedPref.readString(context,
-                        Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
-                model!!.setChannel(context, channel)
-            } else {
-                model = createInitialModel(context)
-                model!!.setChannel(context, channel)
-            }
-        }
-    }
-
-    @JvmStatic
     fun setExVisitorId(context: Context, exVisitorId: String) {
         if(model != null) {
             model!!.setExVisitorId(context, exVisitorId)
@@ -521,21 +505,6 @@ object RelatedDigital {
                 model!!.getSdkVersion()
             } else {
                 AppUtils.getSdkVersion()
-            }
-        }
-    }
-
-    @JvmStatic
-    fun getChannel(context: Context) : String{
-        return if(model!=null) {
-            model!!.getChannel()
-        } else {
-            if(SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
-                model = Gson().fromJson(SharedPref.readString(context,
-                        Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
-                model!!.getChannel()
-            } else {
-                "ANDROID"
             }
         }
     }

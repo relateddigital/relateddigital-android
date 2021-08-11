@@ -19,10 +19,9 @@ class RelatedDigitalModel(
         private var requestTimeoutInSecond: Int = 30,
         private var maxGeofenceCount: Int = 100,
         private var appVersion: String,
-        private var osType: String,
+        private var osType: String = "ANDROID",
         private var osVersion: String,
         private var sdkVersion: String,
-        private var channel: String = "ANDROID",
         private var deviceType: String,
         private var deviceName: String,
         private var carrier: String,
@@ -34,6 +33,7 @@ class RelatedDigitalModel(
         private var cookieId: String?,
         private var userAgent: String,
         private var visitorData: String,
+        private var cookie: LoadBalanceCookie? = null
 ) : Serializable {
 
     fun setIsPushNotificationEnabled(context: Context, isPushNotificationEnabled: Boolean) {
@@ -106,11 +106,6 @@ class RelatedDigitalModel(
         saveToSharedPrefs(context)
     }
 
-    fun setChannel(context: Context, channel: String) {
-        this.channel = channel
-        saveToSharedPrefs(context)
-    }
-
     fun setDeviceType(context: Context, deviceType: String) {
         this.deviceType = deviceType
         saveToSharedPrefs(context)
@@ -170,6 +165,11 @@ class RelatedDigitalModel(
         saveToSharedPrefs(context)
     }
 
+    fun setCookie(context: Context, cookie: LoadBalanceCookie) {
+        this.cookie = cookie
+        saveToSharedPrefs(context)
+    }
+
     fun getIsPushNotificationEnabled(): Boolean {
         return isPushNotificationEnabled
     }
@@ -226,10 +226,6 @@ class RelatedDigitalModel(
         return sdkVersion
     }
 
-    fun getChannel(): String {
-        return channel
-    }
-
     fun getDeviceType(): String {
         return deviceType
     }
@@ -272,6 +268,10 @@ class RelatedDigitalModel(
 
     fun getVisitorData(): String {
         return visitorData
+    }
+
+    fun getCookie(): LoadBalanceCookie? {
+        return cookie
     }
 
     fun saveToSharedPrefs(context: Context) {

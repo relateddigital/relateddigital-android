@@ -25,5 +25,7 @@ class Constants {
         const val TVC_REQUEST_KEY = "OM.tvc"
         const val LVT_REQUEST_KEY = "OM.lvt"
         const val ADVERTISER_ID_REQUEST_KEY = "OM.m_adid"
+        const val USER_AGENT_REQUEST_KEY = "User-Agent"
+        const val OM_3_REQUEST_KEY = "OM.3rd"
     }
 }

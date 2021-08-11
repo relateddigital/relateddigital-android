@@ -3,8 +3,10 @@ package com.relateddigital.relateddigital_android.network
 import android.app.Activity
 import android.content.Context
 import com.relateddigital.relateddigital_android.constants.Constants
+import com.relateddigital.relateddigital_android.model.Domain
 import com.relateddigital.relateddigital_android.model.LoadBalanceCookie
 import com.relateddigital.relateddigital_android.model.RelatedDigitalModel
+import com.relateddigital.relateddigital_android.model.Request
 import com.relateddigital.relateddigital_android.util.GoogleUtils
 import com.relateddigital.relateddigital_android.util.SharedPref
 import java.text.ParseException
@@ -50,23 +52,78 @@ class RequestHandler {
                 }
                 properties.remove(Constants.APP_ID_REQUEST_KEY)
             }
-
-            val timeOfEvent = System.currentTimeMillis() / 1000
-
-            val queryMap = HashMap<String, String>()
-            queryMap[Constants.ORGANIZATION_ID_REQUEST_KEY] = model!!.getOrganizationId()
-            queryMap[Constants.SITE_ID_REQUEST_KEY] = model.getProfileId()
-            queryMap[Constants.DATE_REQUEST_KEY] = timeOfEvent.toString()
-            queryMap[Constants.URI_REQUEST_KEY] = pageName
-            queryMap[Constants.COOKIE_ID_REQUEST_KEY] = model.getCookieId()!!
-            queryMap[Constants.CHANNEL_REQUEST_KEY] = model.getChannel()
-            queryMap[Constants.MAPPL_REQUEST_KEY] = "true"
-            queryMap[Constants.SDK_VERSION_REQUEST_KEY] = model.getSdkVersion()
-            queryMap[Constants.NRV_REQUEST_KEY] = mNrv.toString()
-            queryMap[Constants.PVIV_REQUEST_KEY] = mPviv.toString()
-            queryMap[Constants.TVC_REQUEST_KEY] = mTvc.toString()
-            queryMap[Constants.LVT_REQUEST_KEY] = mLvt.toString()
         }
+
+        val timeOfEvent = System.currentTimeMillis() / 1000
+
+        val queryMap = HashMap<String, String>()
+        queryMap[Constants.ORGANIZATION_ID_REQUEST_KEY] = model!!.getOrganizationId()
+        queryMap[Constants.SITE_ID_REQUEST_KEY] = model.getProfileId()
+        queryMap[Constants.DATE_REQUEST_KEY] = timeOfEvent.toString()
+        queryMap[Constants.URI_REQUEST_KEY] = pageName
+        queryMap[Constants.COOKIE_ID_REQUEST_KEY] = model.getCookieId()!!
+        queryMap[Constants.CHANNEL_REQUEST_KEY] = model.getOsType()
+        queryMap[Constants.MAPPL_REQUEST_KEY] = "true"
+        queryMap[Constants.SDK_VERSION_REQUEST_KEY] = model.getSdkVersion()
+        queryMap[Constants.NRV_REQUEST_KEY] = mNrv.toString()
+        queryMap[Constants.PVIV_REQUEST_KEY] = mPviv.toString()
+        queryMap[Constants.TVC_REQUEST_KEY] = mTvc.toString()
+        queryMap[Constants.LVT_REQUEST_KEY] = mLvt.toString()
+
+        if (properties != null) {
+            for (i in properties.keys.indices) {
+                val key = properties.keys.toTypedArray()[i]
+                queryMap[key] = properties[key]!!
+            }
+        }
+
+        if(model.getAdvertisingIdentifier().isNotEmpty()) {
+            queryMap[Constants.ADVERTISER_ID_REQUEST_KEY] = model.getAdvertisingIdentifier()
+        }
+
+        if(model.getExVisitorId().isNotEmpty()) {
+            queryMap[Constants.EXVISITOR_ID_REQUEST_KEY] = model.getExVisitorId()
+        }
+
+        if(model.getToken().isNotEmpty()) {
+            queryMap[Constants.TOKEN_ID_REQUEST_KEY] = model.getToken()
+        }
+
+        if(model.getGoogleAppAlias().isNotEmpty() || model.getHuaweiAppAlias().isNotEmpty()) {
+            if(GoogleUtils.checkPlayService(context)) {
+                queryMap[Constants.APP_ID_REQUEST_KEY] = model.getGoogleAppAlias()
+            } else{
+                queryMap[Constants.APP_ID_REQUEST_KEY] = model.getHuaweiAppAlias()
+            }
+        }
+
+        val headerMap = HashMap<String, String>()
+        if (model.getUserAgent().isNotEmpty()) {
+            headerMap[Constants.USER_AGENT_REQUEST_KEY] = model.getUserAgent()
+        }
+
+        if (model.getCookie() != null) {
+            val loadBalanceCookieKey = model.getCookie()!!.getLoggerCookieKey()
+            val loadBalanceCookieValue = model.getCookie()!!.getLoggerCookieValue()
+            val Om3rdCookieValue = model.getCookie()!!.getLoggerOM3rdCookieValue()
+            var cookieString = ""
+            if (loadBalanceCookieKey.isNotEmpty() && loadBalanceCookieValue.isNotEmpty()) {
+                cookieString = "$loadBalanceCookieKey=$loadBalanceCookieValue"
+            }
+            if (Om3rdCookieValue.isNotEmpty()) {
+                if (cookieString != "") {
+                    cookieString = "$cookieString;"
+                }
+                cookieString = cookieString + Constants.OM_3_REQUEST_KEY.toString() + "=" + Om3rdCookieValue
+            }
+            if (cookieString != "") {
+                headerMap["Cookie"] = cookieString
+            }
+        }
+
+        RequestSender.addToQueue(Request(Domain.LOGGER, queryMap, headerMap, null))
+        RequestSender.addToQueue(Request(Domain.REAL_TIME, queryMap, headerMap, null))
+        RequestSender.send()
     }
 
     private fun updateSessionParameters(context: Context, pageName: String) {
