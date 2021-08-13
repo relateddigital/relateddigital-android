@@ -2,6 +2,7 @@ package com.relateddigital.relateddigital_android
 
 import android.app.Activity
 import android.content.Context
+import android.os.Build
 import android.util.Log
 import com.google.gson.Gson
 import com.relateddigital.relateddigital_android.constants.Constants
@@ -10,6 +11,7 @@ import com.relateddigital.relateddigital_android.model.RelatedDigitalModel
 import com.relateddigital.relateddigital_android.network.RequestHandler
 import com.relateddigital.relateddigital_android.util.AppUtils
 import com.relateddigital.relateddigital_android.util.SharedPref
+import java.util.*
 
 object RelatedDigital {
     private var model : RelatedDigitalModel? = null
@@ -21,7 +23,7 @@ object RelatedDigital {
              profileId: String,
              dataSource: String) {
 
-        val modelStr = SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY,"")
+        val modelStr = SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY, "")
 
         model = if(modelStr.isEmpty()) {
             createInitialModel(context)
@@ -32,6 +34,11 @@ object RelatedDigital {
         model!!.setOrganizationId(context, organizationId)
         model!!.setProfileId(context, profileId)
         model!!.setDataSource(context, dataSource)
+
+        model!!.setCookie(context, LoadBalanceCookie())
+        if(model!!.getCookieId().isNullOrEmpty()) {
+            model!!.setCookieId(context, null)
+        }
     }
 
     private fun createInitialModel(context: Context): RelatedDigitalModel {
@@ -682,10 +689,16 @@ object RelatedDigital {
     @JvmStatic
     fun customEvent(context: Context, pageName: String, properties: HashMap<String, String>?,
                     parent: Activity? = null) {
-        if(pageName.isNullOrEmpty()) {
-            Log.e(LOG_TAG, "pageName cannot be null or empty!!!")
+        if(pageName.isEmpty()) {
+            Log.e(LOG_TAG, "pageName cannot be empty!!!")
             return
         }
+
+        if (Build.VERSION.SDK_INT < Constants.MIN_SDK_VALUE) {
+            Log.e(LOG_TAG, "Related Digital SDK requires min API level 21!")
+            return
+        }
+
         RequestHandler().createRequest(context, model, pageName, properties, parent)
     }
 }

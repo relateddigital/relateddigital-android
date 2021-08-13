@@ -2,6 +2,7 @@ package com.relateddigital.relateddigital_android.constants
 
 class Constants {
     companion object {
+        const val MIN_SDK_VALUE: Int = 21
         const val RELATED_DIGITAL_MODEL_KEY = "related_digital_model_key"
         const val COOKIE_ID_KEY = "cookie_id_key"
         const val EURO_CONSENT_TIME_KEY = "ConsentTime"
@@ -27,5 +28,7 @@ class Constants {
         const val ADVERTISER_ID_REQUEST_KEY = "OM.m_adid"
         const val USER_AGENT_REQUEST_KEY = "User-Agent"
         const val OM_3_REQUEST_KEY = "OM.3rd"
+        const val LOAD_BALANCE_PREFIX = "NSC"
+        const val OM_3_KEY = "OM.3rd"
     }
 }

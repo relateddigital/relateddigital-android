@@ -18,7 +18,6 @@ class RequestHandler {
     private var mPviv = 0
     private var mTvc = 0
     private var mLvt: String? = null
-    private val loadBalanceCookie = LoadBalanceCookie()
 
     fun createRequest(context: Context, model: RelatedDigitalModel?, pageName: String,
                       properties: HashMap<String, String>?, parent: Activity? = null) {
@@ -121,9 +120,8 @@ class RequestHandler {
             }
         }
 
-        RequestSender.addToQueue(Request(Domain.LOGGER, queryMap, headerMap, null))
-        RequestSender.addToQueue(Request(Domain.REAL_TIME, queryMap, headerMap, null))
-        RequestSender.send()
+        RequestSender.addToQueue(Request(Domain.LOGGER, queryMap, headerMap, null), model)
+        RequestSender.addToQueue(Request(Domain.REAL_TIME, queryMap, headerMap, null), model)
     }
 
     private fun updateSessionParameters(context: Context, pageName: String) {

@@ -167,7 +167,6 @@ class RelatedDigitalModel(
 
     fun setCookie(context: Context, cookie: LoadBalanceCookie) {
         this.cookie = cookie
-        saveToSharedPrefs(context)
     }
 
     fun getIsPushNotificationEnabled(): Boolean {
