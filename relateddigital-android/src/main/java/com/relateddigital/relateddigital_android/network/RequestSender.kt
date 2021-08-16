@@ -13,11 +13,14 @@ import okhttp3.Headers
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.util.*
+import kotlin.collections.ArrayList
 
 object RequestSender {
     private const val LOG_TAG = "Related Digital"
     private val requestQueue = ArrayList<Request>()
     private var isSendingARequest = false
+    private var retryCounter = 0
     fun addToQueue(request: Request, model: RelatedDigitalModel) {
         requestQueue.add(request)
         send(model)
@@ -40,16 +43,15 @@ object RequestSender {
                         currentRequest.headerMap, currentRequest.queryMap)!!
                 call.enqueue(object : Callback<Void?> {
                     override fun onResponse(call: Call<Void?>, response: Response<Void?>) {
-                        Log.i(LOG_TAG, "Successful Request : " + response.raw().request.url.toString())
-                        parseAndSetResponseHeaders(response.headers(), "logger", model)
-                        removeFromQueue()
-                        isSendingARequest = false
-                        send(model)
+                        if (response.isSuccessful) {
+                            applySuccessConditions(response, model, Domain.LOGGER)
+                        } else {
+                            applyFailConditions(call, model)
+                        }
                     }
 
                     override fun onFailure(call: Call<Void?>, t: Throwable) {
-                        Log.i(LOG_TAG, "Fail Request : " + call.request().url.toString())
-                        // TODO retry here
+                        applyFailConditions(call, model)
                     }
                 })
             }
@@ -61,16 +63,15 @@ object RequestSender {
                         currentRequest.headerMap, currentRequest.queryMap)!!
                 call.enqueue(object : Callback<Void?> {
                     override fun onResponse(call: Call<Void?>, response: Response<Void?>) {
-                        Log.i(LOG_TAG, "Successful Request : " + response.raw().request.url.toString())
-                        parseAndSetResponseHeaders(response.headers(), "realTime", model)
-                        removeFromQueue()
-                        isSendingARequest = false
-                        send(model)
+                        if (response.isSuccessful) {
+                            applySuccessConditions(response, model, Domain.REAL_TIME)
+                        } else {
+                            applyFailConditions(call, model)
+                        }
                     }
 
                     override fun onFailure(call: Call<Void?>, t: Throwable) {
-                        Log.i(LOG_TAG, "Fail Request : " + call.request().url.toString())
-                        // TODO retry here
+                        applyFailConditions(call, model)
                     }
                 })
             }
@@ -82,23 +83,22 @@ object RequestSender {
                         currentRequest.headerMap, currentRequest.queryMap)!!
                 call.enqueue(object : Callback<Void?> {
                     override fun onResponse(call: Call<Void?>, response: Response<Void?>) {
-                        Log.i(LOG_TAG, "Successful Request : " + response.raw().request.url.toString())
-                        parseAndSetResponseHeaders(response.headers(), "realTime", model)
-                        removeFromQueue()
-                        isSendingARequest = false
-                        send(model)
+                        if (response.isSuccessful) {
+                            applySuccessConditions(response, model, Domain.S)
+                        } else {
+                            applyFailConditions(call, model)
+                        }
                     }
 
                     override fun onFailure(call: Call<Void?>, t: Throwable) {
-                        Log.i(LOG_TAG, "Fail Request : " + call.request().url.toString())
-                        // TODO retry here
+                        applyFailConditions(call, model)
                     }
                 })
             }
         }
     }
 
-    private fun parseAndSetResponseHeaders(responseHeaders: Headers, type: String,
+    private fun parseAndSetResponseHeaders(responseHeaders: Headers, type: Domain,
                                            model: RelatedDigitalModel) {
         val names = responseHeaders.names()
         if (names.isNotEmpty()) {
@@ -112,27 +112,27 @@ object RequestSender {
             if (cookies.size > 0) {
                 for (cookie in cookies) {
                     val fields = cookie.split(";").toTypedArray()
-                    if (fields[0].toLowerCase().contains(Constants.LOAD_BALANCE_PREFIX.toLowerCase())) {
+                    if (fields[0].toLowerCase(Locale.ROOT).contains(Constants.LOAD_BALANCE_PREFIX.toLowerCase(Locale.ROOT))) {
                         val cookieKeyValue = fields[0].split("=").toTypedArray()
                         if (cookieKeyValue.size > 1) {
                             val cookieKey = cookieKeyValue[0]
                             val cookieValue = cookieKeyValue[1]
-                            if (type == "logger" && model.getCookie() != null) {
+                            if (type == Domain.LOGGER && model.getCookie() != null) {
                                 model.getCookie()!!.setLoggerCookieKey(cookieKey)
                                 model.getCookie()!!.setLoggerCookieValue(cookieValue)
-                            } else if (type == "realTime" && model.getCookie() != null) {
+                            } else if (type == Domain.REAL_TIME && model.getCookie() != null) {
                                 model.getCookie()!!.setRealTimeCookieKey(cookieKey)
                                 model.getCookie()!!.setRealTimeCookieValue(cookieValue)
                             }
                         }
                     }
-                    if (fields[0].toLowerCase().contains(Constants.OM_3_KEY.toLowerCase())) {
+                    if (fields[0].toLowerCase(Locale.ROOT).contains(Constants.OM_3_KEY.toLowerCase(Locale.ROOT))) {
                         val cookieKeyValue = fields[0].split("=").toTypedArray()
                         if (cookieKeyValue.size > 1 || model.getCookie() != null) {
                             val cookieValue = cookieKeyValue[1]
-                            if (type == "logger" && model.getCookie() != null) {
+                            if (type == Domain.LOGGER && model.getCookie() != null) {
                                 model.getCookie()!!.setLoggerOM3rdCookieValue(cookieValue)
-                            } else if (type == "realTime" && model.getCookie() != null) {
+                            } else if (type == Domain.REAL_TIME && model.getCookie() != null) {
                                 model.getCookie()!!.setRealOM3rdTimeCookieValue(cookieValue)
                             }
                         }
@@ -144,5 +144,27 @@ object RequestSender {
 
     private fun removeFromQueue() {
         requestQueue.removeAt(0)
+    }
+
+    private fun applySuccessConditions(response: Response<Void?>, model: RelatedDigitalModel,
+                                       type: Domain) {
+        Log.i(LOG_TAG, "Successful Request : " + response.raw().request.url.toString())
+        parseAndSetResponseHeaders(response.headers(), type, model)
+        removeFromQueue()
+        isSendingARequest = false
+        retryCounter = 0
+        send(model)
+    }
+
+    private fun applyFailConditions(call: Call<Void?>, model: RelatedDigitalModel) {
+        Log.w(LOG_TAG, "Fail Request : " + call.request().url.toString())
+        isSendingARequest = false
+        retryCounter++
+        if (retryCounter >= 3) {
+            Log.w(LOG_TAG, "Could not send the request after 3 attempts!!!")
+            removeFromQueue()
+            retryCounter = 0
+        }
+        send(model)
     }
 }
