@@ -3,7 +3,7 @@ package com.relateddigital.relateddigital_android.model
 import com.google.gson.annotations.SerializedName
 import java.io.Serializable
 
-class StoryReport : Serializable{
+class StoryReport : Serializable {
     @SerializedName("impression")
     var impression: String? = null
 

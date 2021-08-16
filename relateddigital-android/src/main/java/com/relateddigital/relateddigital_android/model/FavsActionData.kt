@@ -13,7 +13,7 @@ class FavsActionData : Serializable {
 
     override fun toString(): String {
         return "Actiondata [favorites = " + favorites + ", attributes = " + Arrays.toString(
-            attributes
+                attributes
         ) + "]"
     }
 }

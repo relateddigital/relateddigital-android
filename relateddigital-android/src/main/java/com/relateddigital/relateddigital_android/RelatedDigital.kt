@@ -8,14 +8,15 @@ import com.google.gson.Gson
 import com.relateddigital.relateddigital_android.constants.Constants
 import com.relateddigital.relateddigital_android.model.LoadBalanceCookie
 import com.relateddigital.relateddigital_android.model.RelatedDigitalModel
+import com.relateddigital.relateddigital_android.model.VisilabsParameter
 import com.relateddigital.relateddigital_android.network.RequestHandler
 import com.relateddigital.relateddigital_android.util.AppUtils
 import com.relateddigital.relateddigital_android.util.SharedPref
 import java.util.*
 
 object RelatedDigital {
-    private var model : RelatedDigitalModel? = null
-    private const val LOG_TAG : String = "RelatedDigital"
+    private var model: RelatedDigitalModel? = null
+    private const val LOG_TAG: String = "RelatedDigital"
 
     @JvmStatic
     fun init(context: Context,
@@ -25,7 +26,7 @@ object RelatedDigital {
 
         val modelStr = SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY, "")
 
-        model = if(modelStr.isEmpty()) {
+        model = if (modelStr.isEmpty()) {
             createInitialModel(context)
         } else {
             Gson().fromJson(modelStr, RelatedDigitalModel::class.java)
@@ -36,9 +37,11 @@ object RelatedDigital {
         model!!.setDataSource(context, dataSource)
 
         model!!.setCookie(context, LoadBalanceCookie())
-        if(model!!.getCookieId().isNullOrEmpty()) {
+        if (model!!.getCookieId().isNullOrEmpty()) {
             model!!.setCookieId(context, null)
         }
+
+        initVisilabsParameters()
     }
 
     private fun createInitialModel(context: Context): RelatedDigitalModel {
@@ -67,13 +70,13 @@ object RelatedDigital {
                                      googleAppAlias: String,
                                      huaweiAppAlias: String,
                                      token: String) {
-        if(model != null) {
+        if (model != null) {
             model!!.setIsPushNotificationEnabled(context, isPushNotificationEnabled)
             model!!.setGoogleAppAlias(context, googleAppAlias)
             model!!.setHuaweiAppAlias(context, huaweiAppAlias)
             model!!.setToken(context, token)
         } else {
-            if(SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
+            if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
                 model = Gson().fromJson(SharedPref.readString(context,
                         Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
                 model!!.setIsPushNotificationEnabled(context, isPushNotificationEnabled)
@@ -91,10 +94,10 @@ object RelatedDigital {
 
     @JvmStatic
     fun setIsInAppNotificationEnabled(context: Context, isInAppNotificationEnabled: Boolean) {
-        if(model != null) {
+        if (model != null) {
             model!!.setIsInAppNotificationEnabled(context, isInAppNotificationEnabled)
         } else {
-            if(SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
+            if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
                 model = Gson().fromJson(SharedPref.readString(context,
                         Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
                 model!!.setIsInAppNotificationEnabled(context, isInAppNotificationEnabled)
@@ -107,10 +110,10 @@ object RelatedDigital {
 
     @JvmStatic
     fun setIsGeofenceEnabled(context: Context, isGeofenceEnabled: Boolean) {
-        if(model != null) {
+        if (model != null) {
             model!!.setIsGeofenceEnabled(context, isGeofenceEnabled)
         } else {
-            if(SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
+            if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
                 model = Gson().fromJson(SharedPref.readString(context,
                         Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
                 model!!.setIsGeofenceEnabled(context, isGeofenceEnabled)
@@ -123,10 +126,10 @@ object RelatedDigital {
 
     @JvmStatic
     fun setGoogleAppAlias(context: Context, googleAppAlias: String) {
-        if(model != null) {
+        if (model != null) {
             model!!.setGoogleAppAlias(context, googleAppAlias)
         } else {
-            if(SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
+            if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
                 model = Gson().fromJson(SharedPref.readString(context,
                         Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
                 model!!.setGoogleAppAlias(context, googleAppAlias)
@@ -139,10 +142,10 @@ object RelatedDigital {
 
     @JvmStatic
     fun setHuaweiAppAlias(context: Context, huaweiAppAlias: String) {
-        if(model != null) {
+        if (model != null) {
             model!!.setHuaweiAppAlias(context, huaweiAppAlias)
         } else {
-            if(SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
+            if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
                 model = Gson().fromJson(SharedPref.readString(context,
                         Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
                 model!!.setHuaweiAppAlias(context, huaweiAppAlias)
@@ -155,10 +158,10 @@ object RelatedDigital {
 
     @JvmStatic
     fun setOrganizationId(context: Context, organizationId: String) {
-        if(model != null) {
+        if (model != null) {
             model!!.setOrganizationId(context, organizationId)
         } else {
-            if(SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
+            if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
                 model = Gson().fromJson(SharedPref.readString(context,
                         Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
                 model!!.setOrganizationId(context, organizationId)
@@ -171,10 +174,10 @@ object RelatedDigital {
 
     @JvmStatic
     fun setProfileId(context: Context, profileId: String) {
-        if(model != null) {
+        if (model != null) {
             model!!.setProfileId(context, profileId)
         } else {
-            if(SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
+            if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
                 model = Gson().fromJson(SharedPref.readString(context,
                         Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
                 model!!.setProfileId(context, profileId)
@@ -187,10 +190,10 @@ object RelatedDigital {
 
     @JvmStatic
     fun setDataSource(context: Context, dataSource: String) {
-        if(model != null) {
+        if (model != null) {
             model!!.setDataSource(context, dataSource)
         } else {
-            if(SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
+            if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
                 model = Gson().fromJson(SharedPref.readString(context,
                         Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
                 model!!.setDataSource(context, dataSource)
@@ -203,10 +206,10 @@ object RelatedDigital {
 
     @JvmStatic
     fun setRequestTimeoutInSecond(context: Context, requestTimeoutInSecond: Int) {
-        if(model != null) {
+        if (model != null) {
             model!!.setRequestTimeoutInSecond(context, requestTimeoutInSecond)
         } else {
-            if(SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
+            if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
                 model = Gson().fromJson(SharedPref.readString(context,
                         Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
                 model!!.setRequestTimeoutInSecond(context, requestTimeoutInSecond)
@@ -219,10 +222,10 @@ object RelatedDigital {
 
     @JvmStatic
     fun setMaxGeofenceCount(context: Context, maxGeofenceCount: Int) {
-        if(model != null) {
+        if (model != null) {
             model!!.setMaxGeofenceCount(context, maxGeofenceCount)
         } else {
-            if(SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
+            if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
                 model = Gson().fromJson(SharedPref.readString(context,
                         Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
                 model!!.setMaxGeofenceCount(context, maxGeofenceCount)
@@ -235,10 +238,10 @@ object RelatedDigital {
 
     @JvmStatic
     fun setAdvertisingIdentifier(context: Context, advertisingIdentifier: String) {
-        if(model != null) {
+        if (model != null) {
             model!!.setAdvertisingIdentifier(context, advertisingIdentifier)
         } else {
-            if(SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
+            if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
                 model = Gson().fromJson(SharedPref.readString(context,
                         Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
                 model!!.setAdvertisingIdentifier(context, advertisingIdentifier)
@@ -251,10 +254,10 @@ object RelatedDigital {
 
     @JvmStatic
     fun setExVisitorId(context: Context, exVisitorId: String) {
-        if(model != null) {
+        if (model != null) {
             model!!.setExVisitorId(context, exVisitorId)
         } else {
-            if(SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
+            if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
                 model = Gson().fromJson(SharedPref.readString(context,
                         Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
                 model!!.setExVisitorId(context, exVisitorId)
@@ -267,10 +270,10 @@ object RelatedDigital {
 
     @JvmStatic
     fun setToken(context: Context, token: String) {
-        if(model != null) {
+        if (model != null) {
             model!!.setToken(context, token)
         } else {
-            if(SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
+            if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
                 model = Gson().fromJson(SharedPref.readString(context,
                         Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
                 model!!.setToken(context, token)
@@ -283,7 +286,7 @@ object RelatedDigital {
 
     @JvmStatic
     fun clearCookieId(context: Context) {
-        if(model!=null) {
+        if (model != null) {
             model!!.setCookieId(context, "")
         }
         AppUtils.clearCookieId(context)
@@ -291,17 +294,17 @@ object RelatedDigital {
 
     @JvmStatic
     fun clearExVisitorId(context: Context) {
-        if(model!=null) {
+        if (model != null) {
             model!!.setExVisitorId(context, "")
         }
     }
 
     @JvmStatic
-    fun getIsPushNotificationEnabled(context: Context) : Boolean{
-        return if(model!=null) {
+    fun getIsPushNotificationEnabled(context: Context): Boolean {
+        return if (model != null) {
             model!!.getIsPushNotificationEnabled()
         } else {
-            if(SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
+            if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
                 model = Gson().fromJson(SharedPref.readString(context,
                         Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
                 model!!.getIsPushNotificationEnabled()
@@ -313,11 +316,11 @@ object RelatedDigital {
     }
 
     @JvmStatic
-    fun getIsInAppNotificationEnabled(context: Context) : Boolean{
-        return if(model!=null) {
+    fun getIsInAppNotificationEnabled(context: Context): Boolean {
+        return if (model != null) {
             model!!.getIsInAppNotificationEnabled()
         } else {
-            if(SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
+            if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
                 model = Gson().fromJson(SharedPref.readString(context,
                         Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
                 model!!.getIsInAppNotificationEnabled()
@@ -329,11 +332,11 @@ object RelatedDigital {
     }
 
     @JvmStatic
-    fun getIsGeofenceEnabled(context: Context) : Boolean{
-        return if(model!=null) {
+    fun getIsGeofenceEnabled(context: Context): Boolean {
+        return if (model != null) {
             model!!.getIsGeofenceEnabled()
         } else {
-            if(SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
+            if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
                 model = Gson().fromJson(SharedPref.readString(context,
                         Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
                 model!!.getIsGeofenceEnabled()
@@ -345,11 +348,11 @@ object RelatedDigital {
     }
 
     @JvmStatic
-    fun getGoogleAppAlias(context: Context) : String{
-        return if(model!=null) {
+    fun getGoogleAppAlias(context: Context): String {
+        return if (model != null) {
             model!!.getGoogleAppAlias()
         } else {
-            if(SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
+            if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
                 model = Gson().fromJson(SharedPref.readString(context,
                         Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
                 model!!.getGoogleAppAlias()
@@ -361,11 +364,11 @@ object RelatedDigital {
     }
 
     @JvmStatic
-    fun getHuaweiAppAlias(context: Context) : String{
-        return if(model!=null) {
+    fun getHuaweiAppAlias(context: Context): String {
+        return if (model != null) {
             model!!.getHuaweiAppAlias()
         } else {
-            if(SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
+            if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
                 model = Gson().fromJson(SharedPref.readString(context,
                         Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
                 model!!.getHuaweiAppAlias()
@@ -377,11 +380,11 @@ object RelatedDigital {
     }
 
     @JvmStatic
-    fun getOrganizationId(context: Context) : String{
-        return if(model!=null) {
+    fun getOrganizationId(context: Context): String {
+        return if (model != null) {
             model!!.getOrganizationId()
         } else {
-            if(SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
+            if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
                 model = Gson().fromJson(SharedPref.readString(context,
                         Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
                 model!!.getOrganizationId()
@@ -393,11 +396,11 @@ object RelatedDigital {
     }
 
     @JvmStatic
-    fun getProfileId(context: Context) : String{
-        return if(model!=null) {
+    fun getProfileId(context: Context): String {
+        return if (model != null) {
             model!!.getProfileId()
         } else {
-            if(SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
+            if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
                 model = Gson().fromJson(SharedPref.readString(context,
                         Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
                 model!!.getProfileId()
@@ -409,11 +412,11 @@ object RelatedDigital {
     }
 
     @JvmStatic
-    fun getDataSource(context: Context) : String{
-        return if(model!=null) {
+    fun getDataSource(context: Context): String {
+        return if (model != null) {
             model!!.getDataSource()
         } else {
-            if(SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
+            if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
                 model = Gson().fromJson(SharedPref.readString(context,
                         Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
                 model!!.getDataSource()
@@ -425,11 +428,11 @@ object RelatedDigital {
     }
 
     @JvmStatic
-    fun getRequestTimeoutInSecond(context: Context) : Int{
-        return if(model!=null) {
+    fun getRequestTimeoutInSecond(context: Context): Int {
+        return if (model != null) {
             model!!.getRequestTimeoutInSecond()
         } else {
-            if(SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
+            if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
                 model = Gson().fromJson(SharedPref.readString(context,
                         Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
                 model!!.getRequestTimeoutInSecond()
@@ -441,11 +444,11 @@ object RelatedDigital {
     }
 
     @JvmStatic
-    fun getMaxGeofenceCount(context: Context) : Int{
-        return if(model!=null) {
+    fun getMaxGeofenceCount(context: Context): Int {
+        return if (model != null) {
             model!!.getMaxGeofenceCount()
         } else {
-            if(SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
+            if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
                 model = Gson().fromJson(SharedPref.readString(context,
                         Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
                 model!!.getMaxGeofenceCount()
@@ -457,11 +460,11 @@ object RelatedDigital {
     }
 
     @JvmStatic
-    fun getAppVersion(context: Context) : String{
-        return if(model!=null) {
+    fun getAppVersion(context: Context): String {
+        return if (model != null) {
             model!!.getAppVersion()
         } else {
-            if(SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
+            if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
                 model = Gson().fromJson(SharedPref.readString(context,
                         Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
                 model!!.getAppVersion()
@@ -472,11 +475,11 @@ object RelatedDigital {
     }
 
     @JvmStatic
-    fun getOsType(context: Context) : String{
-        return if(model!=null) {
+    fun getOsType(context: Context): String {
+        return if (model != null) {
             model!!.getOsType()
         } else {
-            if(SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
+            if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
                 model = Gson().fromJson(SharedPref.readString(context,
                         Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
                 model!!.getOsType()
@@ -487,11 +490,11 @@ object RelatedDigital {
     }
 
     @JvmStatic
-    fun getOsVersion(context: Context) : String{
-        return if(model!=null) {
+    fun getOsVersion(context: Context): String {
+        return if (model != null) {
             model!!.getOsVersion()
         } else {
-            if(SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
+            if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
                 model = Gson().fromJson(SharedPref.readString(context,
                         Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
                 model!!.getOsVersion()
@@ -502,11 +505,11 @@ object RelatedDigital {
     }
 
     @JvmStatic
-    fun getSdkVersion(context: Context) : String{
-        return if(model!=null) {
+    fun getSdkVersion(context: Context): String {
+        return if (model != null) {
             model!!.getSdkVersion()
         } else {
-            if(SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
+            if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
                 model = Gson().fromJson(SharedPref.readString(context,
                         Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
                 model!!.getSdkVersion()
@@ -517,11 +520,11 @@ object RelatedDigital {
     }
 
     @JvmStatic
-    fun getDeviceType(context: Context) : String{
-        return if(model!=null) {
+    fun getDeviceType(context: Context): String {
+        return if (model != null) {
             model!!.getDeviceType()
         } else {
-            if(SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
+            if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
                 model = Gson().fromJson(SharedPref.readString(context,
                         Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
                 model!!.getDeviceType()
@@ -532,11 +535,11 @@ object RelatedDigital {
     }
 
     @JvmStatic
-    fun getDeviceName(context: Context) : String{
-        return if(model!=null) {
+    fun getDeviceName(context: Context): String {
+        return if (model != null) {
             model!!.getDeviceName()
         } else {
-            if(SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
+            if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
                 model = Gson().fromJson(SharedPref.readString(context,
                         Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
                 model!!.getDeviceName()
@@ -547,11 +550,11 @@ object RelatedDigital {
     }
 
     @JvmStatic
-    fun getCarrier(context: Context) : String{
-        return if(model!=null) {
+    fun getCarrier(context: Context): String {
+        return if (model != null) {
             model!!.getCarrier()
         } else {
-            if(SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
+            if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
                 model = Gson().fromJson(SharedPref.readString(context,
                         Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
                 model!!.getCarrier()
@@ -562,11 +565,11 @@ object RelatedDigital {
     }
 
     @JvmStatic
-    fun getIdentifierForVendor(context: Context) : String{
-        return if(model!=null) {
+    fun getIdentifierForVendor(context: Context): String {
+        return if (model != null) {
             model!!.getIdentifierForVendor()
         } else {
-            if(SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
+            if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
                 model = Gson().fromJson(SharedPref.readString(context,
                         Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
                 model!!.getIdentifierForVendor()
@@ -577,11 +580,11 @@ object RelatedDigital {
     }
 
     @JvmStatic
-    fun getAdvertisingIdentifier(context: Context) : String{
-        return if(model!=null) {
+    fun getAdvertisingIdentifier(context: Context): String {
+        return if (model != null) {
             model!!.getAdvertisingIdentifier()
         } else {
-            if(SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
+            if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
                 model = Gson().fromJson(SharedPref.readString(context,
                         Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
                 model!!.getAdvertisingIdentifier()
@@ -593,11 +596,11 @@ object RelatedDigital {
     }
 
     @JvmStatic
-    fun getLocal(context: Context) : String{
-        return if(model!=null) {
+    fun getLocal(context: Context): String {
+        return if (model != null) {
             model!!.getLocal()
         } else {
-            if(SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
+            if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
                 model = Gson().fromJson(SharedPref.readString(context,
                         Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
                 model!!.getLocal()
@@ -608,11 +611,11 @@ object RelatedDigital {
     }
 
     @JvmStatic
-    fun getExVisitorId(context: Context) : String{
-        return if(model!=null) {
+    fun getExVisitorId(context: Context): String {
+        return if (model != null) {
             model!!.getExVisitorId()
         } else {
-            if(SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
+            if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
                 model = Gson().fromJson(SharedPref.readString(context,
                         Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
                 model!!.getExVisitorId()
@@ -624,11 +627,11 @@ object RelatedDigital {
     }
 
     @JvmStatic
-    fun getToken(context: Context) : String{
-        return if(model!=null) {
+    fun getToken(context: Context): String {
+        return if (model != null) {
             model!!.getToken()
         } else {
-            if(SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
+            if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
                 model = Gson().fromJson(SharedPref.readString(context,
                         Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
                 model!!.getToken()
@@ -640,11 +643,11 @@ object RelatedDigital {
     }
 
     @JvmStatic
-    fun getCookieId(context: Context) : String?{
-        return if(model!=null) {
+    fun getCookieId(context: Context): String? {
+        return if (model != null) {
             model!!.getCookieId()
         } else {
-            if(SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
+            if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
                 model = Gson().fromJson(SharedPref.readString(context,
                         Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
                 model!!.getCookieId()
@@ -656,11 +659,11 @@ object RelatedDigital {
     }
 
     @JvmStatic
-    fun getUserAgent(context: Context) : String{
-        return if(model!=null) {
+    fun getUserAgent(context: Context): String {
+        return if (model != null) {
             model!!.getUserAgent()
         } else {
-            if(SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
+            if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
                 model = Gson().fromJson(SharedPref.readString(context,
                         Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
                 model!!.getUserAgent()
@@ -671,11 +674,11 @@ object RelatedDigital {
     }
 
     @JvmStatic
-    fun getVisitorData(context: Context) : String{
-        return if(model!=null) {
+    fun getVisitorData(context: Context): String {
+        return if (model != null) {
             model!!.getVisitorData()
         } else {
-            if(SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
+            if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
                 model = Gson().fromJson(SharedPref.readString(context,
                         Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
                 model!!.getVisitorData()
@@ -689,16 +692,60 @@ object RelatedDigital {
     @JvmStatic
     fun customEvent(context: Context, pageName: String, properties: HashMap<String, String>?,
                     parent: Activity? = null) {
-        if(pageName.isEmpty()) {
+        if (pageName.isEmpty()) {
             Log.e(LOG_TAG, "pageName cannot be empty!!!")
             return
         }
 
-        if (Build.VERSION.SDK_INT < Constants.MIN_SDK_VALUE) {
+        if (Build.VERSION.SDK_INT < Constants.SDK_MIN_API_VERSION) {
             Log.e(LOG_TAG, "Related Digital SDK requires min API level 21!")
             return
         }
 
         RequestHandler().createRequest(context, model, pageName, properties, parent)
+    }
+
+    private fun initVisilabsParameters() {
+        val visilabsParameters = ArrayList<VisilabsParameter>()
+        visilabsParameters.add(VisilabsParameter(Constants.TARGET_PREF_VOSS_KEY,
+                Constants.TARGET_PREF_VOSS_STORE_KEY, 1, null))
+        visilabsParameters.add(VisilabsParameter(Constants.TARGET_PREF_VCNAME_KEY,
+                Constants.TARGET_PREF_VCNAME_STORE_KEY, 1, null))
+        visilabsParameters.add(VisilabsParameter(Constants.TARGET_PREF_VCMEDIUM_KEY,
+                Constants.TARGET_PREF_VCMEDIUM_STORE_KEY, 1, null))
+        visilabsParameters.add(VisilabsParameter(Constants.TARGET_PREF_VCSOURCE_KEY,
+                Constants.TARGET_PREF_VCSOURCE_STORE_KEY, 1, null))
+        visilabsParameters.add(VisilabsParameter(Constants.TARGET_PREF_VSEG1_KEY,
+                Constants.TARGET_PREF_VSEG1_STORE_KEY, 1, null))
+        visilabsParameters.add(VisilabsParameter(Constants.TARGET_PREF_VSEG2_KEY,
+                Constants.TARGET_PREF_VSEG2_STORE_KEY, 1, null))
+        visilabsParameters.add(VisilabsParameter(Constants.TARGET_PREF_VSEG3_KEY,
+                Constants.TARGET_PREF_VSEG3_STORE_KEY, 1, null))
+        visilabsParameters.add(VisilabsParameter(Constants.TARGET_PREF_VSEG4_KEY,
+                Constants.TARGET_PREF_VSEG4_STORE_KEY, 1, null))
+        visilabsParameters.add(VisilabsParameter(Constants.TARGET_PREF_VSEG5_KEY,
+                Constants.TARGET_PREF_VSEG5_STORE_KEY, 1, null))
+        visilabsParameters.add(VisilabsParameter(Constants.TARGET_PREF_BD_KEY,
+                Constants.TARGET_PREF_BD_STORE_KEY, 1, null))
+        visilabsParameters.add(VisilabsParameter(Constants.TARGET_PREF_GN_KEY,
+                Constants.TARGET_PREF_GN_STORE_KEY, 1, null))
+        visilabsParameters.add(VisilabsParameter(Constants.TARGET_PREF_LOC_KEY,
+                Constants.TARGET_PREF_LOC_STORE_KEY, 1, null))
+        visilabsParameters.add(VisilabsParameter(Constants.TARGET_PREF_VPV_KEY,
+                Constants.TARGET_PREF_VPV_STORE_KEY, 1, null))
+        visilabsParameters.add(VisilabsParameter(Constants.TARGET_PREF_LPVS_KEY,
+                Constants.TARGET_PREF_LPVS_STORE_KEY, 10, null))
+        visilabsParameters.add(VisilabsParameter(Constants.TARGET_PREF_LPP_KEY,
+                Constants.TARGET_PREF_LPP_STORE_KEY,
+                1, object : ArrayList<String>() {
+            init {
+                add(Constants.TARGET_PREF_PPR_KEY)
+            }
+        }))
+        visilabsParameters.add(VisilabsParameter(Constants.TARGET_PREF_VQ_KEY,
+                Constants.TARGET_PREF_VQ_STORE_KEY, 1, null))
+        visilabsParameters.add(VisilabsParameter(Constants.TARGET_PREF_VRDOMAIN_KEY,
+                Constants.TARGET_PREF_VRDOMAIN_STORE_KEY, 1, null))
+        Constants.VISILABS_PARAMETERS = visilabsParameters
     }
 }

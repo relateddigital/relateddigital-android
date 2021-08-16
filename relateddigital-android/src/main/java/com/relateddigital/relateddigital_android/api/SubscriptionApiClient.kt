@@ -20,16 +20,16 @@ object SubscriptionApiClient {
             val interceptor = HttpLoggingInterceptor()
             interceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
             val httpClient = OkHttpClient.Builder()
-                .addInterceptor(interceptor)
-                .connectTimeout(connectTimeOutInSec.toLong(), TimeUnit.SECONDS)
-                .readTimeout(10, TimeUnit.SECONDS)
+                    .addInterceptor(interceptor)
+                    .connectTimeout(connectTimeOutInSec.toLong(), TimeUnit.SECONDS)
+                    .readTimeout(10, TimeUnit.SECONDS)
             synchronized(SubscriptionApiClient::class.java) {
                 if (retrofit == null) {
                     retrofit = Retrofit.Builder()
-                        .baseUrl("https://pushs.euromsg.com/")
-                        .addConverterFactory(GsonConverterFactory.create())
-                        .client(httpClient.build())
-                        .build()
+                            .baseUrl("https://pushs.euromsg.com/")
+                            .addConverterFactory(GsonConverterFactory.create())
+                            .client(httpClient.build())
+                            .build()
                 }
             }
         }

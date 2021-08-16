@@ -24,8 +24,7 @@ object RequestSender {
     }
 
     private fun send(model: RelatedDigitalModel) {
-        // TODO after a successful response get the cookie from the header and set it to the model
-        if(isSendingARequest || requestQueue.isEmpty()) {
+        if (isSendingARequest || requestQueue.isEmpty()) {
             return
         }
 
@@ -33,7 +32,7 @@ object RequestSender {
 
         val currentRequest = requestQueue[0]
 
-        when(currentRequest.domain) {
+        when (currentRequest.domain) {
             Domain.LOGGER -> {
                 val loggerApiInterface = LoggerApiClient.getClient(model.getRequestTimeoutInSecond())
                         ?.create(ApiMethods::class.java)

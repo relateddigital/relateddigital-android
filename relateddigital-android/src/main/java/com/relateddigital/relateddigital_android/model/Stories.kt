@@ -14,5 +14,5 @@ class Stories : Serializable {
     var link: String? = null
 
     @SerializedName("shown")
-    var shown:Boolean? = null
+    var shown: Boolean? = null
 }

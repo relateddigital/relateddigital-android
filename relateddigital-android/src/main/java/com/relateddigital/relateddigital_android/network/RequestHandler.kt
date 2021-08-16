@@ -2,18 +2,23 @@ package com.relateddigital.relateddigital_android.network
 
 import android.app.Activity
 import android.content.Context
+import android.util.Log
 import com.relateddigital.relateddigital_android.constants.Constants
 import com.relateddigital.relateddigital_android.model.Domain
-import com.relateddigital.relateddigital_android.model.LoadBalanceCookie
 import com.relateddigital.relateddigital_android.model.RelatedDigitalModel
 import com.relateddigital.relateddigital_android.model.Request
 import com.relateddigital.relateddigital_android.util.GoogleUtils
+import com.relateddigital.relateddigital_android.util.PersistentTargetManager
 import com.relateddigital.relateddigital_android.util.SharedPref
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
 
 class RequestHandler {
+    companion object {
+        private const val LOG_TAG = "RequestHandler"
+    }
+
     private var mNrv = 0
     private var mPviv = 0
     private var mTvc = 0
@@ -43,14 +48,20 @@ class RequestHandler {
             }
             if (properties.containsKey(Constants.APP_ID_REQUEST_KEY)) {
                 if (properties[Constants.APP_ID_REQUEST_KEY] != null) {
-                    if(GoogleUtils.checkPlayService(context)) {
+                    if (GoogleUtils.checkPlayService(context)) {
                         model!!.setGoogleAppAlias(context, properties[Constants.APP_ID_REQUEST_KEY]!!)
-                    } else{
+                    } else {
                         model!!.setHuaweiAppAlias(context, properties[Constants.APP_ID_REQUEST_KEY]!!)
                     }
                 }
                 properties.remove(Constants.APP_ID_REQUEST_KEY)
             }
+        }
+
+        try {
+            PersistentTargetManager.saveParameters(context, properties)
+        } catch (e: Exception) {
+            Log.e(LOG_TAG, e.message, e)
         }
 
         val timeOfEvent = System.currentTimeMillis() / 1000
@@ -76,22 +87,22 @@ class RequestHandler {
             }
         }
 
-        if(model.getAdvertisingIdentifier().isNotEmpty()) {
+        if (model.getAdvertisingIdentifier().isNotEmpty()) {
             queryMap[Constants.ADVERTISER_ID_REQUEST_KEY] = model.getAdvertisingIdentifier()
         }
 
-        if(model.getExVisitorId().isNotEmpty()) {
+        if (model.getExVisitorId().isNotEmpty()) {
             queryMap[Constants.EXVISITOR_ID_REQUEST_KEY] = model.getExVisitorId()
         }
 
-        if(model.getToken().isNotEmpty()) {
+        if (model.getToken().isNotEmpty()) {
             queryMap[Constants.TOKEN_ID_REQUEST_KEY] = model.getToken()
         }
 
-        if(model.getGoogleAppAlias().isNotEmpty() || model.getHuaweiAppAlias().isNotEmpty()) {
-            if(GoogleUtils.checkPlayService(context)) {
+        if (model.getGoogleAppAlias().isNotEmpty() || model.getHuaweiAppAlias().isNotEmpty()) {
+            if (GoogleUtils.checkPlayService(context)) {
                 queryMap[Constants.APP_ID_REQUEST_KEY] = model.getGoogleAppAlias()
-            } else{
+            } else {
                 queryMap[Constants.APP_ID_REQUEST_KEY] = model.getHuaweiAppAlias()
             }
         }

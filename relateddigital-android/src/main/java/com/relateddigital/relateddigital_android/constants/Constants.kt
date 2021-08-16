@@ -1,12 +1,14 @@
 package com.relateddigital.relateddigital_android.constants
 
+import com.relateddigital.relateddigital_android.model.VisilabsParameter
+
 class Constants {
     companion object {
-        const val MIN_SDK_VALUE: Int = 21
+        const val SDK_MIN_API_VERSION: Int = 21
         const val RELATED_DIGITAL_MODEL_KEY = "related_digital_model_key"
+
         const val COOKIE_ID_KEY = "cookie_id_key"
         const val EURO_CONSENT_TIME_KEY = "ConsentTime"
-        const val SDK_MIN_API_VERSION: Int = 21
         const val LAST_EVENT_TIME_KEY = "last_event_time"
         const val PVIV_KEY = "pviv"
         const val TVC_KEY = "tvc"
@@ -30,5 +32,46 @@ class Constants {
         const val OM_3_REQUEST_KEY = "OM.3rd"
         const val LOAD_BALANCE_PREFIX = "NSC"
         const val OM_3_KEY = "OM.3rd"
+
+        var VISILABS_PARAMETERS: List<VisilabsParameter>? = null
+        const val TARGET_PREF_VOSS_KEY = "OM.OSS"
+        const val TARGET_PREF_VCNAME_KEY = "OM.cname"
+        const val TARGET_PREF_VCMEDIUM_KEY = "OM.cmedium"
+        const val TARGET_PREF_VCSOURCE_KEY = "OM.csource"
+        const val TARGET_PREF_VSEG1_KEY = "OM.vseg1"
+        const val TARGET_PREF_VSEG2_KEY = "OM.vseg2"
+        const val TARGET_PREF_VSEG3_KEY = "OM.vseg3"
+        const val TARGET_PREF_VSEG4_KEY = "OM.vseg4"
+        const val TARGET_PREF_VSEG5_KEY = "OM.vseg5"
+        const val TARGET_PREF_BD_KEY = "OM.bd"
+        const val TARGET_PREF_GN_KEY = "OM.gn"
+        const val TARGET_PREF_LOC_KEY = "OM.loc"
+        const val TARGET_PREF_VPV_KEY = "OM.pv"
+        const val TARGET_PREF_LPVS_KEY = "OM.pv"
+        const val TARGET_PREF_LPP_KEY = "OM.pp"
+        const val TARGET_PREF_VQ_KEY = "OM.q"
+        const val TARGET_PREF_VRDOMAIN_KEY = "OM.rDomain"
+        const val TARGET_PREF_PPR_KEY = "OM.ppr"
+
+        const val TARGET_PREF_VOSS_STORE_KEY = "OM.voss"
+        const val TARGET_PREF_VCNAME_STORE_KEY = "OM.vcname"
+        const val TARGET_PREF_VCMEDIUM_STORE_KEY = "OM.vcmedium"
+        const val TARGET_PREF_VCSOURCE_STORE_KEY = "OM.vcsource"
+        const val TARGET_PREF_VSEG1_STORE_KEY = "OM.vseg1"
+        const val TARGET_PREF_VSEG2_STORE_KEY = "OM.vseg2"
+        const val TARGET_PREF_VSEG3_STORE_KEY = "OM.vseg3"
+        const val TARGET_PREF_VSEG4_STORE_KEY = "OM.vseg4"
+        const val TARGET_PREF_VSEG5_STORE_KEY = "OM.vseg5"
+        const val TARGET_PREF_BD_STORE_KEY = "OM.bd"
+        const val TARGET_PREF_GN_STORE_KEY = "OM.gn"
+        const val TARGET_PREF_LOC_STORE_KEY = "OM.loc"
+        const val TARGET_PREF_VPV_STORE_KEY = "OM.vpv"
+        const val TARGET_PREF_LPVS_STORE_KEY = "OM.lpvs"
+        const val TARGET_PREF_LPP_STORE_KEY = "OM.lpp"
+        const val TARGET_PREF_VQ_STORE_KEY = "OM.vq"
+        const val TARGET_PREF_VRDOMAIN_STORE_KEY = "OM.vrDomain"
+
+        const val SHOWN_STORIES_PREF = "VisilabsShownStories"
+        const val SHOWN_STORIES_PREF_KEY = "shownStories"
     }
 }

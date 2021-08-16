@@ -1,8 +1,10 @@
 package com.relateddigital.relateddigital_android.model
 
 import android.content.Context
+import android.util.Log
 import com.google.gson.Gson
 import com.relateddigital.relateddigital_android.constants.Constants
+import com.relateddigital.relateddigital_android.util.PersistentTargetManager
 import com.relateddigital.relateddigital_android.util.SharedPref
 import java.io.Serializable
 import java.util.*
@@ -35,6 +37,10 @@ class RelatedDigitalModel(
         private var visitorData: String,
         private var cookie: LoadBalanceCookie? = null
 ) : Serializable {
+
+    companion object {
+        private const val LOG_TAG = "RelatedDigitalModel"
+    }
 
     fun setIsPushNotificationEnabled(context: Context, isPushNotificationEnabled: Boolean) {
         this.isPushNotificationEnabled = isPushNotificationEnabled
@@ -137,7 +143,12 @@ class RelatedDigitalModel(
     }
 
     fun setExVisitorId(context: Context, exVisitorId: String) {
+        val previousExVisitorId = this.exVisitorId
         this.exVisitorId = exVisitorId
+
+        if (previousExVisitorId.isNotEmpty() && previousExVisitorId != this.exVisitorId) {
+            PersistentTargetManager.clearParameters(context)
+        }
         saveToSharedPrefs(context)
     }
 
@@ -147,11 +158,17 @@ class RelatedDigitalModel(
     }
 
     fun setCookieId(context: Context, cookieId: String?) {
+        val previousCookieID = this.cookieId
         if (cookieId.isNullOrEmpty()) {
             this.cookieId = UUID.randomUUID().toString()
-        } else{
+        } else {
             this.cookieId = cookieId
         }
+
+        if (previousCookieID != null && previousCookieID != this.cookieId) {
+            PersistentTargetManager.clearParameters(context)
+        }
+
         saveToSharedPrefs(context)
     }
 
@@ -279,7 +296,7 @@ class RelatedDigitalModel(
                 Gson().toJson(this))
     }
 
-    fun getFromSharedPref(context: Context) : RelatedDigitalModel{
+    fun getFromSharedPref(context: Context): RelatedDigitalModel {
         return Gson().fromJson(SharedPref.readString(context,
                 Constants.RELATED_DIGITAL_MODEL_KEY), this::class.java)
     }

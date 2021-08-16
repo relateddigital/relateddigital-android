@@ -79,13 +79,13 @@ class Subscription : Serializable {
                     isStringEqual(local, previousSubscription.local) &&
                     isStringEqual(identifierForVendor, previousSubscription.identifierForVendor) &&
                     isStringEqual(
-                        advertisingIdentifier,
-                        previousSubscription.advertisingIdentifier
+                            advertisingIdentifier,
+                            previousSubscription.advertisingIdentifier
                     ) &&
                     isStringEqual(sdkVersion, previousSubscription.sdkVersion) &&
                     isStringEqual(
-                        this.token,
-                        previousSubscription.token
+                            this.token,
+                            previousSubscription.token
                     ) && firstTime == previousSubscription.firstTime &&
                     isMapEqual(extra, previousSubscription.getExtra())
         }

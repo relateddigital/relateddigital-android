@@ -36,31 +36,31 @@ class SharedPref {
             spEditor.apply()
         }
 
-        fun readString(context: Context, key: String, defaultValue: String = "") : String {
+        fun readString(context: Context, key: String, defaultValue: String = ""): String {
             val appName = context.packageName
             val sp = context.getSharedPreferences(appName, Context.MODE_PRIVATE)
             return sp.getString(key, defaultValue)!!
         }
 
-        fun readInt(context: Context, key: String, defaultValue: Int = 0) : Int {
+        fun readInt(context: Context, key: String, defaultValue: Int = 0): Int {
             val appName = context.packageName
             val sp = context.getSharedPreferences(appName, Context.MODE_PRIVATE)
             return sp.getInt(key, defaultValue)
         }
 
-        fun readBoolean(context: Context, key: String, defaultValue: Boolean = false) : Boolean {
+        fun readBoolean(context: Context, key: String, defaultValue: Boolean = false): Boolean {
             val appName = context.packageName
             val sp = context.getSharedPreferences(appName, Context.MODE_PRIVATE)
             return sp.getBoolean(key, defaultValue)
         }
 
-        fun readLong(context: Context, key: String, defaultValue: Long = 0) : Long {
+        fun readLong(context: Context, key: String, defaultValue: Long = 0): Long {
             val appName = context.packageName
             val sp = context.getSharedPreferences(appName, Context.MODE_PRIVATE)
             return sp.getLong(key, defaultValue)
         }
 
-        fun clearKey(context: Context, key: String){
+        fun clearKey(context: Context, key: String) {
             val appName = context.packageName
             val sp = context.getSharedPreferences(appName, Context.MODE_PRIVATE)
             val spEditor = sp.edit()

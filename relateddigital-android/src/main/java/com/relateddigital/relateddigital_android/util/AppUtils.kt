@@ -139,7 +139,7 @@ object AppUtils {
 
     fun getCookieId(context: Context): String {
         var cookieId: String = SharedPref.readString(context, Constants.COOKIE_ID_KEY, "")
-        if(cookieId.isEmpty()) {
+        if (cookieId.isEmpty()) {
             cookieId = createNewCookieId()
             SharedPref.writeString(context, Constants.COOKIE_ID_KEY, cookieId)
         }
