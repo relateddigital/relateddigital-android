@@ -37,7 +37,7 @@ class RequestHandler {
                         properties[Constants.EXVISITOR_ID_REQUEST_KEY]) {
                     model.setCookieId(context, null)
                 }
-                model.setExVisitorId(context, properties[Constants.EXVISITOR_ID_REQUEST_KEY]!!)
+                model.setExVisitorId(context, properties[Constants.EXVISITOR_ID_REQUEST_KEY]!!, false)
                 properties.remove(Constants.EXVISITOR_ID_REQUEST_KEY)
             }
             if (properties.containsKey(Constants.TOKEN_ID_REQUEST_KEY)) {
