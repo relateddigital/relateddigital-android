@@ -142,8 +142,19 @@ class RelatedDigitalModel(
         saveToSharedPrefs(context)
     }
 
-    fun setExVisitorId(context: Context, exVisitorId: String) {
+    fun setExVisitorId(context: Context, exVisitorId: String, isLogout: Boolean) {
+        if(exVisitorId.isEmpty() && !isLogout) {
+            Log.w(LOG_TAG, "exVisitorId cannot be empty!!")
+            return
+        }
+
         val previousExVisitorId = this.exVisitorId
+
+        if(exVisitorId.isNotEmpty() && exVisitorId != previousExVisitorId &&
+                previousExVisitorId.isNotEmpty() ) {
+            setCookieId(context, null)
+        }
+
         this.exVisitorId = exVisitorId
 
         if (previousExVisitorId.isNotEmpty() && previousExVisitorId != this.exVisitorId) {

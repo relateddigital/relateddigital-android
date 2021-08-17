@@ -255,15 +255,15 @@ object RelatedDigital {
     @JvmStatic
     fun setExVisitorId(context: Context, exVisitorId: String) {
         if (model != null) {
-            model!!.setExVisitorId(context, exVisitorId)
+            model!!.setExVisitorId(context, exVisitorId, false)
         } else {
             if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
                 model = Gson().fromJson(SharedPref.readString(context,
                         Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
-                model!!.setExVisitorId(context, exVisitorId)
+                model!!.setExVisitorId(context, exVisitorId, false)
             } else {
                 model = createInitialModel(context)
-                model!!.setExVisitorId(context, exVisitorId)
+                model!!.setExVisitorId(context, exVisitorId, false)
             }
         }
     }
@@ -290,13 +290,6 @@ object RelatedDigital {
             model!!.setCookieId(context, "")
         }
         AppUtils.clearCookieId(context)
-    }
-
-    @JvmStatic
-    fun clearExVisitorId(context: Context) {
-        if (model != null) {
-            model!!.setExVisitorId(context, "")
-        }
     }
 
     @JvmStatic
@@ -685,6 +678,25 @@ object RelatedDigital {
             } else {
                 Log.e(LOG_TAG, "No visitor data gotten yet!!")
                 ""
+            }
+        }
+    }
+
+    @JvmStatic
+    fun logout(context: Context) {
+        if (model != null) {
+            model!!.setExVisitorId(context, "", true)
+            model!!.setCookieId(context, null)
+        } else {
+            if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
+                model = Gson().fromJson(SharedPref.readString(context,
+                        Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
+                model!!.setExVisitorId(context, "", true)
+                model!!.setCookieId(context, null)
+            } else {
+                model = createInitialModel(context)
+                model!!.setExVisitorId(context, "", true)
+                model!!.setCookieId(context, null)
             }
         }
     }
