@@ -22,7 +22,7 @@ object RetentionApiClient {
             val httpClient = OkHttpClient.Builder()
                     .addInterceptor(interceptor)
                     .connectTimeout(connectTimeOutInSec.toLong(), TimeUnit.SECONDS)
-                    .readTimeout(10, TimeUnit.SECONDS)
+                    .readTimeout(30, TimeUnit.SECONDS)
             synchronized(RetentionApiClient::class.java) {
                 if (retrofit == null) {
                     retrofit = Retrofit.Builder()
