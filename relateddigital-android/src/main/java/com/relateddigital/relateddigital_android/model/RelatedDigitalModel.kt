@@ -21,6 +21,7 @@ class RelatedDigitalModel(
         private var requestTimeoutInSecond: Int = 30,
         private var maxGeofenceCount: Int = 100,
         private var appVersion: String,
+        private var apiVersion: String = "Android",
         private var osType: String = "ANDROID",
         private var osVersion: String,
         private var sdkVersion: String,
@@ -35,6 +36,7 @@ class RelatedDigitalModel(
         private var cookieId: String?,
         private var userAgent: String,
         private var visitorData: String,
+        private var visitData: String,
         private var cookie: LoadBalanceCookie? = null
 ) : Serializable {
 
@@ -193,6 +195,11 @@ class RelatedDigitalModel(
         saveToSharedPrefs(context)
     }
 
+    fun setVisitData(context: Context, visitData: String) {
+        this.visitData = visitData
+        saveToSharedPrefs(context)
+    }
+
     fun setCookie(context: Context, cookie: LoadBalanceCookie) {
         this.cookie = cookie
     }
@@ -239,6 +246,10 @@ class RelatedDigitalModel(
 
     fun getAppVersion(): String {
         return appVersion
+    }
+
+    fun getApiVersion(): String {
+        return apiVersion
     }
 
     fun getOsType(): String {
@@ -297,6 +308,10 @@ class RelatedDigitalModel(
         return visitorData
     }
 
+    fun getVisitData(): String {
+        return visitData
+    }
+
     fun getCookie(): LoadBalanceCookie? {
         return cookie
     }
@@ -310,5 +325,92 @@ class RelatedDigitalModel(
     fun getFromSharedPref(context: Context): RelatedDigitalModel {
         return Gson().fromJson(SharedPref.readString(context,
                 Constants.RELATED_DIGITAL_MODEL_KEY), this::class.java)
+    }
+
+    fun fill(model: RelatedDigitalModel) {
+        if(model.getIsPushNotificationEnabled() != null) {
+            this.isPushNotificationEnabled = model.getIsPushNotificationEnabled()
+        }
+        if(model.getIsInAppNotificationEnabled() != null) {
+            this.isInAppNotificationEnabled = model.getIsInAppNotificationEnabled()
+        }
+        if(model.getIsGeofenceEnabled() != null) {
+            this.isGeofenceEnabled = model.getIsGeofenceEnabled()
+        }
+        if(model.getGoogleAppAlias() != null) {
+            this.googleAppAlias = model.getGoogleAppAlias()
+        }
+        if(model.getHuaweiAppAlias() != null) {
+            this.huaweiAppAlias = model.getHuaweiAppAlias()
+        }
+        if(model.getOrganizationId() != null) {
+            this.organizationId = model.getOrganizationId()
+        }
+        if(model.getProfileId() != null) {
+            this.profileId = model.getProfileId()
+        }
+        if(model.getDataSource() != null) {
+            this.dataSource = model.getDataSource()
+        }
+        if(model.getRequestTimeoutInSecond() != null) {
+            this.requestTimeoutInSecond = model.getRequestTimeoutInSecond()
+        }
+        if(model.getMaxGeofenceCount() != null) {
+            this.maxGeofenceCount = model.getMaxGeofenceCount()
+        }
+        if(model.getAppVersion() != null) {
+            this.appVersion = model.getAppVersion()
+        }
+        if(model.getApiVersion() != null) {
+            this.apiVersion = model.getApiVersion()
+        }
+        if(model.getOsType() != null) {
+            this.osType = model.getOsType()
+        }
+        if(model.getOsVersion() != null) {
+            this.osVersion = model.getOsVersion()
+        }
+        if(model.getSdkVersion() != null) {
+            this.sdkVersion = model.getSdkVersion()
+        }
+        if(model.getDeviceType() != null) {
+            this.deviceType = model.getDeviceType()
+        }
+        if(model.getDeviceName() != null) {
+            this.deviceName = model.getDeviceName()
+        }
+        if(model.getCarrier() != null) {
+            this.carrier = model.getCarrier()
+        }
+        if(model.getIdentifierForVendor() != null) {
+            this.identifierForVendor = model.getIdentifierForVendor()
+        }
+        if(model.getAdvertisingIdentifier() != null) {
+            this.advertisingIdentifier = model.getAdvertisingIdentifier()
+        }
+        if(model.getLocal() != null) {
+            this.local = model.getLocal()
+        }
+        if(model.getExVisitorId() != null) {
+            this.exVisitorId = model.getExVisitorId()
+        }
+        if(model.getToken() != null) {
+            this.token = model.getToken()
+        }
+        if(model.getCookieId() != null) {
+            this.cookieId = model.getCookieId()
+        }
+        if(model.getUserAgent() != null) {
+            this.userAgent = model.getUserAgent()
+        }
+        if(model.getVisitorData() != null) {
+            this.visitorData = model.getVisitorData()
+        }
+        if(model.getVisitData() != null) {
+            this.visitData = model.getVisitData()
+        }
+        if(model.getCookie() != null) {
+            this.cookie = model.getCookie()
+        }
     }
 }

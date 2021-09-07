@@ -32,7 +32,7 @@ interface ApiMethods {
     fun getGeneralRequestJsonResponse(
             @HeaderMap headers: Map<String, String>,
             @QueryMap queryParameters: Map<String, String>
-    ): Call<ResponseBody>
+    ): Call<List<InAppMessage>>
 
     @GET("actjson")
     fun getInAppRequestResponse(

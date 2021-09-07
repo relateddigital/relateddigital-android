@@ -1,5 +1,8 @@
 package com.relateddigital.relateddigital_android.model
 
 enum class Domain {
-    LOGGER, REAL_TIME, S
+    LOG_LOGGER,
+    LOG_REAL_TIME,
+    LOG_S,
+    IN_APP_NOTIFICATION_ACT_JSON,
 }
