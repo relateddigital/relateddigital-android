@@ -1,9 +1,14 @@
 package com.relateddigital.relateddigital_android.constants
 
+import android.content.Context
+import android.content.Intent
+import android.os.Build
+import android.util.Log
 import com.relateddigital.relateddigital_android.model.VisilabsParameter
 
 class Constants {
     companion object {
+        const val LOG_TAG = "Constants"
         const val SDK_MIN_API_VERSION: Int = 21
         const val RELATED_DIGITAL_MODEL_KEY = "related_digital_model_key"
 
@@ -77,5 +82,7 @@ class Constants {
 
         const val SHOWN_STORIES_PREF = "VisilabsShownStories"
         const val SHOWN_STORIES_PREF_KEY = "shownStories"
+
+        const val INTENT_ID_KEY = "INTENT_ID_KEY"
     }
 }

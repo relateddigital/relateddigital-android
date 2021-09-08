@@ -1,5 +1,6 @@
 package com.relateddigital.relateddigital_android.network
 
+import android.content.Context
 import android.util.Log
 import com.relateddigital.relateddigital_android.api.ApiMethods
 import com.relateddigital.relateddigital_android.api.LoggerApiClient
@@ -10,6 +11,7 @@ import com.relateddigital.relateddigital_android.model.Domain
 import com.relateddigital.relateddigital_android.model.InAppMessage
 import com.relateddigital.relateddigital_android.model.RelatedDigitalModel
 import com.relateddigital.relateddigital_android.model.Request
+import com.relateddigital.relateddigital_android.util.InAppNotificationTimer
 import okhttp3.Headers
 import retrofit2.Call
 import retrofit2.Callback
@@ -22,12 +24,12 @@ object RequestSender {
     private val requestQueue = ArrayList<Request>()
     private var isSendingARequest = false
     private var retryCounter = 0
-    fun addToQueue(request: Request, model: RelatedDigitalModel) {
+    fun addToQueue(request: Request, model: RelatedDigitalModel, context: Context) {
         requestQueue.add(request)
-        send(model)
+        send(model, context)
     }
 
-    private fun send(model: RelatedDigitalModel) {
+    private fun send(model: RelatedDigitalModel, context: Context) {
         if (isSendingARequest || requestQueue.isEmpty()) {
             return
         }
@@ -39,67 +41,67 @@ object RequestSender {
         when (currentRequest.domain) {
             Domain.LOG_LOGGER -> {
                 val loggerApiInterface =
-                    LoggerApiClient.getClient(model.getRequestTimeoutInSecond())
-                        ?.create(ApiMethods::class.java)
+                        LoggerApiClient.getClient(model.getRequestTimeoutInSecond())
+                                ?.create(ApiMethods::class.java)
                 val call: Call<Void> = loggerApiInterface?.sendToLogger(
-                    model.getDataSource(),
-                    currentRequest.headerMap, currentRequest.queryMap
+                        model.getDataSource(),
+                        currentRequest.headerMap, currentRequest.queryMap
                 )!!
                 call.enqueue(object : Callback<Void?> {
                     override fun onResponse(call: Call<Void?>, response: Response<Void?>) {
                         if (response.isSuccessful) {
-                            applySuccessConditions(response, model, Domain.LOG_LOGGER)
+                            applySuccessConditions(response, model, Domain.LOG_LOGGER, context)
                         } else {
-                            applyFailConditions(call, model)
+                            applyFailConditions(call, model, context)
                         }
                     }
 
                     override fun onFailure(call: Call<Void?>, t: Throwable) {
-                        applyFailConditions(call, model)
+                        applyFailConditions(call, model, context)
                     }
                 })
             }
 
             Domain.LOG_REAL_TIME -> {
                 val realTimeApiInterface =
-                    RealTimeApiClient.getClient(model.getRequestTimeoutInSecond())
-                        ?.create(ApiMethods::class.java)
+                        RealTimeApiClient.getClient(model.getRequestTimeoutInSecond())
+                                ?.create(ApiMethods::class.java)
                 val call: Call<Void> = realTimeApiInterface?.sendToRealTime(
-                    model.getDataSource(),
-                    currentRequest.headerMap, currentRequest.queryMap
+                        model.getDataSource(),
+                        currentRequest.headerMap, currentRequest.queryMap
                 )!!
                 call.enqueue(object : Callback<Void?> {
                     override fun onResponse(call: Call<Void?>, response: Response<Void?>) {
                         if (response.isSuccessful) {
-                            applySuccessConditions(response, model, Domain.LOG_REAL_TIME)
+                            applySuccessConditions(response, model, Domain.LOG_REAL_TIME, context)
                         } else {
-                            applyFailConditions(call, model)
+                            applyFailConditions(call, model, context)
                         }
                     }
 
                     override fun onFailure(call: Call<Void?>, t: Throwable) {
-                        applyFailConditions(call, model)
+                        applyFailConditions(call, model, context)
                     }
                 })
             }
 
             Domain.LOG_S -> {
                 val sApiInterface = SApiClient.getClient(model.getRequestTimeoutInSecond())
-                    ?.create(ApiMethods::class.java)
+                        ?.create(ApiMethods::class.java)
                 val call: Call<Void> = sApiInterface?.sendSubsJsonRequestToS(
-                    currentRequest.headerMap, currentRequest.queryMap
+                        currentRequest.headerMap, currentRequest.queryMap
                 )!!
                 call.enqueue(object : Callback<Void?> {
                     override fun onResponse(call: Call<Void?>, response: Response<Void?>) {
                         if (response.isSuccessful) {
-                            applySuccessConditions(response, model, Domain.LOG_S)
+                            applySuccessConditions(response, model, Domain.LOG_S, context)
                         } else {
-                            applyFailConditions(call, model)
+                            applyFailConditions(call, model, context)
                         }
                     }
 
                     override fun onFailure(call: Call<Void?>, t: Throwable) {
-                        applyFailConditions(call, model)
+                        applyFailConditions(call, model, context)
                     }
                 })
             }
@@ -107,20 +109,31 @@ object RequestSender {
             Domain.IN_APP_NOTIFICATION_ACT_JSON -> {
                 try {
                     val actJsonInterface = SApiClient.getClient(model.getRequestTimeoutInSecond())
-                        ?.create(ApiMethods::class.java)
+                            ?.create(ApiMethods::class.java)
                     val call: Call<List<InAppMessage>> =
-                        actJsonInterface?.getGeneralRequestJsonResponse(
-                            currentRequest.headerMap, currentRequest.queryMap
-                        )!!
+                            actJsonInterface?.getGeneralRequestJsonResponse(
+                                    currentRequest.headerMap, currentRequest.queryMap
+                            )!!
                     call.enqueue(object : Callback<List<InAppMessage>?> {
                         override fun onResponse(
-                            call: Call<List<InAppMessage>?>,
-                            response: Response<List<InAppMessage>?>
+                                call: Call<List<InAppMessage>?>,
+                                response: Response<List<InAppMessage>?>
                         ) {
                             if (response.isSuccessful) {
                                 try {
                                     val inAppMessages = response.body()
-                                    // TODO : Visilabs 835 den devam et. Message daki visitorData ve visitData yı shared pref e kaydet.
+                                    Log.i(
+                                            LOG_TAG,
+                                            "Successful InApp Request : " + call.request().url.toString()
+                                    )
+                                    val timer = Timer("InAppNotification Delay Timer", false)
+                                    val timerTask = InAppNotificationTimer(null, 0,
+                                            inAppMessages, currentRequest.parent, model, context)
+                                    var delay: Long = 0
+                                    if(timerTask.getMessage() != null) {
+                                        delay = timerTask.getMessage()!!.mActionData!!.mWaitingTime!!.toLong() * 1000
+                                    }
+                                    timer.schedule(timerTask, delay)
                                 } catch (e: Exception) {
                                     e.printStackTrace()
                                     Log.w(LOG_TAG, "Could not parse the response for the" +
@@ -130,8 +143,8 @@ object RequestSender {
                                 }
                             } else {
                                 Log.w(
-                                    LOG_TAG,
-                                    "Fail InApp Request : " + call.request().url.toString()
+                                        LOG_TAG,
+                                        "Fail InApp Request : " + call.request().url.toString()
                                 )
                                 Log.w(LOG_TAG, "Fail Request Response Code : " + response.code())
                             }
@@ -151,8 +164,8 @@ object RequestSender {
     }
 
     private fun parseAndSetResponseHeaders(
-        responseHeaders: Headers, type: Domain,
-        model: RelatedDigitalModel
+            responseHeaders: Headers, type: Domain,
+            model: RelatedDigitalModel
     ) {
         val names = responseHeaders.names()
         if (names.isNotEmpty()) {
@@ -167,10 +180,10 @@ object RequestSender {
                 for (cookie in cookies) {
                     val fields = cookie.split(";").toTypedArray()
                     if (fields[0].toLowerCase(Locale.ROOT).contains(
-                            Constants.LOAD_BALANCE_PREFIX.toLowerCase(
-                                Locale.ROOT
-                            )
-                        )) {
+                                    Constants.LOAD_BALANCE_PREFIX.toLowerCase(
+                                            Locale.ROOT
+                                    )
+                            )) {
                         val cookieKeyValue = fields[0].split("=").toTypedArray()
                         if (cookieKeyValue.size > 1) {
                             val cookieKey = cookieKeyValue[0]
@@ -185,10 +198,10 @@ object RequestSender {
                         }
                     }
                     if (fields[0].toLowerCase(Locale.ROOT).contains(
-                            Constants.OM_3_KEY.toLowerCase(
-                                Locale.ROOT
-                            )
-                        )) {
+                                    Constants.OM_3_KEY.toLowerCase(
+                                            Locale.ROOT
+                                    )
+                            )) {
                         val cookieKeyValue = fields[0].split("=").toTypedArray()
                         if (cookieKeyValue.size > 1 || model.getCookie() != null) {
                             val cookieValue = cookieKeyValue[1]
@@ -209,18 +222,18 @@ object RequestSender {
     }
 
     private fun applySuccessConditions(
-        response: Response<Void?>, model: RelatedDigitalModel,
-        type: Domain
+            response: Response<Void?>, model: RelatedDigitalModel,
+            type: Domain, context: Context
     ) {
         Log.i(LOG_TAG, "Successful Request : " + response.raw().request.url.toString())
         parseAndSetResponseHeaders(response.headers(), type, model)
         removeFromQueue()
         isSendingARequest = false
         retryCounter = 0
-        send(model)
+        send(model, context)
     }
 
-    private fun applyFailConditions(call: Call<Void?>, model: RelatedDigitalModel) {
+    private fun applyFailConditions(call: Call<Void?>, model: RelatedDigitalModel, context: Context) {
         Log.w(LOG_TAG, "Fail Request : " + call.request().url.toString())
         isSendingARequest = false
         retryCounter++
@@ -229,6 +242,6 @@ object RequestSender {
             removeFromQueue()
             retryCounter = 0
         }
-        send(model)
+        send(model, context)
     }
 }

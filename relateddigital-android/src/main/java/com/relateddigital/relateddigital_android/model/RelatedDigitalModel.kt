@@ -197,7 +197,6 @@ class RelatedDigitalModel(
 
     fun setVisitData(context: Context, visitData: String) {
         this.visitData = visitData
-        saveToSharedPrefs(context)
     }
 
     fun setCookie(context: Context, cookie: LoadBalanceCookie) {
@@ -358,38 +357,8 @@ class RelatedDigitalModel(
         if(model.getMaxGeofenceCount() != null) {
             this.maxGeofenceCount = model.getMaxGeofenceCount()
         }
-        if(model.getAppVersion() != null) {
-            this.appVersion = model.getAppVersion()
-        }
-        if(model.getApiVersion() != null) {
-            this.apiVersion = model.getApiVersion()
-        }
-        if(model.getOsType() != null) {
-            this.osType = model.getOsType()
-        }
-        if(model.getOsVersion() != null) {
-            this.osVersion = model.getOsVersion()
-        }
-        if(model.getSdkVersion() != null) {
-            this.sdkVersion = model.getSdkVersion()
-        }
-        if(model.getDeviceType() != null) {
-            this.deviceType = model.getDeviceType()
-        }
-        if(model.getDeviceName() != null) {
-            this.deviceName = model.getDeviceName()
-        }
-        if(model.getCarrier() != null) {
-            this.carrier = model.getCarrier()
-        }
-        if(model.getIdentifierForVendor() != null) {
-            this.identifierForVendor = model.getIdentifierForVendor()
-        }
         if(model.getAdvertisingIdentifier() != null) {
             this.advertisingIdentifier = model.getAdvertisingIdentifier()
-        }
-        if(model.getLocal() != null) {
-            this.local = model.getLocal()
         }
         if(model.getExVisitorId() != null) {
             this.exVisitorId = model.getExVisitorId()
@@ -397,20 +366,8 @@ class RelatedDigitalModel(
         if(model.getToken() != null) {
             this.token = model.getToken()
         }
-        if(model.getCookieId() != null) {
-            this.cookieId = model.getCookieId()
-        }
-        if(model.getUserAgent() != null) {
-            this.userAgent = model.getUserAgent()
-        }
         if(model.getVisitorData() != null) {
             this.visitorData = model.getVisitorData()
-        }
-        if(model.getVisitData() != null) {
-            this.visitData = model.getVisitData()
-        }
-        if(model.getCookie() != null) {
-            this.cookie = model.getCookie()
         }
     }
 }

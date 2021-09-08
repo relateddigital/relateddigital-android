@@ -25,8 +25,8 @@ object RequestHandler {
             headerMap = headerMap
         )
 
-        RequestSender.addToQueue(Request(Domain.LOG_LOGGER, queryMap, headerMap, null), model)
-        RequestSender.addToQueue(Request(Domain.LOG_REAL_TIME, queryMap, headerMap, null), model)
+        RequestSender.addToQueue(Request(Domain.LOG_LOGGER, queryMap, headerMap, null), model, context)
+        RequestSender.addToQueue(Request(Domain.LOG_REAL_TIME, queryMap, headerMap, null), model, context)
     }
 
     fun createInAppNotificationRequest(
@@ -44,6 +44,6 @@ object RequestHandler {
             headerMap = headerMap
         )
 
-        RequestSender.addToQueue(Request(Domain.IN_APP_NOTIFICATION_ACT_JSON, queryMap, headerMap, parent), model)
+        RequestSender.addToQueue(Request(Domain.IN_APP_NOTIFICATION_ACT_JSON, queryMap, headerMap, parent), model, context)
     }
 }
