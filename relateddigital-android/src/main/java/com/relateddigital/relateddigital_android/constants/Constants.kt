@@ -1,9 +1,5 @@
 package com.relateddigital.relateddigital_android.constants
 
-import android.content.Context
-import android.content.Intent
-import android.os.Build
-import android.util.Log
 import com.relateddigital.relateddigital_android.model.VisilabsParameter
 
 class Constants {
@@ -18,6 +14,7 @@ class Constants {
         const val PVIV_KEY = "pviv"
         const val TVC_KEY = "tvc"
         const val COOKIE_ID_REQUEST_KEY = "OM.cookieID"
+        const val DOMAIN_REQUEST_KEY = "OM.domain"
         const val EXVISITOR_ID_REQUEST_KEY = "OM.exVisitorID"
         const val CHANNEL_REQUEST_KEY = "OM.vchannel"
         const val TOKEN_ID_REQUEST_KEY = "OM.sys.TokenID"
@@ -82,6 +79,8 @@ class Constants {
 
         const val SHOWN_STORIES_PREF = "VisilabsShownStories"
         const val SHOWN_STORIES_PREF_KEY = "shownStories"
+
+        const val PAGE_NAME_REQUEST_VAL = "/OM_evt.gif"
 
         const val INTENT_ID_KEY = "INTENT_ID_KEY"
     }

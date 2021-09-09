@@ -37,6 +37,15 @@ object RequestFormer {
         addInAppNotificationExtraParameters(model, queryMap)
     }
 
+    fun formInAppNotificationClickRequest(
+            context: Context, model: RelatedDigitalModel?, pageName: String,
+            properties: HashMap<String, String>?,
+            queryMap: HashMap<String, String>, headerMap: HashMap<String, String>
+    ) {
+        fillCommonParameters(context, model, pageName, properties, queryMap, headerMap)
+        addInAppNotificationClickExtraParameters(model, queryMap)
+    }
+
     fun updateSessionParameters(context: Context, pageName: String) {
         val dateNow = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date())
         val lastEventTime: String = SharedPref.readString(
@@ -237,5 +246,11 @@ object RequestFormer {
         if(model.getVisitData().isNotEmpty()) {
             queryMap[Constants.VISIT_DATA_REQUEST_KEY] = model.getVisitData()
         }
+    }
+
+    private fun addInAppNotificationClickExtraParameters(
+            model: RelatedDigitalModel?, queryMap: HashMap<String, String>
+    ) {
+        queryMap[Constants.DOMAIN_REQUEST_KEY] = model!!.getDataSource() + "_Android"
     }
 }

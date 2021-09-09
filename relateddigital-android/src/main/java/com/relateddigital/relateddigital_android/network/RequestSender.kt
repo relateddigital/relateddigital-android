@@ -50,14 +50,15 @@ object RequestSender {
                 call.enqueue(object : Callback<Void?> {
                     override fun onResponse(call: Call<Void?>, response: Response<Void?>) {
                         if (response.isSuccessful) {
-                            applySuccessConditions(response, model, Domain.LOG_LOGGER, context)
+                            applySuccessConditions(response.headers(), response.raw().request.url.toString(),
+                                    model, Domain.LOG_LOGGER, context)
                         } else {
-                            applyFailConditions(call, model, context)
+                            applyFailConditions(call.request().url.toString(), model, context)
                         }
                     }
 
                     override fun onFailure(call: Call<Void?>, t: Throwable) {
-                        applyFailConditions(call, model, context)
+                        applyFailConditions(call.request().url.toString(), model, context)
                     }
                 })
             }
@@ -73,14 +74,15 @@ object RequestSender {
                 call.enqueue(object : Callback<Void?> {
                     override fun onResponse(call: Call<Void?>, response: Response<Void?>) {
                         if (response.isSuccessful) {
-                            applySuccessConditions(response, model, Domain.LOG_REAL_TIME, context)
+                            applySuccessConditions(response.headers(), response.raw().request.url.toString(),
+                                    model, Domain.LOG_REAL_TIME, context)
                         } else {
-                            applyFailConditions(call, model, context)
+                            applyFailConditions(call.request().url.toString(), model, context)
                         }
                     }
 
                     override fun onFailure(call: Call<Void?>, t: Throwable) {
-                        applyFailConditions(call, model, context)
+                        applyFailConditions(call.request().url.toString(), model, context)
                     }
                 })
             }
@@ -94,71 +96,71 @@ object RequestSender {
                 call.enqueue(object : Callback<Void?> {
                     override fun onResponse(call: Call<Void?>, response: Response<Void?>) {
                         if (response.isSuccessful) {
-                            applySuccessConditions(response, model, Domain.LOG_S, context)
+                            applySuccessConditions(response.headers(), response.raw().request.url.toString(),
+                                    model, Domain.LOG_S, context)
                         } else {
-                            applyFailConditions(call, model, context)
+                            applyFailConditions(call.request().url.toString(), model, context)
                         }
                     }
 
                     override fun onFailure(call: Call<Void?>, t: Throwable) {
-                        applyFailConditions(call, model, context)
+                        applyFailConditions(call.request().url.toString(), model, context)
                     }
                 })
             }
 
             Domain.IN_APP_NOTIFICATION_ACT_JSON -> {
-                try {
-                    val actJsonInterface = SApiClient.getClient(model.getRequestTimeoutInSecond())
-                            ?.create(ApiMethods::class.java)
-                    val call: Call<List<InAppMessage>> =
-                            actJsonInterface?.getGeneralRequestJsonResponse(
-                                    currentRequest.headerMap, currentRequest.queryMap
-                            )!!
-                    call.enqueue(object : Callback<List<InAppMessage>?> {
-                        override fun onResponse(
-                                call: Call<List<InAppMessage>?>,
-                                response: Response<List<InAppMessage>?>
-                        ) {
-                            if (response.isSuccessful) {
-                                try {
-                                    val inAppMessages = response.body()
-                                    Log.i(
-                                            LOG_TAG,
-                                            "Successful InApp Request : " + call.request().url.toString()
-                                    )
-                                    val timer = Timer("InAppNotification Delay Timer", false)
-                                    val timerTask = InAppNotificationTimer(null, 0,
-                                            inAppMessages, currentRequest.parent, model, context)
-                                    var delay: Long = 0
-                                    if(timerTask.getMessage() != null) {
-                                        delay = timerTask.getMessage()!!.mActionData!!.mWaitingTime!!.toLong() * 1000
-                                    }
-                                    timer.schedule(timerTask, delay)
-                                } catch (e: Exception) {
-                                    e.printStackTrace()
-                                    Log.w(LOG_TAG, "Could not parse the response for the" +
-                                            " request - not in the expected format : " +
-                                            response.raw().request.url.toString()
-                                    )
-                                }
-                            } else {
-                                Log.w(
+                val actJsonInterface = SApiClient.getClient(model.getRequestTimeoutInSecond())
+                        ?.create(ApiMethods::class.java)
+                val call: Call<List<InAppMessage>> =
+                        actJsonInterface?.getGeneralRequestJsonResponse(
+                                currentRequest.headerMap, currentRequest.queryMap
+                        )!!
+                call.enqueue(object : Callback<List<InAppMessage>?> {
+                    override fun onResponse(
+                            call: Call<List<InAppMessage>?>,
+                            response: Response<List<InAppMessage>?>
+                    ) {
+                        if (response.isSuccessful) {
+                            applySuccessConditions(response.headers(), response.raw().request.url.toString(),
+                                    model, Domain.LOG_S, context)
+                            try {
+                                val inAppMessages = response.body()
+                                Log.i(
                                         LOG_TAG,
-                                        "Fail InApp Request : " + call.request().url.toString()
+                                        "Successful InApp Request : " + call.request().url.toString()
                                 )
-                                Log.w(LOG_TAG, "Fail Request Response Code : " + response.code())
+                                val timer = Timer("InAppNotification Delay Timer", false)
+                                val timerTask = InAppNotificationTimer(null, 0,
+                                        inAppMessages, currentRequest.parent, model, context)
+                                var delay: Long = 0
+                                if (timerTask.getMessage() != null) {
+                                    delay = timerTask.getMessage()!!.mActionData!!.mWaitingTime!!.toLong() * 1000
+                                }
+                                timer.schedule(timerTask, delay)
+                            } catch (e: Exception) {
+                                e.printStackTrace()
+                                Log.w(LOG_TAG, "Could not parse the response for the" +
+                                        " request - not in the expected format : " +
+                                        response.raw().request.url.toString()
+                                )
                             }
+                        } else {
+                            applyFailConditions(call.request().url.toString(), model, context)
+                            Log.w(
+                                    LOG_TAG,
+                                    "Fail InApp Request : " + call.request().url.toString()
+                            )
+                            Log.w(LOG_TAG, "Fail Request Response Code : " + response.code())
                         }
+                    }
 
-                        override fun onFailure(call: Call<List<InAppMessage>?>, t: Throwable) {
-                            Log.w(LOG_TAG, "Fail InApp Request : " + call.request().url.toString())
-                            Log.w(LOG_TAG, "Fail Request Message : " + t.message)
-                        }
-                    })
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    Log.e(LOG_TAG, "Could not parse the response!")
-                }
+                    override fun onFailure(call: Call<List<InAppMessage>?>, t: Throwable) {
+                        applyFailConditions(call.request().url.toString(), model, context)
+                        Log.w(LOG_TAG, "Fail InApp Request : " + call.request().url.toString())
+                        Log.w(LOG_TAG, "Fail Request Message : " + t.message)
+                    }
+                })
             }
         }
     }
@@ -222,19 +224,19 @@ object RequestSender {
     }
 
     private fun applySuccessConditions(
-            response: Response<Void?>, model: RelatedDigitalModel,
+            headers: Headers, url: String, model: RelatedDigitalModel,
             type: Domain, context: Context
     ) {
-        Log.i(LOG_TAG, "Successful Request : " + response.raw().request.url.toString())
-        parseAndSetResponseHeaders(response.headers(), type, model)
+        Log.i(LOG_TAG, "Successful Request : $url")
+        parseAndSetResponseHeaders(headers, type, model)
         removeFromQueue()
         isSendingARequest = false
         retryCounter = 0
         send(model, context)
     }
 
-    private fun applyFailConditions(call: Call<Void?>, model: RelatedDigitalModel, context: Context) {
-        Log.w(LOG_TAG, "Fail Request : " + call.request().url.toString())
+    private fun applyFailConditions(url: String, model: RelatedDigitalModel, context: Context) {
+        Log.w(LOG_TAG, "Fail Request : $url")
         isSendingARequest = false
         retryCounter++
         if (retryCounter >= 3) {

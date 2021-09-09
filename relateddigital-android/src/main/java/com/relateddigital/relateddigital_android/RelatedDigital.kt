@@ -6,6 +6,7 @@ import android.os.Build
 import android.util.Log
 import com.google.gson.Gson
 import com.relateddigital.relateddigital_android.constants.Constants
+import com.relateddigital.relateddigital_android.inapp.InAppButtonInterface
 import com.relateddigital.relateddigital_android.model.LoadBalanceCookie
 import com.relateddigital.relateddigital_android.model.RelatedDigitalModel
 import com.relateddigital.relateddigital_android.model.VisilabsParameter
@@ -17,6 +18,7 @@ import java.util.*
 
 object RelatedDigital {
     private var model: RelatedDigitalModel? = null
+    private var inAppButtonInterface: InAppButtonInterface? = null
     private const val LOG_TAG: String = "RelatedDigital"
 
     @JvmStatic
@@ -47,23 +49,27 @@ object RelatedDigital {
 
     private fun createInitialModel(context: Context): RelatedDigitalModel {
         return RelatedDigitalModel(
-            organizationId = "",
-            profileId = "",
-            dataSource = "",
-            appVersion = AppUtils.getAppVersion(context),
-            osType = AppUtils.getOsType(),
-            osVersion = AppUtils.getOsVersion(),
-            sdkVersion = AppUtils.getSdkVersion(),
-            deviceType = AppUtils.getDeviceType(),
-            deviceName = AppUtils.getDeviceName(),
-            carrier = AppUtils.getCarrier(context),
-            identifierForVendor = AppUtils.getIdentifierForVendor(context),
-            local = AppUtils.getLocal(context),
-            userAgent = AppUtils.getUserAgent(),
-            cookieId = AppUtils.getCookieId(context),
-            visitorData = "",
-            visitData = ""
+                organizationId = "",
+                profileId = "",
+                dataSource = "",
+                appVersion = AppUtils.getAppVersion(context),
+                osType = AppUtils.getOsType(),
+                osVersion = AppUtils.getOsVersion(),
+                sdkVersion = AppUtils.getSdkVersion(),
+                deviceType = AppUtils.getDeviceType(),
+                deviceName = AppUtils.getDeviceName(),
+                carrier = AppUtils.getCarrier(context),
+                identifierForVendor = AppUtils.getIdentifierForVendor(context),
+                local = AppUtils.getLocal(context),
+                userAgent = AppUtils.getUserAgent(),
+                cookieId = AppUtils.getCookieId(context),
+                visitorData = "",
+                visitData = ""
         )
+    }
+
+    fun getRelatedDigitalModel(): RelatedDigitalModel? {
+        return model
     }
 
     @JvmStatic
@@ -284,6 +290,11 @@ object RelatedDigital {
                 model!!.setToken(context, token)
             }
         }
+    }
+
+    @JvmStatic
+    fun setInAppButtonInterface(inAppButtonInterface: InAppButtonInterface?) {
+        this.inAppButtonInterface = inAppButtonInterface
     }
 
     @JvmStatic
@@ -685,6 +696,11 @@ object RelatedDigital {
     }
 
     @JvmStatic
+    fun getInAppButtonInterface(): InAppButtonInterface? {
+        return this.inAppButtonInterface
+    }
+
+    @JvmStatic
     fun logout(context: Context) {
         if (model != null) {
             model!!.setExVisitorId(context, "", true)
@@ -718,7 +734,7 @@ object RelatedDigital {
 
         RequestFormer.updateSessionParameters(context, pageName)
 
-        if(model!!.getIsInAppNotificationEnabled()) {
+        if (model!!.getIsInAppNotificationEnabled()) {
             RequestHandler.createInAppNotificationRequest(context, model!!, pageName, properties, parent)
         }
         RequestHandler.createLoggerRequest(context, model!!, pageName, properties)

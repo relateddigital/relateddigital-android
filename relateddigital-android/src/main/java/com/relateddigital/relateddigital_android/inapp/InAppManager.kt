@@ -1,5 +1,6 @@
 package com.relateddigital.relateddigital_android.inapp
 
+import android.R
 import android.app.Activity
 import android.content.Intent
 import android.util.Log
@@ -10,8 +11,8 @@ import com.relateddigital.relateddigital_android.util.ActivityImageUtils
 import java.util.concurrent.locks.ReentrantLock
 
 class InAppManager(
-    private val mCookieID: String,
-    private val mDataSource: String
+        private val mCookieID: String,
+        private val mDataSource: String
 ) {
     companion object {
         private const val LOG_TAG = "InAppManager"
@@ -29,10 +30,10 @@ class InAppManager(
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                     intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
                     intent.putExtra(
-                        Constants.INTENT_ID_KEY, getStateId(
+                            Constants.INTENT_ID_KEY, getStateId(
                             parent,
                             mailSubscriptionForm
-                        )
+                    )
                     )
                     parent.startActivity(intent)
                 }
@@ -73,12 +74,12 @@ class InAppManager(
                     InAppNotificationType.MINI.toString() -> {
                         stateId = getStateId(parent, inAppMessage)
                         inAppUpdateDisplayState = InAppUpdateDisplayState.claimDisplayState(
-                            stateId
+                                stateId
                         )
                         if (inAppUpdateDisplayState == null) {
                             Log.w(
-                                LOG_TAG,
-                                "Notification's display proposal was already consumed, no notification will be shown."
+                                    LOG_TAG,
+                                    "Notification's display proposal was already consumed, no notification will be shown."
                             )
                         } else {
                             openInAppMiniFragment(stateId, parent, inAppUpdateDisplayState)
@@ -90,22 +91,22 @@ class InAppManager(
                     InAppNotificationType.NPS_WITH_NUMBERS.toString(), InAppNotificationType.IMAGE_BUTTON.toString(),
                     InAppNotificationType.CAROUSEL.toString(), InAppNotificationType.NPS_AND_SECOND_POP_UP.toString() -> {
                         intent.putExtra(
-                            Constants.INTENT_ID_KEY, getStateId(
+                                Constants.INTENT_ID_KEY, getStateId(
                                 parent,
                                 inAppMessage
-                            )
+                        )
                         )
                         parent.startActivity(intent)
                     }
                     InAppNotificationType.ALERT.toString() -> {
                         stateId = getStateId(parent, inAppMessage)
                         inAppUpdateDisplayState = InAppUpdateDisplayState.claimDisplayState(
-                            stateId
+                                stateId
                         )
                         if (inAppUpdateDisplayState == null) {
                             Log.w(
-                                LOG_TAG,
-                                "Notification's display proposal was already consumed, no notification will be shown."
+                                    LOG_TAG,
+                                    "Notification's display proposal was already consumed, no notification will be shown."
                             )
                         } else {
                             if (inAppMessage.mActionData!!.mAlertType.equals("actionSheet")) {
@@ -116,9 +117,9 @@ class InAppManager(
                         }
                     }
                     else -> Log.e(
-                        LOG_TAG,
-                        "Unrecognized notification type " + inAppMessage.mActionData
-                        !!.mMsgType.toString() + " can't be shown"
+                            LOG_TAG,
+                            "Unrecognized notification type " + inAppMessage.mActionData
+                            !!.mMsgType.toString() + " can't be shown"
                     )
                 }
             } catch (ex: Exception) {
@@ -133,9 +134,9 @@ class InAppManager(
         val highlightColor: Int = ActivityImageUtils.getHighlightColorFromBackground(parent)
         val inAppNotificationState = InAppNotificationState(mailSubscriptionForm, highlightColor)
         val stateID: Int = InAppUpdateDisplayState.proposeDisplay(
-            inAppNotificationState,
-            mCookieID,
-            mDataSource
+                inAppNotificationState,
+                mCookieID,
+                mDataSource
         )
         if (stateID <= 0) {
             Log.e(LOG_TAG, "DisplayState Lock in inconsistent state!")
@@ -147,9 +148,9 @@ class InAppManager(
         val highlightColor: Int = ActivityImageUtils.getHighlightColorFromBackground(parent)
         val inAppNotificationState = InAppNotificationState(inAppMessage, highlightColor)
         val stateID: Int = InAppUpdateDisplayState.proposeDisplay(
-            inAppNotificationState,
-            mCookieID,
-            mDataSource
+                inAppNotificationState,
+                mCookieID,
+                mDataSource
         )
         if (stateID <= 0) {
             Log.e(LOG_TAG, "DisplayState Lock in inconsistent state!")
@@ -158,11 +159,18 @@ class InAppManager(
     }
 
     private fun openInAppMiniFragment(
-        stateID: Int,
-        parent: Activity,
-        inAppUpdateDisplayState: InAppUpdateDisplayState
+            stateID: Int,
+            parent: Activity,
+            inAppUpdateDisplayState: InAppUpdateDisplayState
     ) {
-        //TODO : InAppMiniFragment
+        val inAppMiniFragment = InAppMiniFragment()
+        if (inAppUpdateDisplayState.getDisplayState() != null) {
+            inAppMiniFragment.setInAppState(stateID, inAppUpdateDisplayState.getDisplayState() as InAppNotificationState)
+            inAppMiniFragment.retainInstance = true
+            val transaction = parent.fragmentManager.beginTransaction()
+            transaction.add(R.id.content, inAppMiniFragment)
+            transaction.commit()
+        }
     }
 
     private fun openInAppActivity(parent: Activity, inAppData: Int) {
@@ -171,17 +179,17 @@ class InAppManager(
     }
 
     private fun openInAppAlert(
-        stateID: Int,
-        parent: Activity,
-        inAppUpdateDisplayState: InAppUpdateDisplayState
+            stateID: Int,
+            parent: Activity,
+            inAppUpdateDisplayState: InAppUpdateDisplayState
     ) {
         //TODO : InAppAlertFragment
     }
 
     private fun openInAppActionSheet(
-        stateID: Int,
-        parent: Activity,
-        inAppUpdateDisplayState: InAppUpdateDisplayState
+            stateID: Int,
+            parent: Activity,
+            inAppUpdateDisplayState: InAppUpdateDisplayState
     ) {
         //TODO : InAppBottomSheetFragment
     }

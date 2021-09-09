@@ -13,7 +13,7 @@
     <string name="smile_rating_great">Harika</string>
     <string name="OK">OK</string>
     <string name="coupon_code">Coupon Code</string>
-    <string name="copied_to_clipboard">Copied to Clipboard</string>
+    <string name="copied_to_clipboard">Panoya kopyalandı</string>
 
     <string-array name="names">
         <item>@string/smile_rating_terrible</item>
@@ -23,15 +23,14 @@
         <item>@string/smile_rating_great</item>
     </string-array>
 
-    <string name="missing_subs_email">Please, click on the button to send your subscription.</string>
+    <string name="missing_subs_email">Lütfen, butona tıklayarak bilgilerinizi gönderin.</string>
 
     <!-- Countdown Timer strings -->
-    <string name="colon" translatable="false">:</string>
-    <string name="week_name" >Week</string>
-    <string name="day_name" >Day</string>
-    <string name="hour_name" >Hour</string>
-    <string name="minute_name" >Minute</string>
-    <string name="second_name" >Second</string>
-    <string name="time_is_over" >Time has expired!</string>
-    <string name="feedback_toast" >Thanks for your feedback!</string>
+    <string name="week_name" >Hafta</string>
+    <string name="day_name" >Gün</string>
+    <string name="hour_name" >Saat</string>
+    <string name="minute_name" >Dakika</string>
+    <string name="second_name" >Saniye</string>
+    <string name="time_is_over" >Süre doldu!</string>
+    <string name="feedback_toast" >Geri bildiriminiz için teşekkürler!</string>
 </resources>
