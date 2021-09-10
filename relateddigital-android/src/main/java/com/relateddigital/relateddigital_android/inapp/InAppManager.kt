@@ -1,9 +1,9 @@
 package com.relateddigital.relateddigital_android.inapp
 
-import android.R
 import android.app.Activity
 import android.content.Intent
 import android.util.Log
+import androidx.fragment.app.FragmentActivity
 import com.relateddigital.relateddigital_android.constants.Constants
 import com.relateddigital.relateddigital_android.model.InAppMessage
 import com.relateddigital.relateddigital_android.model.MailSubscriptionForm
@@ -16,33 +16,6 @@ class InAppManager(
 ) {
     companion object {
         private const val LOG_TAG = "InAppManager"
-    }
-
-    fun showMailSubscriptionForm(mailSubscriptionForm: MailSubscriptionForm, parent: Activity) {
-        parent.runOnUiThread {
-            val lock: ReentrantLock = InAppUpdateDisplayState.getLockObject()
-            lock.lock()
-            try {
-                if (InAppUpdateDisplayState.hasCurrentProposal()) {
-                    Log.i(LOG_TAG, "DisplayState is locked, will not show notifications")
-                } else {
-                    val intent = Intent(parent, MailSubscriptionFormActivity::class.java)
-                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                    intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
-                    intent.putExtra(
-                            Constants.INTENT_ID_KEY, getStateId(
-                            parent,
-                            mailSubscriptionForm
-                    )
-                    )
-                    parent.startActivity(intent)
-                }
-            } catch (ex: Exception) {
-                Log.e(LOG_TAG, ex.message, ex)
-            } finally {
-                lock.unlock()
-            }
-        }
     }
 
     fun showInAppMessage(inAppMessage: InAppMessage, parent: Activity) {
@@ -168,14 +141,9 @@ class InAppManager(
             inAppMiniFragment.setInAppState(stateID, inAppUpdateDisplayState.getDisplayState() as InAppNotificationState)
             inAppMiniFragment.retainInstance = true
             val transaction = parent.fragmentManager.beginTransaction()
-            transaction.add(R.id.content, inAppMiniFragment)
+            transaction.add(android.R.id.content, inAppMiniFragment)
             transaction.commit()
         }
-    }
-
-    private fun openInAppActivity(parent: Activity, inAppData: Int) {
-        //TODO : InAppNotificationActivity
-        //TODO : bu kaldırılıp show in app message da handle edilebilir
     }
 
     private fun openInAppAlert(
@@ -183,7 +151,18 @@ class InAppManager(
             parent: Activity,
             inAppUpdateDisplayState: InAppUpdateDisplayState
     ) {
-        //TODO : InAppAlertFragment
+        if (inAppUpdateDisplayState.getDisplayState() == null) {
+            InAppUpdateDisplayState.releaseDisplayState(stateID)
+            return
+        }
+        if (parent is FragmentActivity) {
+            val inAppAlertFragment: InAppAlertFragment = InAppAlertFragment.newInstance()
+            inAppAlertFragment.isCancelable = false
+            inAppAlertFragment.setInAppState(stateID, inAppUpdateDisplayState.getDisplayState() as InAppNotificationState, parent)
+            inAppAlertFragment.show(parent.supportFragmentManager, "InAppAlertFragment")
+        } else {
+            InAppUpdateDisplayState.releaseDisplayState(stateID)
+        }
     }
 
     private fun openInAppActionSheet(
@@ -191,6 +170,17 @@ class InAppManager(
             parent: Activity,
             inAppUpdateDisplayState: InAppUpdateDisplayState
     ) {
-        //TODO : InAppBottomSheetFragment
+        if (inAppUpdateDisplayState.getDisplayState() == null) {
+            InAppUpdateDisplayState.releaseDisplayState(stateID)
+            return
+        }
+        if (parent is FragmentActivity) {
+            val inAppBottomSheetFragment: InAppBottomSheetFragment = InAppBottomSheetFragment.newInstance()
+            inAppBottomSheetFragment.isCancelable = false
+            inAppBottomSheetFragment.setInAppState(stateID, inAppUpdateDisplayState.getDisplayState() as InAppNotificationState)
+            inAppBottomSheetFragment.show(parent.supportFragmentManager, "InAppBottomSheetFragment")
+        } else {
+            InAppUpdateDisplayState.releaseDisplayState(stateID)
+        }
     }
 }
