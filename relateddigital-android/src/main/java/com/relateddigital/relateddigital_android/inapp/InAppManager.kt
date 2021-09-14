@@ -58,7 +58,12 @@ class InAppManager(
                             openInAppMiniFragment(stateId, parent, inAppUpdateDisplayState)
                         }
                     }
-                    InAppNotificationType.FULL.toString(), InAppNotificationType.FULL_IMAGE.toString(),
+
+                    InAppNotificationType.FULL.toString() -> {
+                        openInAppActivity(parent, getStateId(parent, inAppMessage))
+                    }
+
+                    InAppNotificationType.FULL_IMAGE.toString(),
                     InAppNotificationType.SMILE_RATING.toString(),
                     InAppNotificationType.NPS.toString(), InAppNotificationType.IMAGE_TEXT_BUTTON.toString(),
                     InAppNotificationType.NPS_WITH_NUMBERS.toString(), InAppNotificationType.IMAGE_BUTTON.toString(),
@@ -144,6 +149,14 @@ class InAppManager(
             transaction.add(android.R.id.content, inAppMiniFragment)
             transaction.commit()
         }
+    }
+
+    private fun openInAppActivity(parent: Activity, inAppData: Int) {
+        val intent = Intent(parent.applicationContext, InAppFullActivity::class.java)
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
+        intent.putExtra(InAppFullActivity.INTENT_ID_KEY, inAppData)
+        parent.startActivity(intent)
     }
 
     private fun openInAppAlert(
