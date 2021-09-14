@@ -3,7 +3,7 @@ package com.relateddigital.androidexampleapp
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
-import com.relateddigital.androidexampleapp.databinding.ActivityInAppNotificationBinding
+import com.relateddigital.androidexampleapp.databinding.ActivityInAppNotificationExampleBinding
 import com.relateddigital.relateddigital_android.RelatedDigital
 import java.util.HashMap
 
@@ -11,10 +11,10 @@ class InAppNotificationActivity : AppCompatActivity() {
     companion object{
         private const val LOG_TAG = "InAppNotificationActivity"
     }
-    private lateinit var binding: ActivityInAppNotificationBinding
+    private lateinit var binding: ActivityInAppNotificationExampleBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityInAppNotificationBinding.inflate(layoutInflater)
+        binding = ActivityInAppNotificationExampleBinding.inflate(layoutInflater)
         val view: View = binding.root
         setContentView(view)
 
@@ -83,7 +83,7 @@ class InAppNotificationActivity : AppCompatActivity() {
         }
 
         binding.inAppCarouselButton.setOnClickListener {
-            sendInAppRequest("in-app-carousel")
+            //sendInAppRequest("in-app-carousel")
         }
 
         binding.shakeToWinButton.setOnClickListener {

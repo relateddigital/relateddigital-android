@@ -1,6 +1,8 @@
 package com.relateddigital.relateddigital_android.model
 
+import android.graphics.Typeface
 import com.google.gson.annotations.SerializedName
+import com.relateddigital.relateddigital_android.inapp.FontFamily
 import java.io.Serializable
 
 class ActionData : Serializable {
@@ -108,4 +110,19 @@ class ActionData : Serializable {
 
     @SerializedName("secondPopup_image2")
     var mSecondPopupImg2: String? = null
+
+    fun getFontFamily(): Typeface? {
+        if (mFontFamily == null || mFontFamily == "") {
+            return Typeface.DEFAULT
+        }
+        if (FontFamily.Monospace.toString() == mFontFamily!!.toLowerCase()) {
+            return Typeface.MONOSPACE
+        }
+        if (FontFamily.SansSerif.toString() == mFontFamily!!.toLowerCase()) {
+            return Typeface.SANS_SERIF
+        }
+        return if (FontFamily.Serif.toString() == mFontFamily!!.toLowerCase()) {
+            Typeface.SERIF
+        } else Typeface.DEFAULT
+    }
 }

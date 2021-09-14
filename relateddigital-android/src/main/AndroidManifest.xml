@@ -8,7 +8,9 @@
     <application
         android:networkSecurityConfig="@xml/network_security_config"
         android:supportsRtl="true">
-        <activity android:name=".inapp.InAppNotificationActivity"></activity>
+        <activity
+            android:name=".inapp.InAppNotificationActivity"
+            android:theme="@style/Theme.AppCompat.Light.Dialog.Alert" />
         <activity android:name=".inapp.MailSubscriptionFormActivity" />
     </application>
 
