@@ -10,11 +10,15 @@
         android:supportsRtl="true">
         <activity
             android:name=".inapp.InAppFullActivity"
-            android:theme="@style/Theme.AppCompat.Light.Dialog.Alert" />
+            android:theme="@style/Theme.AppCompat.Light.Dialog.Alert"
+            android:noHistory="true"/>
         <activity
             android:name=".inapp.InAppNotificationActivity"
-            android:theme="@style/Theme.AppCompat.Light.Dialog.Alert" />
-        <activity android:name=".inapp.MailSubscriptionFormActivity" />
+            android:theme="@style/Theme.AppCompat.Light.Dialog.Alert"
+            android:noHistory="true"/>
+        <activity
+            android:name=".inapp.MailSubscriptionFormActivity"
+            android:noHistory="true"/>
     </application>
 
 </manifest>
