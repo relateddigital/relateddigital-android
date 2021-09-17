@@ -1,7 +1,6 @@
 package com.relateddigital.androidexampleapp
 
 import android.app.Application
-import android.util.Log
 import com.relateddigital.relateddigital_android.RelatedDigital
 
 class MainApplication : Application() {
