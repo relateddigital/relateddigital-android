@@ -13,6 +13,9 @@ class MailSubActionData : Serializable {
     @SerializedName("message")
     var message: String? = null
 
+    @SerializedName("button_label")
+    var button_label: String? = null
+
     @SerializedName("waiting_time")
     var waiting_time: Int? = null
 

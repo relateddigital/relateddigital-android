@@ -5,4 +5,5 @@ enum class Domain {
     LOG_REAL_TIME,
     LOG_S,
     IN_APP_NOTIFICATION_ACT_JSON,
+    IN_APP_ACTION_MOBILE,
 }

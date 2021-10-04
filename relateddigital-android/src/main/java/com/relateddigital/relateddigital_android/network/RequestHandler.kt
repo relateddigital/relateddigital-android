@@ -5,53 +5,127 @@ import android.content.Context
 import android.util.Log
 import com.relateddigital.relateddigital_android.RelatedDigital
 import com.relateddigital.relateddigital_android.constants.Constants
-import com.relateddigital.relateddigital_android.model.Domain
-import com.relateddigital.relateddigital_android.model.InAppMessage
-import com.relateddigital.relateddigital_android.model.RelatedDigitalModel
-import com.relateddigital.relateddigital_android.model.Request
+import com.relateddigital.relateddigital_android.model.*
 
 object RequestHandler {
     private const val LOG_TAG = "RequestHandler"
 
     fun createLoggerRequest(
-            context: Context, model: RelatedDigitalModel, pageName: String,
-            properties: HashMap<String, String>?
+        context: Context, model: RelatedDigitalModel, pageName: String,
+        properties: HashMap<String, String>?
     ) {
         val queryMap = HashMap<String, String>()
         val headerMap = HashMap<String, String>()
         RequestFormer.formLoggerRequest(
-                context = context,
-                model = model,
-                pageName = pageName,
-                properties = properties,
-                queryMap = queryMap,
-                headerMap = headerMap
+            context = context,
+            model = model,
+            pageName = pageName,
+            properties = properties,
+            queryMap = queryMap,
+            headerMap = headerMap
         )
 
-        RequestSender.addToQueue(Request(Domain.LOG_LOGGER, queryMap, headerMap, null), model, context)
-        RequestSender.addToQueue(Request(Domain.LOG_REAL_TIME, queryMap, headerMap, null), model, context)
+        RequestSender.addToQueue(
+            Request(Domain.LOG_LOGGER, queryMap, headerMap, null),
+            model,
+            context
+        )
+        RequestSender.addToQueue(
+            Request(Domain.LOG_REAL_TIME, queryMap, headerMap, null),
+            model,
+            context
+        )
     }
 
     fun createInAppNotificationRequest(
-            context: Context, model: RelatedDigitalModel, pageName: String,
-            properties: HashMap<String, String>?, parent: Activity? = null
+        context: Context, model: RelatedDigitalModel, pageName: String,
+        properties: HashMap<String, String>?, parent: Activity? = null
     ) {
         val queryMap = HashMap<String, String>()
         val headerMap = HashMap<String, String>()
         RequestFormer.formInAppNotificationRequest(
-                context = context,
-                model = model,
-                pageName = pageName,
-                properties = properties,
-                queryMap = queryMap,
-                headerMap = headerMap
+            context = context,
+            model = model,
+            pageName = pageName,
+            properties = properties,
+            queryMap = queryMap,
+            headerMap = headerMap
         )
 
-        RequestSender.addToQueue(Request(Domain.IN_APP_NOTIFICATION_ACT_JSON, queryMap, headerMap, parent), model, context)
+        RequestSender.addToQueue(
+            Request(
+                Domain.IN_APP_NOTIFICATION_ACT_JSON,
+                queryMap,
+                headerMap,
+                parent
+            ), model, context
+        )
+    }
+
+    fun createInAppActionRequest(
+        context: Context, model: RelatedDigitalModel, pageName: String,
+        properties: HashMap<String, String>?, parent: Activity? = null
+    ) {
+        val queryMap = HashMap<String, String>()
+        val headerMap = HashMap<String, String>()
+        RequestFormer.formInAppActionRequest(
+            context = context,
+            model = model,
+            pageName = pageName,
+            properties = properties,
+            queryMap = queryMap,
+            headerMap = headerMap
+        )
+
+        RequestSender.addToQueue(
+            Request(Domain.IN_APP_ACTION_MOBILE, queryMap, headerMap, parent),
+            model,
+            context
+        )
+    }
+
+    fun createInAppActionClickRequest(context: Context, report: MailSubReport?) {
+        if (report?.click.isNullOrEmpty()) {
+            Log.e(LOG_TAG, "report click is null or empty.")
+            return
+        }
+
+        val queryMap = HashMap<String, String>()
+        val headerMap = HashMap<String, String>()
+        val properties = HashMap<String, String>()
+        val tempMultiQuery: List<String> = report!!.click!!.split("&")
+        for (s in tempMultiQuery) {
+            val tempQueryString = s.split("=".toRegex(), 2).toTypedArray()
+            if (tempQueryString.size == 2) {
+                properties[tempQueryString[0]] = tempQueryString[1]
+            }
+        }
+
+        RequestFormer.formInAppNotificationClickRequest(
+            context = context,
+            model = RelatedDigital.getRelatedDigitalModel(),
+            pageName = Constants.PAGE_NAME_REQUEST_VAL,
+            properties = properties,
+            queryMap = queryMap,
+            headerMap = headerMap
+        )
+
+        RequestSender.addToQueue(
+            Request(
+                Domain.LOG_LOGGER, queryMap, headerMap,
+                null
+            ), RelatedDigital.getRelatedDigitalModel()!!, context
+        )
+        RequestSender.addToQueue(
+            Request(
+                Domain.LOG_REAL_TIME, queryMap, headerMap,
+                null
+            ), RelatedDigital.getRelatedDigitalModel()!!, context
+        )
     }
 
     fun createInAppNotificationClickRequest(
-            context: Context, inAppMessage: InAppMessage?, rating: String?
+        context: Context, inAppMessage: InAppMessage?, rating: String?
     ) {
         if (inAppMessage == null || inAppMessage.mActionData!!.mQs.isNullOrEmpty()) {
             Log.w(LOG_TAG, "Notification or query string is null or empty.")
@@ -80,17 +154,50 @@ object RequestHandler {
         val queryMap = HashMap<String, String>()
         val headerMap = HashMap<String, String>()
         RequestFormer.formInAppNotificationClickRequest(
-                context = context,
-                model = RelatedDigital.getRelatedDigitalModel(),
-                pageName = Constants.PAGE_NAME_REQUEST_VAL,
-                properties = properties,
-                queryMap = queryMap,
-                headerMap = headerMap
+            context = context,
+            model = RelatedDigital.getRelatedDigitalModel(),
+            pageName = Constants.PAGE_NAME_REQUEST_VAL,
+            properties = properties,
+            queryMap = queryMap,
+            headerMap = headerMap
         )
 
-        RequestSender.addToQueue(Request(Domain.LOG_LOGGER, queryMap, headerMap,
-                null), RelatedDigital.getRelatedDigitalModel()!!, context)
-        RequestSender.addToQueue(Request(Domain.LOG_REAL_TIME, queryMap, headerMap,
-                null), RelatedDigital.getRelatedDigitalModel()!!, context)
+        RequestSender.addToQueue(
+            Request(
+                Domain.LOG_LOGGER, queryMap, headerMap,
+                null
+            ), RelatedDigital.getRelatedDigitalModel()!!, context
+        )
+        RequestSender.addToQueue(
+            Request(
+                Domain.LOG_REAL_TIME, queryMap, headerMap,
+                null
+            ), RelatedDigital.getRelatedDigitalModel()!!, context
+        )
+    }
+
+    fun createSubsJsonRequest(context: Context, type: String, actId: String, auth: String, email: String) {
+        val properties = HashMap<String, String>()
+        val queryMap = HashMap<String, String>()
+        val headerMap = HashMap<String, String>()
+        properties[Constants.REQUEST_TYPE_KEY] = type
+        properties[Constants.REQUEST_SUBS_ACTION_ID_KEY] = actId
+        properties[Constants.REQUEST_AUTH_KEY] = auth
+        properties[Constants.REQUEST_SUBS_EMAIL_KEY] = email
+        RequestFormer.formSubJsonRequest(
+            context = context,
+            model = RelatedDigital.getRelatedDigitalModel(),
+            pageName = Constants.PAGE_NAME_REQUEST_VAL,
+            properties = properties,
+            queryMap = queryMap,
+            headerMap = headerMap
+        )
+
+        RequestSender.addToQueue(
+            Request(
+                Domain.LOG_S, queryMap, headerMap,
+                null
+            ), RelatedDigital.getRelatedDigitalModel()!!, context
+        )
     }
 }

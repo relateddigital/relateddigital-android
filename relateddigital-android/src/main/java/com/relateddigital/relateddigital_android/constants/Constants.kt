@@ -39,6 +39,15 @@ class Constants {
         const val LOAD_BALANCE_PREFIX = "NSC"
         const val OM_3_KEY = "OM.3rd"
 
+        const val REQUEST_TYPE_KEY = "type"
+        const val REQUEST_AUTH_KEY = "auth"
+        const val REQUEST_SUBS_ACTION_ID_KEY = "actionid"
+        const val REQUEST_SUBS_EMAIL_KEY = "OM.subsemail"
+        const val REQUEST_ACTION_ID_KEY = "action_id"
+        const val REQUEST_ACTION_TYPE_KEY = "action_type"
+        const val REQUEST_ACTION_TYPE_VAL = "MailSubscriptionForm~SpinToWin~ScratchToWin"
+
+
         var VISILABS_PARAMETERS: List<VisilabsParameter>? = null
         const val TARGET_PREF_VOSS_KEY = "OM.OSS"
         const val TARGET_PREF_VCNAME_KEY = "OM.cname"

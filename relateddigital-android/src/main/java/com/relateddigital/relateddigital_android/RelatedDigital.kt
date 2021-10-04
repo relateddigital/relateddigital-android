@@ -736,6 +736,7 @@ object RelatedDigital {
 
         if (model!!.getIsInAppNotificationEnabled()) {
             RequestHandler.createInAppNotificationRequest(context, model!!, pageName, properties, parent)
+            RequestHandler.createInAppActionRequest(context, model!!, pageName, properties, parent)
         }
         RequestHandler.createLoggerRequest(context, model!!, pageName, properties)
     }

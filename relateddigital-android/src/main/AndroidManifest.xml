@@ -9,15 +9,28 @@
         android:networkSecurityConfig="@xml/network_security_config"
         android:supportsRtl="true">
         <activity
-            android:name=".inapp.InAppFullActivity"
+            android:name=".inapp.ScratchToWinActivity"
             android:theme="@style/Theme.AppCompat.Light.Dialog.Alert"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"
             android:noHistory="true"/>
+        <activity
+            android:name=".inapp.SpinToWinActivity"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"
+            android:noHistory="true"/>
+        <activity
+            android:name=".inapp.InAppFullActivity"
+            android:noHistory="true"
+            android:theme="@style/Theme.AppCompat.Light.Dialog.Alert" />
         <activity
             android:name=".inapp.InAppNotificationActivity"
-            android:theme="@style/Theme.AppCompat.Light.Dialog.Alert"
-            android:noHistory="true"/>
+            android:noHistory="true"
+            android:theme="@style/Theme.AppCompat.Light.Dialog.Alert" />
         <activity
             android:name=".inapp.MailSubscriptionFormActivity"
+            android:theme="@style/Theme.AppCompat.Light.Dialog.Alert"
+            android:windowSoftInputMode="adjustResize"
             android:noHistory="true"/>
     </application>
 

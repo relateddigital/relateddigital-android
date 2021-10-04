@@ -37,6 +37,15 @@ object RequestFormer {
         addInAppNotificationExtraParameters(model, queryMap)
     }
 
+    fun formInAppActionRequest(
+        context: Context, model: RelatedDigitalModel?, pageName: String,
+        properties: HashMap<String, String>?,
+        queryMap: HashMap<String, String>, headerMap: HashMap<String, String>
+    ) {
+        fillCommonParameters(context, model, pageName, properties, queryMap, headerMap)
+        addInAppActionExtraParameters(model, queryMap)
+    }
+
     fun formInAppNotificationClickRequest(
             context: Context, model: RelatedDigitalModel?, pageName: String,
             properties: HashMap<String, String>?,
@@ -44,6 +53,14 @@ object RequestFormer {
     ) {
         fillCommonParameters(context, model, pageName, properties, queryMap, headerMap)
         addInAppNotificationClickExtraParameters(model, queryMap)
+    }
+
+    fun formSubJsonRequest(
+        context: Context, model: RelatedDigitalModel?, pageName: String,
+        properties: HashMap<String, String>?,
+        queryMap: HashMap<String, String>, headerMap: HashMap<String, String>
+    ) {
+        fillCommonParameters(context, model, pageName, properties, queryMap, headerMap)
     }
 
     fun updateSessionParameters(context: Context, pageName: String) {
@@ -246,6 +263,20 @@ object RequestFormer {
         if(model.getVisitData().isNotEmpty()) {
             queryMap[Constants.VISIT_DATA_REQUEST_KEY] = model.getVisitData()
         }
+    }
+
+    private fun addInAppActionExtraParameters(
+        model: RelatedDigitalModel?, queryMap: HashMap<String, String>
+    ) {
+        if(model!!.getVisitorData().isNotEmpty()) {
+            queryMap[Constants.VISITOR_DATA_REQUEST_KEY] = model.getVisitorData()
+        }
+
+        if(model.getVisitData().isNotEmpty()) {
+            queryMap[Constants.VISIT_DATA_REQUEST_KEY] = model.getVisitData()
+        }
+
+        queryMap[Constants.REQUEST_ACTION_TYPE_KEY] = Constants.REQUEST_ACTION_TYPE_VAL
     }
 
     private fun addInAppNotificationClickExtraParameters(
