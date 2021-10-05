@@ -38,6 +38,11 @@ class Constants {
         const val OM_3_REQUEST_KEY = "OM.3rd"
         const val LOAD_BALANCE_PREFIX = "NSC"
         const val OM_3_KEY = "OM.3rd"
+        const val PROMOTION_CODE_REQUEST_KEY = "OM.promoaction"
+        const val ACTION_ID_REQUEST_KEY = "OM.actionid"
+        const val PROMOTION_CODE_EMAIL_REQUEST_KEY = "OM.promoemail"
+        const val PROMOTION_CODE_TITLE_REQUEST_KEY = "OM.promotitle"
+        const val PROMOTION_CODE_SLICE_TEXT_REQUEST_KEY = "OM.promoslice"
 
         const val REQUEST_TYPE_KEY = "type"
         const val REQUEST_AUTH_KEY = "auth"

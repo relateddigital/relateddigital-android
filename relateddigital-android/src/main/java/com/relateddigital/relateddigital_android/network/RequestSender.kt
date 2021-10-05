@@ -2,7 +2,6 @@ package com.relateddigital.relateddigital_android.network
 
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import android.util.Log
 import com.relateddigital.relateddigital_android.api.ApiMethods
 import com.relateddigital.relateddigital_android.api.LoggerApiClient
@@ -12,9 +11,12 @@ import com.relateddigital.relateddigital_android.constants.Constants
 import com.relateddigital.relateddigital_android.inapp.InAppManager
 import com.relateddigital.relateddigital_android.inapp.ScratchToWinActivity
 import com.relateddigital.relateddigital_android.inapp.SpinToWinActivity
+import com.relateddigital.relateddigital_android.inapp.VisilabsResponse
 import com.relateddigital.relateddigital_android.model.*
 import com.relateddigital.relateddigital_android.util.InAppNotificationTimer
 import okhttp3.Headers
+import okhttp3.ResponseBody
+import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -43,18 +45,18 @@ object RequestSender {
         when (currentRequest.domain) {
             Domain.LOG_LOGGER -> {
                 val loggerApiInterface =
-                    LoggerApiClient.getClient(model.getRequestTimeoutInSecond())
-                        ?.create(ApiMethods::class.java)
+                        LoggerApiClient.getClient(model.getRequestTimeoutInSecond())
+                                ?.create(ApiMethods::class.java)
                 val call: Call<Void> = loggerApiInterface?.sendToLogger(
-                    model.getDataSource(),
-                    currentRequest.headerMap, currentRequest.queryMap
+                        model.getDataSource(),
+                        currentRequest.headerMap, currentRequest.queryMap
                 )!!
                 call.enqueue(object : Callback<Void?> {
                     override fun onResponse(call: Call<Void?>, response: Response<Void?>) {
                         if (response.isSuccessful) {
                             applySuccessConditions(
-                                response.headers(), response.raw().request.url.toString(),
-                                model, Domain.LOG_LOGGER, context
+                                    response.headers(), response.raw().request.url.toString(),
+                                    model, Domain.LOG_LOGGER, context
                             )
                         } else {
                             applyFailConditions(call.request().url.toString(), model, context)
@@ -69,18 +71,18 @@ object RequestSender {
 
             Domain.LOG_REAL_TIME -> {
                 val realTimeApiInterface =
-                    RealTimeApiClient.getClient(model.getRequestTimeoutInSecond())
-                        ?.create(ApiMethods::class.java)
+                        RealTimeApiClient.getClient(model.getRequestTimeoutInSecond())
+                                ?.create(ApiMethods::class.java)
                 val call: Call<Void> = realTimeApiInterface?.sendToRealTime(
-                    model.getDataSource(),
-                    currentRequest.headerMap, currentRequest.queryMap
+                        model.getDataSource(),
+                        currentRequest.headerMap, currentRequest.queryMap
                 )!!
                 call.enqueue(object : Callback<Void?> {
                     override fun onResponse(call: Call<Void?>, response: Response<Void?>) {
                         if (response.isSuccessful) {
                             applySuccessConditions(
-                                response.headers(), response.raw().request.url.toString(),
-                                model, Domain.LOG_REAL_TIME, context
+                                    response.headers(), response.raw().request.url.toString(),
+                                    model, Domain.LOG_REAL_TIME, context
                             )
                         } else {
                             applyFailConditions(call.request().url.toString(), model, context)
@@ -95,16 +97,16 @@ object RequestSender {
 
             Domain.LOG_S -> {
                 val sApiInterface = SApiClient.getClient(model.getRequestTimeoutInSecond())
-                    ?.create(ApiMethods::class.java)
+                        ?.create(ApiMethods::class.java)
                 val call: Call<Void> = sApiInterface?.sendSubsJsonRequestToS(
-                    currentRequest.headerMap, currentRequest.queryMap
+                        currentRequest.headerMap, currentRequest.queryMap
                 )!!
                 call.enqueue(object : Callback<Void?> {
                     override fun onResponse(call: Call<Void?>, response: Response<Void?>) {
                         if (response.isSuccessful) {
                             applySuccessConditions(
-                                response.headers(), response.raw().request.url.toString(),
-                                model, Domain.LOG_S, context
+                                    response.headers(), response.raw().request.url.toString(),
+                                    model, Domain.LOG_S, context
                             )
                         } else {
                             applyFailConditions(call.request().url.toString(), model, context)
@@ -119,51 +121,51 @@ object RequestSender {
 
             Domain.IN_APP_NOTIFICATION_ACT_JSON -> {
                 val actJsonInterface = SApiClient.getClient(model.getRequestTimeoutInSecond())
-                    ?.create(ApiMethods::class.java)
+                        ?.create(ApiMethods::class.java)
                 val call: Call<List<InAppMessage>> =
-                    actJsonInterface?.getGeneralRequestJsonResponse(
-                        currentRequest.headerMap, currentRequest.queryMap
-                    )!!
+                        actJsonInterface?.getGeneralRequestJsonResponse(
+                                currentRequest.headerMap, currentRequest.queryMap
+                        )!!
                 call.enqueue(object : Callback<List<InAppMessage>?> {
                     override fun onResponse(
-                        call: Call<List<InAppMessage>?>,
-                        response: Response<List<InAppMessage>?>
+                            call: Call<List<InAppMessage>?>,
+                            response: Response<List<InAppMessage>?>
                     ) {
                         if (response.isSuccessful) {
                             applySuccessConditions(
-                                response.headers(), response.raw().request.url.toString(),
-                                model, Domain.LOG_S, context
+                                    response.headers(), response.raw().request.url.toString(),
+                                    model, Domain.LOG_S, context
                             )
                             try {
                                 val inAppMessages = response.body()
                                 Log.i(
-                                    LOG_TAG,
-                                    "Successful InApp Request : " + call.request().url.toString()
+                                        LOG_TAG,
+                                        "Successful InApp Request : " + call.request().url.toString()
                                 )
                                 val timer = Timer("InAppNotification Delay Timer", false)
                                 val timerTask = InAppNotificationTimer(
-                                    null, 0,
-                                    inAppMessages, currentRequest.parent, model, context
+                                        null, 0,
+                                        inAppMessages, currentRequest.parent, model, context
                                 )
                                 var delay: Long = 0
                                 if (timerTask.getMessage() != null) {
                                     delay =
-                                        timerTask.getMessage()!!.mActionData!!.mWaitingTime!!.toLong() * 1000
+                                            timerTask.getMessage()!!.mActionData!!.mWaitingTime!!.toLong() * 1000
                                 }
                                 timer.schedule(timerTask, delay)
                             } catch (e: Exception) {
                                 e.printStackTrace()
                                 Log.w(
-                                    LOG_TAG, "Could not parse the response for the" +
-                                            " request - not in the expected format : " +
-                                            response.raw().request.url.toString()
+                                        LOG_TAG, "Could not parse the response for the" +
+                                        " request - not in the expected format : " +
+                                        response.raw().request.url.toString()
                                 )
                             }
                         } else {
                             applyFailConditions(call.request().url.toString(), model, context)
                             Log.w(
-                                LOG_TAG,
-                                "Fail InApp Request : " + call.request().url.toString()
+                                    LOG_TAG,
+                                    "Fail InApp Request : " + call.request().url.toString()
                             )
                             Log.w(LOG_TAG, "Fail Request Response Code : " + response.code())
                         }
@@ -179,50 +181,55 @@ object RequestSender {
 
             Domain.IN_APP_ACTION_MOBILE -> {
                 val mobileInterface = SApiClient.getClient(model.getRequestTimeoutInSecond())
-                    ?.create(ApiMethods::class.java)
+                        ?.create(ApiMethods::class.java)
                 val call: Call<ActionResponse> =
-                    mobileInterface?.getActionRequestResponse(
-                        currentRequest.headerMap, currentRequest.queryMap
-                    )!!
+                        mobileInterface?.getActionRequestResponse(
+                                currentRequest.headerMap, currentRequest.queryMap
+                        )!!
                 call.enqueue(object : Callback<ActionResponse> {
                     override fun onResponse(
-                        call: Call<ActionResponse>,
-                        response: Response<ActionResponse>
+                            call: Call<ActionResponse>,
+                            response: Response<ActionResponse>
                     ) {
                         if (response.isSuccessful) {
                             try {
                                 applySuccessConditions(
-                                    response.headers(), response.raw().request.url.toString(),
-                                    model, Domain.LOG_S, context
+                                        response.headers(), response.raw().request.url.toString(),
+                                        model, Domain.LOG_S, context
                                 )
                                 val actionsResponse = response.body()
                                 if (actionsResponse != null) {
-                                    if (actionsResponse.mSpinToWinList!!.isNotEmpty()) {
-                                        val intent =
-                                            Intent(currentRequest.parent, SpinToWinActivity::class.java)
-                                        val spinToWinModel: SpinToWin =
-                                            actionsResponse.mSpinToWinList!![0]
-                                        intent.putExtra("spin-to-win-data", spinToWinModel)
-                                        currentRequest.parent!!.startActivity(intent)
-                                    } else if (actionsResponse.mScratchToWinList!!.isNotEmpty()) {
-                                        val intent =
-                                            Intent(currentRequest.parent, ScratchToWinActivity::class.java)
-                                        val scratchToWinModel: ScratchToWin =
-                                            actionsResponse.mScratchToWinList!![0]
-                                        intent.putExtra("scratch-to-win-data", scratchToWinModel)
-                                        currentRequest.parent!!.startActivity(intent)
-                                    } else if (actionsResponse.mMailSubscriptionForm!!.isNotEmpty()) {
-                                        InAppManager(
-                                            model.getCookieId()!!,
-                                            model.getDataSource()
-                                        ).showMailSubscriptionForm(
-                                            actionsResponse.mMailSubscriptionForm!![0], currentRequest.parent!!
-                                        )
-                                    } else {
-                                        Log.e(
-                                            LOG_TAG,
-                                            "Response is null : " + response.raw().request.url.toString()
-                                        )
+                                    when {
+                                        actionsResponse.mSpinToWinList!!.isNotEmpty() -> {
+                                            val intent =
+                                                    Intent(currentRequest.parent, SpinToWinActivity::class.java)
+                                            val spinToWinModel: SpinToWin =
+                                                    actionsResponse.mSpinToWinList!![0]
+                                            intent.putExtra("spin-to-win-data", spinToWinModel)
+                                            currentRequest.parent!!.startActivity(intent)
+                                        }
+                                        actionsResponse.mScratchToWinList!!.isNotEmpty() -> {
+                                            val intent =
+                                                    Intent(currentRequest.parent, ScratchToWinActivity::class.java)
+                                            val scratchToWinModel: ScratchToWin =
+                                                    actionsResponse.mScratchToWinList!![0]
+                                            intent.putExtra("scratch-to-win-data", scratchToWinModel)
+                                            currentRequest.parent!!.startActivity(intent)
+                                        }
+                                        actionsResponse.mMailSubscriptionForm!!.isNotEmpty() -> {
+                                            InAppManager(
+                                                    model.getCookieId()!!,
+                                                    model.getDataSource()
+                                            ).showMailSubscriptionForm(
+                                                    actionsResponse.mMailSubscriptionForm!![0], currentRequest.parent!!
+                                            )
+                                        }
+                                        else -> {
+                                            Log.e(
+                                                    LOG_TAG,
+                                                    "Response is null : " + response.raw().request.url.toString()
+                                            )
+                                        }
                                     }
                                 } else {
                                     Log.e(LOG_TAG, "Response is null : " + response.raw().request.url.toString())
@@ -230,23 +237,23 @@ object RequestSender {
                             } catch (e: java.lang.Exception) {
                                 e.printStackTrace()
                                 Log.e(
-                                    LOG_TAG,
-                                    "Could not parse the response for the request : " + response.raw().request.url.toString()
+                                        LOG_TAG,
+                                        "Could not parse the response for the request : " + response.raw().request.url.toString()
                                 )
                                 Log.e(
-                                    LOG_TAG,
-                                    "Fail Request : " + call.request().url.toString()
+                                        LOG_TAG,
+                                        "Fail Request : " + call.request().url.toString()
                                 )
                                 Log.e(
-                                    LOG_TAG,
-                                    "Fail Request Message : The response is not in the correct format"
+                                        LOG_TAG,
+                                        "Fail Request Message : The response is not in the correct format"
                                 )
                             }
                         } else {
                             applyFailConditions(call.request().url.toString(), model, context)
                             Log.w(
-                                LOG_TAG,
-                                "Fail InApp Request : " + call.request().url.toString()
+                                    LOG_TAG,
+                                    "Fail InApp Request : " + call.request().url.toString()
                             )
                             Log.w(LOG_TAG, "Fail Request Response Code : " + response.code())
                         }
@@ -255,9 +262,50 @@ object RequestSender {
                     override fun onFailure(call: Call<ActionResponse>, t: Throwable) {
                         applyFailConditions(call.request().url.toString(), model, context)
                         Log.e(
-                            LOG_TAG,
-                            "Fail Request Message : " + t.message
+                                LOG_TAG,
+                                "Fail Request Message : " + t.message
                         )
+                    }
+                })
+            }
+
+            Domain.IN_APP_SPIN_TO_WIN_PROMO_CODE -> {
+                val sInterface = SApiClient.getClient(model.getRequestTimeoutInSecond())
+                        ?.create(ApiMethods::class.java)
+                val call: Call<ResponseBody> = sInterface!!.getPromotionCodeRequestJsonResponse(currentRequest.headerMap, currentRequest.queryMap)
+                call.enqueue(object : Callback<ResponseBody> {
+                    override fun onResponse(call: Call<ResponseBody?>?, response: Response<ResponseBody>) {
+                        var rawJsonResponse = ""
+                        try {
+                            rawJsonResponse = response.body()!!.string()
+                            if (rawJsonResponse != "") {
+                                val jsonResponse = JSONObject(rawJsonResponse)
+                                if (jsonResponse.getBoolean("success") && !jsonResponse.getString("promocode").equals("")) {
+                                    Log.i(LOG_TAG, "Success Request : " + response.raw().request.url.toString())
+                                    val visilabsResponse = VisilabsResponse(jsonResponse, null, null, null, null)
+                                    currentRequest.visilabsCallback!!.success(visilabsResponse)
+                                } else {
+                                    Log.e(LOG_TAG, "Empty promotion code - auth issue" + response.raw().request.url.toString())
+                                    val visilabsResponse = VisilabsResponse(null, null, "Empty promotion code - auth issue", null, "Empty promotion code - auth issue")
+                                    currentRequest.visilabsCallback!!.fail(visilabsResponse)
+                                }
+                            } else {
+                                Log.e(LOG_TAG, "Empty response for the request : " + response.raw().request.url.toString())
+                                val visilabsResponse = VisilabsResponse(null, null, "empty string", null, "empty string")
+                                currentRequest.visilabsCallback!!.fail(visilabsResponse)
+                            }
+                        } catch (e: java.lang.Exception) {
+                            e.printStackTrace()
+                            Log.e(LOG_TAG, "Could not parse the response for the request : " + response.raw().request.url.toString())
+                            val visilabsResponse = VisilabsResponse(null, null, rawJsonResponse, null, rawJsonResponse)
+                            currentRequest.visilabsCallback!!.fail(visilabsResponse)
+                        }
+                    }
+
+                    override fun onFailure(call: Call<ResponseBody?>?, t: Throwable) {
+                        Log.e(LOG_TAG, "Fail Request " + t.message)
+                        val visilabsResponse = VisilabsResponse(null, null, t.message, t, t.message!!)
+                        currentRequest.visilabsCallback!!.fail(visilabsResponse)
                     }
                 })
             }
@@ -265,8 +313,8 @@ object RequestSender {
     }
 
     private fun parseAndSetResponseHeaders(
-        responseHeaders: Headers, type: Domain,
-        model: RelatedDigitalModel
+            responseHeaders: Headers, type: Domain,
+            model: RelatedDigitalModel
     ) {
         val names = responseHeaders.names()
         if (names.isNotEmpty()) {
@@ -281,10 +329,10 @@ object RequestSender {
                 for (cookie in cookies) {
                     val fields = cookie.split(";").toTypedArray()
                     if (fields[0].toLowerCase(Locale.ROOT).contains(
-                            Constants.LOAD_BALANCE_PREFIX.toLowerCase(
-                                Locale.ROOT
-                            )
-                        )) {
+                                    Constants.LOAD_BALANCE_PREFIX.toLowerCase(
+                                            Locale.ROOT
+                                    )
+                            )) {
                         val cookieKeyValue = fields[0].split("=").toTypedArray()
                         if (cookieKeyValue.size > 1) {
                             val cookieKey = cookieKeyValue[0]
@@ -299,10 +347,10 @@ object RequestSender {
                         }
                     }
                     if (fields[0].toLowerCase(Locale.ROOT).contains(
-                            Constants.OM_3_KEY.toLowerCase(
-                                Locale.ROOT
-                            )
-                        )) {
+                                    Constants.OM_3_KEY.toLowerCase(
+                                            Locale.ROOT
+                                    )
+                            )) {
                         val cookieKeyValue = fields[0].split("=").toTypedArray()
                         if (cookieKeyValue.size > 1 || model.getCookie() != null) {
                             val cookieValue = cookieKeyValue[1]
@@ -323,8 +371,8 @@ object RequestSender {
     }
 
     private fun applySuccessConditions(
-        headers: Headers, url: String, model: RelatedDigitalModel,
-        type: Domain, context: Context
+            headers: Headers, url: String, model: RelatedDigitalModel,
+            type: Domain, context: Context
     ) {
         Log.i(LOG_TAG, "Successful Request : $url")
         parseAndSetResponseHeaders(headers, type, model)

@@ -5,6 +5,7 @@ import android.content.Context
 import android.util.Log
 import com.relateddigital.relateddigital_android.RelatedDigital
 import com.relateddigital.relateddigital_android.constants.Constants
+import com.relateddigital.relateddigital_android.inapp.VisilabsCallback
 import com.relateddigital.relateddigital_android.model.*
 
 object RequestHandler {
@@ -198,6 +199,26 @@ object RequestHandler {
                 Domain.LOG_S, queryMap, headerMap,
                 null
             ), RelatedDigital.getRelatedDigitalModel()!!, context
+        )
+    }
+
+    fun createSpinToWinPromoCodeRequest(context: Context, visilabsCallback: VisilabsCallback, properties: HashMap<String, String>?) {
+        val queryMap = HashMap<String, String>()
+        val headerMap = HashMap<String, String>()
+        RequestFormer.formSpinToWinPromoCodeRequest(
+                context = context,
+                model = RelatedDigital.getRelatedDigitalModel(),
+                pageName = Constants.PAGE_NAME_REQUEST_VAL,
+                properties = properties,
+                queryMap = queryMap,
+                headerMap = headerMap
+        )
+
+        RequestSender.addToQueue(
+                Request(
+                        Domain.IN_APP_SPIN_TO_WIN_PROMO_CODE, queryMap, headerMap,
+                        null, visilabsCallback
+                ), RelatedDigital.getRelatedDigitalModel()!!, context
         )
     }
 }
