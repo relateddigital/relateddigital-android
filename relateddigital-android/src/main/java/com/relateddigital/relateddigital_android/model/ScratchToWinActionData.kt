@@ -29,7 +29,7 @@ class ScratchToWinActionData : Serializable {
     var sendemail: Boolean? = null
 
     @SerializedName("mail_subscription_form")
-    var mailSubscriptionForm: MailSubscriptionForm? = null
+    var mailSubscriptionForm: ScratchToWinMailSubForm? = null
 
     @SerializedName("ExtendedProps")
     var extendedProps: String? = null
