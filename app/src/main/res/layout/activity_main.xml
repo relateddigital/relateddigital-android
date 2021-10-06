@@ -10,17 +10,6 @@
     tools:context=".MainActivity">
 
     <Button
-        android:id="@+id/inAppNotificationPage"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/page_button_height"
-        android:layout_marginTop="@dimen/page_button_top_margin"
-        android:layout_marginBottom="@dimen/page_button_bottom_margin"
-        android:background="@drawable/rounded_corners_background"
-        android:padding="@dimen/page_button_padding"
-        android:text="@string/in_app_notification_page"
-        android:textSize="@dimen/page_button_text_size" />
-
-    <Button
         android:id="@+id/pushNotificationPage"
         android:layout_width="match_parent"
         android:layout_height="@dimen/page_button_height"
@@ -32,14 +21,14 @@
         android:textSize="@dimen/page_button_text_size" />
 
     <Button
-        android:id="@+id/loginPage"
+        android:id="@+id/inAppNotificationPage"
         android:layout_width="match_parent"
         android:layout_height="@dimen/page_button_height"
         android:layout_marginTop="@dimen/page_button_top_margin"
         android:layout_marginBottom="@dimen/page_button_bottom_margin"
         android:background="@drawable/rounded_corners_background"
         android:padding="@dimen/page_button_padding"
-        android:text="@string/login_page"
+        android:text="@string/in_app_notification_page"
         android:textSize="@dimen/page_button_text_size" />
 
     <Button
@@ -51,6 +40,17 @@
         android:background="@drawable/rounded_corners_background"
         android:padding="@dimen/page_button_padding"
         android:text="@string/story_page"
+        android:textSize="@dimen/page_button_text_size" />
+
+    <Button
+        android:id="@+id/loginPage"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/page_button_height"
+        android:layout_marginTop="@dimen/page_button_top_margin"
+        android:layout_marginBottom="@dimen/page_button_bottom_margin"
+        android:background="@drawable/rounded_corners_background"
+        android:padding="@dimen/page_button_padding"
+        android:text="@string/login_page"
         android:textSize="@dimen/page_button_text_size" />
 
 </LinearLayout>
