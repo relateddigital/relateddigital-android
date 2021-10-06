@@ -91,7 +91,7 @@ class InAppNotificationActivity : AppCompatActivity() {
         }
 
         binding.appTrackerButton.setOnClickListener {
-            // sendTheListOfAppsInstalled();
+            RelatedDigital.sendTheListOfAppsInstalled(applicationContext);
         }
 
         binding.nps1Button.setOnClickListener {

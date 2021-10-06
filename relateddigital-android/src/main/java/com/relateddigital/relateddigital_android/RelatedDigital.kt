@@ -5,6 +5,7 @@ import android.content.Context
 import android.os.Build
 import android.util.Log
 import com.google.gson.Gson
+import com.relateddigital.relateddigital_android.appTracker.AppTracker
 import com.relateddigital.relateddigital_android.constants.Constants
 import com.relateddigital.relateddigital_android.inapp.InAppButtonInterface
 import com.relateddigital.relateddigital_android.model.LoadBalanceCookie
@@ -739,6 +740,35 @@ object RelatedDigital {
             RequestHandler.createInAppActionRequest(context, model!!, pageName, properties, parent)
         }
         RequestHandler.createLoggerRequest(context, model!!, pageName, properties)
+    }
+
+    /**
+     * This method is used to send the list of the
+     * applications installed from a store in the device to the server.
+     * With Android 11, to get the list of the apps installed
+     * in the device, you have 2 options:
+     * 1-) You can add the package names of the applications
+     * that you are interested in into the AndroidManifest.xml file
+     * like below:
+     * <manifest package="com.example.myApp">
+     * <queries>
+     * <package android:name="com.example.app1"></package>
+     * <package android:name="com.example.app2"></package>
+    </queries> *
+     * ...
+    </manifest> *
+     * 2-) You can add the permission below to the
+     * AndroidManifest.xml files like below:
+     * <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" tools:ignore="QueryAllPackagesPermission"></uses-permission>
+     *
+     * For the 2nd method: Google might expect you to
+     * explain why you need this permission when you upload
+     * the app to Play Store.
+     * https://developer.android.com/training/basics/intents/package-visibility
+     */
+    @JvmStatic
+    fun sendTheListOfAppsInstalled(context: Context) {
+        AppTracker.sendTheListOfAppsInstalled(context)
     }
 
     private fun initVisilabsParameters() {
