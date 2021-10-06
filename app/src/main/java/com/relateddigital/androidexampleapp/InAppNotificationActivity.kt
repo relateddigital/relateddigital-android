@@ -1,11 +1,13 @@
 package com.relateddigital.androidexampleapp
 
-import androidx.appcompat.app.AppCompatActivity
+import android.R
 import android.os.Bundle
 import android.view.View
+import androidx.appcompat.app.AppCompatActivity
 import com.relateddigital.androidexampleapp.databinding.ActivityInAppNotificationExampleBinding
 import com.relateddigital.relateddigital_android.RelatedDigital
-import java.util.HashMap
+import com.relateddigital.relateddigital_android.inapp.SocialProofFragment
+import java.util.*
 
 class InAppNotificationActivity : AppCompatActivity() {
     companion object{
@@ -75,7 +77,15 @@ class InAppNotificationActivity : AppCompatActivity() {
         }
 
         binding.socialProofButton.setOnClickListener {
-            sendInAppRequest("social-proof")
+            val socialProofFragment: SocialProofFragment = SocialProofFragment.newInstance(0, null)
+
+            socialProofFragment.retainInstance = true
+
+            val transaction = fragmentManager.beginTransaction()
+            transaction.add(R.id.content, socialProofFragment)
+            transaction.commit()
+            //TODO when backend side gets ready, check below
+            //sendInAppRequest("socialproof");
         }
 
         binding.countdownTimerButton.setOnClickListener {
@@ -84,7 +94,7 @@ class InAppNotificationActivity : AppCompatActivity() {
 
         binding.inAppCarouselButton.setOnClickListener {
             //TODO: change this to "carousel" when BE gets ready
-            sendInAppRequest("image_button")
+            sendInAppRequest("image_button  ")
         }
 
         binding.shakeToWinButton.setOnClickListener {
