@@ -83,7 +83,8 @@ class InAppNotificationActivity : AppCompatActivity() {
         }
 
         binding.inAppCarouselButton.setOnClickListener {
-            //sendInAppRequest("in-app-carousel")
+            //TODO: change this to "carousel" when BE gets ready
+            sendInAppRequest("image_button")
         }
 
         binding.shakeToWinButton.setOnClickListener {

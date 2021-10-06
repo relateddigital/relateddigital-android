@@ -693,6 +693,8 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
                             Log.e(LOG_TAG, "The link is not formatted properly!")
                         }
                     }
+                    InAppUpdateDisplayState.releaseDisplayState(mIntentId)
+                    finish()
                 }
             }
             1 -> {
@@ -721,6 +723,8 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
                             Log.e(LOG_TAG, "The link is not formatted properly!")
                         }
                     }
+                    InAppUpdateDisplayState.releaseDisplayState(mIntentId)
+                    finish()
                 }
             }
             2 -> {
@@ -759,6 +763,8 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
                             Log.e(LOG_TAG, "The link is not formatted properly!")
                         }
                     }
+                    InAppUpdateDisplayState.releaseDisplayState(mIntentId)
+                    finish()
                 }
             }
             4 -> {
