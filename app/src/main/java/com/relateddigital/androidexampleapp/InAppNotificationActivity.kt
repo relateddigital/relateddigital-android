@@ -1,6 +1,7 @@
 package com.relateddigital.androidexampleapp
 
 import android.R
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
@@ -8,6 +9,7 @@ import com.relateddigital.androidexampleapp.databinding.ActivityInAppNotificatio
 import com.relateddigital.relateddigital_android.RelatedDigital
 import com.relateddigital.relateddigital_android.inapp.CountdownTimerFragment
 import com.relateddigital.relateddigital_android.inapp.HalfScreenFragment
+import com.relateddigital.relateddigital_android.inapp.ShakeToWinActivity
 import com.relateddigital.relateddigital_android.inapp.SocialProofFragment
 import java.util.*
 
@@ -108,7 +110,10 @@ class InAppNotificationActivity : AppCompatActivity() {
         }
 
         binding.shakeToWinButton.setOnClickListener {
-            sendInAppRequest("shake-to-win")
+            val intent = Intent(this, ShakeToWinActivity::class.java)
+            startActivity(intent)
+            //TODO when backend side gets ready, use below
+            //sendInAppRequest("shaketowin");
         }
 
         binding.appTrackerButton.setOnClickListener {
