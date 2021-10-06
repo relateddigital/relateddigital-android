@@ -1,9 +1,13 @@
 package com.relateddigital.relateddigital_android
 
 import android.app.Activity
+import android.app.ActivityManager
+import android.app.ActivityManager.RunningAppProcessInfo
 import android.content.Context
 import android.os.Build
+import android.os.Handler
 import android.util.Log
+import androidx.annotation.RequiresApi
 import com.google.gson.Gson
 import com.relateddigital.relateddigital_android.appTracker.AppTracker
 import com.relateddigital.relateddigital_android.constants.Constants
@@ -13,13 +17,17 @@ import com.relateddigital.relateddigital_android.model.RelatedDigitalModel
 import com.relateddigital.relateddigital_android.model.VisilabsParameter
 import com.relateddigital.relateddigital_android.network.RequestFormer
 import com.relateddigital.relateddigital_android.network.RequestHandler
+import com.relateddigital.relateddigital_android.remoteConfig.RemoteConfigHelper
 import com.relateddigital.relateddigital_android.util.AppUtils
 import com.relateddigital.relateddigital_android.util.SharedPref
 import java.util.*
 
+
 object RelatedDigital {
     private var model: RelatedDigitalModel? = null
     private var inAppButtonInterface: InAppButtonInterface? = null
+    private var mHandler: Handler? = null
+    private var mRunnable: Runnable? = null
     private const val LOG_TAG: String = "RelatedDigital"
 
     @JvmStatic
@@ -46,6 +54,8 @@ object RelatedDigital {
         }
 
         initVisilabsParameters()
+
+        createRemoteConfigJob(context)
     }
 
     private fun createInitialModel(context: Context): RelatedDigitalModel {
@@ -813,5 +823,29 @@ object RelatedDigital {
         visilabsParameters.add(VisilabsParameter(Constants.TARGET_PREF_VRDOMAIN_KEY,
                 Constants.TARGET_PREF_VRDOMAIN_STORE_KEY, 1, null))
         Constants.VISILABS_PARAMETERS = visilabsParameters
+    }
+
+    private fun createRemoteConfigJob(context: Context) {
+        mHandler = Handler()
+        mRunnable = object : Runnable {
+            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+            override fun run() {
+                RemoteConfigHelper.checkRemoteConfigs(context)
+                val myProcess = RunningAppProcessInfo()
+                ActivityManager.getMyMemoryState(myProcess)
+                if (myProcess.importance != RunningAppProcessInfo.IMPORTANCE_GONE) {
+                    mHandler!!.postDelayed(this, 600000) // 10-min
+                } else {
+                    mHandler!!.removeCallbacks(mRunnable!!)
+                }
+            }
+        }
+        mHandler!!.post(mRunnable!!)
+    }
+
+    fun isBlocked(context: Context): Boolean {
+        val isBlocked: String = SharedPref.readString(context, Constants.REMOTE_CONFIG_BLOCK_PREF_KEY,
+                "f")
+        return isBlocked == "t"
     }
 }

@@ -12,82 +12,102 @@ object RequestHandler {
     private const val LOG_TAG = "RequestHandler"
 
     fun createLoggerRequest(
-        context: Context, model: RelatedDigitalModel, pageName: String,
-        properties: HashMap<String, String>?
+            context: Context, model: RelatedDigitalModel, pageName: String,
+            properties: HashMap<String, String>?
     ) {
+        if (RelatedDigital.isBlocked(context)) {
+            Log.w(LOG_TAG, "Too much server load, ignoring the request!")
+            return
+        }
+
         val queryMap = HashMap<String, String>()
         val headerMap = HashMap<String, String>()
         RequestFormer.formLoggerRequest(
-            context = context,
-            model = model,
-            pageName = pageName,
-            properties = properties,
-            queryMap = queryMap,
-            headerMap = headerMap
+                context = context,
+                model = model,
+                pageName = pageName,
+                properties = properties,
+                queryMap = queryMap,
+                headerMap = headerMap
         )
 
         RequestSender.addToQueue(
-            Request(Domain.LOG_LOGGER, queryMap, headerMap, null),
-            model,
-            context
+                Request(Domain.LOG_LOGGER, queryMap, headerMap, null),
+                model,
+                context
         )
         RequestSender.addToQueue(
-            Request(Domain.LOG_REAL_TIME, queryMap, headerMap, null),
-            model,
-            context
+                Request(Domain.LOG_REAL_TIME, queryMap, headerMap, null),
+                model,
+                context
         )
     }
 
     fun createInAppNotificationRequest(
-        context: Context, model: RelatedDigitalModel, pageName: String,
-        properties: HashMap<String, String>?, parent: Activity? = null
+            context: Context, model: RelatedDigitalModel, pageName: String,
+            properties: HashMap<String, String>?, parent: Activity? = null
     ) {
+        if (RelatedDigital.isBlocked(context)) {
+            Log.w(LOG_TAG, "Too much server load, ignoring the request!")
+            return
+        }
+
         val queryMap = HashMap<String, String>()
         val headerMap = HashMap<String, String>()
         RequestFormer.formInAppNotificationRequest(
-            context = context,
-            model = model,
-            pageName = pageName,
-            properties = properties,
-            queryMap = queryMap,
-            headerMap = headerMap
+                context = context,
+                model = model,
+                pageName = pageName,
+                properties = properties,
+                queryMap = queryMap,
+                headerMap = headerMap
         )
 
         RequestSender.addToQueue(
-            Request(
-                Domain.IN_APP_NOTIFICATION_ACT_JSON,
-                queryMap,
-                headerMap,
-                parent
-            ), model, context
+                Request(
+                        Domain.IN_APP_NOTIFICATION_ACT_JSON,
+                        queryMap,
+                        headerMap,
+                        parent
+                ), model, context
         )
     }
 
     fun createInAppActionRequest(
-        context: Context, model: RelatedDigitalModel, pageName: String,
-        properties: HashMap<String, String>?, parent: Activity? = null
+            context: Context, model: RelatedDigitalModel, pageName: String,
+            properties: HashMap<String, String>?, parent: Activity? = null
     ) {
+        if (RelatedDigital.isBlocked(context)) {
+            Log.w(LOG_TAG, "Too much server load, ignoring the request!")
+            return
+        }
+
         val queryMap = HashMap<String, String>()
         val headerMap = HashMap<String, String>()
         RequestFormer.formInAppActionRequest(
-            context = context,
-            model = model,
-            pageName = pageName,
-            properties = properties,
-            queryMap = queryMap,
-            headerMap = headerMap
+                context = context,
+                model = model,
+                pageName = pageName,
+                properties = properties,
+                queryMap = queryMap,
+                headerMap = headerMap
         )
 
         RequestSender.addToQueue(
-            Request(Domain.IN_APP_ACTION_MOBILE, queryMap, headerMap, parent),
-            model,
-            context
+                Request(Domain.IN_APP_ACTION_MOBILE, queryMap, headerMap, parent),
+                model,
+                context
         )
     }
 
     fun createInAppActionClickRequest(context: Context, report: MailSubReport?) {
         if (report?.click.isNullOrEmpty()) {
             Log.e(LOG_TAG, "report click is null or empty.")
+            return
+        }
+
+        if (RelatedDigital.isBlocked(context)) {
+            Log.w(LOG_TAG, "Too much server load, ignoring the request!")
             return
         }
 
@@ -103,33 +123,38 @@ object RequestHandler {
         }
 
         RequestFormer.formInAppNotificationClickRequest(
-            context = context,
-            model = RelatedDigital.getRelatedDigitalModel(),
-            pageName = Constants.PAGE_NAME_REQUEST_VAL,
-            properties = properties,
-            queryMap = queryMap,
-            headerMap = headerMap
+                context = context,
+                model = RelatedDigital.getRelatedDigitalModel(),
+                pageName = Constants.PAGE_NAME_REQUEST_VAL,
+                properties = properties,
+                queryMap = queryMap,
+                headerMap = headerMap
         )
 
         RequestSender.addToQueue(
-            Request(
-                Domain.LOG_LOGGER, queryMap, headerMap,
-                null
-            ), RelatedDigital.getRelatedDigitalModel()!!, context
+                Request(
+                        Domain.LOG_LOGGER, queryMap, headerMap,
+                        null
+                ), RelatedDigital.getRelatedDigitalModel()!!, context
         )
         RequestSender.addToQueue(
-            Request(
-                Domain.LOG_REAL_TIME, queryMap, headerMap,
-                null
-            ), RelatedDigital.getRelatedDigitalModel()!!, context
+                Request(
+                        Domain.LOG_REAL_TIME, queryMap, headerMap,
+                        null
+                ), RelatedDigital.getRelatedDigitalModel()!!, context
         )
     }
 
     fun createInAppNotificationClickRequest(
-        context: Context, inAppMessage: InAppMessage?, rating: String?
+            context: Context, inAppMessage: InAppMessage?, rating: String?
     ) {
         if (inAppMessage == null || inAppMessage.mActionData!!.mQs.isNullOrEmpty()) {
             Log.w(LOG_TAG, "Notification or query string is null or empty.")
+            return
+        }
+
+        if (RelatedDigital.isBlocked(context)) {
+            Log.w(LOG_TAG, "Too much server load, ignoring the request!")
             return
         }
 
@@ -155,29 +180,34 @@ object RequestHandler {
         val queryMap = HashMap<String, String>()
         val headerMap = HashMap<String, String>()
         RequestFormer.formInAppNotificationClickRequest(
-            context = context,
-            model = RelatedDigital.getRelatedDigitalModel(),
-            pageName = Constants.PAGE_NAME_REQUEST_VAL,
-            properties = properties,
-            queryMap = queryMap,
-            headerMap = headerMap
+                context = context,
+                model = RelatedDigital.getRelatedDigitalModel(),
+                pageName = Constants.PAGE_NAME_REQUEST_VAL,
+                properties = properties,
+                queryMap = queryMap,
+                headerMap = headerMap
         )
 
         RequestSender.addToQueue(
-            Request(
-                Domain.LOG_LOGGER, queryMap, headerMap,
-                null
-            ), RelatedDigital.getRelatedDigitalModel()!!, context
+                Request(
+                        Domain.LOG_LOGGER, queryMap, headerMap,
+                        null
+                ), RelatedDigital.getRelatedDigitalModel()!!, context
         )
         RequestSender.addToQueue(
-            Request(
-                Domain.LOG_REAL_TIME, queryMap, headerMap,
-                null
-            ), RelatedDigital.getRelatedDigitalModel()!!, context
+                Request(
+                        Domain.LOG_REAL_TIME, queryMap, headerMap,
+                        null
+                ), RelatedDigital.getRelatedDigitalModel()!!, context
         )
     }
 
     fun createSubsJsonRequest(context: Context, type: String, actId: String, auth: String, email: String) {
+        if (RelatedDigital.isBlocked(context)) {
+            Log.w(LOG_TAG, "Too much server load, ignoring the request!")
+            return
+        }
+
         val properties = HashMap<String, String>()
         val queryMap = HashMap<String, String>()
         val headerMap = HashMap<String, String>()
@@ -186,23 +216,28 @@ object RequestHandler {
         properties[Constants.REQUEST_AUTH_KEY] = auth
         properties[Constants.REQUEST_SUBS_EMAIL_KEY] = email
         RequestFormer.formSubJsonRequest(
-            context = context,
-            model = RelatedDigital.getRelatedDigitalModel(),
-            pageName = Constants.PAGE_NAME_REQUEST_VAL,
-            properties = properties,
-            queryMap = queryMap,
-            headerMap = headerMap
+                context = context,
+                model = RelatedDigital.getRelatedDigitalModel(),
+                pageName = Constants.PAGE_NAME_REQUEST_VAL,
+                properties = properties,
+                queryMap = queryMap,
+                headerMap = headerMap
         )
 
         RequestSender.addToQueue(
-            Request(
-                Domain.LOG_S, queryMap, headerMap,
-                null
-            ), RelatedDigital.getRelatedDigitalModel()!!, context
+                Request(
+                        Domain.LOG_S, queryMap, headerMap,
+                        null
+                ), RelatedDigital.getRelatedDigitalModel()!!, context
         )
     }
 
     fun createSpinToWinPromoCodeRequest(context: Context, visilabsCallback: VisilabsCallback, properties: HashMap<String, String>?) {
+        if (RelatedDigital.isBlocked(context)) {
+            Log.w(LOG_TAG, "Too much server load, ignoring the request!")
+            return
+        }
+
         val queryMap = HashMap<String, String>()
         val headerMap = HashMap<String, String>()
         RequestFormer.formSpinToWinPromoCodeRequest(

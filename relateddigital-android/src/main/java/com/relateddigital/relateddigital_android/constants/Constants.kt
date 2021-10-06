@@ -98,5 +98,8 @@ class Constants {
         const val PAGE_NAME_REQUEST_VAL = "/OM_evt.gif"
 
         const val INTENT_ID_KEY = "INTENT_ID_KEY"
+
+        const val REMOTE_CONFIG_BLOCK_PREF = "visilabs_block_pref"
+        const val REMOTE_CONFIG_BLOCK_PREF_KEY = "visilabs_block_pref_key"
     }
 }

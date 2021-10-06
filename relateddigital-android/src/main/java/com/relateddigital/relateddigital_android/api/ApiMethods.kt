@@ -97,4 +97,10 @@ interface ApiMethods {
     @Headers("Content-Type: application/json;charset=utf-8")
     @POST("/retention")
     fun report(@Header("User-Agent") userAgent: String, @Body retention: Retention): Call<Void>
+
+    //Methods for remote config
+    @GET("rc.json")
+    fun getRemoteConfig(
+            @HeaderMap headers: Map<String, String>
+    ): Call<List<String>>
 }
