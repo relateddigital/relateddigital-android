@@ -6,6 +6,7 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.relateddigital.androidexampleapp.databinding.ActivityInAppNotificationExampleBinding
 import com.relateddigital.relateddigital_android.RelatedDigital
+import com.relateddigital.relateddigital_android.inapp.CountdownTimerFragment
 import com.relateddigital.relateddigital_android.inapp.SocialProofFragment
 import java.util.*
 
@@ -89,7 +90,15 @@ class InAppNotificationActivity : AppCompatActivity() {
         }
 
         binding.countdownTimerButton.setOnClickListener {
-            sendInAppRequest("countdown-timer")
+            val countdownTimerFragment: CountdownTimerFragment = CountdownTimerFragment.newInstance(0, null)
+
+            countdownTimerFragment.retainInstance = true
+
+            val transaction = fragmentManager.beginTransaction()
+            transaction.add(R.id.content, countdownTimerFragment)
+            transaction.commit()
+            //TODO when backend side gets ready, check below
+            //sendInAppRequest("countdowntimer");
         }
 
         binding.inAppCarouselButton.setOnClickListener {
