@@ -3,7 +3,7 @@ package com.relateddigital.relateddigital_android.model
 import com.google.gson.annotations.SerializedName
 import java.io.Serializable
 
-class BannerStory : Serializable {
+class SkinBasedStory : Serializable {
     @SerializedName("actid")
     var actid: String? = null
 
@@ -14,5 +14,5 @@ class BannerStory : Serializable {
     var actiontype: String? = null
 
     @SerializedName("actiondata")
-    var actiondata: StoryBannerActionData? = null
+    var actiondata: StorySkinBasedActionData? = null
 }

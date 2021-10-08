@@ -3,7 +3,7 @@ package com.relateddigital.relateddigital_android.model
 import com.google.gson.annotations.SerializedName
 import java.io.Serializable
 
-class Stories : Serializable {
+class BannerStories : Serializable {
     @SerializedName("title")
     var title: String? = null
 
@@ -14,5 +14,5 @@ class Stories : Serializable {
     var link: String? = null
 
     @SerializedName("shown")
-    var shown: Boolean? = null
+    var shown = false
 }

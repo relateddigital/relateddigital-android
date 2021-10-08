@@ -101,5 +101,18 @@ class Constants {
 
         const val REMOTE_CONFIG_BLOCK_PREF = "visilabs_block_pref"
         const val REMOTE_CONFIG_BLOCK_PREF_KEY = "visilabs_block_pref_key"
+
+        const val STORY_CIRCLE = "50%"
+        const val STORY_ROUNDED_RECTANGLE = "10%"
+        const val STORY_RECTANGLE = ""
+        const val STORY_LOOKING_BANNERS = "story_looking_banners"
+        const val STORY_SKIN_BASED = "skin_based"
+        const val STORY_ITEM_POSITION = "story_item_position"
+        const val STORY_POSITION = "position"
+        const val ACTION_DATA = "action"
+        const val ACTION_ID = "action_id"
+        const val STORY_PHOTO_KEY = "photo"
+        const val STORY_VIDEO_KEY = "video"
+        const val STORY_ACTION_TYPE_VAL = "Story"
     }
 }

@@ -11,7 +11,7 @@ class FavsResponse : Serializable {
     private var mMailSubscriptionForm: List<MailSubscriptionForm>? = null
 
     @SerializedName("Story")
-    private var mStory: List<Story>? = null
+    private var mStory: List<BannerStory>? = null
 
     @SerializedName("VERSION")
     var version: Int? = null
@@ -29,7 +29,7 @@ class FavsResponse : Serializable {
         set(mailSubscriptionForm) {
             mMailSubscriptionForm = mailSubscriptionForm
         }
-    var story: List<Story>?
+    var story: List<BannerStory>?
         get() = mStory
         set(story) {
             mStory = story

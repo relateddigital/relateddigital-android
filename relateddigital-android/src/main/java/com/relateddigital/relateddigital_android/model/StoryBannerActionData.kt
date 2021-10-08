@@ -3,14 +3,14 @@ package com.relateddigital.relateddigital_android.model
 import com.google.gson.annotations.SerializedName
 import java.io.Serializable
 
-class StoryActionData : Serializable {
+class StoryBannerActionData : Serializable {
     @SerializedName("stories")
-    var stories: List<Stories>? = null
+    var stories: List<BannerStories>? = null
 
     @SerializedName("taTemplate")
     var taTemplate: String? = null
 
-    @SerializedName("extendedProps")
+    @SerializedName("ExtendedProps")
     var extendedProps: String? = null
 
     @SerializedName("report")

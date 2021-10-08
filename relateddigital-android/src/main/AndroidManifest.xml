@@ -9,10 +9,13 @@
         android:networkSecurityConfig="@xml/network_security_config"
         android:supportsRtl="true">
         <activity
+            android:name=".inapp.StoryActivity"
+            android:noHistory="true"/>
+        <activity
             android:name=".inapp.ShakeToWinActivity"
             android:configChanges="orientation"
-            android:screenOrientation="portrait"
-            android:noHistory="true"/>
+            android:noHistory="true"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".inapp.ScratchToWinActivity"
             android:configChanges="orientation"

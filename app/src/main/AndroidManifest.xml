@@ -25,7 +25,7 @@
             android:label="@string/in_app_notification_page_label"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".StoryActivity"
+            android:name=".StoryDemoActivity"
             android:label="@string/story_page_label"
             android:screenOrientation="portrait" />
         <activity

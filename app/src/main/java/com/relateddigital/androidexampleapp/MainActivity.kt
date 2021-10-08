@@ -39,7 +39,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.storyPage.setOnClickListener {
-            val intent = Intent(this@MainActivity, StoryActivity::class.java)
+            val intent = Intent(this@MainActivity, StoryDemoActivity::class.java)
             startActivity(intent)
         }
     }
