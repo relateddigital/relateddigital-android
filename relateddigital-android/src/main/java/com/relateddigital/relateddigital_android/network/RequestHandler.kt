@@ -322,6 +322,8 @@ object RequestHandler {
             return
         }
 
+        RequestFormer.updateSessionParameters(context, Constants.STORY_ACTION_TYPE_VAL)
+
         val queryMap = HashMap<String, String>()
         val headerMap = HashMap<String, String>()
         RequestFormer.formStoryActionRequest(
