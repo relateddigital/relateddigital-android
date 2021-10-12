@@ -38,7 +38,7 @@
         android:orientation="horizontal"
         android:paddingBottom="20dp">
 
-        <com.relateddigital.relateddigital_android.inapp.FadingImageView
+        <com.relateddigital.relateddigital_android.inapp.inappmessages.FadingImageView
             android:id="@+id/fiv_in_app_image"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

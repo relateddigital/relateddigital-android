@@ -7,10 +7,10 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.relateddigital.androidexampleapp.databinding.ActivityInAppNotificationExampleBinding
 import com.relateddigital.relateddigital_android.RelatedDigital
-import com.relateddigital.relateddigital_android.inapp.CountdownTimerFragment
-import com.relateddigital.relateddigital_android.inapp.HalfScreenFragment
-import com.relateddigital.relateddigital_android.inapp.ShakeToWinActivity
-import com.relateddigital.relateddigital_android.inapp.SocialProofFragment
+import com.relateddigital.relateddigital_android.inapp.countdowntimer.CountdownTimerFragment
+import com.relateddigital.relateddigital_android.inapp.halfscreen.HalfScreenFragment
+import com.relateddigital.relateddigital_android.inapp.shaketowin.ShakeToWinActivity
+import com.relateddigital.relateddigital_android.inapp.socialproof.SocialProofFragment
 import java.util.*
 
 class InAppNotificationActivity : AppCompatActivity() {

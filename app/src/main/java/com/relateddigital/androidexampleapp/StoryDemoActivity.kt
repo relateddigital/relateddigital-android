@@ -10,8 +10,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.relateddigital.androidexampleapp.databinding.ActivityStoryDemoBinding
-import com.relateddigital.relateddigital_android.databinding.StoryBinding
-import com.relateddigital.relateddigital_android.inapp.StoryItemClickListener
+import com.relateddigital.relateddigital_android.inapp.story.StoryItemClickListener
 import com.relateddigital.relateddigital_android.util.PersistentTargetManager
 
 class StoryDemoActivity : AppCompatActivity() {

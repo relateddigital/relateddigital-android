@@ -57,7 +57,7 @@
 
         </LinearLayout>
 
-        <com.relateddigital.relateddigital_android.inapp.StoryRecyclerView
+        <com.relateddigital.relateddigital_android.inapp.story.StoryRecyclerView
             android:id="@+id/vrv_story"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />

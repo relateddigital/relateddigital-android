@@ -97,7 +97,7 @@
 
             </LinearLayout>
 
-            <com.relateddigital.relateddigital_android.inapp.SmileRating
+            <com.relateddigital.relateddigital_android.inapp.inappmessages.SmileRating
                 android:id="@+id/smileRating"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -117,7 +117,7 @@
                 android:stepSize="0.5"
                 android:visibility="gone" />
 
-            <com.relateddigital.relateddigital_android.inapp.NpsWithNumbersView
+            <com.relateddigital.relateddigital_android.inapp.inappmessages.NpsWithNumbersView
                 android:id="@+id/npsWithNumbersView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

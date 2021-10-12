@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.relateddigital.relateddigital_android.inapp.RatingGrid
+    <com.relateddigital.relateddigital_android.inapp.inappmessages.RatingGrid
         android:id="@+id/rating_grid"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

@@ -9,8 +9,8 @@ import com.relateddigital.relateddigital_android.api.RealTimeApiClient
 import com.relateddigital.relateddigital_android.api.SApiClient
 import com.relateddigital.relateddigital_android.constants.Constants
 import com.relateddigital.relateddigital_android.inapp.InAppManager
-import com.relateddigital.relateddigital_android.inapp.ScratchToWinActivity
-import com.relateddigital.relateddigital_android.inapp.SpinToWinActivity
+import com.relateddigital.relateddigital_android.inapp.scratchtowin.ScratchToWinActivity
+import com.relateddigital.relateddigital_android.inapp.spintowin.SpinToWinActivity
 import com.relateddigital.relateddigital_android.inapp.VisilabsResponse
 import com.relateddigital.relateddigital_android.model.*
 import com.relateddigital.relateddigital_android.util.InAppNotificationTimer

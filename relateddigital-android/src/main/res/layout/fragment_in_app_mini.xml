@@ -5,7 +5,7 @@
     android:orientation="horizontal"
     android:visibility="gone">
 
-    <com.relateddigital.relateddigital_android.inapp.MiniCircleImageView
+    <com.relateddigital.relateddigital_android.inapp.inappmessages.MiniCircleImageView
         android:id="@+id/iv_in_app_image_mini"
         android:layout_width="75dp"
         android:layout_height="match_parent"

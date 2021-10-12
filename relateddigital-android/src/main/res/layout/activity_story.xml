@@ -55,7 +55,7 @@
         android:padding="5dp"
         android:text="Click" />
 
-    <com.relateddigital.relateddigital_android.inapp.StoriesProgressView
+    <com.relateddigital.relateddigital_android.inapp.story.StoriesProgressView
         android:id="@+id/stories"
         android:layout_width="match_parent"
         android:layout_height="3dp"

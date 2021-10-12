@@ -9,34 +9,34 @@
         android:networkSecurityConfig="@xml/network_security_config"
         android:supportsRtl="true">
         <activity
-            android:name=".inapp.StoryActivity"
+            android:name=".inapp.story.StoryActivity"
             android:noHistory="true"/>
         <activity
-            android:name=".inapp.ShakeToWinActivity"
+            android:name=".inapp.shaketowin.ShakeToWinActivity"
             android:configChanges="orientation"
             android:noHistory="true"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".inapp.ScratchToWinActivity"
+            android:name=".inapp.scratchtowin.ScratchToWinActivity"
             android:configChanges="orientation"
             android:noHistory="true"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.Light.Dialog.Alert" />
         <activity
-            android:name=".inapp.SpinToWinActivity"
+            android:name=".inapp.spintowin.SpinToWinActivity"
             android:configChanges="orientation"
             android:noHistory="true"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".inapp.InAppFullActivity"
+            android:name=".inapp.inappmessages.InAppFullActivity"
             android:noHistory="true"
             android:theme="@style/Theme.AppCompat.Light.Dialog.Alert" />
         <activity
-            android:name=".inapp.InAppNotificationActivity"
+            android:name=".inapp.inappmessages.InAppNotificationActivity"
             android:noHistory="true"
             android:theme="@style/Theme.AppCompat.Light.Dialog.Alert" />
         <activity
-            android:name=".inapp.MailSubscriptionFormActivity"
+            android:name=".inapp.mailsubsform.MailSubscriptionFormActivity"
             android:noHistory="true"
             android:theme="@style/Theme.AppCompat.Light.Dialog.Alert"
             android:windowSoftInputMode="adjustResize" />
