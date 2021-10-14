@@ -53,7 +53,6 @@ class StoryActivity : Activity(), StoriesProgressView.StoriesListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         overridePendingTransition(R.anim.anim_fade_in, R.anim.anim_fade_out)
-        window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
         setContentView(R.layout.activity_story)
         mActivity = this
         if (intent != null) {

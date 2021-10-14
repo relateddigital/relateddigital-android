@@ -11,6 +11,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.relateddigital.androidexampleapp.databinding.ActivityStoryDemoBinding
 import com.relateddigital.relateddigital_android.inapp.story.StoryItemClickListener
+import com.relateddigital.relateddigital_android.inapp.story.StoryRequestListener
 import com.relateddigital.relateddigital_android.util.PersistentTargetManager
 
 class StoryDemoActivity : AppCompatActivity() {
@@ -53,10 +54,19 @@ class StoryDemoActivity : AppCompatActivity() {
 
     private fun showStory() {
         val storyId = binding!!.etStoryId.text.toString().trim()
+        val storyRequestListener = object : StoryRequestListener {
+            override fun onRequestResult(isAvailable: Boolean) {
+                if (!isAvailable) {
+                    binding!!.vrvStory.visibility = View.GONE
+                }
+            }
+        }
         if (storyId.isEmpty()) {
-            binding!!.vrvStory.setStoryAction(applicationContext, storyItemClickListener)
+            binding!!.vrvStory.setStoryActionWithRequestCallback(applicationContext,
+                    storyItemClickListener, storyRequestListener)
         } else {
-            binding!!.vrvStory.setStoryActionId(applicationContext, storyId, storyItemClickListener)
+            binding!!.vrvStory.setStoryActionIdWithRequestCallback(applicationContext, storyId,
+                    storyItemClickListener, storyRequestListener)
         }
     }
 

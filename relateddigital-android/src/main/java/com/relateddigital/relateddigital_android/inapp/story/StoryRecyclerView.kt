@@ -32,16 +32,7 @@ class StoryRecyclerView : RecyclerView {
         mStoryItemClickListener = storyItemClickListener
         val parameters = HashMap<String, String>()
         parameters[Constants.REQUEST_ACTION_TYPE_KEY] = Constants.STORY_ACTION_TYPE_VAL
-        RequestHandler.createStoryActionRequest(mContext, getStoryCallback(context), parameters)
-    }
-
-    fun setStoryActionSync(context: Context?, activity: Activity, storyItemClickListener: StoryItemClickListener?) {
-        if (RelatedDigital.isBlocked(mContext)) {
-            Log.w(TAG, "Too much server load, ignoring the request!")
-            return
-        }
-        mStoryItemClickListener = storyItemClickListener
-
+        RequestHandler.createStoryActionRequest(mContext, getStoryCallback(context, null), parameters)
     }
 
     fun setStoryActionId(context: Context?, actionId: String, storyItemClickListener: StoryItemClickListener?) {
@@ -52,21 +43,38 @@ class StoryRecyclerView : RecyclerView {
         mStoryItemClickListener = storyItemClickListener
         val parameters = HashMap<String, String>()
         parameters[Constants.REQUEST_ACTION_ID_KEY] = actionId
-        RequestHandler.createStoryActionRequest(mContext, getStoryCallback(context), parameters)
+        RequestHandler.createStoryActionRequest(mContext, getStoryCallback(context, null), parameters)
     }
 
-    fun setStoryActionIdSync(context: Context?, activity: Activity, actionId: String?, storyItemClickListener: StoryItemClickListener?) {
+    fun setStoryActionWithRequestCallback(context: Context?, storyItemClickListener: StoryItemClickListener?,
+                                          storyRequestListener: StoryRequestListener?) {
+        if (RelatedDigital.isBlocked(context!!)) {
+            Log.w(TAG, "Too much server load, ignoring the request!")
+            return
+        }
+        mStoryItemClickListener = storyItemClickListener
+        val parameters = HashMap<String, String>()
+        parameters[Constants.REQUEST_ACTION_TYPE_KEY] = Constants.STORY_ACTION_TYPE_VAL
+        RequestHandler.createStoryActionRequest(mContext, getStoryCallback(context, storyRequestListener), parameters)
+    }
+
+    fun setStoryActionIdWithRequestCallback(context: Context?, actionId: String,
+                                            storyItemClickListener: StoryItemClickListener?,
+                                            storyRequestListener: StoryRequestListener?) {
         if (RelatedDigital.isBlocked(mContext)) {
             Log.w(TAG, "Too much server load, ignoring the request!")
             return
         }
         mStoryItemClickListener = storyItemClickListener
-
+        val parameters = HashMap<String, String>()
+        parameters[Constants.REQUEST_ACTION_ID_KEY] = actionId
+        RequestHandler.createStoryActionRequest(mContext, getStoryCallback(context, storyRequestListener), parameters)
     }
 
-    private fun getStoryCallback(context: Context?): VisilabsCallback {
+    private fun getStoryCallback(context: Context?, storyRequestListener: StoryRequestListener?): VisilabsCallback {
         return object : VisilabsCallback {
             override fun success(response: VisilabsResponse?) {
+                storyRequestListener?.onRequestResult(true)
                 try {
                     val storyLookingBannerResponse: StoryLookingBannerResponse = Gson().fromJson(response!!.rawResponse, StoryLookingBannerResponse::class.java)
                     if (storyLookingBannerResponse.Story!!.isEmpty()) {
@@ -96,11 +104,13 @@ class StoryRecyclerView : RecyclerView {
                     }
                 } catch (ex: Exception) {
                     Log.e(TAG, ex.message, ex)
+                    storyRequestListener?.onRequestResult(false)
                 }
             }
 
             override fun fail(response: VisilabsResponse?) {
                 Log.e(TAG, response!!.rawResponse)
+                storyRequestListener?.onRequestResult(false)
             }
         }
     }
