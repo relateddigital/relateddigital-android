@@ -7,11 +7,14 @@ import android.os.Build
 import android.os.Environment
 import android.telephony.TelephonyManager
 import android.util.Log
+import androidx.core.content.ContextCompat
 import com.relateddigital.relateddigital_android.BuildConfig
 import com.relateddigital.relateddigital_android.constants.Constants
+import com.relateddigital.relateddigital_android.locationPermission.LocationPermission
 import java.io.*
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.HashMap
 
 object AppUtils {
     private var sId: String = ""
@@ -237,5 +240,48 @@ object AppUtils {
             ID = ""
         }
         return ID
+    }
+
+    fun getLocationPermissionStatus(context: Context?): LocationPermission {
+        return if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P) {
+            if (ContextCompat.checkSelfPermission(context!!, Manifest.permission.ACCESS_FINE_LOCATION)
+                    == PackageManager.PERMISSION_GRANTED ||
+                    ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION)
+                    == PackageManager.PERMISSION_GRANTED) {
+                LocationPermission.ALWAYS
+            } else {
+                LocationPermission.NONE
+            }
+        } else {
+            if (ContextCompat.checkSelfPermission(context!!, Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+                    == PackageManager.PERMISSION_GRANTED) {
+                LocationPermission.ALWAYS
+            } else {
+                if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
+                        == PackageManager.PERMISSION_GRANTED ||
+                        ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION)
+                        == PackageManager.PERMISSION_GRANTED) {
+                    LocationPermission.APP_OPEN
+                } else {
+                    LocationPermission.NONE
+                }
+            }
+        }
+    }
+
+    fun cleanParameters(map: HashMap<String, String>) {
+        for (key in map.keys) {
+            if (!StringUtils.isNullOrWhiteSpace(key)) {
+                if (!(key != Constants.ORGANIZATION_ID_REQUEST_KEY && key != Constants.SITE_ID_REQUEST_KEY
+                                && key != Constants.EXVISITOR_ID_REQUEST_KEY && key != Constants.COOKIE_ID_REQUEST_KEY
+                                && key != Constants.ZONE_ID_KEY && key != Constants.BODY_KEY
+                                && key != Constants.TOKEN_ID_REQUEST_KEY && key != Constants.APP_ID_REQUEST_KEY
+                                && key != Constants.API_VERSION_REQUEST_KEY && key != Constants.FILTER_KEY)) {
+                    map.remove(key)
+                }
+            } else {
+                map.remove(key)
+            }
+        }
     }
 }

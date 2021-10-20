@@ -3,15 +3,24 @@ package com.relateddigital.androidexampleapp
 import android.R
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.google.gson.Gson
 import com.relateddigital.androidexampleapp.databinding.ActivityInAppNotificationExampleBinding
 import com.relateddigital.relateddigital_android.RelatedDigital
+import com.relateddigital.relateddigital_android.constants.Constants
+import com.relateddigital.relateddigital_android.inapp.VisilabsCallback
+import com.relateddigital.relateddigital_android.inapp.VisilabsResponse
 import com.relateddigital.relateddigital_android.inapp.countdowntimer.CountdownTimerFragment
 import com.relateddigital.relateddigital_android.inapp.halfscreen.HalfScreenFragment
 import com.relateddigital.relateddigital_android.inapp.shaketowin.ShakeToWinActivity
 import com.relateddigital.relateddigital_android.inapp.socialproof.SocialProofFragment
+import com.relateddigital.relateddigital_android.model.FavsResponse
+import com.relateddigital.relateddigital_android.network.RequestHandler
 import java.util.*
+
 
 class InAppNotificationActivity : AppCompatActivity() {
     companion object{
@@ -140,6 +149,64 @@ class InAppNotificationActivity : AppCompatActivity() {
             transaction.commit()
             //TODO when backend side gets ready, check below
             //sendInAppRequest("half-screen");
+        }
+
+        binding.locationPermissionButton.setOnClickListener {
+            RelatedDigital.sendLocationPermission(applicationContext)
+        }
+
+        binding.recommendationButton.setOnClickListener {
+            val callback: VisilabsCallback = object : VisilabsCallback {
+                override fun success(response: VisilabsResponse?) {
+                    try {
+                        Toast.makeText(applicationContext, "Got the recommendations successfully!", Toast.LENGTH_SHORT).show()
+                        val jsonObject = response!!.json
+                        val groupTitle = jsonObject!!.getString("title")
+                        val jsonArray = jsonObject.getJSONArray("recommendations")
+                        for (i in 0 until jsonArray.length()) {
+                            val currentProductObject = jsonArray.getJSONObject(i)
+                            val currentProductTitle = currentProductObject.getString("title")
+                            val currentProductPrice = currentProductObject.getDouble("price")
+                            val currentProductFreeShipping = currentProductObject.getBoolean("freeshipping")
+                            val qs = currentProductObject.getString("qs")
+                            //Continues like this...
+                        }
+                    } catch (e: Exception) {
+                        Toast.makeText(applicationContext, "Could not parse the recommendations!", Toast.LENGTH_SHORT).show()
+                    }
+                }
+
+                override fun fail(response: VisilabsResponse?) {
+                    Toast.makeText(applicationContext, "Could not get the recommendations!", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            /*RequestHandler.createRecommendationRequest(applicationContext, zoneId,
+                    productCode, callback)*/
+        }
+
+        binding.favouriteResponseButton.setOnClickListener {
+            val callback: VisilabsCallback = object : VisilabsCallback {
+                override fun success(response: VisilabsResponse?) {
+                    try {
+                        Toast.makeText(applicationContext, "Got the favourites successfully!", Toast.LENGTH_SHORT).show()
+                        val favsResponse: FavsResponse = Gson().fromJson(response!!.rawResponse, FavsResponse::class.java)
+
+                        val favBrands: String = favsResponse.favoriteAttributeAction!![0].actiondata!!.favorites!!.brand!![0]!!
+                        Log.i("Favs 1.Brand", favBrands)
+
+                    } catch (e: Exception) {
+                        Toast.makeText(applicationContext, "Could not parse the favourites!", Toast.LENGTH_SHORT).show()
+                    }
+                }
+
+                override fun fail(response: VisilabsResponse?) {
+                    Toast.makeText(applicationContext, "Could not get the favourites!", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            RequestHandler.createFavsResponseRequest(applicationContext, null,
+                    Constants.FavoriteAttributeAction, callback)
         }
     }
 

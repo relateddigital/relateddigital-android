@@ -114,5 +114,16 @@ class Constants {
         const val STORY_PHOTO_KEY = "photo"
         const val STORY_VIDEO_KEY = "video"
         const val STORY_ACTION_TYPE_VAL = "Story"
+
+        const val LOCATION_PERMISSION_REQUEST_KEY = "OM.locpermit"
+        const val LOC_PERMISSION_ALWAYS_REQUEST_VAL = "always"
+        const val LOC_PERMISSION_APP_OPEN_REQUEST_VAL = "appopen"
+        const val LOC_PERMISSION_NONE_REQUEST_VAL = "none"
+
+        const val ZONE_ID_KEY = "OM.zid"
+        const val BODY_KEY = "OM.body"
+        const val FILTER_KEY = "OM.w.f"
+
+        const val FavoriteAttributeAction = "FavoriteAttributeAction"
     }
 }

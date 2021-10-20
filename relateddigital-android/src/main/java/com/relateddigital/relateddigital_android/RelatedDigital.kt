@@ -12,6 +12,7 @@ import com.google.gson.Gson
 import com.relateddigital.relateddigital_android.appTracker.AppTracker
 import com.relateddigital.relateddigital_android.constants.Constants
 import com.relateddigital.relateddigital_android.inapp.InAppButtonInterface
+import com.relateddigital.relateddigital_android.locationPermission.LocationPermissionHandler
 import com.relateddigital.relateddigital_android.model.LoadBalanceCookie
 import com.relateddigital.relateddigital_android.model.RelatedDigitalModel
 import com.relateddigital.relateddigital_android.model.VisilabsParameter
@@ -779,6 +780,11 @@ object RelatedDigital {
     @JvmStatic
     fun sendTheListOfAppsInstalled(context: Context) {
         AppTracker.sendTheListOfAppsInstalled(context)
+    }
+
+    @JvmStatic
+    fun sendLocationPermission(context: Context) {
+        LocationPermissionHandler.sendLocationPermissionToTheServer(context)
     }
 
     private fun initVisilabsParameters() {
