@@ -11,10 +11,10 @@ import androidx.core.content.ContextCompat
 import com.relateddigital.relateddigital_android.BuildConfig
 import com.relateddigital.relateddigital_android.constants.Constants
 import com.relateddigital.relateddigital_android.locationPermission.LocationPermission
+import com.relateddigital.relateddigital_android.model.UtilResultModel
 import java.io.*
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.collections.HashMap
 
 object AppUtils {
     private var sId: String = ""
@@ -267,6 +267,20 @@ object AppUtils {
                 }
             }
         }
+    }
+
+    fun getNumberFromText(text: String?): UtilResultModel? {
+        var model: UtilResultModel? = null
+        if (!text.isNullOrEmpty()) {
+            val number = text.replace("\\D+".toRegex(), "")
+            if (number.isNotEmpty()) {
+                model = UtilResultModel()
+                model.number = number.toInt()
+                model.startIdx = text.indexOf(number)
+                model.endIdx = text.indexOf(number) + number.length
+            }
+        }
+        return model
     }
 
     fun cleanParameters(map: HashMap<String, String>) {

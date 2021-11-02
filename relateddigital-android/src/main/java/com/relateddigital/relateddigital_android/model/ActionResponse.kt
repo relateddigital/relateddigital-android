@@ -16,6 +16,9 @@ class ActionResponse : Serializable {
     @SerializedName("ScratchToWin")
     var mScratchToWinList: List<ScratchToWin>? = null
 
+    @SerializedName("ProductStatNotifier")
+    var mProductStatNotifierList: List<ProductStatNotifier>? = null
+
     @SerializedName("Story")
     var mStory: List<BannerStory>? = null
 
@@ -44,6 +47,12 @@ class ActionResponse : Serializable {
         get() = mScratchToWinList
         set(scratchToWinList) {
             mScratchToWinList = scratchToWinList
+        }
+
+    var productStatNotifierList: List<ProductStatNotifier>?
+        get() = mProductStatNotifierList
+        set(productStatNotifierList) {
+            mProductStatNotifierList = productStatNotifierList
         }
     var story: List<BannerStory>?
         get() = mStory

@@ -247,7 +247,9 @@ object RequestFormer {
         if (properties != null) {
             for (i in properties.keys.indices) {
                 val key = properties.keys.toTypedArray()[i]
-                queryMap[key] = properties[key]!!
+                if(properties[key] != null) {
+                    queryMap[key] = properties[key]!!
+                }
             }
         }
 

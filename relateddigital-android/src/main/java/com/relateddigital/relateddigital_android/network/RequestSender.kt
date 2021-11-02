@@ -1,5 +1,7 @@
 package com.relateddigital.relateddigital_android.network
 
+import android.R
+import android.app.FragmentTransaction
 import android.content.Context
 import android.content.Intent
 import android.util.Log
@@ -11,6 +13,7 @@ import com.relateddigital.relateddigital_android.constants.Constants
 import com.relateddigital.relateddigital_android.inapp.InAppManager
 import com.relateddigital.relateddigital_android.inapp.VisilabsResponse
 import com.relateddigital.relateddigital_android.inapp.scratchtowin.ScratchToWinActivity
+import com.relateddigital.relateddigital_android.inapp.socialproof.SocialProofFragment
 import com.relateddigital.relateddigital_android.inapp.spintowin.SpinToWinActivity
 import com.relateddigital.relateddigital_android.model.*
 import com.relateddigital.relateddigital_android.recommendation.RecommendationUtils
@@ -236,6 +239,15 @@ object RequestSender {
                                                     currentRequest.parent!!
                                             )
                                         }
+                                        actionsResponse.mProductStatNotifierList!!.isNotEmpty() -> {
+                                            val socialProofFragment: SocialProofFragment = SocialProofFragment.newInstance(actionsResponse.mProductStatNotifierList!![0])
+
+                                            socialProofFragment.retainInstance = true
+
+                                            val transaction: FragmentTransaction = currentRequest.parent!!.fragmentManager.beginTransaction()
+                                            transaction.add(R.id.content, socialProofFragment)
+                                            transaction.commit()
+                                        }
                                         else -> {
                                             Log.e(
                                                     LOG_TAG,
@@ -417,7 +429,7 @@ object RequestSender {
                                 if (rawJsonResponse != "") {
                                     val mainObject = JSONObject(rawJsonResponse)
                                     val storyArray: JSONArray? = mainObject.optJSONArray("Story")
-                                    if(storyArray != null && storyArray.length() > 0) {
+                                    if (storyArray != null && storyArray.length() > 0) {
                                         val visilabsResponse = VisilabsResponse(
                                                 JSONObject(rawJsonResponse),
                                                 null,

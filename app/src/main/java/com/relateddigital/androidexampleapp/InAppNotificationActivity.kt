@@ -16,7 +16,6 @@ import com.relateddigital.relateddigital_android.inapp.VisilabsResponse
 import com.relateddigital.relateddigital_android.inapp.countdowntimer.CountdownTimerFragment
 import com.relateddigital.relateddigital_android.inapp.halfscreen.HalfScreenFragment
 import com.relateddigital.relateddigital_android.inapp.shaketowin.ShakeToWinActivity
-import com.relateddigital.relateddigital_android.inapp.socialproof.SocialProofFragment
 import com.relateddigital.relateddigital_android.model.FavsResponse
 import com.relateddigital.relateddigital_android.network.RequestHandler
 import java.util.*
@@ -90,15 +89,14 @@ class InAppNotificationActivity : AppCompatActivity() {
         }
 
         binding.socialProofButton.setOnClickListener {
-            val socialProofFragment: SocialProofFragment = SocialProofFragment.newInstance(0, null)
-
-            socialProofFragment.retainInstance = true
-
-            val transaction = fragmentManager.beginTransaction()
-            transaction.add(R.id.content, socialProofFragment)
-            transaction.commit()
-            //TODO when backend side gets ready, check below
-            //sendInAppRequest("socialproof");
+            val parameters: HashMap<String, String> = HashMap()
+            parameters["OM.inapptype"] = "socialproof"
+            parameters["OM.pv"] = "CV7933-837-837"
+            RelatedDigital.customEvent(
+                    context = applicationContext,
+                    pageName = "in-app",
+                    properties = parameters,
+                    parent = this@InAppNotificationActivity)
         }
 
         binding.countdownTimerButton.setOnClickListener {
