@@ -15,4 +15,7 @@ class Slice : Serializable {
 
     @SerializedName("type")
     var type: String? = null
+
+    @SerializedName("is_available")
+    var isAvailable: Boolean? = null
 }

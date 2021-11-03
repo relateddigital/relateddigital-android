@@ -88,58 +88,94 @@ class SpinToWinJavaScriptInterface internal constructor(webViewDialogFragment: S
     /**
      * This method makes a request to the ad server to get the coupon code
      */
-    @get:JavascriptInterface
-    @get:RequiresApi(api = Build.VERSION_CODES.KITKAT)
-    val promotionCode: Unit
-        get() {
-            var selectedCode = ""
-            var selectedSliceText = ""
-            val promotionCodes: MutableList<String> = ArrayList()
-            val sliceTexts: MutableList<String> = ArrayList()
-            val promotionIndexes: MutableList<Int> = ArrayList()
-            var selectedIndex = -1
-            val promoAuth: String = spinToWinModel.actiondata!!.promoAuth!!
-            val actId: Int = spinToWinModel.actid!!
-            for (i in spinToWinModel.actiondata!!.slices!!.indices) {
-                val slice: Slice = spinToWinModel.actiondata!!.slices!![i]
-                if (slice.type.equals("promotion")) {
-                    promotionCodes.add(slice.code!!)
-                    promotionIndexes.add(i)
-                    sliceTexts.add(slice.displayName!!)
-                }
-            }
-            if (promotionCodes.size > 0) {
-                try {
-                    val random = Random()
-                    val randomIndex = random.nextInt(promotionCodes.size)
-                    selectedCode = promotionCodes[randomIndex]
-                    selectedIndex = promotionIndexes[randomIndex]
-                    selectedSliceText = sliceTexts[randomIndex]
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                }
-            }
-            if (selectedIndex != -1) {
-                try {
-                    val queryParameters = HashMap<String, String>()
-                    queryParameters["promotionid"] = selectedCode
-                    queryParameters["promoauth"] = promoAuth
-                    queryParameters["actionid"] = actId.toString()
-                    RequestHandler.createSpinToWinPromoCodeRequest(mWebViewDialogFragment.requireContext(),
-                            getVisilabsCallback(selectedIndex,
-                                    selectedSliceText), queryParameters)
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                }
-            } else {
-                val mainHandler = Handler(Looper.getMainLooper())
-                val myRunnable = Runnable {
-                    mWebViewDialogFragment.getWebView()!!.evaluateJavascript(
-                            "window.chooseSlice(-1, undefined);", null)
-                }
-                mainHandler.post(myRunnable)
+    @JavascriptInterface
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    fun getPromotionCode() {
+        var selectedCode: String
+        var selectedSliceText: String
+        val promotionCodes: MutableList<String> = ArrayList()
+        val sliceTexts: MutableList<String> = ArrayList()
+        val promotionIndexes: MutableList<Int> = ArrayList()
+        var selectedIndex = -1
+
+        val promoAuth: String = spinToWinModel.actiondata!!.promoAuth!!
+        val actId: Int = spinToWinModel.actid!!
+
+        for (i in spinToWinModel.actiondata!!.slices!!.indices) {
+            val slice: Slice = spinToWinModel.actiondata!!.slices!![i]
+            if (slice.type.equals("promotion") && slice.isAvailable!!) {
+                promotionCodes.add(slice.code!!)
+                promotionIndexes.add(i)
+                sliceTexts.add(slice.displayName!!)
             }
         }
+
+        if (promotionCodes.size > 0) {
+            try {
+                val random = Random()
+                val randomIndex = random.nextInt(promotionCodes.size)
+                selectedCode = promotionCodes[randomIndex]
+                selectedIndex = promotionIndexes[randomIndex]
+                selectedSliceText = sliceTexts[randomIndex]
+                val queryParameters = HashMap<String, String>()
+                queryParameters["promotionid"] = selectedCode
+                queryParameters["promoauth"] = promoAuth
+                queryParameters["actionid"] = actId.toString()
+                RequestHandler.createSpinToWinPromoCodeRequest(mWebViewDialogFragment.requireContext(),
+                        getVisilabsCallback(selectedIndex,
+                                selectedSliceText), queryParameters)
+            } catch (e: java.lang.Exception) {
+                e.printStackTrace()
+                selectedIndex = -1
+            }
+        }
+
+        if (selectedIndex == -1) {
+            val staticCodes: MutableList<String> = ArrayList()
+            val staticSliceTexts: MutableList<String> = ArrayList()
+            val staticIndexes: MutableList<Int> = ArrayList()
+            for (i in spinToWinModel.actiondata!!.slices!!.indices) {
+                val slice: Slice = spinToWinModel.actiondata!!.slices!![i]
+                if (slice.type.equals("staticcode")) {
+                    staticCodes.add(slice.code!!)
+                    staticIndexes.add(i)
+                    staticSliceTexts.add(slice.displayName!!)
+                }
+            }
+            if (staticCodes.size > 0) {
+                try {
+                    val random = Random()
+                    val randomIndex = random.nextInt(staticCodes.size)
+                    selectedCode = staticCodes[randomIndex]
+                    selectedIndex = staticIndexes[randomIndex]
+                    selectedSliceText = staticSliceTexts[randomIndex]
+                    val mainHandler = Handler(Looper.getMainLooper())
+                    val finalSelectedCode = selectedCode
+                    val finalSelectedSliceText = selectedSliceText
+                    val finalSelectedIndex = selectedIndex
+                    val myRunnable = Runnable {
+                        sendPromotionCodeInfo(finalSelectedCode, finalSelectedSliceText)
+                        mWebViewDialogFragment.getWebView()!!.evaluateJavascript(
+                                "window.chooseSlice($finalSelectedIndex,'$finalSelectedCode');",
+                                null)
+                    }
+                    mainHandler.post(myRunnable)
+                } catch (e: java.lang.Exception) {
+                    e.printStackTrace()
+                    selectedIndex = -1
+                }
+            }
+        }
+
+        if (selectedIndex == -1) {
+            val mainHandler = Handler(Looper.getMainLooper())
+            val myRunnable = Runnable {
+                mWebViewDialogFragment.getWebView()!!.evaluateJavascript(
+                        "window.chooseSlice(-1, undefined);", null)
+            }
+            mainHandler.post(myRunnable)
+        }
+    }
 
     private fun getVisilabsCallback(idx: Int, sliceText: String): VisilabsCallback {
         return object : VisilabsCallback {
@@ -160,12 +196,52 @@ class SpinToWinJavaScriptInterface internal constructor(webViewDialogFragment: S
 
             @RequiresApi(api = Build.VERSION_CODES.KITKAT)
             override fun fail(response: VisilabsResponse?) {
-                val mainHandler = Handler(Looper.getMainLooper())
-                val myRunnable = Runnable {
-                    mWebViewDialogFragment.getWebView()!!.evaluateJavascript(
-                            "window.chooseSlice(-1, undefined);", null)
+                Log.e("SpinToWin", "Could not get the promotion code!")
+                val staticCodes: MutableList<String> = ArrayList()
+                val staticSliceTexts: MutableList<String> = ArrayList()
+                val staticIndexes: MutableList<Int> = ArrayList()
+                var selectedIndex = -1
+                for (i in spinToWinModel.actiondata!!.slices!!.indices) {
+                    val slice: Slice = spinToWinModel.actiondata!!.slices!![i]
+                    if (slice.type.equals("staticcode")) {
+                        staticCodes.add(slice.code!!)
+                        staticIndexes.add(i)
+                        staticSliceTexts.add(slice.displayName!!)
+                    }
                 }
-                mainHandler.post(myRunnable)
+
+                if (staticCodes.size > 0) {
+                    val finalSelectedCode: String
+                    val finalSelectedSliceText: String
+                    try {
+                        val random = Random()
+                        val randomIndex = random.nextInt(staticCodes.size)
+                        finalSelectedCode = staticCodes[randomIndex]
+                        selectedIndex = staticIndexes[randomIndex]
+                        finalSelectedSliceText = staticSliceTexts[randomIndex]
+                        val mainHandler = Handler(Looper.getMainLooper())
+                        val finalSelectedIndex = selectedIndex
+                        val myRunnable = Runnable {
+                            sendPromotionCodeInfo(finalSelectedCode, finalSelectedSliceText)
+                            mWebViewDialogFragment.getWebView()!!.evaluateJavascript(
+                                    "window.chooseSlice($finalSelectedIndex,'$finalSelectedCode');",
+                                    null)
+                        }
+                        mainHandler.post(myRunnable)
+                    } catch (e: java.lang.Exception) {
+                        e.printStackTrace()
+                        selectedIndex = -1
+                    }
+                }
+
+                if (selectedIndex == -1) {
+                    val mainHandler = Handler(Looper.getMainLooper())
+                    val myRunnable = Runnable {
+                        mWebViewDialogFragment.getWebView()!!.evaluateJavascript(
+                                "window.chooseSlice(-1, undefined);", null)
+                    }
+                    mainHandler.post(myRunnable)
+                }
             }
         }
     }
