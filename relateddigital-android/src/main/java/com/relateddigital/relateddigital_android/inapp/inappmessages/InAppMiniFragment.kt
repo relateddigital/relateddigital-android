@@ -145,17 +145,13 @@ class InAppMiniFragment: Fragment() {
                     buttonInterface.onPress(uriString)
                 } else {
                     if (!uriString.isNullOrEmpty()) {
-                        val uri: Uri = try {
-                            Uri.parse(uriString)
-                        } catch (e: IllegalArgumentException) {
-                            Log.i(LOG_TAG, "Can't parse notification URI, will not take any action", e)
-                            return true
-                        }
                         try {
+                            val uri: Uri = Uri.parse(uriString)
                             val viewIntent = Intent(Intent.ACTION_VIEW, uri)
                             mParent!!.startActivity(viewIntent)
-                        } catch (e: ActivityNotFoundException) {
-                            Log.i(LOG_TAG, "User doesn't have an activity for notification URI $uri")
+                        } catch (e: Exception) {
+                            Log.i(LOG_TAG, "Can't parse notification URI, will not take any action", e)
+                            return true
                         }
                     }
                 }

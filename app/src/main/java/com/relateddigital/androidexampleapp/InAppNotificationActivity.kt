@@ -14,7 +14,6 @@ import com.relateddigital.relateddigital_android.constants.Constants
 import com.relateddigital.relateddigital_android.inapp.VisilabsCallback
 import com.relateddigital.relateddigital_android.inapp.VisilabsResponse
 import com.relateddigital.relateddigital_android.inapp.countdowntimer.CountdownTimerFragment
-import com.relateddigital.relateddigital_android.inapp.halfscreen.HalfScreenFragment
 import com.relateddigital.relateddigital_android.inapp.shaketowin.ShakeToWinActivity
 import com.relateddigital.relateddigital_android.model.FavsResponse
 import com.relateddigital.relateddigital_android.network.RequestHandler
@@ -140,13 +139,7 @@ class InAppNotificationActivity : AppCompatActivity() {
         }
 
         binding.halfScreenButton.setOnClickListener {
-            val halfScreenFragment: HalfScreenFragment = HalfScreenFragment.newInstance(0, null)
-            halfScreenFragment.retainInstance = true
-            val transaction = fragmentManager.beginTransaction()
-            transaction.add(R.id.content, halfScreenFragment)
-            transaction.commit()
-            //TODO when backend side gets ready, check below
-            //sendInAppRequest("half-screen");
+            sendInAppRequest("halfscreen");
         }
 
         binding.locationPermissionButton.setOnClickListener {

@@ -1,19 +1,23 @@
 package com.relateddigital.relateddigital_android.inapp.halfscreen
 
 import android.app.Fragment
-import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.graphics.Color
-import android.graphics.Typeface
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.relateddigital.relateddigital_android.R
+import com.relateddigital.relateddigital_android.RelatedDigital
 import com.relateddigital.relateddigital_android.databinding.FragmentHalfScreenBinding
+import com.relateddigital.relateddigital_android.inapp.InAppButtonInterface
 import com.relateddigital.relateddigital_android.inapp.InAppNotificationState
-import com.relateddigital.relateddigital_android.util.StringUtils
+import com.relateddigital.relateddigital_android.inapp.InAppUpdateDisplayState
+import com.relateddigital.relateddigital_android.inapp.inappmessages.InAppMiniFragment
+import com.relateddigital.relateddigital_android.model.InAppMessage
+import com.relateddigital.relateddigital_android.network.RequestHandler
 import com.squareup.picasso.Picasso
 
 /**
@@ -22,143 +26,8 @@ import com.squareup.picasso.Picasso
  * create an instance of this fragment.
  */
 class HalfScreenFragment : Fragment() {
-    private var mStateId = 0
-    private var mInAppState: InAppNotificationState? = null
-    private var mIsTop = false
-    private lateinit var binding: FragmentHalfScreenBinding
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        mStateId = arguments.getInt(ARG_PARAM1)
-        mInAppState = arguments.getParcelable(ARG_PARAM2)
-    }
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View {
-        binding = FragmentHalfScreenBinding.inflate(inflater, container, false)
-        val view: View = binding.root
-        if (savedInstanceState != null) {
-            //TODO: get the json string here
-        } else {
-            //TODO: get the json string here
-        }
-        setupInitialView()
-        return view
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        //TODO: save the json string here
-    }
-
-    private fun setupInitialView() {
-        //Check the position and assign it to mIsTop
-        mIsTop = true
-        if (mIsTop) {
-            adjustTop()
-        } else {
-            adjustBottom()
-        }
-        setupCloseButton()
-    }
-
-    private fun adjustTop() {
-        //TODO remove the code below when the actual data gets ready
-        //TODO check if title is on
-        if (true) {
-            binding.halfScreenContainerTop.setBackgroundColor(resources.getColor(R.color.black))
-            binding.topTitleView.text = "30 Ağustos Zafer Bayramı"
-            binding.topTitleView.setTextColor(Color.parseColor("#E02B19"))
-            binding.topTitleView.textSize = 20f
-            binding.topTitleView.setTypeface(Typeface.SANS_SERIF)
-        } else {
-            binding.topTitleView.visibility = View.GONE
-        }
-        Picasso.get().load("https://brtk.net/wp-content/uploads/2021/08/28/30agustossss.jpg?ver=cf14dae8e18a0da9aee40b2c8f3f2b39")
-                .into(binding.topImageView)
-        binding.topImageView.setOnClickListener { //TODO click report here
-            //TODO Check if there is buttonCallback
-            try {
-                val viewIntent = Intent(Intent.ACTION_VIEW, StringUtils.getURIfromUrlString("https://www.relateddigital.com/"))
-                startActivity(viewIntent)
-            } catch (e: ActivityNotFoundException) {
-                Log.i("Visilabs", "User doesn't have an activity for notification URI")
-            }
-            endFragment()
-        }
-        binding.halfScreenContainerBot.visibility = View.GONE
-    }
-
-    private fun adjustBottom() {
-        //TODO remove the code below when the actual data gets ready
-        //TODO check if title is on
-        if (true) {
-            binding.halfScreenContainerBot.setBackgroundColor(resources.getColor(R.color.black))
-            binding.botTitleView.text = "30 Ağustos Zafer Bayramı"
-            binding.botTitleView.setTextColor(Color.parseColor("#E02B19"))
-            binding.botTitleView.textSize = 20f
-            binding.botTitleView.typeface = Typeface.SANS_SERIF
-        } else {
-            binding.botTitleView.visibility = View.GONE
-        }
-        Picasso.get().load("https://brtk.net/wp-content/uploads/2021/08/28/30agustossss.jpg?ver=cf14dae8e18a0da9aee40b2c8f3f2b39")
-                .into(binding.botImageView)
-        binding.botImageView.setOnClickListener { //TODO click report here
-            //TODO Check if there is buttonCallback
-            try {
-                val viewIntent = Intent(Intent.ACTION_VIEW, StringUtils.getURIfromUrlString("https://www.relateddigital.com/"))
-                startActivity(viewIntent)
-            } catch (e: ActivityNotFoundException) {
-                Log.i("Visilabs", "User doesn't have an activity for notification URI")
-            }
-            endFragment()
-        }
-        binding.halfScreenContainerTop.visibility = View.GONE
-    }
-
-    private fun setupCloseButton() {
-        //TODO check if close button will be displayed first
-        if (mIsTop) {
-            binding.topCloseButton.setBackgroundResource(closeIcon)
-            binding.topCloseButton.setOnClickListener { endFragment() }
-        } else {
-            binding.botCloseButton.setBackgroundResource(closeIcon)
-            binding.botCloseButton.setOnClickListener { endFragment() }
-        }
-    }
-
-    //TODO when real data comes:
-    /* switch (mInAppMessage.getActionData().getCloseButtonColor()) {
-
-         case "white":
-             return R.drawable.ic_close_white_24dp;
-
-         case "black":
-             return R.drawable.ic_close_black_24dp;
-     }
-     return R.drawable.ic_close_black_24dp;*/
-    private val closeIcon: Int
-        get() = R.drawable.ic_close_white_24dp
-    //TODO when real data comes:
-    /* switch (mInAppMessage.getActionData().getCloseButtonColor()) {
-
-         case "white":
-             return R.drawable.ic_close_white_24dp;
-
-         case "black":
-             return R.drawable.ic_close_black_24dp;
-     }
-     return R.drawable.ic_close_black_24dp;*/
-
-    private fun endFragment() {
-        //TODO Release display state here
-        if (activity != null) {
-            activity.fragmentManager.beginTransaction().remove(this@HalfScreenFragment).commit()
-        }
-    }
-
-    companion object {
+    companion object{
         private const val LOG_TAG = "HalfScreenFragment"
-
         // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
         private const val ARG_PARAM1 = "stateIdKey"
         private const val ARG_PARAM2 = "inAppStateKey"
@@ -171,7 +40,6 @@ class HalfScreenFragment : Fragment() {
          * @param inAppState Parameter 2.
          * @return A new instance of fragment SocialProofFragment.
          */
-        // TODO: Rename and change types and number of parameters
         fun newInstance(stateId: Int, inAppState: InAppNotificationState?): HalfScreenFragment {
             val fragment = HalfScreenFragment()
             val args = Bundle()
@@ -179,6 +47,148 @@ class HalfScreenFragment : Fragment() {
             args.putParcelable(ARG_PARAM2, inAppState)
             fragment.arguments = args
             return fragment
+        }
+    }
+
+    private var mStateId = 0
+    private var mInAppState: InAppNotificationState? = null
+    private var mInAppMessage: InAppMessage? = null
+    private var mIsTop = false
+    private lateinit var binding: FragmentHalfScreenBinding
+
+    fun HalfScreenFragment() {
+        // Required empty public constructor
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        mStateId = arguments.getInt(ARG_PARAM1)
+        mInAppState = arguments.getParcelable(ARG_PARAM2)
+        if (mInAppState != null) {
+            mInAppMessage = mInAppState!!.getInAppMessage()
+        }
+    }
+
+    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
+                              savedInstanceState: Bundle?): View {
+        binding = FragmentHalfScreenBinding.inflate(inflater!!, container, false)
+        val view: View = binding.root
+        if (mInAppState != null) {
+            if (mInAppMessage == null) {
+                endFragment()
+                Log.e(LOG_TAG, "Could not get the data, closing in app")
+            } else {
+                setupInitialView()
+            }
+        } else {
+            endFragment()
+            Log.e(LOG_TAG, "Could not get the data, closing in app")
+        }
+        return view
+    }
+
+    private fun setupInitialView() {
+        mIsTop = mInAppMessage!!.mActionData!!.mPos.equals("top")
+        if (mIsTop) {
+            adjustTop()
+        } else {
+            adjustBottom()
+        }
+        setupCloseButton()
+    }
+
+    private fun adjustTop() {
+        if (!mInAppMessage!!.mActionData!!.mMsgTitle.isNullOrEmpty()) {
+            binding.halfScreenContainerTop.setBackgroundColor(Color.parseColor(mInAppMessage!!.mActionData!!.mBackground))
+            binding.topTitleView.text = mInAppMessage!!.mActionData!!.mMsgTitle
+            binding.topTitleView.setTextColor(Color.parseColor(mInAppMessage!!.mActionData!!.mMsgTitleColor))
+            binding.topTitleView.textSize = mInAppMessage!!.mActionData!!.mMsgTitleTextSize!!.toFloat() * 2 + 14
+            binding.topTitleView.typeface = mInAppMessage!!.mActionData!!.getFontFamily()
+        } else {
+            binding.topTitleView.visibility = View.GONE
+        }
+        Picasso.get().load("https://brtk.net/wp-content/uploads/2021/08/28/30agustossss.jpg?ver=cf14dae8e18a0da9aee40b2c8f3f2b39")
+                .into(binding.topImageView)
+        binding.topImageView.setOnClickListener {
+            val uriString: String? = mInAppMessage!!.mActionData!!.mAndroidLnk
+            val buttonInterface: InAppButtonInterface? = RelatedDigital.getInAppButtonInterface()
+            RequestHandler.createInAppNotificationClickRequest(activity, mInAppMessage, null)
+            if (buttonInterface != null) {
+                RelatedDigital.setInAppButtonInterface(null)
+                buttonInterface.onPress(uriString)
+            } else {
+                if (!uriString.isNullOrEmpty()) {
+                    try {
+                        val uri: Uri = Uri.parse(uriString)
+                        val viewIntent = Intent(Intent.ACTION_VIEW, uri)
+                        activity.startActivity(viewIntent)
+                    } catch (e: Exception) {
+                        Log.i(LOG_TAG, "Can't parse notification URI, will not take any action", e)
+                    }
+                }
+            }
+            endFragment()
+        }
+        binding.halfScreenContainerBot.visibility = View.GONE
+    }
+
+    private fun adjustBottom() {
+        if (!mInAppMessage!!.mActionData!!.mMsgTitle.isNullOrEmpty()) {
+            binding.halfScreenContainerBot.setBackgroundColor(Color.parseColor(mInAppMessage!!.mActionData!!.mBackground))
+            binding.botTitleView.text = mInAppMessage!!.mActionData!!.mMsgTitle
+            binding.botTitleView.setTextColor(Color.parseColor(mInAppMessage!!.mActionData!!.mMsgTitleColor))
+            binding.botTitleView.textSize = mInAppMessage!!.mActionData!!.mMsgTitleTextSize!!.toFloat() * 2 + 14
+            binding.botTitleView.typeface = mInAppMessage!!.mActionData!!.getFontFamily()
+        } else {
+            binding.botTitleView.visibility = View.GONE
+        }
+        Picasso.get().load("https://brtk.net/wp-content/uploads/2021/08/28/30agustossss.jpg?ver=cf14dae8e18a0da9aee40b2c8f3f2b39")
+                .into(binding.botImageView)
+        binding.botImageView.setOnClickListener {
+            val uriString: String? = mInAppMessage!!.mActionData!!.mAndroidLnk
+            val buttonInterface: InAppButtonInterface? = RelatedDigital.getInAppButtonInterface()
+            RequestHandler.createInAppNotificationClickRequest(activity, mInAppMessage, null)
+            if (buttonInterface != null) {
+                RelatedDigital.setInAppButtonInterface(null)
+                buttonInterface.onPress(uriString)
+            } else {
+                if (!uriString.isNullOrEmpty()) {
+                    try {
+                        val uri: Uri = Uri.parse(uriString)
+                        val viewIntent = Intent(Intent.ACTION_VIEW, uri)
+                        activity.startActivity(viewIntent)
+                    } catch (e: Exception) {
+                        Log.i(LOG_TAG, "Can't parse notification URI, will not take any action", e)
+                    }
+                }
+            }
+            endFragment()
+        }
+        binding.halfScreenContainerTop.visibility = View.GONE
+    }
+
+    private fun setupCloseButton() {
+        if (mIsTop) {
+            binding.topCloseButton.setBackgroundResource(getCloseIcon())
+            binding.topCloseButton.setOnClickListener { endFragment() }
+        } else {
+            binding.botCloseButton.setBackgroundResource(getCloseIcon())
+            binding.botCloseButton.setOnClickListener { endFragment() }
+        }
+    }
+
+    private fun getCloseIcon(): Int {
+        when (mInAppMessage!!.mActionData!!.mCloseButtonColor) {
+            "white" -> return R.drawable.ic_close_white_24dp
+            "black" -> return R.drawable.ic_close_black_24dp
+        }
+        return R.drawable.ic_close_black_24dp
+    }
+
+    private fun endFragment() {
+        if (activity != null) {
+            InAppUpdateDisplayState.releaseDisplayState(mStateId)
+            activity.fragmentManager.beginTransaction().remove(this@HalfScreenFragment).commit()
         }
     }
 }

@@ -111,6 +111,12 @@ class ActionData : Serializable {
     @SerializedName("secondPopup_image2")
     var mSecondPopupImg2: String? = null
 
+    @SerializedName("pos")
+    var mPos: String? = null
+
+    @SerializedName("msg_title_textsize")
+    var mMsgTitleTextSize: String? = null
+
     fun getFontFamily(): Typeface? {
         if (mFontFamily == null || mFontFamily == "") {
             return Typeface.DEFAULT

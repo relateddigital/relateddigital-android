@@ -11,6 +11,11 @@ enum class InAppNotificationType {
             return "mini"
         }
     },
+    HALF_SCREEN {
+        override fun toString(): String {
+            return "half_screen_image"
+        }
+    },
     FULL {
         override fun toString(): String {
             return "full"
