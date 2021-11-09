@@ -38,6 +38,7 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".MainActivity"
+            android:exported="true"
             android:label="@string/main_page_label"
             android:screenOrientation="portrait">
             <intent-filter>
