@@ -15,7 +15,6 @@ import com.relateddigital.relateddigital_android.databinding.FragmentHalfScreenB
 import com.relateddigital.relateddigital_android.inapp.InAppButtonInterface
 import com.relateddigital.relateddigital_android.inapp.InAppNotificationState
 import com.relateddigital.relateddigital_android.inapp.InAppUpdateDisplayState
-import com.relateddigital.relateddigital_android.inapp.inappmessages.InAppMiniFragment
 import com.relateddigital.relateddigital_android.model.InAppMessage
 import com.relateddigital.relateddigital_android.network.RequestHandler
 import com.squareup.picasso.Picasso
@@ -107,7 +106,7 @@ class HalfScreenFragment : Fragment() {
         } else {
             binding.topTitleView.visibility = View.GONE
         }
-        Picasso.get().load("https://brtk.net/wp-content/uploads/2021/08/28/30agustossss.jpg?ver=cf14dae8e18a0da9aee40b2c8f3f2b39")
+        Picasso.get().load(mInAppMessage!!.mActionData!!.mImg)
                 .into(binding.topImageView)
         binding.topImageView.setOnClickListener {
             val uriString: String? = mInAppMessage!!.mActionData!!.mAndroidLnk
@@ -142,7 +141,7 @@ class HalfScreenFragment : Fragment() {
         } else {
             binding.botTitleView.visibility = View.GONE
         }
-        Picasso.get().load("https://brtk.net/wp-content/uploads/2021/08/28/30agustossss.jpg?ver=cf14dae8e18a0da9aee40b2c8f3f2b39")
+        Picasso.get().load(mInAppMessage!!.mActionData!!.mImg)
                 .into(binding.botImageView)
         binding.botImageView.setOnClickListener {
             val uriString: String? = mInAppMessage!!.mActionData!!.mAndroidLnk
