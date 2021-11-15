@@ -33,7 +33,6 @@ class SocialProofFragment : Fragment() {
     private var mIsTop = false
     private var mTimer: Timer? = null
     private lateinit var binding: FragmentSocialProofBinding
-    private var mNumber = 0
     private var mExtendedProps: ProductStatNotifierExtendedProps? = null
     private var utilResultModel: UtilResultModel? = null
     private var mFontFamily = Typeface.DEFAULT
@@ -46,11 +45,9 @@ class SocialProofFragment : Fragment() {
                               savedInstanceState: Bundle?): View {
         binding = FragmentSocialProofBinding.inflate(inflater, container, false)
         val view: View = binding.root
-        checkNumber()
-        if (isUnderThreshold) {
-            endFragment()
+        if (checkNumber()) {
+            setupInitialView()
         }
-        setupInitialView()
         return view
     }
 
@@ -83,48 +80,66 @@ class SocialProofFragment : Fragment() {
     }
 
     private fun adjustTop() {
-        if(utilResultModel!!.startIdx == -1) {
-            endFragment()
-        } else {
-            binding.socialProofContainerTop.setBackgroundColor(Color.parseColor(mModel!!.actiondata!!.bgcolor))
-            val text: String = mModel!!.actiondata!!.content!!
+        binding.socialProofContainerTop.setBackgroundColor(
+            Color.parseColor(
+                mModel!!.actiondata!!.bgcolor
+            )
+        )
+        val text: String? = utilResultModel!!.message
+        binding.textViewTop.typeface = mFontFamily
+        binding.textViewTop.textSize = mExtendedProps!!.content_text_size!!.toFloat() * 2 + 14
+        binding.textViewTop.setTextColor(Color.parseColor(mExtendedProps!!.content_text_color))
+        binding.socialProofContainerBot.visibility = View.GONE
+        if (utilResultModel!!.isTag) {
             val spannableString = SpannableString(text)
-            spannableString.setSpan(
-                AbsoluteSizeSpan(mExtendedProps!!.contentcount_text_size!!.toInt() * 2 + 14, true),
-                utilResultModel!!.startIdx, utilResultModel!!.endIdx, 0
-            )
-            spannableString.setSpan(
-                ForegroundColorSpan(Color.parseColor(mExtendedProps!!.contentcount_text_color)),
-                utilResultModel!!.startIdx, utilResultModel!!.endIdx, 0
-            )
+            for (i in 0 until utilResultModel!!.numbers.size) {
+                spannableString.setSpan(
+                    AbsoluteSizeSpan(
+                        mExtendedProps!!.contentcount_text_size!!.toInt() * 2 + 14,
+                        true
+                    ),
+                    utilResultModel!!.startIdxs[i], utilResultModel!!.endIdxs[i], 0
+                )
+                spannableString.setSpan(
+                    ForegroundColorSpan(Color.parseColor(mExtendedProps!!.contentcount_text_color)),
+                    utilResultModel!!.startIdxs[i], utilResultModel!!.endIdxs[i], 0
+                )
+            }
             binding.textViewTop.text = spannableString
-            binding.textViewTop.typeface = mFontFamily
-            binding.textViewTop.textSize = mExtendedProps!!.content_text_size!!.toFloat() * 2 + 14
-            binding.textViewTop.setTextColor(Color.parseColor(mExtendedProps!!.content_text_color))
-            binding.socialProofContainerBot.visibility = View.GONE
+        } else {
+            binding.textViewTop.text = text
         }
     }
 
     private fun adjustBottom() {
-        if(utilResultModel!!.startIdx == -1) {
-            endFragment()
-        } else {
-            binding.socialProofContainerBot.setBackgroundColor(Color.parseColor(mModel!!.actiondata!!.bgcolor))
-            val text: String = mModel!!.actiondata!!.content!!
+        binding.socialProofContainerBot.setBackgroundColor(
+            Color.parseColor(
+                mModel!!.actiondata!!.bgcolor
+            )
+        )
+        val text: String? = utilResultModel!!.message
+        binding.textViewBot.typeface = mFontFamily
+        binding.textViewBot.textSize = mExtendedProps!!.content_text_size!!.toFloat() * 2 + 14
+        binding.textViewBot.setTextColor(Color.parseColor(mExtendedProps!!.content_text_color))
+        binding.socialProofContainerTop.visibility = View.GONE
+        if (utilResultModel!!.isTag) {
             val spannableString = SpannableString(text)
-            spannableString.setSpan(
-                AbsoluteSizeSpan(mExtendedProps!!.content_text_size!!.toInt() * 2 + 14, true),
-                utilResultModel!!.startIdx, utilResultModel!!.endIdx, 0
-            )
-            spannableString.setSpan(
-                ForegroundColorSpan(Color.parseColor(mExtendedProps!!.contentcount_text_color)),
-                utilResultModel!!.startIdx, utilResultModel!!.endIdx, 0
-            )
+            for (i in 0 until utilResultModel!!.numbers.size) {
+                spannableString.setSpan(
+                    AbsoluteSizeSpan(
+                        mExtendedProps!!.contentcount_text_size!!.toInt() * 2 + 14,
+                        true
+                    ),
+                    utilResultModel!!.startIdxs[i], utilResultModel!!.endIdxs[i], 0
+                )
+                spannableString.setSpan(
+                    ForegroundColorSpan(Color.parseColor(mExtendedProps!!.contentcount_text_color)),
+                    utilResultModel!!.startIdxs[i], utilResultModel!!.endIdxs[i], 0
+                )
+            }
             binding.textViewBot.text = spannableString
-            binding.textViewBot.typeface = mFontFamily
-            binding.textViewBot.textSize = mExtendedProps!!.content_text_size!!.toFloat() * 2 + 14
-            binding.textViewBot.setTextColor(Color.parseColor(mExtendedProps!!.content_text_color))
-            binding.socialProofContainerTop.visibility = View.GONE
+        } else {
+            binding.textViewBot.text = text
         }
     }
 
@@ -170,33 +185,40 @@ class SocialProofFragment : Fragment() {
             return R.drawable.ic_close_black_24dp
         }
 
-    private fun checkNumber() {
+    private fun checkNumber(): Boolean {
         utilResultModel = AppUtils.getNumberFromText(mModel!!.actiondata!!.content)
-        if (utilResultModel == null) {
+        return if (utilResultModel == null) {
             Log.e(LOG_TAG, "Invalid Inputs!")
             endFragment()
+            false
         } else {
-            mNumber = utilResultModel!!.number
+            true
         }
     }
 
     private val fontFamily: Unit
         get() {
-            if (FontFamily.Monospace.toString() == mExtendedProps!!.content_font_family!!.toLowerCase(Locale.ROOT)) {
+            if (FontFamily.Monospace.toString() == mExtendedProps!!.content_font_family!!.lowercase(
+                    Locale.ROOT
+                )) {
                 mFontFamily = Typeface.MONOSPACE
             }
-            if (FontFamily.SansSerif.toString() == mExtendedProps!!.content_font_family!!.toLowerCase(Locale.ROOT)) {
+            if (FontFamily.SansSerif.toString() == mExtendedProps!!.content_font_family!!.lowercase(
+                    Locale.ROOT
+                )) {
                 mFontFamily = Typeface.SANS_SERIF
             }
-            if (FontFamily.Serif.toString() == mExtendedProps!!.content_font_family!!.toLowerCase(Locale.ROOT)) {
+            if (FontFamily.Serif.toString() == mExtendedProps!!.content_font_family!!.lowercase(
+                    Locale.ROOT
+                )) {
                 mFontFamily = Typeface.SERIF
             }
-            if (FontFamily.Default.toString() == mExtendedProps!!.content_font_family!!.toLowerCase(Locale.ROOT)) {
+            if (FontFamily.Default.toString() == mExtendedProps!!.content_font_family!!.lowercase(
+                    Locale.ROOT
+                )) {
                 mFontFamily = Typeface.DEFAULT
             }
         }
-    private val isUnderThreshold: Boolean
-        get() = mNumber < mModel!!.actiondata!!.threshold!!
 
     private fun endFragment() {
         if (mTimer != null) {

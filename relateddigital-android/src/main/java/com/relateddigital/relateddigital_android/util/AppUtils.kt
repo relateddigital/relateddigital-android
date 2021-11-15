@@ -15,6 +15,7 @@ import com.relateddigital.relateddigital_android.model.UtilResultModel
 import java.io.*
 import java.text.SimpleDateFormat
 import java.util.*
+import java.util.regex.Pattern
 
 object AppUtils {
     private var sId: String = ""
@@ -269,17 +270,51 @@ object AppUtils {
         }
     }
 
-    fun getNumberFromText(text: String?): UtilResultModel? {
+    fun getNumberFromText(textData: String?): UtilResultModel? {
+        var text = textData
         var model: UtilResultModel? = null
+
         if (!text.isNullOrEmpty()) {
-            val number = text.replace("\\D+".toRegex(), "")
-            if (number.isNotEmpty()) {
-                model = UtilResultModel()
-                model.number = number.toInt()
-                model.startIdx = text.indexOf(number)
-                model.endIdx = text.indexOf(number) + number.length
+            try {
+                val numbers: MutableList<String> = ArrayList()
+                val pattern = Pattern.compile("<COUNT>(.+?)</COUNT>", Pattern.DOTALL)
+                val matcher = pattern.matcher(text)
+                while (matcher.find()) {
+                    numbers.add(matcher.group(1)!!)
+                }
+                if (numbers.isNotEmpty()) {
+                    model = UtilResultModel()
+                    text = text.replace("<COUNT>".toRegex(), "")
+                    text = text.replace("</COUNT>".toRegex(), "")
+                    model.isTag = true
+                    model.message = text
+                    var idxToStart = 0
+                    for (i in numbers.indices) {
+                        val number = numbers[i].toInt()
+                        val idx = text.indexOf(numbers[i], idxToStart)
+                        if (idx != -1) {
+                            model.addStartIdx(idx)
+                            model.addEndIdx(idx + numbers[i].length)
+                            model.addNumber(number)
+                        }
+                        idxToStart = text.indexOf(numbers[i]) + 1
+                    }
+                } else {
+                    if (text.contains("<COUNT>")) {
+                        Log.e("SocialProof", "Could not parse the number!")
+                    } else {
+                        Log.e("SocialProof", "Tag COUNT is not used!")
+                        model = UtilResultModel()
+                        model.message = text
+                        model.isTag = false
+                    }
+                }
+            } catch (e: java.lang.Exception) {
+                Log.e("SocialProof", "Could not parse the number!")
+                model = null
             }
         }
+
         return model
     }
 
