@@ -246,7 +246,7 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
 
     private fun setTitle() {
         binding.tvTitle.visibility = View.VISIBLE
-        binding.tvTitle.typeface = mInAppMessage!!.mActionData!!.getFontFamily()
+        binding.tvTitle.typeface = mInAppMessage!!.mActionData!!.getFontFamily(this)
         binding.tvTitle.text = mInAppMessage!!.mActionData!!.mMsgTitle!!.replace("\\n", "\n")
         if (!mInAppMessage!!.mActionData!!.mMsgTitleColor.isNullOrEmpty()) {
             try {
@@ -270,7 +270,7 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
 
     private fun setBody() {
         binding.tvBody.text = mInAppMessage!!.mActionData!!.mMsgBody!!.replace("\\n", "\n")
-        binding.tvBody.typeface = mInAppMessage!!.mActionData!!.getFontFamily()
+        binding.tvBody.typeface = mInAppMessage!!.mActionData!!.getFontFamily(this)
         binding.tvBody.visibility = View.VISIBLE
         if (!mInAppMessage!!.mActionData!!.mMsgBodyColor.isNullOrEmpty()) {
             try {
@@ -290,7 +290,7 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
     }
 
     private fun setButton() {
-        binding.btnTemplate.typeface = mInAppMessage!!.mActionData!!.getFontFamily()
+        binding.btnTemplate.typeface = mInAppMessage!!.mActionData!!.getFontFamily(this)
         binding.btnTemplate.visibility = View.VISIBLE
         binding.btnTemplate.text = mInAppMessage!!.mActionData!!.mBtnText
         if (!mInAppMessage!!.mActionData!!.mButtonTextColor.isNullOrEmpty()) {
@@ -379,7 +379,7 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
         }
 
     private fun setNpsSecondPopUpButton() {
-        binding.btnTemplate.typeface = mInAppMessage!!.mActionData!!.getFontFamily()
+        binding.btnTemplate.typeface = mInAppMessage!!.mActionData!!.getFontFamily(this)
         binding.btnTemplate.visibility = View.VISIBLE
         binding.btnTemplate.text = mInAppMessage!!.mActionData!!.mBtnText
         if (!mInAppMessage!!.mActionData!!.mButtonTextColor.isNullOrEmpty()) {
@@ -480,14 +480,14 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
             Picasso.get().load(mInAppMessage!!.mActionData!!.mSecondPopupImg1)
                     .into(bindingSecondPopUp.imageView)
         }
-        bindingSecondPopUp.titleView.typeface = mInAppMessage!!.mActionData!!.getFontFamily()
+        bindingSecondPopUp.titleView.typeface = mInAppMessage!!.mActionData!!.getFontFamily(this)
         bindingSecondPopUp.titleView.text = mInAppMessage!!.mActionData!!.mSecondPopupMsgTitle!!.replace("\\n", "\n")
         bindingSecondPopUp.titleView.setTextColor(Color.parseColor(mInAppMessage!!.mActionData!!.mMsgTitleColor))
-        bindingSecondPopUp.bodyTextView.typeface = mInAppMessage!!.mActionData!!.getFontFamily()
+        bindingSecondPopUp.bodyTextView.typeface = mInAppMessage!!.mActionData!!.getFontFamily(this)
         bindingSecondPopUp.bodyTextView.text = mInAppMessage!!.mActionData!!.mSecondPopupMsgBody!!.replace("\\n", "\n")
         bindingSecondPopUp.bodyTextView.setTextColor(Color.parseColor(mInAppMessage!!.mActionData!!.mMsgBodyColor))
         bindingSecondPopUp.bodyTextView.textSize = mInAppMessage!!.mActionData!!.mSecondPopupMsgBodyTextSize!!.toFloat() + 8
-        bindingSecondPopUp.button.typeface = mInAppMessage!!.mActionData!!.getFontFamily()
+        bindingSecondPopUp.button.typeface = mInAppMessage!!.mActionData!!.getFontFamily(this)
         bindingSecondPopUp.button.text = mInAppMessage!!.mActionData!!.mSecondPopupBtnText
         bindingSecondPopUp.button.setTextColor(Color.parseColor(mInAppMessage!!.mActionData!!.mButtonTextColor))
         bindingSecondPopUp.button.setBackgroundColor(Color.parseColor(mInAppMessage!!.mActionData!!.mButtonColor))

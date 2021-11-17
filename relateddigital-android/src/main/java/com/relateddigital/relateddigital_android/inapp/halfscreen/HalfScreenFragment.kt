@@ -102,7 +102,7 @@ class HalfScreenFragment : Fragment() {
             binding.topTitleView.text = mInAppMessage!!.mActionData!!.mMsgTitle
             binding.topTitleView.setTextColor(Color.parseColor(mInAppMessage!!.mActionData!!.mMsgTitleColor))
             binding.topTitleView.textSize = mInAppMessage!!.mActionData!!.mMsgTitleTextSize!!.toFloat() * 2 + 14
-            binding.topTitleView.typeface = mInAppMessage!!.mActionData!!.getFontFamily()
+            binding.topTitleView.typeface = mInAppMessage!!.mActionData!!.getFontFamily(activity)
         } else {
             binding.topTitleView.visibility = View.GONE
         }
@@ -137,7 +137,7 @@ class HalfScreenFragment : Fragment() {
             binding.botTitleView.text = mInAppMessage!!.mActionData!!.mMsgTitle
             binding.botTitleView.setTextColor(Color.parseColor(mInAppMessage!!.mActionData!!.mMsgTitleColor))
             binding.botTitleView.textSize = mInAppMessage!!.mActionData!!.mMsgTitleTextSize!!.toFloat() * 2 + 14
-            binding.botTitleView.typeface = mInAppMessage!!.mActionData!!.getFontFamily()
+            binding.botTitleView.typeface = mInAppMessage!!.mActionData!!.getFontFamily(activity)
         } else {
             binding.botTitleView.visibility = View.GONE
         }

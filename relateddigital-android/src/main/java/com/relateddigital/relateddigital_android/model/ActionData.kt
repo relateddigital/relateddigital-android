@@ -1,9 +1,15 @@
 package com.relateddigital.relateddigital_android.model
 
+import android.content.Context
 import android.graphics.Typeface
+import androidx.core.content.res.ResourcesCompat
 import com.google.gson.annotations.SerializedName
 import com.relateddigital.relateddigital_android.inapp.FontFamily
 import java.io.Serializable
+import java.util.*
+import com.relateddigital.relateddigital_android.util.AppUtils
+import com.relateddigital.relateddigital_android.util.AppUtils.isResourceAvailable
+
 
 class ActionData : Serializable {
     @SerializedName("alert_type")
@@ -117,18 +123,24 @@ class ActionData : Serializable {
     @SerializedName("msg_title_textsize")
     var mMsgTitleTextSize: String? = null
 
-    fun getFontFamily(): Typeface? {
+    fun getFontFamily(context: Context): Typeface? {
         if (mFontFamily == null || mFontFamily == "") {
             return Typeface.DEFAULT
         }
-        if (FontFamily.Monospace.toString() == mFontFamily!!.toLowerCase()) {
+        if (FontFamily.Monospace.toString() == mFontFamily!!.lowercase(Locale.getDefault())) {
             return Typeface.MONOSPACE
         }
-        if (FontFamily.SansSerif.toString() == mFontFamily!!.toLowerCase()) {
+        if (FontFamily.SansSerif.toString() == mFontFamily!!.lowercase(Locale.getDefault())) {
             return Typeface.SANS_SERIF
         }
-        return if (FontFamily.Serif.toString() == mFontFamily!!.toLowerCase()) {
-            Typeface.SERIF
-        } else Typeface.DEFAULT
+        if (FontFamily.Serif.toString() == mFontFamily!!.lowercase(Locale.getDefault())) {
+            return Typeface.SERIF
+        }
+        if (isResourceAvailable(context, mFontFamily)) {
+            val id = context.resources.getIdentifier(mFontFamily, "font", context.packageName)
+            return ResourcesCompat.getFont(context, id)
+        }
+
+        return Typeface.DEFAULT
     }
 }

@@ -48,6 +48,7 @@ class InAppMiniFragment: Fragment() {
                 remove()
             } else {
                 binding!!.tvInAppTitleMini.text = mInAppMessage!!.mActionData!!.mMsgTitle!!.replace("\\n", "\n")
+                binding!!.tvInAppTitleMini.typeface = mInAppMessage!!.mActionData!!.getFontFamily(activity)
                 if (!mInAppMessage!!.mActionData!!.mImg.equals("")) {
                     binding!!.ivInAppImageMini.visibility = View.VISIBLE
                     Picasso.get().load(mInAppMessage!!.mActionData!!.mImg).into(binding!!.ivInAppImageMini)

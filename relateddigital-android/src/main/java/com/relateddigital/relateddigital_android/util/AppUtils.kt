@@ -333,4 +333,9 @@ object AppUtils {
             }
         }
     }
+
+    fun isResourceAvailable(context: Context, name: String?): Boolean {
+        val res = context.resources.getIdentifier(name, "font", context.packageName)
+        return res != 0
+    }
 }
