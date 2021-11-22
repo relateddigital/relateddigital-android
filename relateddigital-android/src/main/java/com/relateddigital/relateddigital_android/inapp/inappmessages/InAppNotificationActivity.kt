@@ -81,7 +81,6 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
             }
             cacheImages()
             setContentView(view)
-            setFinishOnTouchOutside(false)
             if (isShowingInApp) {
                 if (mIsCarousel) {
                     if (mCarouselPosition == -1) {
@@ -110,7 +109,6 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
                 InAppUpdateDisplayState.releaseDisplayState(mIntentId)
                 finish()
             }
-            setFinishOnTouchOutside(true)
         }
     }
 
@@ -157,7 +155,6 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
                 e.printStackTrace()
             }
         }
-        binding.ibClose.setBackgroundResource(closeIcon)
         when (mInAppMessage!!.mActionData!!.mMsgType) {
             InAppNotificationType.IMAGE_TEXT_BUTTON.toString() -> {
                 setTitle()
@@ -471,10 +468,18 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
                 bindingSecondPopUp.couponContainer.visibility = View.GONE
             }
         }
-        bindingSecondPopUp.closeButton.setBackgroundResource(closeIcon)
-        bindingSecondPopUp.closeButton.setOnClickListener {
-            InAppUpdateDisplayState.releaseDisplayState(mIntentId)
-            finish()
+        if (mInAppMessage!!.mActionData!!.mCloseEventTrigger.equals("backgroundclick")) {
+            bindingSecondPopUp.closeButton.visibility = View.GONE
+            setFinishOnTouchOutside(true)
+        } else {
+            setFinishOnTouchOutside(
+                !mInAppMessage!!.mActionData!!.mCloseEventTrigger.equals("closebutton")
+            )
+            bindingSecondPopUp.closeButton.setBackgroundResource(closeIcon)
+            bindingSecondPopUp.closeButton.setOnClickListener {
+                InAppUpdateDisplayState.releaseDisplayState(mIntentId)
+                finish()
+            }
         }
         if (!mInAppMessage!!.mActionData!!.mSecondPopupImg1.isNullOrEmpty()) {
             Picasso.get().load(mInAppMessage!!.mActionData!!.mSecondPopupImg1)
@@ -561,9 +566,18 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
         }
 
     private fun setCloseButton() {
-        binding.ibClose.setOnClickListener {
-            InAppUpdateDisplayState.releaseDisplayState(mIntentId)
-            finish()
+        if (mInAppMessage!!.mActionData!!.mCloseEventTrigger.equals("backgroundclick")) {
+            binding.ibClose.visibility = View.GONE
+            setFinishOnTouchOutside(true)
+        } else {
+            setFinishOnTouchOutside(
+                !mInAppMessage!!.mActionData!!.mCloseEventTrigger.equals("closebutton")
+            )
+            binding.ibClose.setOnClickListener {
+                InAppUpdateDisplayState.releaseDisplayState(mIntentId)
+                finish()
+            }
+            binding.ibClose.setBackgroundResource(closeIcon)
         }
     }
 
@@ -640,10 +654,18 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
     }
 
     private fun setupInitialViewCarousel() {
-        bindingCarousel.carouselCloseButton.setBackgroundResource(closeIcon)
-        bindingCarousel.carouselCloseButton.setOnClickListener {
-            InAppUpdateDisplayState.releaseDisplayState(mIntentId)
-            finish()
+        if (mInAppMessage!!.mActionData!!.mCloseEventTrigger.equals("backgroundclick")) {
+            bindingCarousel.carouselCloseButton.visibility = View.GONE
+            setFinishOnTouchOutside(true)
+        } else {
+            setFinishOnTouchOutside(
+                !mInAppMessage!!.mActionData!!.mCloseEventTrigger.equals("closebutton")
+            )
+            bindingCarousel.carouselCloseButton.setBackgroundResource(closeIcon)
+            bindingCarousel.carouselCloseButton.setOnClickListener {
+                InAppUpdateDisplayState.releaseDisplayState(mIntentId)
+                finish()
+            }
         }
         for (i in 0 until carouselItemCount) {
             val view = View(applicationContext)

@@ -123,6 +123,9 @@ class ActionData : Serializable {
     @SerializedName("msg_title_textsize")
     var mMsgTitleTextSize: String? = null
 
+    @SerializedName("close_event_trigger")
+    var mCloseEventTrigger: String? = null
+
     fun getFontFamily(context: Context): Typeface? {
         if (mFontFamily == null || mFontFamily == "") {
             return Typeface.DEFAULT
