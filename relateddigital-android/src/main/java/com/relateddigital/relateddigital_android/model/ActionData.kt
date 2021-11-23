@@ -126,6 +126,12 @@ class ActionData : Serializable {
     @SerializedName("close_event_trigger")
     var mCloseEventTrigger: String? = null
 
+    @SerializedName("custom_font_family_ios")
+    var mCustomFontFamilyIos: String? = null
+
+    @SerializedName("custom_font_family_android")
+    var mCustomFontFamilyAndroid: String? = null
+
     fun getFontFamily(context: Context): Typeface? {
         if (mFontFamily == null || mFontFamily == "") {
             return Typeface.DEFAULT
@@ -139,9 +145,11 @@ class ActionData : Serializable {
         if (FontFamily.Serif.toString() == mFontFamily!!.lowercase(Locale.getDefault())) {
             return Typeface.SERIF
         }
-        if (isResourceAvailable(context, mFontFamily)) {
-            val id = context.resources.getIdentifier(mFontFamily, "font", context.packageName)
-            return ResourcesCompat.getFont(context, id)
+        if(!mCustomFontFamilyAndroid.isNullOrEmpty()) {
+            if (isResourceAvailable(context, mCustomFontFamilyAndroid)) {
+                val id = context.resources.getIdentifier(mCustomFontFamilyAndroid, "font", context.packageName)
+                return ResourcesCompat.getFont(context, id)
+            }
         }
 
         return Typeface.DEFAULT
