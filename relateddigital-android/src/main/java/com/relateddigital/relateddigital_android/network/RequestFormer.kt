@@ -237,6 +237,7 @@ object RequestFormer {
         queryMap[Constants.CHANNEL_REQUEST_KEY] = model.getOsType()
         queryMap[Constants.MAPPL_REQUEST_KEY] = "true"
         queryMap[Constants.APP_VERSION_REQUEST_KEY] = model.getAppVersion()
+        queryMap[Constants.NOTIFICATION_PERMISSION_REQUEST_KEY] = model.getPushPermissionStatus()
         queryMap[Constants.API_VERSION_REQUEST_KEY] = model.getApiVersion()
         queryMap[Constants.SDK_VERSION_REQUEST_KEY] = model.getSdkVersion()
         queryMap[Constants.NRV_REQUEST_KEY] = mNrv.toString()

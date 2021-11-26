@@ -21,6 +21,7 @@ class RelatedDigitalModel(
         private var requestTimeoutInSecond: Int = 30,
         private var maxGeofenceCount: Int = 100,
         private var appVersion: String,
+        private var pushPermissionStatus: String,
         private var apiVersion: String = "Android",
         private var osType: String = "ANDROID",
         private var osVersion: String,
@@ -96,6 +97,11 @@ class RelatedDigitalModel(
 
     fun setAppVersion(context: Context, appVersion: String) {
         this.appVersion = appVersion
+        saveToSharedPrefs(context)
+    }
+
+    fun setPushPermissionStatus(context: Context, pushPermissionStatus: String) {
+        this.pushPermissionStatus = pushPermissionStatus
         saveToSharedPrefs(context)
     }
 
@@ -245,6 +251,10 @@ class RelatedDigitalModel(
 
     fun getAppVersion(): String {
         return appVersion
+    }
+
+    fun getPushPermissionStatus(): String {
+        return pushPermissionStatus
     }
 
     fun getApiVersion(): String {

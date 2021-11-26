@@ -61,22 +61,23 @@ object RelatedDigital {
 
     private fun createInitialModel(context: Context): RelatedDigitalModel {
         return RelatedDigitalModel(
-                organizationId = "",
-                profileId = "",
-                dataSource = "",
-                appVersion = AppUtils.getAppVersion(context),
-                osType = AppUtils.getOsType(),
-                osVersion = AppUtils.getOsVersion(),
-                sdkVersion = AppUtils.getSdkVersion(),
-                deviceType = AppUtils.getDeviceType(),
-                deviceName = AppUtils.getDeviceName(),
-                carrier = AppUtils.getCarrier(context),
-                identifierForVendor = AppUtils.getIdentifierForVendor(context),
-                local = AppUtils.getLocal(context),
-                userAgent = AppUtils.getUserAgent(),
-                cookieId = AppUtils.getCookieId(context),
-                visitorData = "",
-                visitData = ""
+            organizationId = "",
+            profileId = "",
+            dataSource = "",
+            appVersion = AppUtils.getAppVersion(context),
+            pushPermissionStatus = AppUtils.getNotificationPermissionStatus(context),
+            osType = AppUtils.getOsType(),
+            osVersion = AppUtils.getOsVersion(),
+            sdkVersion = AppUtils.getSdkVersion(),
+            deviceType = AppUtils.getDeviceType(),
+            deviceName = AppUtils.getDeviceName(),
+            carrier = AppUtils.getCarrier(context),
+            identifierForVendor = AppUtils.getIdentifierForVendor(context),
+            local = AppUtils.getLocal(context),
+            userAgent = AppUtils.getUserAgent(),
+            cookieId = AppUtils.getCookieId(context),
+            visitorData = "",
+            visitData = ""
         )
     }
 

@@ -7,6 +7,7 @@ import android.os.Build
 import android.os.Environment
 import android.telephony.TelephonyManager
 import android.util.Log
+import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import com.relateddigital.relateddigital_android.BuildConfig
 import com.relateddigital.relateddigital_android.constants.Constants
@@ -337,5 +338,13 @@ object AppUtils {
     fun isResourceAvailable(context: Context, name: String?): Boolean {
         val res = context.resources.getIdentifier(name, "font", context.packageName)
         return res != 0
+    }
+
+    fun getNotificationPermissionStatus(context: Context): String {
+        return if (NotificationManagerCompat.from(context).areNotificationsEnabled()) {
+            "Y"
+        } else {
+            "N"
+        }
     }
 }

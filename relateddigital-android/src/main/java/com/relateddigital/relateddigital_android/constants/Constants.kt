@@ -125,5 +125,7 @@ class Constants {
         const val FILTER_KEY = "OM.w.f"
 
         const val FavoriteAttributeAction = "FavoriteAttributeAction"
+
+        const val NOTIFICATION_PERMISSION_REQUEST_KEY = "OM.pushpermit"
     }
 }
