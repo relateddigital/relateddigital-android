@@ -126,6 +126,6 @@ class Constants {
 
         const val FavoriteAttributeAction = "FavoriteAttributeAction"
 
-        const val NOTIFICATION_PERMISSION_REQUEST_KEY = "OM.pushpermit"
+        const val NOTIFICATION_PERMISSION_REQUEST_KEY = "OM.pushnotifystatus"
     }
 }

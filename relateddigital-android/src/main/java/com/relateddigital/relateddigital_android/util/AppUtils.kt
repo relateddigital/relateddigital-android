@@ -342,9 +342,9 @@ object AppUtils {
 
     fun getNotificationPermissionStatus(context: Context): String {
         return if (NotificationManagerCompat.from(context).areNotificationsEnabled()) {
-            "Y"
+            "granted"
         } else {
-            "N"
+            "denied"
         }
     }
 }
