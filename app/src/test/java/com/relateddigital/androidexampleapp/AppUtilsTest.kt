@@ -65,16 +65,6 @@ class AppUtilsTest {
     }
 
     @Test
-    fun testGetCurrentTurkeyDateString() {
-        val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
-        val tzTurkey = TimeZone.getTimeZone("Turkey")
-        dateFormat.timeZone = tzTurkey
-        val result1 = dateFormat.format(Date())
-        val result2 = AppUtils.getCurrentTurkeyDateString()
-        assert(result1 == result2)
-    }
-
-    @Test
     fun testIsDateDifferenceGreaterThan() {
         val result: Boolean
         val date11 = "2021-11-30 11:21:26"
