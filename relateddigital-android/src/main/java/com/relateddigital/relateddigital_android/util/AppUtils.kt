@@ -159,7 +159,7 @@ object AppUtils {
         SharedPref.clearKey(context, Constants.COOKIE_ID_KEY)
     }
 
-    private fun getCurrentDateString(): String? {
+    fun getCurrentDateString(): String? {
         val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
         return dateFormat.format(Date())
     }
@@ -346,5 +346,21 @@ object AppUtils {
         } else {
             "denied"
         }
+    }
+
+    fun isDateDifferenceGreaterThan(date1: String?, date2: String?, thresholdDay: Int): Boolean {
+        var result = true
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+        try {
+            val dateRecent = dateFormat.parse(date1!!)
+            val dateFar = dateFormat.parse(date2!!)
+            if (dateRecent!!.time - dateFar!!.time <= thresholdDay * 24 * 60 * 60 * 1000) {
+                result = false
+            }
+        } catch (e: java.lang.Exception) {
+            e.printStackTrace()
+            return true
+        }
+        return result
     }
 }
