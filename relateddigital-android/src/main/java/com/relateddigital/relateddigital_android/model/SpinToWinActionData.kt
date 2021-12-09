@@ -60,4 +60,8 @@ class SpinToWinActionData : Serializable {
 
     @SerializedName("wheel_spin_action")
     var wheelSpinAction: String? = null
+
+    @SerializedName("promocodes_soldout_message")
+    var promoCodesSoldOutMessage: String? = null
+
 }
