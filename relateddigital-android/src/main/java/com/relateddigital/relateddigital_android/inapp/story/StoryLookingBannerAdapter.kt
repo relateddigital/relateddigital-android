@@ -26,6 +26,8 @@ import java.net.URI
 import java.net.URISyntaxException
 import java.util.*
 import de.hdodenhof.circleimageview.CircleImageView
+import com.relateddigital.relateddigital_android.util.AppUtils
+import com.relateddigital.relateddigital_android.util.AppUtils.getFontFamily
 
 
 class StoryLookingBannerAdapter(var mContext: Context, var mStoryItemClickListener: StoryItemClickListener?) : RecyclerView.Adapter<StoryLookingBannerAdapter.StoryHolder>() {
@@ -76,6 +78,12 @@ class StoryLookingBannerAdapter(var mContext: Context, var mStoryItemClickListen
             e.printStackTrace()
         }
         storyHolder.tvStoryName.setTextColor(Color.parseColor(bannerExtendedProps?.storylb_label_color))
+        storyHolder.tvStoryName.typeface = getFontFamily(
+            mContext,
+            bannerExtendedProps?.font_family,
+            bannerExtendedProps?.custom_font_family_android
+        )
+
         if (BuildConfig.DEBUG && bannerExtendedProps == null) {
             error("Assertion failed")
         }

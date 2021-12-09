@@ -17,6 +17,11 @@ import java.io.*
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.regex.Pattern
+import android.graphics.Typeface
+import androidx.core.content.res.ResourcesCompat
+import com.relateddigital.relateddigital_android.inapp.FontFamily
+import com.relateddigital.relateddigital_android.util.AppUtils.isResourceAvailable
+
 
 object AppUtils {
     private var sId: String = ""
@@ -363,4 +368,27 @@ object AppUtils {
         }
         return result
     }
+
+    fun getFontFamily(context: Context, fontFamily: String?, fontName: String?): Typeface {
+        if (fontFamily.isNullOrEmpty()) {
+            return Typeface.DEFAULT
+        }
+        if (FontFamily.Monospace.toString() == fontFamily.lowercase(Locale.getDefault())) {
+            return Typeface.MONOSPACE
+        }
+        if (FontFamily.SansSerif.toString() == fontFamily.lowercase(Locale.getDefault())) {
+            return Typeface.SANS_SERIF
+        }
+        if (FontFamily.Serif.toString() == fontFamily.lowercase(Locale.getDefault())) {
+            return Typeface.SERIF
+        }
+        if (!fontName.isNullOrEmpty()) {
+            if (isResourceAvailable(context, fontName)) {
+                val id = context.resources.getIdentifier(fontName, "font", context.packageName)
+                return ResourcesCompat.getFont(context, id)!!
+            }
+        }
+        return Typeface.DEFAULT
+    }
+
 }

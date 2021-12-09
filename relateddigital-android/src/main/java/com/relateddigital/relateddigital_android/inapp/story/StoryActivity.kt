@@ -20,13 +20,18 @@ import android.widget.VideoView
 import androidx.recyclerview.widget.RecyclerView
 import com.relateddigital.relateddigital_android.R
 import com.relateddigital.relateddigital_android.constants.Constants
-import com.relateddigital.relateddigital_android.model.SkinBasedStories
-import com.relateddigital.relateddigital_android.model.StoryItems
-import com.relateddigital.relateddigital_android.model.StorySkinBasedActionData
+import com.relateddigital.relateddigital_android.model.*
 import com.relateddigital.relateddigital_android.network.RequestHandler
 import com.relateddigital.relateddigital_android.util.PersistentTargetManager
 import com.squareup.picasso.Picasso
 import java.util.*
+import com.relateddigital.relateddigital_android.model.ExtendedProps
+
+import com.google.gson.Gson
+import java.net.URI
+import com.relateddigital.relateddigital_android.util.AppUtils
+import com.relateddigital.relateddigital_android.util.AppUtils.getFontFamily
+
 
 class StoryActivity : Activity(), StoriesProgressView.StoriesListener {
     private lateinit var mStoriesProgressView: StoriesProgressView
@@ -37,6 +42,7 @@ class StoryActivity : Activity(), StoriesProgressView.StoriesListener {
     private var mLimit = 500L
     private var mStories: SkinBasedStories? = null
     private var mBannerActionData: StorySkinBasedActionData? = null
+    private var mExtendedProps: StorySkinBasedExtendedProps? = null
     private var mActionId: String? = null
     private lateinit var mBtnStory: Button
     private lateinit var mReverse: View
@@ -59,6 +65,10 @@ class StoryActivity : Activity(), StoriesProgressView.StoriesListener {
             try {
                 mBannerActionData =
                     intent.getSerializableExtra(Constants.ACTION_DATA) as StorySkinBasedActionData?
+                mExtendedProps = Gson().fromJson(
+                    URI(mBannerActionData?.ExtendedProps).path,
+                    StorySkinBasedExtendedProps::class.java
+                )
                 mActionId = intent.getSerializableExtra(Constants.ACTION_ID) as String?
                 mStoryPosition = intent.extras!!.getInt(Constants.STORY_POSITION)
                 mStoryItemPosition = intent.extras!!.getInt(Constants.STORY_ITEM_POSITION)
@@ -145,6 +155,16 @@ class StoryActivity : Activity(), StoriesProgressView.StoriesListener {
             Picasso.get().load(mStories!!.thumbnail).into(mIvCover)
         }
         mTvCover.text = mStories!!.title
+        if (mExtendedProps != null && mExtendedProps!!.storyz_label_color != null) {
+            mTvCover.setTextColor(Color.parseColor(mExtendedProps!!.storyz_label_color))
+        }
+
+        mTvCover.typeface = getFontFamily(
+            this,
+            if (mExtendedProps != null) mExtendedProps!!.font_family else null,
+            if (mExtendedProps != null) mExtendedProps!!.custom_font_family_android else null
+        )
+
         setStoryItem(mStories!!.getItems()!![mStoryItemPosition])
         mIvClose.setOnClickListener { onBackPressed() }
         bindReverseView()

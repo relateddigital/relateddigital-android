@@ -23,6 +23,9 @@ import de.hdodenhof.circleimageview.CircleImageView
 import java.net.URI
 import java.net.URISyntaxException
 import java.util.*
+import com.relateddigital.relateddigital_android.util.AppUtils
+import com.relateddigital.relateddigital_android.util.AppUtils.getFontFamily
+
 
 class StorySkinBasedAdapter(var mContext: Context) :
     RecyclerView.Adapter<StorySkinBasedAdapter.StoryHolder>() {
@@ -67,6 +70,17 @@ class StorySkinBasedAdapter(var mContext: Context) :
         } catch (e: URISyntaxException) {
             e.printStackTrace()
         }
+
+        if (extendedProps?.storyz_label_color != null) {
+            storyHolder.tvStoryName.setTextColor(Color.parseColor(extendedProps.storyz_label_color))
+        }
+
+        storyHolder.tvStoryName.typeface = getFontFamily(
+            mContext,
+            extendedProps?.font_family,
+            extendedProps?.custom_font_family_android
+        )
+
         storyHolder.civStory.setOnClickListener { clickEvent(position) }
         storyHolder.ivStory.setOnClickListener { clickEvent(position) }
         val borderRadius: String? =
