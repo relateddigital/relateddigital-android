@@ -31,3 +31,5 @@ local.properties
 /.idea/jarRepositories.xml
 /.idea/modules/app/androidexampleapp.app.iml
 /.idea/modules/relateddigital-android/androidexampleapp.relateddigital-android.iml
+/.idea/codeStyles/Project.xml
+/.idea/codeStyles/codeStyleConfig.xml
