@@ -10,6 +10,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import com.relateddigital.relateddigital_android.R
 import com.relateddigital.relateddigital_android.databinding.FragmentCountdownTimerBinding
 import com.relateddigital.relateddigital_android.inapp.InAppNotificationState
@@ -50,6 +52,9 @@ class CountdownTimerFragment : Fragment() {
                               savedInstanceState: Bundle?): View {
         binding = FragmentCountdownTimerBinding.inflate(inflater, container, false)
         val view: View = binding.root
+
+        hideStatusBar()
+
         if (savedInstanceState != null) {
             //TODO: get the remaining time here
             //TODO: get the json string here
@@ -382,6 +387,27 @@ class CountdownTimerFragment : Fragment() {
             activity.fragmentManager.beginTransaction().remove(this@CountdownTimerFragment).commit()
         }
     }
+
+    private fun hideStatusBar() {
+        val decorView = activity.window.decorView
+        val uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN
+        decorView.systemUiVisibility = uiOptions
+        activity.actionBar?.hide()
+    }
+
+    private fun showStatusBar() {
+        if (activity != null) {
+            ViewCompat.getWindowInsetsController(
+                activity.window.decorView
+            )?.show(WindowInsetsCompat.Type.systemBars())
+        }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        showStatusBar()
+    }
+
 
     companion object {
         private const val LOG_TAG = "CountdownTimerFragment"
