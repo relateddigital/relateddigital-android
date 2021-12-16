@@ -1,5 +1,6 @@
 package com.relateddigital.relateddigital_android.inapp.halfscreen
 
+import android.app.ActionBar
 import android.app.Fragment
 import android.content.Intent
 import android.graphics.Color
@@ -9,6 +10,8 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import com.relateddigital.relateddigital_android.R
 import com.relateddigital.relateddigital_android.RelatedDigital
 import com.relateddigital.relateddigital_android.databinding.FragmentHalfScreenBinding
@@ -72,6 +75,9 @@ class HalfScreenFragment : Fragment() {
                               savedInstanceState: Bundle?): View {
         binding = FragmentHalfScreenBinding.inflate(inflater!!, container, false)
         val view: View = binding.root
+
+        hideStatusBar()
+
         if (mInAppState != null) {
             if (mInAppMessage == null) {
                 endFragment()
@@ -190,4 +196,25 @@ class HalfScreenFragment : Fragment() {
             activity.fragmentManager.beginTransaction().remove(this@HalfScreenFragment).commit()
         }
     }
+
+    private fun hideStatusBar() {
+        val decorView = activity.window.decorView
+        val uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN
+        decorView.systemUiVisibility = uiOptions
+        activity.actionBar?.hide()
+    }
+
+    private fun showStatusBar() {
+        if (activity != null) {
+            ViewCompat.getWindowInsetsController(
+                activity.window.decorView
+            )?.show(WindowInsetsCompat.Type.systemBars())
+        }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        showStatusBar()
+    }
+
 }

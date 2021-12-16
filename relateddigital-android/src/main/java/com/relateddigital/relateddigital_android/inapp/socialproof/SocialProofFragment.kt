@@ -11,6 +11,8 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import com.google.gson.Gson
 import com.relateddigital.relateddigital_android.R
 import com.relateddigital.relateddigital_android.databinding.FragmentSocialProofBinding
@@ -45,6 +47,9 @@ class SocialProofFragment : Fragment() {
                               savedInstanceState: Bundle?): View {
         binding = FragmentSocialProofBinding.inflate(inflater, container, false)
         val view: View = binding.root
+
+        hideStatusBar()
+
         if (checkNumber()) {
             setupInitialView()
         }
@@ -228,6 +233,27 @@ class SocialProofFragment : Fragment() {
             activity.fragmentManager.beginTransaction().remove(this@SocialProofFragment).commit()
         }
     }
+
+    private fun hideStatusBar() {
+        val decorView = activity.window.decorView
+        val uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN
+        decorView.systemUiVisibility = uiOptions
+        activity.actionBar?.hide()
+    }
+
+    private fun showStatusBar() {
+        if (activity != null) {
+            ViewCompat.getWindowInsetsController(
+                activity.window.decorView
+            )?.show(WindowInsetsCompat.Type.systemBars())
+        }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        showStatusBar()
+    }
+
 
     companion object {
         private const val LOG_TAG = "SocialProofFragment"
