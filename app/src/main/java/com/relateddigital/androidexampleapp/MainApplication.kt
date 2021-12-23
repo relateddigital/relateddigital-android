@@ -1,7 +1,16 @@
 package com.relateddigital.androidexampleapp
 
 import android.app.Application
+import android.text.TextUtils
+import android.util.Log
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.firebase.messaging.FirebaseMessaging
+import com.huawei.agconnect.AGConnectOptionsBuilder
+import com.huawei.hms.aaid.HmsInstanceId
+import com.huawei.hms.common.ApiException
 import com.relateddigital.relateddigital_android.RelatedDigital
+import com.relateddigital.relateddigital_android.constants.Constants
+import com.relateddigital.relateddigital_android.util.GoogleUtils
 
 class MainApplication : Application() {
     override fun onCreate() {
@@ -20,10 +29,65 @@ class MainApplication : Application() {
             isInAppNotificationEnabled = true
         )
 
+        // Enable Push Notifications
+        if(GoogleUtils.checkPlayService(this)) {
+            getFirebaseToken()
+        } else {
+            getHuaweiToken()
+        }
+
         // Enable Geofencing
         RelatedDigital.setIsGeofenceEnabled(
             context = applicationContext,
             isGeofenceEnabled = true
         )
+    }
+
+    private fun getFirebaseToken(){
+        FirebaseMessaging.getInstance().token
+            .addOnCompleteListener(OnCompleteListener { task ->
+                if (!task.isSuccessful) {
+                    Log.e("Firebase Token : ", "Getting the token failed!!!")
+                    return@OnCompleteListener
+                }
+                val token = task.result
+
+                // Enable Push Notifications
+                RelatedDigital.setIsPushNotificationEnabled(
+                    context = applicationContext,
+                    isPushNotificationEnabled = true,
+                    googleAppAlias = Constants.GOOGLE_APP_ALIAS,
+                    huaweiAppAlias = Constants.HUAWEI_APP_ALIAS,
+                    token = token
+                )
+            })
+    }
+
+    private fun getHuaweiToken() {
+        object : Thread() {
+            override fun run() {
+                try {
+                    val appId = AGConnectOptionsBuilder().build(applicationContext)
+                        .getString("client/app_id")
+                    val token = HmsInstanceId.getInstance(applicationContext).getToken(appId, "HCM")
+                    if (TextUtils.isEmpty(token) || token == null) {
+                        Log.e("Huawei Token : ", "Empty token!!!")
+                        return
+                    }
+                    Log.i("Huawei Token", "" + token)
+
+                    // Enable Push Notifications
+                    RelatedDigital.setIsPushNotificationEnabled(
+                        context = applicationContext,
+                        isPushNotificationEnabled = true,
+                        googleAppAlias = Constants.GOOGLE_APP_ALIAS,
+                        huaweiAppAlias = Constants.HUAWEI_APP_ALIAS,
+                        token = token
+                    )
+                } catch (e: ApiException) {
+                    Log.e("Huawei Token", "Getting the token failed! $e")
+                }
+            }
+        }.start()
     }
 }

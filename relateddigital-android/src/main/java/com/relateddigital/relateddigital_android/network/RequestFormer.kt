@@ -113,7 +113,7 @@ object RequestFormer {
         latitude: Double, longitude: Double
     ) {
         fillCommonParameters(context, model, pageName, properties, queryMap, headerMap)
-        addGeofenceGetListExtraParameters(model, queryMap, latitude, longitude)
+        addGeofenceGetListExtraParameters(context, model, queryMap, latitude, longitude)
     }
 
     fun formGeofenceTriggerRequest(
@@ -123,7 +123,7 @@ object RequestFormer {
         latitude: Double, longitude: Double, actId: String, geoId: String
     ) {
         fillCommonParameters(context, model, pageName, properties, queryMap, headerMap)
-        addGeofenceTriggerExtraParameters(model, queryMap, latitude, longitude, actId, geoId)
+        addGeofenceTriggerExtraParameters(context, model, queryMap, latitude, longitude, actId, geoId)
     }
 
     fun updateSessionParameters(context: Context, pageName: String) {
@@ -352,7 +352,7 @@ object RequestFormer {
     }
 
     private fun addGeofenceGetListExtraParameters(
-        model: RelatedDigitalModel?, queryMap: HashMap<String, String>,
+        context: Context, model: RelatedDigitalModel?, queryMap: HashMap<String, String>,
         latitude: Double, longitude: Double
     ) {
         val df = DecimalFormat("0.0000000000000")
@@ -368,10 +368,25 @@ object RequestFormer {
         }
 
         queryMap[Constants.GEOFENCE_ACT_KEY] = Constants.GEOFENCE_ACT_VALUE
+
+        if(!model!!.getToken().isNullOrEmpty()) {
+            queryMap[Constants.TOKEN_ID_REQUEST_KEY] = model.getToken()
+        }
+
+        if (GoogleUtils.checkPlayService(context)) {
+            if(!model.getGoogleAppAlias().isNullOrEmpty()) {
+                queryMap[Constants.APP_ID_REQUEST_KEY] = model.getGoogleAppAlias()
+            }
+        } else {
+            if(!model.getHuaweiAppAlias().isNullOrEmpty()) {
+                queryMap[Constants.APP_ID_REQUEST_KEY] = model.getHuaweiAppAlias()
+            }
+        }
+
     }
 
     private fun addGeofenceTriggerExtraParameters(
-        model: RelatedDigitalModel?, queryMap: HashMap<String, String>,
+        context: Context, model: RelatedDigitalModel?, queryMap: HashMap<String, String>,
         latitude: Double, longitude: Double, actId: String, geoId: String
     ) {
         val df = DecimalFormat("0.0000000000000")
@@ -391,5 +406,19 @@ object RequestFormer {
         queryMap[Constants.GEOFENCE_ACT_ID_KEY] = actId
 
         queryMap[Constants.GEOFENCE_GEO_ID_KEY] = geoId
+
+        if(!model!!.getToken().isNullOrEmpty()) {
+            queryMap[Constants.TOKEN_ID_REQUEST_KEY] = model.getToken()
+        }
+
+        if (GoogleUtils.checkPlayService(context)) {
+            if(!model.getGoogleAppAlias().isNullOrEmpty()) {
+                queryMap[Constants.APP_ID_REQUEST_KEY] = model.getGoogleAppAlias()
+            }
+        } else {
+            if(!model.getHuaweiAppAlias().isNullOrEmpty()) {
+                queryMap[Constants.APP_ID_REQUEST_KEY] = model.getHuaweiAppAlias()
+            }
+        }
     }
 }

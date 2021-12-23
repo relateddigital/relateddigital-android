@@ -135,5 +135,8 @@ class Constants {
         const val GEOFENCE_GEO_ID_KEY = "OM.locationid"
         const val GEOFENCE_ACT_VALUE = "getlist"
         const val GEOFENCE_PROCESS_VALUE = "process"
+
+        const val GOOGLE_APP_ALIAS = "relateddigital-android-test"
+        const val HUAWEI_APP_ALIAS = "relateddigital-android-huawei-test"
     }
 }
