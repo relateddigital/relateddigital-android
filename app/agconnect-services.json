@@ -1,13 +1,13 @@
 {
 	"agcgw_all":{
-		"CN":"connect-drcn.hispace.hicloud.com",
-		"CN_back":"connect-drcn.dbankcloud.cn",
-		"DE":"connect-dre.hispace.hicloud.com",
-		"DE_back":"connect-dre.dbankcloud.cn",
-		"RU":"connect-drru.hispace.hicloud.com",
-		"RU_back":"connect-drru.dbankcloud.cn",
-		"SG":"connect-dra.hispace.hicloud.com",
-		"SG_back":"connect-dra.dbankcloud.cn"
+		"CN":"connect-drcn.dbankcloud.cn",
+		"CN_back":"connect-drcn.hispace.hicloud.com",
+		"DE":"connect-dre.dbankcloud.cn",
+		"DE_back":"connect-dre.hispace.hicloud.com",
+		"RU":"connect-drru.dbankcloud.cn",
+		"RU_back":"connect-drru.hispace.hicloud.com",
+		"SG":"connect-dra.dbankcloud.cn",
+		"SG_back":"connect-dra.hispace.hicloud.com"
 	},
 	"client":{
 		"cp_id":"890090000023106263",
