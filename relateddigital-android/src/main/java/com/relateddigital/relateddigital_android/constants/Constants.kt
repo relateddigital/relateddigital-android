@@ -127,5 +127,13 @@ class Constants {
         const val FavoriteAttributeAction = "FavoriteAttributeAction"
 
         const val NOTIFICATION_PERMISSION_REQUEST_KEY = "OM.pushnotifystatus"
+
+        const val GEOFENCE_LATITUDE_KEY = "OM.latitude"
+        const val GEOFENCE_LONGITUDE_KEY = "OM.longitude"
+        const val GEOFENCE_ACT_KEY = "act"
+        const val GEOFENCE_ACT_ID_KEY = "actid"
+        const val GEOFENCE_GEO_ID_KEY = "OM.locationid"
+        const val GEOFENCE_ACT_VALUE = "getlist"
+        const val GEOFENCE_PROCESS_VALUE = "process"
     }
 }

@@ -139,7 +139,7 @@ object RequestSender {
                         if (response.isSuccessful) {
                             applySuccessConditions(
                                     response.headers(), response.raw().request.url.toString(),
-                                    model, Domain.LOG_S, context
+                                    model, Domain.IN_APP_NOTIFICATION_ACT_JSON, context
                             )
                             try {
                                 val inAppMessages = response.body()
@@ -200,7 +200,7 @@ object RequestSender {
                             try {
                                 applySuccessConditions(
                                         response.headers(), response.raw().request.url.toString(),
-                                        model, Domain.LOG_S, context
+                                        model, Domain.IN_APP_ACTION_MOBILE, context
                                 )
                                 val actionsResponse = response.body()
                                 if (actionsResponse != null) {
@@ -311,7 +311,7 @@ object RequestSender {
                         if (response.isSuccessful) {
                             applySuccessConditions(
                                     response.headers(), response.raw().request.url.toString(),
-                                    model, Domain.LOG_S, context
+                                    model, Domain.IN_APP_SPIN_TO_WIN_PROMO_CODE, context
                             )
                             var rawJsonResponse = ""
                             try {
@@ -421,7 +421,7 @@ object RequestSender {
                         if (response.isSuccessful) {
                             applySuccessConditions(
                                     response.headers(), response.raw().request.url.toString(),
-                                    model, Domain.LOG_S, context
+                                    model, Domain.IN_APP_STORY_MOBILE, context
                             )
                             var rawJsonResponse = ""
                             try {
@@ -517,7 +517,7 @@ object RequestSender {
                         if (response.isSuccessful) {
                             applySuccessConditions(
                                     response.headers(), response.raw().request.url.toString(),
-                                    model, Domain.LOG_S, context
+                                    model, Domain.IN_APP_RECOMMENDATION_JSON, context
                             )
                             var rawJsonResponse = ""
                             try {
@@ -596,7 +596,7 @@ object RequestSender {
                         if (response.isSuccessful) {
                             applySuccessConditions(
                                     response.headers(), response.raw().request.url.toString(),
-                                    model, Domain.LOG_S, context
+                                    model, Domain.IN_APP_FAVS_RESPONSE_MOBILE, context
                             )
                             var rawJsonResponse = ""
                             try {
@@ -656,6 +656,148 @@ object RequestSender {
                         )
                         val visilabsResponse = VisilabsResponse(null, null, t.message, t, t.message)
                         currentRequest.visilabsCallback!!.fail(visilabsResponse)
+                    }
+                })
+            }
+
+            Domain.GEOFENCE_GET_LIST -> {
+                val sInterface = SApiClient.getClient(model.getRequestTimeoutInSecond())
+                    ?.create(ApiMethods::class.java)
+                val call: Call<List<GeofenceListResponse>> = sInterface!!.getGeofenceListRequestResponse(
+                    currentRequest.headerMap,
+                    currentRequest.queryMap
+                )
+                call.enqueue(object : Callback<List<GeofenceListResponse>> {
+                    override fun onResponse(
+                        call: Call<List<GeofenceListResponse>?>?,
+                        response: Response<List<GeofenceListResponse>>
+                    ) {
+                        if (response.isSuccessful) {
+                            applySuccessConditions(
+                                response.headers(), response.raw().request.url.toString(),
+                                model, Domain.GEOFENCE_GET_LIST, context
+                            )
+                            try {
+                                val geofenceGetListResponse: List<GeofenceListResponse>? =
+                                    response.body()
+                                currentRequest.geofenceGetListCallback!!.success(
+                                    geofenceGetListResponse,
+                                    response.raw().request.url.toString()
+                                )
+                            } catch (e: Exception) {
+                                e.printStackTrace()
+                                Log.e(
+                                    LOG_TAG,
+                                    "Could not parse the response for the request : " + response.raw().request.url.toString()
+                                )
+                                try {
+                                    currentRequest.geofenceGetListCallback!!.fail(
+                                        Throwable(response.body().toString()),
+                                        call!!.request().url.toString()
+                                    )
+                                } catch (c: Exception) {
+                                    c.printStackTrace()
+                                    currentRequest.geofenceGetListCallback!!.fail(
+                                        Throwable("The response is not in the correct format"),
+                                        call!!.request().url.toString()
+                                    )
+                                }
+                            }
+                        } else {
+                            applyFailConditions(call!!.request().url.toString(), model, context)
+                            currentRequest.geofenceGetListCallback!!.fail(
+                                Throwable("The response is not in the correct format"),
+                                call.request().url.toString())
+                        }
+                    }
+
+                    override fun onFailure(call: Call<List<GeofenceListResponse>>, t: Throwable) {
+                        applyFailConditions(call.request().url.toString(), model, context)
+                        currentRequest.geofenceGetListCallback!!.fail(t, call.request().url.toString())
+                    }
+                })
+            }
+
+            Domain.GEOFENCE_TRIGGER -> {
+                val sInterface = SApiClient.getClient(model.getRequestTimeoutInSecond())
+                    ?.create(ApiMethods::class.java)
+                val call: Call<ResponseBody> = sInterface!!.getGeneralGeofenceRequestJsonResponse(
+                    currentRequest.headerMap,
+                    currentRequest.queryMap
+                )
+                call.enqueue(object : Callback<ResponseBody> {
+                    override fun onResponse(
+                        call: Call<ResponseBody>?,
+                        response: Response<ResponseBody>
+                    ) {
+                        if (response.isSuccessful) {
+                            applySuccessConditions(
+                                response.headers(), response.raw().request.url.toString(),
+                                model, Domain.GEOFENCE_TRIGGER, context
+                            )
+                            var rawJsonResponse = ""
+                            try {
+                                rawJsonResponse = response.body()!!.string()
+                                if (rawJsonResponse != "") {
+                                    Log.i(
+                                        LOG_TAG,
+                                        "Success Request : " + response.raw().request.url.toString()
+                                    )
+                                        if (rawJsonResponse == "ok" || rawJsonResponse == "\"ok\"") {
+                                            Log.i(
+                                                LOG_TAG,
+                                                "Successful Request : Sent the info of Geofence trigger"
+                                            )
+                                        } else {
+                                            Log.e(
+                                                LOG_TAG,
+                                                "Fail Request : Could not send the info of Geofence trigger"
+                                            )
+                                        }
+                                } else {
+                                    Log.e(
+                                        LOG_TAG,
+                                        "Empty response for the request : " + response.raw().request.url.toString()
+                                    )
+                                    Log.e(
+                                        LOG_TAG,
+                                        "Fail Request : Could not send the info of Geofence trigger"
+                                    )
+                                }
+                            } catch (e: Exception) {
+                                e.printStackTrace()
+                                Log.e(
+                                    LOG_TAG,
+                                    "Could not parse the response for the request : " + response.raw().request.url.toString()
+                                )
+                                Log.e(
+                                    LOG_TAG,
+                                    "Fail Request : Could not send the info of Geofence trigger"
+                                )
+                            }
+                        } else {
+                            applyFailConditions(call!!.request().url.toString(), model, context)
+                            Log.e(
+                                LOG_TAG,
+                                "Fail Request " + call.request().url.toString()
+                            )
+                            Log.e(
+                                LOG_TAG,
+                                "Fail Request : Could not send the info of Geofence trigger"
+                            )
+                        }
+                    }
+
+                    override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+                        applyFailConditions(call.request().url.toString(), model, context)
+                        Log.e(
+                            LOG_TAG,
+                            "Fail Request " + call.request().url.toString()
+                        )
+                        Log.e(
+                            LOG_TAG,
+                            "Fail Request : Could not send the info of Geofence trigger"
+                        )
                     }
                 })
             }

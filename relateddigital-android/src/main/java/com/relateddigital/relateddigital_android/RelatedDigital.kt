@@ -11,6 +11,7 @@ import androidx.annotation.RequiresApi
 import com.google.gson.Gson
 import com.relateddigital.relateddigital_android.appTracker.AppTracker
 import com.relateddigital.relateddigital_android.constants.Constants
+import com.relateddigital.relateddigital_android.geofence.GeofenceStarter
 import com.relateddigital.relateddigital_android.inapp.InAppButtonInterface
 import com.relateddigital.relateddigital_android.locationPermission.LocationPermissionHandler
 import com.relateddigital.relateddigital_android.model.LoadBalanceCookie
@@ -52,6 +53,10 @@ object RelatedDigital {
         model!!.setCookie(context, LoadBalanceCookie())
         if (model!!.getCookieId().isNullOrEmpty()) {
             model!!.setCookieId(context, null)
+        }
+
+        if(model!!.getIsGeofenceEnabled()) {
+            GeofenceStarter.startGpsManager(context)
         }
 
         initVisilabsParameters()
@@ -142,6 +147,10 @@ object RelatedDigital {
                 model = createInitialModel(context)
                 model!!.setIsGeofenceEnabled(context, isGeofenceEnabled)
             }
+        }
+
+        if(isGeofenceEnabled) {
+            GeofenceStarter.startGpsManager(context)
         }
     }
 

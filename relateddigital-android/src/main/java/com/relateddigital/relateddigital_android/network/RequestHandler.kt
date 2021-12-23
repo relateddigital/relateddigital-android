@@ -5,6 +5,7 @@ import android.content.Context
 import android.util.Log
 import com.relateddigital.relateddigital_android.RelatedDigital
 import com.relateddigital.relateddigital_android.constants.Constants
+import com.relateddigital.relateddigital_android.geofence.GeofenceGetListCallback
 import com.relateddigital.relateddigital_android.inapp.VisilabsCallback
 import com.relateddigital.relateddigital_android.model.*
 import com.relateddigital.relateddigital_android.recommendation.VisilabsTargetFilter
@@ -13,6 +14,7 @@ import com.relateddigital.relateddigital_android.util.PersistentTargetManager
 import com.relateddigital.relateddigital_android.util.StringUtils
 import org.json.JSONArray
 import org.json.JSONObject
+import java.text.DecimalFormat
 
 object RequestHandler {
     private const val LOG_TAG = "RequestHandler"
@@ -490,6 +492,90 @@ object RequestHandler {
                         Domain.IN_APP_FAVS_RESPONSE_MOBILE, queryMap, headerMap,
                         null, visilabsCallback
                 ), RelatedDigital.getRelatedDigitalModel()!!, context
+        )
+    }
+
+    fun createGeofenceGetListResponseRequest(
+        context: Context,
+        latitude: Double,
+        longitude: Double,
+        geofenceGetListCallback: GeofenceGetListCallback,
+    ) {
+        if (RelatedDigital.isBlocked(context)) {
+            Log.w(LOG_TAG, "Too much server load, ignoring the request!")
+            return
+        }
+
+        val propertiesLoc = HashMap<String, String>()
+        val queryMap = HashMap<String, String>()
+        val headerMap = HashMap<String, String>()
+
+        val parameters = PersistentTargetManager.getParameters(context)
+        for ((key, value) in parameters) {
+            if (!StringUtils.isNullOrWhiteSpace(key) && !StringUtils.isNullOrWhiteSpace(value)) {
+                propertiesLoc[key] = value
+            }
+        }
+
+        RequestFormer.formGeofenceGetListResponseRequest(
+            context = context,
+            model = RelatedDigital.getRelatedDigitalModel(),
+            pageName = Constants.PAGE_NAME_REQUEST_VAL,
+            properties = propertiesLoc,
+            queryMap = queryMap,
+            headerMap = headerMap,
+            latitude = latitude,
+            longitude = longitude
+        )
+
+        RequestSender.addToQueue(
+            Request(
+                Domain.GEOFENCE_GET_LIST, queryMap, headerMap,
+                null, null, geofenceGetListCallback
+            ), RelatedDigital.getRelatedDigitalModel()!!, context
+        )
+    }
+
+    fun createGeofenceTriggerRequest(
+        context: Context,
+        latitude: Double,
+        longitude: Double,
+        actId: String,
+        geoId: String
+    ) {
+        if (RelatedDigital.isBlocked(context)) {
+            Log.w(LOG_TAG, "Too much server load, ignoring the request!")
+            return
+        }
+
+        val propertiesLoc = HashMap<String, String>()
+        val queryMap = HashMap<String, String>()
+        val headerMap = HashMap<String, String>()
+
+        val parameters = PersistentTargetManager.getParameters(context)
+        for ((key, value) in parameters) {
+            if (!StringUtils.isNullOrWhiteSpace(key) && !StringUtils.isNullOrWhiteSpace(value)) {
+                propertiesLoc[key] = value
+            }
+        }
+
+        RequestFormer.formGeofenceTriggerRequest(
+            context = context,
+            model = RelatedDigital.getRelatedDigitalModel(),
+            pageName = Constants.PAGE_NAME_REQUEST_VAL,
+            properties = propertiesLoc,
+            queryMap = queryMap,
+            headerMap = headerMap,
+            latitude = latitude,
+            longitude = longitude,
+            actId = actId,
+            geoId = geoId
+        )
+
+        RequestSender.addToQueue(
+            Request(
+                Domain.GEOFENCE_TRIGGER, queryMap, headerMap, null
+            ), RelatedDigital.getRelatedDigitalModel()!!, context
         )
     }
 }

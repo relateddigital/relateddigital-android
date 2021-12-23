@@ -7,6 +7,7 @@ import com.relateddigital.relateddigital_android.model.RelatedDigitalModel
 import com.relateddigital.relateddigital_android.util.GoogleUtils
 import com.relateddigital.relateddigital_android.util.PersistentTargetManager
 import com.relateddigital.relateddigital_android.util.SharedPref
+import java.text.DecimalFormat
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
@@ -103,6 +104,26 @@ object RequestFormer {
     ) {
         fillCommonParameters(context, model, pageName, properties, queryMap, headerMap)
         addInAppNotificationExtraParameters(model, queryMap)
+    }
+
+    fun formGeofenceGetListResponseRequest(
+        context: Context, model: RelatedDigitalModel?, pageName: String,
+        properties: HashMap<String, String>?,
+        queryMap: HashMap<String, String>, headerMap: HashMap<String, String>,
+        latitude: Double, longitude: Double
+    ) {
+        fillCommonParameters(context, model, pageName, properties, queryMap, headerMap)
+        addGeofenceGetListExtraParameters(model, queryMap, latitude, longitude)
+    }
+
+    fun formGeofenceTriggerRequest(
+        context: Context, model: RelatedDigitalModel?, pageName: String,
+        properties: HashMap<String, String>?,
+        queryMap: HashMap<String, String>, headerMap: HashMap<String, String>,
+        latitude: Double, longitude: Double, actId: String, geoId: String
+    ) {
+        fillCommonParameters(context, model, pageName, properties, queryMap, headerMap)
+        addGeofenceTriggerExtraParameters(model, queryMap, latitude, longitude, actId, geoId)
     }
 
     fun updateSessionParameters(context: Context, pageName: String) {
@@ -328,5 +349,47 @@ object RequestFormer {
             model: RelatedDigitalModel?, queryMap: HashMap<String, String>
     ) {
         queryMap[Constants.DOMAIN_REQUEST_KEY] = model!!.getDataSource() + "_Android"
+    }
+
+    private fun addGeofenceGetListExtraParameters(
+        model: RelatedDigitalModel?, queryMap: HashMap<String, String>,
+        latitude: Double, longitude: Double
+    ) {
+        val df = DecimalFormat("0.0000000000000")
+
+        if (latitude > 0) {
+            val latitudeString: String = df.format(latitude)
+            queryMap[Constants.GEOFENCE_LATITUDE_KEY] = latitudeString
+        }
+
+        if (longitude > 0) {
+            val longitudeString: String = df.format(longitude)
+            queryMap[Constants.GEOFENCE_LONGITUDE_KEY] = longitudeString
+        }
+
+        queryMap[Constants.GEOFENCE_ACT_KEY] = Constants.GEOFENCE_ACT_VALUE
+    }
+
+    private fun addGeofenceTriggerExtraParameters(
+        model: RelatedDigitalModel?, queryMap: HashMap<String, String>,
+        latitude: Double, longitude: Double, actId: String, geoId: String
+    ) {
+        val df = DecimalFormat("0.0000000000000")
+
+        if (latitude > 0) {
+            val latitudeString: String = df.format(latitude)
+            queryMap[Constants.GEOFENCE_LATITUDE_KEY] = latitudeString
+        }
+
+        if (longitude > 0) {
+            val longitudeString: String = df.format(longitude)
+            queryMap[Constants.GEOFENCE_LONGITUDE_KEY] = longitudeString
+        }
+
+        queryMap[Constants.GEOFENCE_ACT_KEY] = Constants.GEOFENCE_PROCESS_VALUE
+
+        queryMap[Constants.GEOFENCE_ACT_ID_KEY] = actId
+
+        queryMap[Constants.GEOFENCE_GEO_ID_KEY] = geoId
     }
 }
