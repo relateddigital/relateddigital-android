@@ -1,8 +1,11 @@
 package com.relateddigital.relateddigital_android.model
 
+import android.content.Context
 import android.graphics.Typeface
+import androidx.core.content.res.ResourcesCompat
 import com.google.gson.annotations.SerializedName
 import com.relateddigital.relateddigital_android.inapp.FontFamily
+import com.relateddigital.relateddigital_android.util.AppUtils
 import java.io.Serializable
 import java.util.*
 
@@ -13,14 +16,26 @@ class ScratchToWinExtendedProps : Serializable {
     @SerializedName("content_title_font_family")
     private var content_title_font_family: String? = null
 
+    @SerializedName("content_title_custom_font_family_ios")
+    private val content_title_custom_font_family_ios: String? = null
+
+    @SerializedName("content_title_custom_font_family_android")
+    private val content_title_custom_font_family_android: String? = null
+
     @SerializedName("content_title_text_size")
     var contentTitleTextSize: String? = null
 
     @SerializedName("content_body_text_color")
     var contentBodyTextColor: String? = null
 
-    @SerializedName("content_body_text_font_family")
-    private var content_body_text_font_family: String? = null
+    @SerializedName("content_body_font_family")
+    private var content_body_font_family: String? = null
+
+    @SerializedName("content_body_custom_font_family_ios")
+    private val content_body_custom_font_family_ios: String? = null
+
+    @SerializedName("content_body_custom_font_family_android")
+    private val content_body_custom_font_family_android: String? = null
 
     @SerializedName("content_body_text_size")
     var contentBodyTextSize: String? = null
@@ -34,6 +49,12 @@ class ScratchToWinExtendedProps : Serializable {
     @SerializedName("button_font_family")
     private var button_font_family: String? = null
 
+    @SerializedName("button_custom_font_family_ios")
+    private val button_custom_font_family_ios: String? = null
+
+    @SerializedName("button_custom_font_family_android")
+    private val button_custom_font_family_android: String? = null
+
     @SerializedName("button_text_size")
     var buttonTextSize: String? = null
 
@@ -42,6 +63,12 @@ class ScratchToWinExtendedProps : Serializable {
 
     @SerializedName("promocode_font_family")
     private var promocode_font_family: String? = null
+
+    @SerializedName("promocode_custom_font_family_ios")
+    private val promocode_custom_font_family_ios: String? = null
+
+    @SerializedName("promocode_custom_font_family_android")
+    private val promocode_custom_font_family_android: String? = null
 
     @SerializedName("promocode_text_size")
     var promoCodeTextSize: String? = null
@@ -54,6 +81,12 @@ class ScratchToWinExtendedProps : Serializable {
 
     @SerializedName("copybutton_font_family")
     private var copybutton_font_family: String? = null
+
+    @SerializedName("copybutton_custom_font_family_ios")
+    private val copybutton_custom_font_family_ios: String? = null
+
+    @SerializedName("copybutton_custom_font_family_android")
+    private val copybutton_custom_font_family_android: String? = null
 
     @SerializedName("copybutton_text_size")
     var copyButtonTextSize: String? = null
@@ -80,99 +113,149 @@ class ScratchToWinExtendedProps : Serializable {
         content_title_font_family = contentTitleFontFamily
     }
 
-    val contentTitleFontFamily: Typeface
-        get() {
-            if (content_title_font_family == null || content_title_font_family == "") {
-                return Typeface.DEFAULT
-            }
-            if (FontFamily.Monospace.toString().equals(content_title_font_family!!.toLowerCase(Locale.ROOT))) {
-                return Typeface.MONOSPACE
-            }
-            if (FontFamily.SansSerif.toString().equals(content_title_font_family!!.toLowerCase(Locale.ROOT))) {
-                return Typeface.SANS_SERIF
-            }
-            return if (FontFamily.Serif.toString().equals(content_title_font_family!!.toLowerCase(Locale.ROOT))) {
-                Typeface.SERIF
-            } else Typeface.DEFAULT
+    fun getContentTitleFontFamily(context: Context): Typeface? {
+        if (content_title_font_family.isNullOrEmpty()) {
+            return Typeface.DEFAULT
         }
-
-    fun setContentBodyTextFontFamily(contentBodyTextFontFamily: String?) {
-        content_body_text_font_family = contentBodyTextFontFamily
+        if (FontFamily.Monospace.toString() == content_title_font_family!!.lowercase(Locale.getDefault())) {
+            return Typeface.MONOSPACE
+        }
+        if (FontFamily.SansSerif.toString() == content_title_font_family!!.lowercase(Locale.getDefault())) {
+            return Typeface.SANS_SERIF
+        }
+        if (FontFamily.Serif.toString() == content_title_font_family!!.lowercase(Locale.getDefault())) {
+            return Typeface.SERIF
+        }
+        if (!content_title_custom_font_family_android.isNullOrEmpty()) {
+            if (AppUtils.isResourceAvailable(context, content_title_custom_font_family_android)) {
+                val id = context.resources.getIdentifier(
+                    content_title_custom_font_family_android,
+                    "font",
+                    context.packageName
+                )
+                return ResourcesCompat.getFont(context, id)
+            }
+        }
+        return Typeface.DEFAULT
     }
 
-    val contentBodyTextFontFamily: Typeface
-        get() {
-            if (content_body_text_font_family == null || content_body_text_font_family == "") {
-                return Typeface.DEFAULT
-            }
-            if (FontFamily.Monospace.toString().equals(content_body_text_font_family!!.toLowerCase(Locale.ROOT))) {
-                return Typeface.MONOSPACE
-            }
-            if (FontFamily.SansSerif.toString().equals(content_body_text_font_family!!.toLowerCase(Locale.ROOT))) {
-                return Typeface.SANS_SERIF
-            }
-            return if (FontFamily.Serif.toString().equals(content_body_text_font_family!!.toLowerCase(Locale.ROOT))) {
-                Typeface.SERIF
-            } else Typeface.DEFAULT
+    fun setContentBodyFontFamily(contentBodyFontFamily: String?) {
+        content_body_font_family = contentBodyFontFamily
+    }
+
+    fun getContentBodyFontFamily(context: Context): Typeface? {
+        if (content_body_font_family.isNullOrEmpty()) {
+            return Typeface.DEFAULT
         }
+        if (FontFamily.Monospace.toString() == content_body_font_family!!.lowercase(Locale.getDefault())) {
+            return Typeface.MONOSPACE
+        }
+        if (FontFamily.SansSerif.toString() == content_body_font_family!!.lowercase(Locale.getDefault())) {
+            return Typeface.SANS_SERIF
+        }
+        if (FontFamily.Serif.toString() == content_body_font_family!!.lowercase(Locale.getDefault())) {
+            return Typeface.SERIF
+        }
+        if (!content_body_custom_font_family_android.isNullOrEmpty()) {
+            if (AppUtils.isResourceAvailable(context, content_body_custom_font_family_android)) {
+                val id = context.resources.getIdentifier(
+                    content_body_custom_font_family_android,
+                    "font",
+                    context.packageName
+                )
+                return ResourcesCompat.getFont(context, id)
+            }
+        }
+        return Typeface.DEFAULT
+    }
 
     fun setButtonFontFamily(buttonFontFamily: String?) {
         button_font_family = buttonFontFamily
     }
 
-    val buttonFontFamily: Typeface
-        get() {
-            if (button_font_family == null || button_font_family == "") {
-                return Typeface.DEFAULT
-            }
-            if (FontFamily.Monospace.toString().equals(button_font_family!!.toLowerCase(Locale.ROOT))) {
-                return Typeface.MONOSPACE
-            }
-            if (FontFamily.SansSerif.toString().equals(button_font_family!!.toLowerCase(Locale.ROOT))) {
-                return Typeface.SANS_SERIF
-            }
-            return if (FontFamily.Serif.toString().equals(button_font_family!!.toLowerCase(Locale.ROOT))) {
-                Typeface.SERIF
-            } else Typeface.DEFAULT
+    fun getButtonFontFamily(context: Context): Typeface? {
+        if (button_font_family.isNullOrEmpty()) {
+            return Typeface.DEFAULT
         }
+        if (FontFamily.Monospace.toString() == button_font_family!!.lowercase(Locale.getDefault())) {
+            return Typeface.MONOSPACE
+        }
+        if (FontFamily.SansSerif.toString() == button_font_family!!.lowercase(Locale.getDefault())) {
+            return Typeface.SANS_SERIF
+        }
+        if (FontFamily.Serif.toString() == button_font_family!!.lowercase(Locale.getDefault())) {
+            return Typeface.SERIF
+        }
+        if (!button_custom_font_family_android.isNullOrEmpty()) {
+            if (AppUtils.isResourceAvailable(context, button_custom_font_family_android)) {
+                val id = context.resources.getIdentifier(
+                    button_custom_font_family_android,
+                    "font",
+                    context.packageName
+                )
+                return ResourcesCompat.getFont(context, id)
+            }
+        }
+        return Typeface.DEFAULT
+    }
 
     fun setPromoCodeFontFamily(promoCodeFontFamily: String?) {
         promocode_font_family = promoCodeFontFamily
     }
 
-    val promoCodeFontFamily: Typeface
-        get() {
-            if (promocode_font_family == null || promocode_font_family == "") {
-                return Typeface.DEFAULT
-            }
-            if (FontFamily.Monospace.toString().equals(promocode_font_family!!.toLowerCase(Locale.ROOT))) {
-                return Typeface.MONOSPACE
-            }
-            if (FontFamily.SansSerif.toString().equals(promocode_font_family!!.toLowerCase(Locale.ROOT))) {
-                return Typeface.SANS_SERIF
-            }
-            return if (FontFamily.Serif.toString().equals(promocode_font_family!!.toLowerCase(Locale.ROOT))) {
-                Typeface.SERIF
-            } else Typeface.DEFAULT
+    fun getPromoCodeFontFamily(context: Context): Typeface? {
+        if (promocode_font_family.isNullOrEmpty()) {
+            return Typeface.DEFAULT
         }
+        if (FontFamily.Monospace.toString() == promocode_font_family!!.lowercase(Locale.getDefault())) {
+            return Typeface.MONOSPACE
+        }
+        if (FontFamily.SansSerif.toString() == promocode_font_family!!.lowercase(Locale.getDefault())) {
+            return Typeface.SANS_SERIF
+        }
+        if (FontFamily.Serif.toString() == promocode_font_family!!.lowercase(Locale.getDefault())) {
+            return Typeface.SERIF
+        }
+        if (!promocode_custom_font_family_android.isNullOrEmpty()) {
+            if (AppUtils.isResourceAvailable(context, promocode_custom_font_family_android)) {
+                val id = context.resources.getIdentifier(
+                    promocode_custom_font_family_android,
+                    "font",
+                    context.packageName
+                )
+                return ResourcesCompat.getFont(context, id)
+            }
+        }
+        return Typeface.DEFAULT
+    }
 
     fun setCopyButtonFontFamily(copyButtonFontFamily: String?) {
         copybutton_font_family = copyButtonFontFamily
     }
 
-    val copyButtonFontFamily: Typeface
-        get() {
-            if (copybutton_font_family == null || copybutton_font_family == "") {
-                return Typeface.DEFAULT
-            }
-            if (FontFamily.Monospace.toString().equals(copybutton_font_family!!.toLowerCase(Locale.ROOT))) {
-                return Typeface.MONOSPACE
-            }
-            if (FontFamily.SansSerif.toString().equals(copybutton_font_family!!.toLowerCase(Locale.ROOT))) {
-                return Typeface.SANS_SERIF
-            }
-            return if (FontFamily.Serif.toString().equals(copybutton_font_family!!.toLowerCase(Locale.ROOT))) {
-                Typeface.SERIF
-            } else Typeface.DEFAULT
+    fun getCopyButtonFontFamily(context: Context): Typeface? {
+        if (copybutton_font_family.isNullOrEmpty()) {
+            return Typeface.DEFAULT
         }
+        if (FontFamily.Monospace.toString() == copybutton_font_family!!.lowercase(Locale.getDefault())) {
+            return Typeface.MONOSPACE
+        }
+        if (FontFamily.SansSerif.toString() == copybutton_font_family!!.lowercase(Locale.getDefault())) {
+            return Typeface.SANS_SERIF
+        }
+        if (FontFamily.Serif.toString() == copybutton_font_family!!.lowercase(Locale.getDefault())) {
+            return Typeface.SERIF
+        }
+        if (!copybutton_custom_font_family_android.isNullOrEmpty()) {
+            if (AppUtils.isResourceAvailable(context, copybutton_custom_font_family_android)) {
+                val id = context.resources.getIdentifier(
+                    copybutton_custom_font_family_android,
+                    "font",
+                    context.packageName
+                )
+                return ResourcesCompat.getFont(context, id)
+            }
+        }
+        return Typeface.DEFAULT
+    }
 }
