@@ -566,13 +566,22 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
         }
 
     private fun setCloseButton() {
-        if (mInAppMessage!!.mActionData!!.mCloseEventTrigger.equals("backgroundclick")) {
-            binding.ibClose.visibility = View.GONE
-            setFinishOnTouchOutside(true)
+        if(mInAppMessage!!.mActionData!!.mCloseEventTrigger != null) {
+            if (mInAppMessage!!.mActionData!!.mCloseEventTrigger.equals("backgroundclick")) {
+                binding.ibClose.visibility = View.GONE
+                setFinishOnTouchOutside(true)
+            } else {
+                setFinishOnTouchOutside(
+                    !mInAppMessage!!.mActionData!!.mCloseEventTrigger.equals("closebutton")
+                )
+                binding.ibClose.setOnClickListener {
+                    InAppUpdateDisplayState.releaseDisplayState(mIntentId)
+                    finish()
+                }
+                binding.ibClose.setBackgroundResource(closeIcon)
+            }
         } else {
-            setFinishOnTouchOutside(
-                !mInAppMessage!!.mActionData!!.mCloseEventTrigger.equals("closebutton")
-            )
+            setFinishOnTouchOutside(true)
             binding.ibClose.setOnClickListener {
                 InAppUpdateDisplayState.releaseDisplayState(mIntentId)
                 finish()
