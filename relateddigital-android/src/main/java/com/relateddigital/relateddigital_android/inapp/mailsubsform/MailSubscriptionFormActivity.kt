@@ -97,7 +97,7 @@ class MailSubscriptionFormActivity : Activity() {
 
     private fun setTitle() {
         binding.tvTitle.setTypeface(
-            getFont_family(mExtendedProps!!.title_font_family),
+            mExtendedProps!!.getTitleFontFamily(this),
             Typeface.BOLD
         )
         binding.tvTitle.text = mMailSubscriptionForm!!.actiondata!!.title!!.replace("\\n", "\n")
@@ -107,7 +107,7 @@ class MailSubscriptionFormActivity : Activity() {
 
     private fun setBody() {
         binding.tvBody.text = mMailSubscriptionForm!!.actiondata!!.message!!.replace("\\n", "\n")
-        binding.tvBody.setTypeface(getFont_family(mExtendedProps!!.text_font_family))
+        binding.tvBody.setTypeface(mExtendedProps!!.getTextFontFamily(this))
         binding.tvBody.setTextColor(Color.parseColor(mExtendedProps!!.text_color))
         binding.tvBody.textSize = mExtendedProps!!.text_size!!.toFloat() + 8
     }
@@ -154,7 +154,7 @@ class MailSubscriptionFormActivity : Activity() {
 
     private fun setButton() {
         binding.btn.text = mMailSubscriptionForm!!.actiondata!!.button_label
-        binding.btn.setTypeface(getFont_family(mExtendedProps!!.button_font_family))
+        binding.btn.typeface = mExtendedProps!!.getButtonFontFamily(this)
         binding.btn.setTextColor(Color.parseColor(mExtendedProps!!.button_text_color))
         binding.btn.setBackgroundColor(Color.parseColor(mExtendedProps!!.button_color))
         binding.btn.textSize = mExtendedProps!!.button_text_size!!.toFloat() + 8
@@ -233,24 +233,6 @@ class MailSubscriptionFormActivity : Activity() {
             textLoc = "<a href=\"$url\">$text</a>"
         }
         return Html.fromHtml(textLoc)
-    }
-
-    private fun getFont_family(font_family: String?): Typeface {
-        if (font_family == null) {
-            return Typeface.DEFAULT
-        }
-        if (FontFamily.Monospace.toString() == font_family.toLowerCase(Locale.ROOT)) {
-            return Typeface.MONOSPACE
-        }
-        if (FontFamily.SansSerif.toString() == font_family.toLowerCase(Locale.ROOT)) {
-            return Typeface.SANS_SERIF
-        }
-        if (FontFamily.Serif.toString() == font_family.toLowerCase(Locale.ROOT)) {
-            return Typeface.SERIF
-        }
-        return if (FontFamily.Default.toString() == font_family.toLowerCase(Locale.ROOT)) {
-            Typeface.DEFAULT
-        } else Typeface.DEFAULT
     }
 
     private val closeIcon: Int
