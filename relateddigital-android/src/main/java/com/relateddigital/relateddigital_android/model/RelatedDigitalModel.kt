@@ -1,13 +1,19 @@
 package com.relateddigital.relateddigital_android.model
 
 import android.content.Context
+import android.text.TextUtils
 import android.util.Log
 import com.google.gson.Gson
 import com.relateddigital.relateddigital_android.constants.Constants
+import com.relateddigital.relateddigital_android.util.AppUtils
+import com.relateddigital.relateddigital_android.util.GoogleUtils
 import com.relateddigital.relateddigital_android.util.PersistentTargetManager
 import com.relateddigital.relateddigital_android.util.SharedPref
 import java.io.Serializable
+import java.text.DateFormat
+import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.HashMap
 
 class RelatedDigitalModel(
         private var isPushNotificationEnabled: Boolean = false,
@@ -38,7 +44,8 @@ class RelatedDigitalModel(
         private var userAgent: String,
         private var visitorData: String,
         private var visitData: String,
-        private var cookie: LoadBalanceCookie? = null
+        private var cookie: LoadBalanceCookie? = null,
+        private var extra: HashMap<String, Any> = HashMap()
 ) : Serializable {
 
     companion object {
@@ -209,6 +216,21 @@ class RelatedDigitalModel(
         this.cookie = cookie
     }
 
+    fun add(context: Context, key: String, value: Any) {
+        extra[key] = value
+        saveToSharedPrefs(context)
+    }
+
+    fun addAll(context: Context, extras: Map<String, Any>) {
+        extra.putAll(extras)
+        saveToSharedPrefs(context)
+    }
+
+    fun removeAll(context: Context) {
+        extra.clear()
+        saveToSharedPrefs(context)
+    }
+
     fun getIsPushNotificationEnabled(): Boolean {
         return isPushNotificationEnabled
     }
@@ -325,7 +347,11 @@ class RelatedDigitalModel(
         return cookie
     }
 
-    fun saveToSharedPrefs(context: Context) {
+    fun getExtra(): HashMap<String, Any> {
+        return extra
+    }
+
+    private fun saveToSharedPrefs(context: Context) {
         SharedPref.writeString(context,
                 Constants.RELATED_DIGITAL_MODEL_KEY,
                 Gson().toJson(this))
@@ -378,6 +404,210 @@ class RelatedDigitalModel(
         }
         if(model.getVisitorData() != null) {
             this.visitorData = model.getVisitorData()
+        }
+        if(!model.getExtra().isNullOrEmpty()) {
+            this.extra.clear()
+            this.extra.putAll(model.getExtra())
+        }
+    }
+
+    fun isValid(context: Context): Boolean {
+        var appAlias = ""
+        appAlias = if(GoogleUtils.checkPlayService(context)) {
+            googleAppAlias
+        } else {
+            huaweiAppAlias
+        }
+        val res1 = !(TextUtils.isEmpty(getToken()) && TextUtils.isEmpty(appAlias))
+        var res2 = true
+        val dateFormat: DateFormat = SimpleDateFormat("yyyy-MM-dd hh:mm:ss")
+        val dateNow = dateFormat.format(Calendar.getInstance().time)
+        val lastSubsTime: String =
+            SharedPref.readString(context, Constants.LAST_SUBS_DATE_KEY)
+        if (lastSubsTime.isNotEmpty()) {
+            if (!AppUtils.isDateDifferenceGreaterThan(dateNow, lastSubsTime, 3)) {
+                val lastSubStr: String =
+                    SharedPref.readString(context, Constants.LAST_SUBS_KEY)
+                if (lastSubStr.isNotEmpty()) {
+                    val lastSubscription: RelatedDigitalModel =
+                        Gson().fromJson(
+                            lastSubStr,
+                            RelatedDigitalModel::class.java
+                        )
+                    if (isEqual(lastSubscription)) {
+                        res2 = false
+                    }
+                }
+            }
+        }
+        return res1 and res2
+    }
+
+    fun isEqual(previousModel: RelatedDigitalModel?): Boolean {
+        val result: Boolean = if (previousModel == null) {
+            false
+        } else {
+            isStringEqual(googleAppAlias, previousModel.getGoogleAppAlias()) &&
+                    isStringEqual(huaweiAppAlias, previousModel.getHuaweiAppAlias()) &&
+                    isStringEqual(appVersion, previousModel.getAppVersion()) &&
+                    isStringEqual(pushPermissionStatus, previousModel.getPushPermissionStatus()) &&
+                    isStringEqual(apiVersion, previousModel.getApiVersion()) &&
+                    isStringEqual(osType, previousModel.getOsType()) &&
+                    isStringEqual(osVersion, previousModel.getOsVersion()) &&
+                    isStringEqual(sdkVersion, previousModel.getSdkVersion()) &&
+                    isStringEqual(deviceType, previousModel.getDeviceType()) &&
+                    isStringEqual(deviceName, previousModel.getDeviceName()) &&
+                    isStringEqual(carrier, previousModel.getCarrier()) &&
+                    isStringEqual(local, previousModel.getLocal()) &&
+                    isStringEqual(
+                        identifierForVendor,
+                        previousModel.getIdentifierForVendor()
+                    ) &&
+                    isStringEqual(
+                        advertisingIdentifier,
+                        previousModel.getAdvertisingIdentifier()
+                    ) &&
+                    isStringEqual(
+                        getToken(),
+                        previousModel.getToken()
+                    ) &&
+                    isMapEqual(extra, previousModel.getExtra())
+        }
+        return result
+    }
+
+    private fun isStringEqual(first: String?, second: String?): Boolean {
+        val result: Boolean = if (first == null || second == null) {
+            first == null && second == null
+        } else {
+            first == second
+        }
+        return result
+    }
+
+    private fun isMapEqual(first: Map<String, Any>, second: Map<String, Any>): Boolean {
+        var result = true
+        if (first.size != second.size) {
+            result = false
+        } else {
+            for (i in first.keys.toTypedArray().indices) {
+                val key = first.keys.toTypedArray()[i]
+                if (key == Constants.EURO_CONSENT_TIME_KEY) {
+                    continue
+                }
+                if (!second.containsKey(key)) {
+                    result = false
+                    break
+                } else {
+                    val value1 = first[key] as String?
+                    val value2 = second[key] as String?
+                    if (value1 == null || value2 == null) {
+                        if (!(value1 == null && value2 == null)) {
+                            result = false
+                            break
+                        }
+                    } else {
+                        if (value1 != value2) {
+                            result = false
+                            break
+                        }
+                    }
+                }
+            }
+        }
+        return result
+    }
+
+    fun copyFrom(context: Context, fromModel: RelatedDigitalModel) {
+        isPushNotificationEnabled = fromModel.getIsPushNotificationEnabled()
+        isInAppNotificationEnabled = fromModel.getIsInAppNotificationEnabled()
+        isGeofenceEnabled = fromModel.getIsGeofenceEnabled()
+        googleAppAlias = fromModel.getGoogleAppAlias()
+        huaweiAppAlias = fromModel.getHuaweiAppAlias()
+        organizationId = fromModel.getOrganizationId()
+        profileId = fromModel.getProfileId()
+        dataSource = fromModel.getDataSource()
+        requestTimeoutInSecond = fromModel.getRequestTimeoutInSecond()
+        maxGeofenceCount = fromModel.getMaxGeofenceCount()
+        appVersion = if(fromModel.getAppVersion().isNullOrEmpty()) {
+            AppUtils.getAppVersion(context)
+        } else {
+            fromModel.getAppVersion()
+        }
+        pushPermissionStatus = if(fromModel.getPushPermissionStatus().isNullOrEmpty()) {
+            AppUtils.getNotificationPermissionStatus(context)
+        } else {
+            fromModel.getPushPermissionStatus()
+        }
+        apiVersion = fromModel.getApiVersion()
+        osType = fromModel.getOsType()
+        osVersion = if(fromModel.getOsVersion().isNullOrEmpty()) {
+            AppUtils.getOsVersion()
+        } else {
+            fromModel.getOsVersion()
+        }
+        sdkVersion = if(fromModel.getSdkVersion().isNullOrEmpty()) {
+            AppUtils.getSdkVersion()
+        } else {
+            fromModel.getSdkVersion()
+        }
+        deviceType = if(fromModel.getDeviceType().isNullOrEmpty()) {
+            AppUtils.getDeviceType()
+        } else {
+            fromModel.getDeviceType()
+        }
+        deviceName = if(fromModel.getDeviceName().isNullOrEmpty()) {
+            AppUtils.getDeviceName()
+        } else {
+            fromModel.getDeviceName()
+        }
+        carrier = if(fromModel.getCarrier().isNullOrEmpty()) {
+            AppUtils.getCarrier(context)
+        } else {
+            fromModel.getCarrier()
+        }
+        identifierForVendor = if(fromModel.getIdentifierForVendor().isNullOrEmpty()) {
+            AppUtils.getIdentifierForVendor(context)
+        } else {
+            fromModel.getIdentifierForVendor()
+        }
+        advertisingIdentifier = fromModel.getAdvertisingIdentifier()
+        local = if(fromModel.getLocal().isNullOrEmpty()) {
+            AppUtils.getLocal(context)
+        } else {
+            fromModel.getLocal()
+        }
+        exVisitorId = fromModel.getExVisitorId()
+        token = fromModel.getToken()
+        cookieId = if(fromModel.getCookieId().isNullOrEmpty()) {
+            AppUtils.getCookieId(context)
+        } else {
+            fromModel.getCookieId()
+        }
+        userAgent = if(fromModel.getUserAgent().isNullOrEmpty()) {
+            AppUtils.getUserAgent()
+        } else {
+            fromModel.getUserAgent()
+        }
+        visitorData = if(fromModel.getVisitorData().isNullOrEmpty()) {
+            ""
+        } else {
+            fromModel.getVisitorData()
+        }
+        visitData = if(fromModel.getVisitData().isNullOrEmpty()) {
+            ""
+        } else {
+            fromModel.getVisitData()
+        }
+        cookie = if(fromModel.getCookie() == null) {
+            null
+        } else {
+            fromModel.getCookie()
+        }
+        extra = HashMap<String, Any>()
+        for (i in fromModel.getExtra().keys.toTypedArray().indices) {
+            val key = fromModel.getExtra().keys.toTypedArray()[i] as String
+            extra[key] = fromModel.getExtra()[key]!!
         }
     }
 }

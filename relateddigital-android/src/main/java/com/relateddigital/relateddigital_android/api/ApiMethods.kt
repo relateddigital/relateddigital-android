@@ -98,6 +98,10 @@ interface ApiMethods {
     @POST("/retention")
     fun report(@Header("User-Agent") userAgent: String, @Body retention: Retention): Call<Void>
 
+    @Headers("Content-Type: application/json;charset=utf-8")
+    @POST("/log/mobileSdk")
+    fun sendLogToGraylog(@Body graylogModel: GraylogModel?): Call<Void>
+
     //Methods for remote config
     @GET("rc.json")
     fun getRemoteConfig(

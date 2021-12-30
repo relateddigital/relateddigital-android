@@ -8,6 +8,8 @@ import android.os.Build
 import android.os.Handler
 import android.util.Log
 import androidx.annotation.RequiresApi
+import androidx.core.app.NotificationManagerCompat
+import com.google.firebase.FirebaseApp
 import com.google.gson.Gson
 import com.relateddigital.relateddigital_android.appTracker.AppTracker
 import com.relateddigital.relateddigital_android.constants.Constants
@@ -91,11 +93,21 @@ object RelatedDigital {
     }
 
     @JvmStatic
-    fun setIsPushNotificationEnabled(context: Context,
-                                     isPushNotificationEnabled: Boolean,
-                                     googleAppAlias: String,
-                                     huaweiAppAlias: String,
-                                     token: String) {
+    fun setIsPushNotificationEnabled(
+        context: Context,
+        isPushNotificationEnabled: Boolean,
+        googleAppAlias: String,
+        huaweiAppAlias: String,
+        token: String,
+        notificationSmallIcon: Int = 0,
+        notificationSmallIconDarkMode: Int = 0,
+        isNotificationLargeIcon: Boolean = false,
+        notificationLargeIcon: Int = 0,
+        notificationLargeIconDarkMode: Int = 0,
+        notificationPushIntent: String = "",
+        notificationChannelName: String = "",
+        notificationColor: String = ""
+    ) {
         if (model != null) {
             model!!.setIsPushNotificationEnabled(context, isPushNotificationEnabled)
             model!!.setGoogleAppAlias(context, googleAppAlias)
@@ -103,8 +115,12 @@ object RelatedDigital {
             model!!.setToken(context, token)
         } else {
             if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
-                model = Gson().fromJson(SharedPref.readString(context,
-                        Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
+                model = Gson().fromJson(
+                    SharedPref.readString(
+                        context,
+                        Constants.RELATED_DIGITAL_MODEL_KEY
+                    ), RelatedDigitalModel::class.java
+                )
                 model!!.setIsPushNotificationEnabled(context, isPushNotificationEnabled)
                 model!!.setGoogleAppAlias(context, googleAppAlias)
                 model!!.setHuaweiAppAlias(context, huaweiAppAlias)
@@ -116,6 +132,115 @@ object RelatedDigital {
                 model!!.setToken(context, token)
             }
         }
+
+        if(notificationSmallIcon != 0) {
+            if (AppUtils.isIconResourceAvailable(
+                    context,
+                    notificationSmallIcon
+                )
+            ) {
+                SharedPref.writeInt(
+                    context,
+                    Constants.NOTIFICATION_TRANSPARENT_SMALL_ICON,
+                    notificationSmallIcon
+                )
+            } else {
+                Log.e(LOG_TAG, "Resource (notification small icon) could not be found" +
+                        " : $notificationSmallIcon")
+            }
+        }
+
+        if(notificationSmallIconDarkMode != 0) {
+            if (AppUtils.isIconResourceAvailable(
+                    context,
+                    notificationSmallIconDarkMode
+                )
+            ) {
+                SharedPref.writeInt(
+                    context,
+                    Constants.NOTIFICATION_TRANSPARENT_SMALL_ICON_DARK_MODE,
+                    notificationSmallIconDarkMode
+                )
+            } else {
+                Log.e(LOG_TAG, "Resource (notification small icon dark mode) could not be found" +
+                        " : $notificationSmallIconDarkMode")
+            }
+        }
+
+        SharedPref.writeBoolean(
+            context,
+            Constants.NOTIFICATION_USE_LARGE_ICON,
+            isNotificationLargeIcon
+        )
+
+        if(notificationLargeIcon != 0) {
+            if (AppUtils.isIconResourceAvailable(
+                    context,
+                    notificationLargeIcon
+                )
+            ) {
+                SharedPref.writeInt(
+                    context,
+                    Constants.NOTIFICATION_LARGE_ICON,
+                    notificationLargeIcon
+                )
+            } else {
+                Log.e(LOG_TAG, "Resource (notification large icon) could not be found" +
+                        " : $notificationLargeIcon")
+            }
+        }
+
+        if(notificationLargeIconDarkMode != 0) {
+            if (AppUtils.isIconResourceAvailable(
+                    context,
+                    notificationLargeIconDarkMode
+                )
+            ) {
+                SharedPref.writeInt(
+                    context,
+                    Constants.NOTIFICATION_LARGE_ICON_DARK_MODE,
+                    notificationLargeIconDarkMode
+                )
+            } else {
+                Log.e(LOG_TAG, "Resource (notification large icon dark mode) could not be found" +
+                        " : $notificationLargeIconDarkMode")
+            }
+        }
+
+        if(notificationPushIntent.isNotEmpty()) {
+            SharedPref.writeString(
+                context,
+                Constants.INTENT_NAME,
+                notificationPushIntent
+            )
+        }
+
+        if(notificationChannelName.isNotEmpty()) {
+            SharedPref.writeString(
+                context,
+                Constants.CHANNEL_NAME,
+                notificationChannelName
+            )
+        }
+
+        if(notificationColor.isNotEmpty()) {
+            SharedPref.writeString(
+                context,
+                Constants.NOTIFICATION_COLOR,
+                notificationColor
+            )
+        }
+
+        registerToFCM(context)
+
+        if(model!!.getPushPermissionStatus() == "granted") {
+            model!!.add(context, "pushPermit", "Y")
+        } else {
+            model!!.add(context, "pushPermit", "N")
+        }
+
+        // TODO : sync method
+        // sync(context)
     }
 
     @JvmStatic
@@ -761,6 +886,10 @@ object RelatedDigital {
             RequestHandler.createInAppActionRequest(context, model!!, pageName, properties, parent)
         }
         RequestHandler.createLoggerRequest(context, model!!, pageName, properties)
+    }
+
+    private fun registerToFCM(context: Context?) {
+        FirebaseApp.initializeApp(context!!)
     }
 
     /**

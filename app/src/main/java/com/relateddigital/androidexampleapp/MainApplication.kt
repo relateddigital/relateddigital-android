@@ -9,7 +9,6 @@ import com.huawei.agconnect.AGConnectOptionsBuilder
 import com.huawei.hms.aaid.HmsInstanceId
 import com.huawei.hms.common.ApiException
 import com.relateddigital.relateddigital_android.RelatedDigital
-import com.relateddigital.relateddigital_android.constants.Constants
 import com.relateddigital.relateddigital_android.util.GoogleUtils
 
 class MainApplication : Application() {
@@ -58,7 +57,15 @@ class MainApplication : Application() {
                     isPushNotificationEnabled = true,
                     googleAppAlias = Constants.GOOGLE_APP_ALIAS,
                     huaweiAppAlias = Constants.HUAWEI_APP_ALIAS,
-                    token = token
+                    token = token,
+                    notificationSmallIcon = R.drawable.text_icon,
+                    notificationSmallIconDarkMode = R.drawable.text_icon_dark_mode,
+                    isNotificationLargeIcon = true,
+                    notificationLargeIcon = R.mipmap.ic_launcher,
+                    notificationLargeIconDarkMode = R.mipmap.ic_launcher,
+                    notificationPushIntent = "com.relateddigital.androidexampleapp.PushNotificationActivity",
+                    notificationChannelName = "relateddigital-android-test",
+                    notificationColor = "#d1dbbd"
                 )
             })
     }
@@ -82,7 +89,15 @@ class MainApplication : Application() {
                         isPushNotificationEnabled = true,
                         googleAppAlias = Constants.GOOGLE_APP_ALIAS,
                         huaweiAppAlias = Constants.HUAWEI_APP_ALIAS,
-                        token = token
+                        token = token,
+                        notificationSmallIcon = R.drawable.text_icon,
+                        notificationSmallIconDarkMode = R.drawable.text_icon_dark_mode,
+                        isNotificationLargeIcon = true,
+                        notificationLargeIcon = R.mipmap.ic_launcher,
+                        notificationLargeIconDarkMode = R.mipmap.ic_launcher,
+                        notificationPushIntent = "com.relateddigital.androidexampleapp.PushNotificationActivity",
+                        notificationChannelName = "relateddigital-android-test",
+                        notificationColor = "#d1dbbd"
                     )
                 } catch (e: ApiException) {
                     Log.e("Huawei Token", "Getting the token failed! $e")

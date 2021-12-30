@@ -8,7 +8,7 @@ import com.relateddigital.relateddigital_android.inapp.FontFamily
 import java.io.Serializable
 import java.util.*
 import com.relateddigital.relateddigital_android.util.AppUtils
-import com.relateddigital.relateddigital_android.util.AppUtils.isResourceAvailable
+import com.relateddigital.relateddigital_android.util.AppUtils.isFontResourceAvailable
 
 
 class ActionData : Serializable {
@@ -146,7 +146,7 @@ class ActionData : Serializable {
             return Typeface.SERIF
         }
         if(!mCustomFontFamilyAndroid.isNullOrEmpty()) {
-            if (isResourceAvailable(context, mCustomFontFamilyAndroid)) {
+            if (isFontResourceAvailable(context, mCustomFontFamilyAndroid)) {
                 val id = context.resources.getIdentifier(mCustomFontFamilyAndroid, "font", context.packageName)
                 return ResourcesCompat.getFont(context, id)
             }

@@ -41,4 +41,23 @@
     <string name="story_id_optional">Story ID (optional)</string>
     <string name="show_story">Show Story</string>
     <string name="clear_story_cache">Clear Story Cache</string>
+
+
+    <string name="token">TOKEN</string>
+    <string name="firebase_token">Firebase Token</string>
+    <string name="huawei_token">Huawei Token</string>
+    <string name="get_payload">GET PAYLOADS</string>
+    <string name="send_text_push">SEND TEXT PUSH</string>
+    <string name="send_image_push">SEND IMAGE PUSH</string>
+    <string name="send_carousel_push">SEND CAROUSEL PUSH</string>
+    <string name="sync">SYNC</string>
+    <string name="please_enter_email_address">Please Enter Email Address</string>
+    <string name="add">ADD</string>
+    <string name="register_email_iys">REGISTER EMAIL (İYS)</string>
+    <string name="register">REGISTER</string>
+    <string name="push_notification_parameters">PUSH NOTIFICATION PARAMETERS</string>
+    <string name="last_push_time">Last Push Time</string>
+    <string name="key">Key</string>
+    <string name="value">Value</string>
+
 </resources>

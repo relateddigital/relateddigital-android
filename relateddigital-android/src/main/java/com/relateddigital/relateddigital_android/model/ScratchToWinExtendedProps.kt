@@ -127,7 +127,7 @@ class ScratchToWinExtendedProps : Serializable {
             return Typeface.SERIF
         }
         if (!content_title_custom_font_family_android.isNullOrEmpty()) {
-            if (AppUtils.isResourceAvailable(context, content_title_custom_font_family_android)) {
+            if (AppUtils.isFontResourceAvailable(context, content_title_custom_font_family_android)) {
                 val id = context.resources.getIdentifier(
                     content_title_custom_font_family_android,
                     "font",
@@ -157,7 +157,7 @@ class ScratchToWinExtendedProps : Serializable {
             return Typeface.SERIF
         }
         if (!content_body_custom_font_family_android.isNullOrEmpty()) {
-            if (AppUtils.isResourceAvailable(context, content_body_custom_font_family_android)) {
+            if (AppUtils.isFontResourceAvailable(context, content_body_custom_font_family_android)) {
                 val id = context.resources.getIdentifier(
                     content_body_custom_font_family_android,
                     "font",
@@ -187,7 +187,7 @@ class ScratchToWinExtendedProps : Serializable {
             return Typeface.SERIF
         }
         if (!button_custom_font_family_android.isNullOrEmpty()) {
-            if (AppUtils.isResourceAvailable(context, button_custom_font_family_android)) {
+            if (AppUtils.isFontResourceAvailable(context, button_custom_font_family_android)) {
                 val id = context.resources.getIdentifier(
                     button_custom_font_family_android,
                     "font",
@@ -217,7 +217,7 @@ class ScratchToWinExtendedProps : Serializable {
             return Typeface.SERIF
         }
         if (!promocode_custom_font_family_android.isNullOrEmpty()) {
-            if (AppUtils.isResourceAvailable(context, promocode_custom_font_family_android)) {
+            if (AppUtils.isFontResourceAvailable(context, promocode_custom_font_family_android)) {
                 val id = context.resources.getIdentifier(
                     promocode_custom_font_family_android,
                     "font",
@@ -247,7 +247,7 @@ class ScratchToWinExtendedProps : Serializable {
             return Typeface.SERIF
         }
         if (!copybutton_custom_font_family_android.isNullOrEmpty()) {
-            if (AppUtils.isResourceAvailable(context, copybutton_custom_font_family_android)) {
+            if (AppUtils.isFontResourceAvailable(context, copybutton_custom_font_family_android)) {
                 val id = context.resources.getIdentifier(
                     copybutton_custom_font_family_android,
                     "font",

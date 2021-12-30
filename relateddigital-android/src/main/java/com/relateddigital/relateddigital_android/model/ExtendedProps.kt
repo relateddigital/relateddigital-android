@@ -7,7 +7,7 @@ import androidx.core.content.res.ResourcesCompat
 import com.relateddigital.relateddigital_android.inapp.FontFamily
 
 import com.relateddigital.relateddigital_android.util.AppUtils
-import com.relateddigital.relateddigital_android.util.AppUtils.isResourceAvailable
+import com.relateddigital.relateddigital_android.util.AppUtils.isFontResourceAvailable
 import java.util.*
 
 
@@ -49,7 +49,7 @@ class ExtendedProps : Serializable {
             return Typeface.SERIF
         }
         if (!title_custom_font_family_android.isNullOrEmpty()) {
-            if (isResourceAvailable(context, title_custom_font_family_android)) {
+            if (isFontResourceAvailable(context, title_custom_font_family_android)) {
                 val id: Int = context.resources.getIdentifier(
                     title_custom_font_family_android,
                     "font",
@@ -75,7 +75,7 @@ class ExtendedProps : Serializable {
             return Typeface.SERIF
         }
         if (!text_custom_font_family_android.isNullOrEmpty()) {
-            if (isResourceAvailable(context, text_custom_font_family_android)) {
+            if (isFontResourceAvailable(context, text_custom_font_family_android)) {
                 val id: Int = context.resources.getIdentifier(
                     text_custom_font_family_android,
                     "font",
@@ -101,7 +101,7 @@ class ExtendedProps : Serializable {
             return Typeface.SERIF
         }
         if (!button_custom_font_family_android.isNullOrEmpty()) {
-            if (isResourceAvailable(context, button_custom_font_family_android)) {
+            if (isFontResourceAvailable(context, button_custom_font_family_android)) {
                 val id: Int = context.resources.getIdentifier(
                     button_custom_font_family_android,
                     "font",

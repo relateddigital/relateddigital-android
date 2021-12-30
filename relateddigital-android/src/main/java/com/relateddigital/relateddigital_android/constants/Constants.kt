@@ -136,7 +136,18 @@ class Constants {
         const val GEOFENCE_ACT_VALUE = "getlist"
         const val GEOFENCE_PROCESS_VALUE = "process"
 
-        const val GOOGLE_APP_ALIAS = "relateddigital-android-test"
-        const val HUAWEI_APP_ALIAS = "relateddigital-android-huawei-test"
+        const val NOTIFICATION_TRANSPARENT_SMALL_ICON = "small_icon"
+        const val NOTIFICATION_TRANSPARENT_SMALL_ICON_DARK_MODE = "small_icon_dark_mode"
+        const val NOTIFICATION_LARGE_ICON = "large_icon"
+        const val NOTIFICATION_LARGE_ICON_DARK_MODE = "large_icon_dark_mode"
+        const val NOTIFICATION_USE_LARGE_ICON = "use_large_icon"
+        const val INTENT_NAME = "intent_name"
+        const val NOTIFICATION_COLOR = "notification_color"
+        const val CHANNEL_NAME = "channel_name"
+        const val BADGE = "badge"
+        const val ACTIVE = 1
+        const val PASSIVE = 0
+        const val LAST_SUBS_DATE_KEY = "last_subscription_date"
+        const val LAST_SUBS_KEY = "last_subscription"
     }
 }

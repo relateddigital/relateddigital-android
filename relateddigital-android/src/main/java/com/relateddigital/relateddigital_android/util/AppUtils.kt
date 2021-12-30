@@ -3,6 +3,7 @@ package com.relateddigital.relateddigital_android.util
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
+import android.content.res.Resources.NotFoundException
 import android.os.Build
 import android.os.Environment
 import android.telephony.TelephonyManager
@@ -20,7 +21,7 @@ import java.util.regex.Pattern
 import android.graphics.Typeface
 import androidx.core.content.res.ResourcesCompat
 import com.relateddigital.relateddigital_android.inapp.FontFamily
-import com.relateddigital.relateddigital_android.util.AppUtils.isResourceAvailable
+import com.relateddigital.relateddigital_android.util.AppUtils.isFontResourceAvailable
 
 
 object AppUtils {
@@ -340,9 +341,26 @@ object AppUtils {
         }
     }
 
-    fun isResourceAvailable(context: Context, name: String?): Boolean {
+    fun isFontResourceAvailable(context: Context, name: String?): Boolean {
         val res = context.resources.getIdentifier(name, "font", context.packageName)
         return res != 0
+    }
+
+    fun isIconResourceAvailable(context: Context?, resId: Int): Boolean {
+        if (context != null) {
+            try {
+                return context.resources.getResourceName(-1) != null
+            } catch (ignore: NotFoundException) {
+                val element = Throwable().stackTrace[0]
+                LogUtils.formGraylogModel(
+                    context,
+                    "e",
+                    "Checking if a resource is available : " + ignore.message,
+                    element.className + "/" + element.methodName + "/" + element.lineNumber
+                )
+            }
+        }
+        return false
     }
 
     fun getNotificationPermissionStatus(context: Context): String {
@@ -383,7 +401,7 @@ object AppUtils {
             return Typeface.SERIF
         }
         if (!fontName.isNullOrEmpty()) {
-            if (isResourceAvailable(context, fontName)) {
+            if (isFontResourceAvailable(context, fontName)) {
                 val id = context.resources.getIdentifier(fontName, "font", context.packageName)
                 return ResourcesCompat.getFont(context, id)!!
             }
