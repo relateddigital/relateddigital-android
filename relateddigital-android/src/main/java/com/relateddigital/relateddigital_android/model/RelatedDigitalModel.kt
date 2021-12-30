@@ -10,6 +10,7 @@ import com.relateddigital.relateddigital_android.util.GoogleUtils
 import com.relateddigital.relateddigital_android.util.PersistentTargetManager
 import com.relateddigital.relateddigital_android.util.SharedPref
 import java.io.Serializable
+import java.lang.Exception
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
@@ -429,13 +430,18 @@ class RelatedDigitalModel(
                 val lastSubStr: String =
                     SharedPref.readString(context, Constants.LAST_SUBS_KEY)
                 if (lastSubStr.isNotEmpty()) {
-                    val lastSubscription: RelatedDigitalModel =
-                        Gson().fromJson(
-                            lastSubStr,
-                            RelatedDigitalModel::class.java
-                        )
-                    if (isEqual(lastSubscription)) {
-                        res2 = false
+                    try {
+                        val lastSubscription: RelatedDigitalModel =
+                            Gson().fromJson(
+                                lastSubStr,
+                                RelatedDigitalModel::class.java
+                            )
+                        if (isEqual(lastSubscription)) {
+                            res2 = false
+                        }
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        SharedPref.writeString(context, Constants.LAST_SUBS_KEY, "")
                     }
                 }
             }
