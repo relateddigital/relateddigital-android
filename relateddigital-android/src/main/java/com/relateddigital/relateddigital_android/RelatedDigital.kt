@@ -24,6 +24,7 @@ import com.relateddigital.relateddigital_android.network.RequestHandler
 import com.relateddigital.relateddigital_android.remoteConfig.RemoteConfigHelper
 import com.relateddigital.relateddigital_android.util.AppUtils
 import com.relateddigital.relateddigital_android.util.SharedPref
+import com.relateddigital.relateddigital_android.util.StringUtils
 import java.util.*
 
 
@@ -848,6 +849,52 @@ object RelatedDigital {
     }
 
     @JvmStatic
+    fun singUp(context: Context, exVisitorId: String, properties: HashMap<String, String>? = null,
+              parent: Activity? = null) {
+        if (StringUtils.isNullOrWhiteSpace(exVisitorId)) {
+            Log.e(LOG_TAG,
+                "Attempted to use null or empty exVisitorID. Ignoring."
+            )
+        } else {
+            if (properties == null) {
+                val propertiesLoc = HashMap<String, String>()
+                propertiesLoc[Constants.EXVISITOR_ID_REQUEST_KEY] = exVisitorId
+                propertiesLoc[Constants.SIGN_UP_REQUEST_KEY] = exVisitorId
+                propertiesLoc[Constants.B_SIGN_UP_KEY_REQUEST_KEY] = "SignUp"
+                customEvent(context, "SignUpPage", propertiesLoc, parent)
+            } else {
+                properties[Constants.EXVISITOR_ID_REQUEST_KEY] = exVisitorId
+                properties[Constants.SIGN_UP_REQUEST_KEY] = exVisitorId
+                properties[Constants.B_SIGN_UP_KEY_REQUEST_KEY] = "SignUp"
+                customEvent(context, "SignUpPage", properties, parent)
+            }
+        }
+    }
+
+    @JvmStatic
+    fun login(context: Context, exVisitorId: String, properties: HashMap<String, String>? = null,
+              parent: Activity? = null) {
+        if (StringUtils.isNullOrWhiteSpace(exVisitorId)) {
+            Log.e(LOG_TAG,
+                "Attempted to use null or empty exVisitorID. Ignoring."
+            )
+        } else {
+            if (properties == null) {
+                val propertiesLoc = HashMap<String, String>()
+                propertiesLoc[Constants.EXVISITOR_ID_REQUEST_KEY] = exVisitorId
+                propertiesLoc[Constants.LOGIN_REQUEST_KEY] = exVisitorId
+                propertiesLoc[Constants.B_LOGIN_KEY_REQUEST_KEY] = "Login"
+                customEvent(context, "LoginPage", propertiesLoc, parent)
+            } else {
+                properties[Constants.EXVISITOR_ID_REQUEST_KEY] = exVisitorId
+                properties[Constants.LOGIN_REQUEST_KEY] = exVisitorId
+                properties[Constants.B_LOGIN_KEY_REQUEST_KEY] = "Login"
+                customEvent(context, "LoginPage", properties, parent)
+            }
+        }
+    }
+
+    @JvmStatic
     fun logout(context: Context) {
         if (model != null) {
             model!!.setExVisitorId(context, "", true)
@@ -863,6 +910,16 @@ object RelatedDigital {
                 model!!.setExVisitorId(context, "", true)
                 model!!.setCookieId(context, null)
             }
+        }
+    }
+
+    @JvmStatic
+    fun sendCampaignParameters(context: Context, properties: HashMap<String, String>) {
+        if(properties.isEmpty()) {
+            Log.e(LOG_TAG, "The map cannot be empty!")
+            return
+        } else {
+            customEvent(context, Constants.PAGE_NAME_REQUEST_VAL, properties)
         }
     }
 

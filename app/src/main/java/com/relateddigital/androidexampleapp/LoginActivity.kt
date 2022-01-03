@@ -35,7 +35,7 @@ class LoginActivity : AppCompatActivity() {
                     parameters["OM.exVisitorID"] = "test9876@euromsg.com"
                     parameters["OM.sys.TokenID"] = token
                     parameters["OM.sys.AppID"] = "visilabs-android-test"
-                    RelatedDigital.customEvent(applicationContext, "Login", parameters, this)
+                    RelatedDigital.login(applicationContext, "Login", parameters, this)
                     Toast.makeText(applicationContext, "Login", Toast.LENGTH_LONG).show()
                 })
         })

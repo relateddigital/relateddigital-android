@@ -44,6 +44,10 @@ class Constants {
         const val PROMOTION_CODE_TITLE_REQUEST_KEY = "OM.promotitle"
         const val PROMOTION_CODE_SLICE_TEXT_REQUEST_KEY = "OM.promoslice"
         const val APP_TRACKER_REQUEST_KEY = "OM.apptracker"
+        const val LOGIN_REQUEST_KEY = "Login"
+        const val B_LOGIN_KEY_REQUEST_KEY = "OM.b_login"
+        const val SIGN_UP_REQUEST_KEY = "SignUp"
+        const val B_SIGN_UP_KEY_REQUEST_KEY = "OM.b_sgnp"
 
         const val REQUEST_TYPE_KEY = "type"
         const val REQUEST_AUTH_KEY = "auth"
