@@ -5,10 +5,8 @@ import android.app.FragmentTransaction
 import android.content.Context
 import android.content.Intent
 import android.util.Log
-import com.relateddigital.relateddigital_android.api.ApiMethods
-import com.relateddigital.relateddigital_android.api.LoggerApiClient
-import com.relateddigital.relateddigital_android.api.RealTimeApiClient
-import com.relateddigital.relateddigital_android.api.SApiClient
+import com.google.gson.Gson
+import com.relateddigital.relateddigital_android.api.*
 import com.relateddigital.relateddigital_android.constants.Constants
 import com.relateddigital.relateddigital_android.inapp.InAppManager
 import com.relateddigital.relateddigital_android.inapp.VisilabsResponse
@@ -18,6 +16,8 @@ import com.relateddigital.relateddigital_android.inapp.spintowin.SpinToWinActivi
 import com.relateddigital.relateddigital_android.model.*
 import com.relateddigital.relateddigital_android.recommendation.RecommendationUtils
 import com.relateddigital.relateddigital_android.util.InAppNotificationTimer
+import com.relateddigital.relateddigital_android.util.RetryCounterManager
+import com.relateddigital.relateddigital_android.util.SharedPref
 import okhttp3.Headers
 import okhttp3.ResponseBody
 import org.json.JSONArray
@@ -25,6 +25,8 @@ import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.text.DateFormat
+import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -802,6 +804,112 @@ object RequestSender {
                 })
             }
         }
+    }
+
+    fun sendSubscriptionRequest(context: Context, model: RelatedDigitalModel, counterId: Int) {
+        val subscription = Subscription(context)
+
+        val subscriptionInterface = SubscriptionApiClient.getClient(model.getRequestTimeoutInSecond())
+            ?.create(ApiMethods::class.java)
+        val call: Call<Void> = subscriptionInterface!!.saveSubscription(
+            model.getUserAgent(),
+            subscription
+        )
+
+        if(counterId != -1) {
+            call.enqueue(object : Callback<Void> {
+                override fun onResponse(
+                    call: Call<Void>?,
+                    response: Response<Void>
+                ) {
+                    if (response.isSuccessful) {
+                        RetryCounterManager.clearCounter(counterId)
+                        saveSubscription(context, model)
+                        Log.i(
+                           LOG_TAG,
+                            "Sending the subscription is success"
+                        )
+                    } else {
+                        if (RetryCounterManager.getCounterValue(counterId) >= 3) {
+                            RetryCounterManager.clearCounter(counterId)
+                            Log.e(
+                                LOG_TAG,
+                                "Sending the subscription is failed after 3 attempts!!!"
+                            )
+                            call!!.cancel()
+                        } else {
+                            RetryCounterManager.increaseCounter(counterId)
+                            sendSubscriptionRequest(context, model, counterId)
+                        }
+                    }
+                }
+
+                override fun onFailure(call: Call<Void>, t: Throwable) {
+                    if (RetryCounterManager.getCounterValue(counterId) >= 3) {
+                        RetryCounterManager.clearCounter(counterId)
+                        Log.e(
+                            LOG_TAG,
+                            "Sending the subscription is failed after 3 attempts!!!"
+                        )
+                        call.cancel()
+                        t.printStackTrace()
+                    } else {
+                        RetryCounterManager.increaseCounter(counterId)
+                        sendSubscriptionRequest(context, model, counterId)
+                    }
+                }
+            })
+        } else {
+            call.enqueue(object : Callback<Void> {
+                override fun onResponse(
+                    call: Call<Void>?,
+                    response: Response<Void>
+                ) {
+                    if (response.isSuccessful) {
+                        RetryCounterManager.clearCounter(counterId)
+                        saveSubscription(context, model)
+                        Log.i(
+                            LOG_TAG,
+                            "Sending the subscription is success"
+                        )
+                    } else {
+                        if (RetryCounterManager.getCounterValue(counterId) >= 3) {
+                            RetryCounterManager.clearCounter(counterId)
+                            Log.e(
+                                LOG_TAG,
+                                "Sending the subscription is failed after 3 attempts!!!"
+                            )
+                            call!!.cancel()
+                        } else {
+                            RetryCounterManager.increaseCounter(counterId)
+                            sendSubscriptionRequest(context, model, counterId)
+                        }
+                    }
+                }
+
+                override fun onFailure(call: Call<Void>, t: Throwable) {
+                    if (RetryCounterManager.getCounterValue(counterId) >= 3) {
+                        RetryCounterManager.clearCounter(counterId)
+                        Log.e(
+                            LOG_TAG,
+                            "Sending the subscription is failed after 3 attempts!!!"
+                        )
+                        call.cancel()
+                        t.printStackTrace()
+                    } else {
+                        RetryCounterManager.increaseCounter(counterId)
+                        sendSubscriptionRequest(context, model, counterId)
+                    }
+                }
+            })
+        }
+    }
+
+    private fun saveSubscription(context: Context, model: RelatedDigitalModel) {
+        val dateFormat: DateFormat = SimpleDateFormat("yyyy-MM-dd hh:mm:ss")
+        val dateNow = dateFormat.format(Calendar.getInstance().time)
+        SharedPref.writeString(context, Constants.LAST_SUBS_DATE_KEY, dateNow)
+        SharedPref.writeString(context, Constants.LAST_SUBS_KEY, Gson().toJson(model))
     }
 
     private fun parseAndSetResponseHeaders(

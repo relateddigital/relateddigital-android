@@ -349,7 +349,7 @@ object AppUtils {
     fun isIconResourceAvailable(context: Context?, resId: Int): Boolean {
         if (context != null) {
             try {
-                return context.resources.getResourceName(-1) != null
+                return context.resources.getResourceName(resId) != null
             } catch (ignore: NotFoundException) {
                 val element = Throwable().stackTrace[0]
                 LogUtils.formGraylogModel(

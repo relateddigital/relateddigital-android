@@ -2,19 +2,25 @@ package com.relateddigital.relateddigital_android.network
 
 import android.app.Activity
 import android.content.Context
+import android.os.Build
 import android.util.Log
+import com.google.gson.Gson
 import com.relateddigital.relateddigital_android.RelatedDigital
+import com.relateddigital.relateddigital_android.api.ApiMethods
+import com.relateddigital.relateddigital_android.api.SApiClient
+import com.relateddigital.relateddigital_android.api.SubscriptionApiClient
 import com.relateddigital.relateddigital_android.constants.Constants
 import com.relateddigital.relateddigital_android.geofence.GeofenceGetListCallback
 import com.relateddigital.relateddigital_android.inapp.VisilabsCallback
 import com.relateddigital.relateddigital_android.model.*
 import com.relateddigital.relateddigital_android.recommendation.VisilabsTargetFilter
-import com.relateddigital.relateddigital_android.util.AppUtils
-import com.relateddigital.relateddigital_android.util.PersistentTargetManager
-import com.relateddigital.relateddigital_android.util.StringUtils
+import com.relateddigital.relateddigital_android.util.*
+import okhttp3.ResponseBody
 import org.json.JSONArray
 import org.json.JSONObject
-import java.text.DecimalFormat
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 object RequestHandler {
     private const val LOG_TAG = "RequestHandler"
@@ -132,7 +138,7 @@ object RequestHandler {
 
         RequestFormer.formInAppNotificationClickRequest(
                 context = context,
-                model = RelatedDigital.getRelatedDigitalModel(),
+                model = RelatedDigital.getRelatedDigitalModel(context),
                 pageName = Constants.PAGE_NAME_REQUEST_VAL,
                 properties = properties,
                 queryMap = queryMap,
@@ -143,13 +149,13 @@ object RequestHandler {
                 Request(
                         Domain.LOG_LOGGER, queryMap, headerMap,
                         null
-                ), RelatedDigital.getRelatedDigitalModel()!!, context
+                ), RelatedDigital.getRelatedDigitalModel(context), context
         )
         RequestSender.addToQueue(
                 Request(
                         Domain.LOG_REAL_TIME, queryMap, headerMap,
                         null
-                ), RelatedDigital.getRelatedDigitalModel()!!, context
+                ), RelatedDigital.getRelatedDigitalModel(context), context
         )
     }
 
@@ -189,7 +195,7 @@ object RequestHandler {
         val headerMap = HashMap<String, String>()
         RequestFormer.formInAppNotificationClickRequest(
                 context = context,
-                model = RelatedDigital.getRelatedDigitalModel(),
+                model = RelatedDigital.getRelatedDigitalModel(context),
                 pageName = Constants.PAGE_NAME_REQUEST_VAL,
                 properties = properties,
                 queryMap = queryMap,
@@ -200,13 +206,13 @@ object RequestHandler {
                 Request(
                         Domain.LOG_LOGGER, queryMap, headerMap,
                         null
-                ), RelatedDigital.getRelatedDigitalModel()!!, context
+                ), RelatedDigital.getRelatedDigitalModel(context), context
         )
         RequestSender.addToQueue(
                 Request(
                         Domain.LOG_REAL_TIME, queryMap, headerMap,
                         null
-                ), RelatedDigital.getRelatedDigitalModel()!!, context
+                ), RelatedDigital.getRelatedDigitalModel(context), context
         )
     }
 
@@ -234,7 +240,7 @@ object RequestHandler {
 
         RequestFormer.formStoryImpressionClickRequest(
                 context = context,
-                model = RelatedDigital.getRelatedDigitalModel(),
+                model = RelatedDigital.getRelatedDigitalModel(context),
                 pageName = Constants.PAGE_NAME_REQUEST_VAL,
                 properties = properties,
                 queryMap = queryMap,
@@ -245,13 +251,13 @@ object RequestHandler {
                 Request(
                         Domain.LOG_LOGGER, queryMap, headerMap,
                         null
-                ), RelatedDigital.getRelatedDigitalModel()!!, context
+                ), RelatedDigital.getRelatedDigitalModel(context), context
         )
         RequestSender.addToQueue(
                 Request(
                         Domain.LOG_REAL_TIME, queryMap, headerMap,
                         null
-                ), RelatedDigital.getRelatedDigitalModel()!!, context
+                ), RelatedDigital.getRelatedDigitalModel(context), context
         )
     }
 
@@ -276,7 +282,7 @@ object RequestHandler {
         properties[Constants.REQUEST_SUBS_EMAIL_KEY] = email
         RequestFormer.formSubJsonRequest(
                 context = context,
-                model = RelatedDigital.getRelatedDigitalModel(),
+                model = RelatedDigital.getRelatedDigitalModel(context),
                 pageName = Constants.PAGE_NAME_REQUEST_VAL,
                 properties = properties,
                 queryMap = queryMap,
@@ -287,7 +293,7 @@ object RequestHandler {
                 Request(
                         Domain.LOG_S, queryMap, headerMap,
                         null
-                ), RelatedDigital.getRelatedDigitalModel()!!, context
+                ), RelatedDigital.getRelatedDigitalModel(context), context
         )
     }
 
@@ -305,7 +311,7 @@ object RequestHandler {
         val headerMap = HashMap<String, String>()
         RequestFormer.formSpinToWinPromoCodeRequest(
                 context = context,
-                model = RelatedDigital.getRelatedDigitalModel(),
+                model = RelatedDigital.getRelatedDigitalModel(context),
                 pageName = Constants.PAGE_NAME_REQUEST_VAL,
                 properties = properties,
                 queryMap = queryMap,
@@ -316,7 +322,7 @@ object RequestHandler {
                 Request(
                         Domain.IN_APP_SPIN_TO_WIN_PROMO_CODE, queryMap, headerMap,
                         null, visilabsCallback
-                ), RelatedDigital.getRelatedDigitalModel()!!, context
+                ), RelatedDigital.getRelatedDigitalModel(context), context
         )
     }
 
@@ -336,7 +342,7 @@ object RequestHandler {
         val headerMap = HashMap<String, String>()
         RequestFormer.formStoryActionRequest(
                 context = context,
-                model = RelatedDigital.getRelatedDigitalModel(),
+                model = RelatedDigital.getRelatedDigitalModel(context),
                 pageName = Constants.PAGE_NAME_REQUEST_VAL,
                 properties = properties,
                 queryMap = queryMap,
@@ -347,7 +353,7 @@ object RequestHandler {
                 Request(
                         Domain.IN_APP_STORY_MOBILE, queryMap, headerMap,
                         null, visilabsCallback
-                ), RelatedDigital.getRelatedDigitalModel()!!, context
+                ), RelatedDigital.getRelatedDigitalModel(context), context
         )
     }
 
@@ -417,7 +423,7 @@ object RequestHandler {
 
         RequestFormer.formRecommendationRequest(
                 context = context,
-                model = RelatedDigital.getRelatedDigitalModel(),
+                model = RelatedDigital.getRelatedDigitalModel(context),
                 pageName = Constants.PAGE_NAME_REQUEST_VAL,
                 properties = propertiesLoc,
                 queryMap = queryMap,
@@ -428,7 +434,7 @@ object RequestHandler {
                 Request(
                         Domain.IN_APP_RECOMMENDATION_JSON, queryMap, headerMap,
                         null, visilabsCallback
-                ), RelatedDigital.getRelatedDigitalModel()!!, context
+                ), RelatedDigital.getRelatedDigitalModel(context), context
         )
     }
 
@@ -480,7 +486,7 @@ object RequestHandler {
 
         RequestFormer.formFavsResponseRequest(
                 context = context,
-                model = RelatedDigital.getRelatedDigitalModel(),
+                model = RelatedDigital.getRelatedDigitalModel(context),
                 pageName = Constants.PAGE_NAME_REQUEST_VAL,
                 properties = propertiesLoc,
                 queryMap = queryMap,
@@ -491,7 +497,7 @@ object RequestHandler {
                 Request(
                         Domain.IN_APP_FAVS_RESPONSE_MOBILE, queryMap, headerMap,
                         null, visilabsCallback
-                ), RelatedDigital.getRelatedDigitalModel()!!, context
+                ), RelatedDigital.getRelatedDigitalModel(context), context
         )
     }
 
@@ -519,7 +525,7 @@ object RequestHandler {
 
         RequestFormer.formGeofenceGetListResponseRequest(
             context = context,
-            model = RelatedDigital.getRelatedDigitalModel(),
+            model = RelatedDigital.getRelatedDigitalModel(context),
             pageName = Constants.PAGE_NAME_REQUEST_VAL,
             properties = propertiesLoc,
             queryMap = queryMap,
@@ -532,7 +538,7 @@ object RequestHandler {
             Request(
                 Domain.GEOFENCE_GET_LIST, queryMap, headerMap,
                 null, null, geofenceGetListCallback
-            ), RelatedDigital.getRelatedDigitalModel()!!, context
+            ), RelatedDigital.getRelatedDigitalModel(context), context
         )
     }
 
@@ -561,7 +567,7 @@ object RequestHandler {
 
         RequestFormer.formGeofenceTriggerRequest(
             context = context,
-            model = RelatedDigital.getRelatedDigitalModel(),
+            model = RelatedDigital.getRelatedDigitalModel(context),
             pageName = Constants.PAGE_NAME_REQUEST_VAL,
             properties = propertiesLoc,
             queryMap = queryMap,
@@ -575,7 +581,22 @@ object RequestHandler {
         RequestSender.addToQueue(
             Request(
                 Domain.GEOFENCE_TRIGGER, queryMap, headerMap, null
-            ), RelatedDigital.getRelatedDigitalModel()!!, context
+            ), RelatedDigital.getRelatedDigitalModel(context), context
         )
+    }
+
+    fun createSyncRequest(context: Context) {
+        if (Build.VERSION.SDK_INT < Constants.SDK_MIN_API_VERSION) {
+            Log.e(LOG_TAG, "RelatedDigital SDK requires min API level 21!")
+            return
+        }
+
+        val model = RelatedDigital.getRelatedDigitalModel(context)
+
+        if(!model.isEqual(RelatedDigital.getPreviousModel()) && model.isValid(context)) {
+            RelatedDigital.updatePreviousModel(context)
+
+            RequestSender.sendSubscriptionRequest(context, model, RetryCounterManager.counterId)
+        }
     }
 }

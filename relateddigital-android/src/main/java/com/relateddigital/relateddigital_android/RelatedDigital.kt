@@ -9,6 +9,7 @@ import android.os.Handler
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.content.contentValuesOf
 import com.google.firebase.FirebaseApp
 import com.google.gson.Gson
 import com.relateddigital.relateddigital_android.appTracker.AppTracker
@@ -18,6 +19,7 @@ import com.relateddigital.relateddigital_android.inapp.InAppButtonInterface
 import com.relateddigital.relateddigital_android.locationPermission.LocationPermissionHandler
 import com.relateddigital.relateddigital_android.model.LoadBalanceCookie
 import com.relateddigital.relateddigital_android.model.RelatedDigitalModel
+import com.relateddigital.relateddigital_android.model.Subscription
 import com.relateddigital.relateddigital_android.model.VisilabsParameter
 import com.relateddigital.relateddigital_android.network.RequestFormer
 import com.relateddigital.relateddigital_android.network.RequestHandler
@@ -34,6 +36,7 @@ object RelatedDigital {
     private var mHandler: Handler? = null
     private var mRunnable: Runnable? = null
     private const val LOG_TAG: String = "RelatedDigital"
+    private var previousModel: RelatedDigitalModel? = null
 
     @JvmStatic
     fun init(context: Context,
@@ -89,8 +92,17 @@ object RelatedDigital {
         )
     }
 
-    fun getRelatedDigitalModel(): RelatedDigitalModel? {
-        return model
+    fun getRelatedDigitalModel(context: Context): RelatedDigitalModel {
+        if(model == null) {
+            model = createInitialModel(context)
+
+            val modelStr = SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY, "")
+
+            if (modelStr.isNotEmpty()) {
+                model!!.fill(Gson().fromJson(modelStr, RelatedDigitalModel::class.java))
+            }
+        }
+        return model!!
     }
 
     @JvmStatic
@@ -146,7 +158,7 @@ object RelatedDigital {
                     notificationSmallIcon
                 )
             } else {
-                Log.e(LOG_TAG, "Resource (notification small icon) could not be found" +
+                Log.i(LOG_TAG, "Resource (notification small icon) could not be found" +
                         " : $notificationSmallIcon")
             }
         }
@@ -163,7 +175,7 @@ object RelatedDigital {
                     notificationSmallIconDarkMode
                 )
             } else {
-                Log.e(LOG_TAG, "Resource (notification small icon dark mode) could not be found" +
+                Log.i(LOG_TAG, "Resource (notification small icon dark mode) could not be found" +
                         " : $notificationSmallIconDarkMode")
             }
         }
@@ -186,7 +198,7 @@ object RelatedDigital {
                     notificationLargeIcon
                 )
             } else {
-                Log.e(LOG_TAG, "Resource (notification large icon) could not be found" +
+                Log.i(LOG_TAG, "Resource (notification large icon) could not be found" +
                         " : $notificationLargeIcon")
             }
         }
@@ -203,7 +215,7 @@ object RelatedDigital {
                     notificationLargeIconDarkMode
                 )
             } else {
-                Log.e(LOG_TAG, "Resource (notification large icon dark mode) could not be found" +
+                Log.i(LOG_TAG, "Resource (notification large icon dark mode) could not be found" +
                         " : $notificationLargeIconDarkMode")
             }
         }
@@ -240,8 +252,7 @@ object RelatedDigital {
             model!!.add(context, "pushPermit", "N")
         }
 
-        // TODO : sync method
-        // sync(context)
+        sync(context)
     }
 
     @JvmStatic
@@ -849,6 +860,35 @@ object RelatedDigital {
     }
 
     @JvmStatic
+    fun getPreviousModel(): RelatedDigitalModel? {
+        return previousModel
+    }
+
+    @JvmStatic
+    fun updatePreviousModel(context: Context) {
+        previousModel = RelatedDigitalModel(
+            organizationId = "",
+            profileId = "",
+            dataSource = "",
+            appVersion = AppUtils.getAppVersion(context),
+            pushPermissionStatus = AppUtils.getNotificationPermissionStatus(context),
+            osType = AppUtils.getOsType(),
+            osVersion = AppUtils.getOsVersion(),
+            sdkVersion = AppUtils.getSdkVersion(),
+            deviceType = AppUtils.getDeviceType(),
+            deviceName = AppUtils.getDeviceName(),
+            carrier = AppUtils.getCarrier(context),
+            identifierForVendor = AppUtils.getIdentifierForVendor(context),
+            local = AppUtils.getLocal(context),
+            userAgent = AppUtils.getUserAgent(),
+            cookieId = AppUtils.getCookieId(context),
+            visitorData = "",
+            visitData = ""
+        )
+        previousModel!!.copyFrom(context, model!!)
+    }
+
+    @JvmStatic
     fun singUp(context: Context, exVisitorId: String, properties: HashMap<String, String>? = null,
               parent: Activity? = null) {
         if (StringUtils.isNullOrWhiteSpace(exVisitorId)) {
@@ -943,6 +983,11 @@ object RelatedDigital {
             RequestHandler.createInAppActionRequest(context, model!!, pageName, properties, parent)
         }
         RequestHandler.createLoggerRequest(context, model!!, pageName, properties)
+    }
+
+    @JvmStatic
+    fun sync(context: Context) {
+        RequestHandler.createSyncRequest(context)
     }
 
     private fun registerToFCM(context: Context?) {

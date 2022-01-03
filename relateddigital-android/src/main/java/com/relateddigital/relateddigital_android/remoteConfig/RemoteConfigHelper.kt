@@ -15,11 +15,11 @@ import java.util.*
 
 object RemoteConfigHelper {
     private const val LOG_TAG = "RemoteConfigHelper"
-    fun checkRemoteConfigs(context: Context?) {
+    fun checkRemoteConfigs(context: Context) {
         if (RemoteConfigApiClient.client != null) {
             val remoteConfigApiInterface: ApiMethods = RemoteConfigApiClient.client!!.create(ApiMethods::class.java)
             val headers = HashMap<String, String>()
-            headers[Constants.USER_AGENT_REQUEST_KEY] = RelatedDigital.getRelatedDigitalModel()!!.getUserAgent()
+            headers[Constants.USER_AGENT_REQUEST_KEY] = RelatedDigital.getRelatedDigitalModel(context).getUserAgent()
             val call: Call<List<String>> = remoteConfigApiInterface.getRemoteConfig(headers)
             call.enqueue(object : Callback<List<String>> {
                 override fun onResponse(call: Call<List<String>>, response: Response<List<String>>) {
@@ -28,7 +28,7 @@ object RemoteConfigHelper {
                     var isMatch = false
                     if (profileIds.isNotEmpty()) {
                         for (i in profileIds.indices) {
-                            if (RelatedDigital.getRelatedDigitalModel()!!.getProfileId() == profileIds[i]) {
+                            if (RelatedDigital.getRelatedDigitalModel(context).getProfileId() == profileIds[i]) {
                                 isMatch = true
                                 setBlockState(context, true)
                                 break

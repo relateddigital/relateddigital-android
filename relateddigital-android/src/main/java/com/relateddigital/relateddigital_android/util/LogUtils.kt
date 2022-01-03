@@ -16,7 +16,7 @@ import retrofit2.Response
 object LogUtils {
     private const val LOG_TAG = "LogUtils"
 
-    fun sendGraylogMessage(graylogModel: GraylogModel) {
+    private fun sendGraylogMessage(graylogModel: GraylogModel) {
         if (GraylogApiClient.client == null) {
             Log.e(LOG_TAG, "Euromessage SDK requires min API level 21!")
             return
@@ -44,33 +44,22 @@ object LogUtils {
         context: Context, logLevel: String, logMessage: String,
         logPlace: String
     ) {
-        val modelStr = SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY, "")
+        val graylogModel = GraylogModel()
+        graylogModel.logLevel = logLevel
+        graylogModel.logMessage = logMessage
+        graylogModel.logPlace = logPlace
+        graylogModel.googleAppAlias = RelatedDigital.getRelatedDigitalModel(context).getGoogleAppAlias()
+        graylogModel.huaweiAppAlias = RelatedDigital.getRelatedDigitalModel(context).getHuaweiAppAlias()
+        graylogModel.token = RelatedDigital.getRelatedDigitalModel(context).getToken()
+        graylogModel.appVersion = RelatedDigital.getRelatedDigitalModel(context).getAppVersion()
+        graylogModel.sdkVersion = RelatedDigital.getRelatedDigitalModel(context).getSdkVersion()
+        graylogModel.osType = RelatedDigital.getRelatedDigitalModel(context).getOsType()
+        graylogModel.osVersion = RelatedDigital.getRelatedDigitalModel(context).getOsVersion()
+        graylogModel.deviceName = RelatedDigital.getRelatedDigitalModel(context).getDeviceName()
+        graylogModel.userAgent = RelatedDigital.getRelatedDigitalModel(context).getUserAgent()
+        graylogModel.identifierForVendor = RelatedDigital.getRelatedDigitalModel(context).getIdentifierForVendor()
+        graylogModel.extra = RelatedDigital.getRelatedDigitalModel(context).getExtra()
 
-        if (modelStr.isNotEmpty()) {
-            val model = Gson().fromJson(modelStr, RelatedDigitalModel::class.java)
-            RelatedDigital.init(
-                context,
-                model.getOrganizationId(),
-                model.getProfileId(),
-                model.getDataSource()
-            )
-            val graylogModel = GraylogModel()
-            graylogModel.logLevel = logLevel
-            graylogModel.logMessage = logMessage
-            graylogModel.logPlace = logPlace
-            graylogModel.googleAppAlias = RelatedDigital.getRelatedDigitalModel()!!.getGoogleAppAlias()
-            graylogModel.huaweiAppAlias = RelatedDigital.getRelatedDigitalModel()!!.getHuaweiAppAlias()
-            graylogModel.token = RelatedDigital.getRelatedDigitalModel()!!.getToken()
-            graylogModel.appVersion = RelatedDigital.getRelatedDigitalModel()!!.getAppVersion()
-            graylogModel.sdkVersion = RelatedDigital.getRelatedDigitalModel()!!.getSdkVersion()
-            graylogModel.osType = RelatedDigital.getRelatedDigitalModel()!!.getOsType()
-            graylogModel.osVersion = RelatedDigital.getRelatedDigitalModel()!!.getOsVersion()
-            graylogModel.deviceName = RelatedDigital.getRelatedDigitalModel()!!.getDeviceName()
-            graylogModel.userAgent = RelatedDigital.getRelatedDigitalModel()!!.getUserAgent()
-            graylogModel.identifierForVendor = RelatedDigital.getRelatedDigitalModel()!!.getIdentifierForVendor()
-            graylogModel.extra = RelatedDigital.getRelatedDigitalModel()!!.getExtra()
-
-            sendGraylogMessage(graylogModel)
-        }
+        sendGraylogMessage(graylogModel)
     }
 }
