@@ -13,6 +13,7 @@ import com.relateddigital.relateddigital_android.model.GsmPermit
 import com.relateddigital.relateddigital_android.model.Message
 import com.relateddigital.relateddigital_android.push.EuromessageCallback
 import com.relateddigital.relateddigital_android.push.PushMessageInterface
+import com.relateddigital.relateddigital_android.util.GoogleUtils
 
 class PushNotificationActivity : AppCompatActivity() {
     companion object{
@@ -39,7 +40,7 @@ class PushNotificationActivity : AppCompatActivity() {
     }
 
     private fun showToken() {
-        if(RelatedDigital.getRelatedDigitalModel(this).getGoogleAppAlias().isNotEmpty()) {
+        if(GoogleUtils.checkPlayService(this)) {
             binding.etToken.setText(RelatedDigital.getRelatedDigitalModel(this).getToken())
         } else {
             binding.etHuaweiToken.setText(RelatedDigital.getRelatedDigitalModel(this).getToken())
