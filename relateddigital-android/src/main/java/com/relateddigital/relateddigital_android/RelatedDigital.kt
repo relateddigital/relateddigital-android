@@ -17,16 +17,16 @@ import com.relateddigital.relateddigital_android.constants.Constants
 import com.relateddigital.relateddigital_android.geofence.GeofenceStarter
 import com.relateddigital.relateddigital_android.inapp.InAppButtonInterface
 import com.relateddigital.relateddigital_android.locationPermission.LocationPermissionHandler
-import com.relateddigital.relateddigital_android.model.LoadBalanceCookie
-import com.relateddigital.relateddigital_android.model.RelatedDigitalModel
-import com.relateddigital.relateddigital_android.model.Subscription
-import com.relateddigital.relateddigital_android.model.VisilabsParameter
+import com.relateddigital.relateddigital_android.model.*
 import com.relateddigital.relateddigital_android.network.RequestFormer
 import com.relateddigital.relateddigital_android.network.RequestHandler
+import com.relateddigital.relateddigital_android.push.EuromessageCallback
+import com.relateddigital.relateddigital_android.push.PushMessageInterface
 import com.relateddigital.relateddigital_android.remoteConfig.RemoteConfigHelper
-import com.relateddigital.relateddigital_android.util.AppUtils
-import com.relateddigital.relateddigital_android.util.SharedPref
-import com.relateddigital.relateddigital_android.util.StringUtils
+import com.relateddigital.relateddigital_android.util.*
+import org.json.JSONArray
+import org.json.JSONObject
+import java.lang.Exception
 import java.util.*
 
 
@@ -986,12 +986,136 @@ object RelatedDigital {
     }
 
     @JvmStatic
-    fun sync(context: Context) {
-        RequestHandler.createSyncRequest(context)
+    fun sync(context: Context, callback: EuromessageCallback? = null) {
+        RequestHandler.createSyncRequest(context, callback)
+    }
+
+    @JvmStatic
+    fun setEmailPermit(context: Context, emailPermit: EmailPermit) {
+        if(emailPermit == EmailPermit.ACTIVE) {
+            model!!.add(context, Constants.EMAIL_PERMIT_KEY, "Y")
+        } else {
+            model!!.add(context, Constants.EMAIL_PERMIT_KEY, "X")
+        }
+    }
+
+    @JvmStatic
+    fun setGsmPermit(context: Context, gsmPermit: GsmPermit) {
+        if(gsmPermit == GsmPermit.ACTIVE) {
+            model!!.add(context, Constants.GSM_PERMIT_KEY, "Y")
+        } else {
+            model!!.add(context, Constants.GSM_PERMIT_KEY, "X")
+        }
+    }
+
+    @JvmStatic
+    fun setTwitterId(context: Context, twitterId: String) {
+        model!!.add(context, Constants.TWITTER_KEY, twitterId)
+    }
+
+    @JvmStatic
+    fun setEmail(context: Context, email: String) {
+        model!!.add(context, Constants.EMAIL_KEY, email)
+    }
+
+    @JvmStatic
+    fun setFacebookId(context: Context, facebookId: String) {
+        model!!.add(context, Constants.FACEBOOK_KEY, facebookId)
+    }
+
+    @JvmStatic
+    fun setRelatedDigitalUserId(context: Context, relatedDigitalUserId: String) {
+        model!!.add(context, Constants.RELATED_DIGITAL_USER_KEY, relatedDigitalUserId)
+    }
+
+    @JvmStatic
+    fun setPhoneNumber(context: Context, msisdn: String) {
+        model!!.add(context, Constants.MSISDN_KEY, msisdn)
+    }
+
+    @JvmStatic
+    fun setUserProperty(context: Context, key: String, value: String) {
+        model!!.add(context, key, value)
+    }
+
+    @JvmStatic
+    fun registerEmail(
+        context: Context, email: String, emailPermit: EmailPermit,
+        isCommercial: Boolean, callback: EuromessageCallback? = null
+    ) {
+        setEmail(context, email)
+        setEmailPermit(context, emailPermit)
+        model!!.add(context, Constants.CONSENT_SOURCE_KEY, Constants.CONSENT_SOURCE_VALUE)
+        if (isCommercial) {
+            model!!.add(context, Constants.RECIPIENT_TYPE_KEY, Constants.RECIPIENT_TYPE_TACIR)
+        } else {
+            model!!.add(context, Constants.RECIPIENT_TYPE_KEY, Constants.RECIPIENT_TYPE_BIREYSEL)
+        }
+
+        model!!.add(context, Constants.CONSENT_TIME_KEY, AppUtils.getCurrentTurkeyDateString() as String)
+
+        sync(context, callback)
     }
 
     private fun registerToFCM(context: Context?) {
         FirebaseApp.initializeApp(context!!)
+    }
+
+    /**
+     * This method returns the list of push messages sent in the last 30 days.
+     * The messages are ordered in terms of their timestamps e.g. most recent one is at index 0.
+     * activity : Activity
+     * callback : PushMessageInterface
+     */
+    @JvmStatic
+    fun getPushMessages(activity: Activity, callback: PushMessageInterface) {
+        object : Thread(Runnable {
+            val payloads: String = SharedPref.readString(
+                activity.applicationContext,
+                Constants.PAYLOAD_SP_KEY
+            )
+            if (payloads.isNotEmpty()) {
+                try {
+                    val pushMessages: MutableList<Message> = ArrayList<Message>()
+                    val jsonObject = JSONObject(payloads)
+                    val jsonArray = jsonObject.getJSONArray(Constants.PAYLOAD_SP_ARRAY_KEY)
+                    for (i in 0 until jsonArray.length()) {
+                        val currentObject = jsonArray.getJSONObject(i)
+                        val currentMessage: Message = Gson().fromJson(
+                            currentObject.toString(),
+                            Message::class.java
+                        )
+                        pushMessages.add(currentMessage)
+                    }
+                    val orderedPushMessages: List<Message> = PayloadUtils.orderPushMessages(
+                        activity.applicationContext,
+                        pushMessages
+                    )
+                    activity.runOnUiThread(Runnable { callback.success(orderedPushMessages) })
+                } catch (e: Exception) {
+                    SharedPref.writeString(
+                        activity.applicationContext,
+                        Constants.PAYLOAD_SP_KEY,
+                        ""
+                    )
+                    val element = Throwable().stackTrace[0]
+                    LogUtils.formGraylogModel(
+                        activity.applicationContext,
+                        "e",
+                        "De-serializing JSON string of push message : " + e.message,
+                        element.className + "/" + element.methodName + "/" + element.lineNumber
+                    )
+                    activity.runOnUiThread(Runnable { callback.fail(e.message!!) })
+                }
+            } else {
+                activity.runOnUiThread(Runnable {
+                    callback.fail(
+                        "There is not any push notification sent " +
+                                "(or saved) in the last 30 days"
+                    )
+                })
+            }
+        }) {}.start()
     }
 
     /**

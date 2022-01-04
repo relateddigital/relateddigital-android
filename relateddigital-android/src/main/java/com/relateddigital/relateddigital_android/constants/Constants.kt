@@ -153,5 +153,23 @@ class Constants {
         const val PASSIVE = 0
         const val LAST_SUBS_DATE_KEY = "last_subscription_date"
         const val LAST_SUBS_KEY = "last_subscription"
+
+        const val EMAIL_PERMIT_KEY = "emailPermit"
+        const val GSM_PERMIT_KEY = "gsmPermit"
+        const val TWITTER_KEY = "twitter"
+        const val FACEBOOK_KEY = "facebook"
+        const val EMAIL_KEY = "email"
+        const val LOCATION_KEY = "location"
+        const val RELATED_DIGITAL_USER_KEY = "keyID"
+        const val MSISDN_KEY = "msisdn"
+        const val CONSENT_SOURCE_KEY = "ConsentSource"
+        const val CONSENT_SOURCE_VALUE = "HS_MOBIL"
+        const val RECIPIENT_TYPE_KEY = "RecipientType"
+        const val RECIPIENT_TYPE_BIREYSEL = "BIREYSEL"
+        const val RECIPIENT_TYPE_TACIR = "TACIR"
+        const val CONSENT_TIME_KEY = "ConsentTime"
+
+        const val PAYLOAD_SP_KEY = "payload_sp"
+        const val PAYLOAD_SP_ARRAY_KEY = "messages"
     }
 }

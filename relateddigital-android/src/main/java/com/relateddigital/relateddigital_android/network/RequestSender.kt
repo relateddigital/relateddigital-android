@@ -14,6 +14,7 @@ import com.relateddigital.relateddigital_android.inapp.scratchtowin.ScratchToWin
 import com.relateddigital.relateddigital_android.inapp.socialproof.SocialProofFragment
 import com.relateddigital.relateddigital_android.inapp.spintowin.SpinToWinActivity
 import com.relateddigital.relateddigital_android.model.*
+import com.relateddigital.relateddigital_android.push.EuromessageCallback
 import com.relateddigital.relateddigital_android.recommendation.RecommendationUtils
 import com.relateddigital.relateddigital_android.util.InAppNotificationTimer
 import com.relateddigital.relateddigital_android.util.RetryCounterManager
@@ -806,7 +807,8 @@ object RequestSender {
         }
     }
 
-    fun sendSubscriptionRequest(context: Context, model: RelatedDigitalModel, counterId: Int) {
+    fun sendSubscriptionRequest(context: Context, model: RelatedDigitalModel, counterId: Int,
+                                callback: EuromessageCallback? = null) {
         val subscription = Subscription(context)
 
         val subscriptionInterface = SubscriptionApiClient.getClient(model.getRequestTimeoutInSecond())
@@ -829,6 +831,7 @@ object RequestSender {
                            LOG_TAG,
                             "Sending the subscription is success"
                         )
+                        callback?.success()
                     } else {
                         if (RetryCounterManager.getCounterValue(counterId) >= 3) {
                             RetryCounterManager.clearCounter(counterId)
@@ -837,6 +840,7 @@ object RequestSender {
                                 "Sending the subscription is failed after 3 attempts!!!"
                             )
                             call!!.cancel()
+                            callback?.fail(response.message())
                         } else {
                             RetryCounterManager.increaseCounter(counterId)
                             sendSubscriptionRequest(context, model, counterId)
@@ -853,6 +857,7 @@ object RequestSender {
                         )
                         call.cancel()
                         t.printStackTrace()
+                        callback?.fail(t.message)
                     } else {
                         RetryCounterManager.increaseCounter(counterId)
                         sendSubscriptionRequest(context, model, counterId)
@@ -872,6 +877,7 @@ object RequestSender {
                             LOG_TAG,
                             "Sending the subscription is success"
                         )
+                        callback?.success()
                     } else {
                         if (RetryCounterManager.getCounterValue(counterId) >= 3) {
                             RetryCounterManager.clearCounter(counterId)
@@ -880,6 +886,7 @@ object RequestSender {
                                 "Sending the subscription is failed after 3 attempts!!!"
                             )
                             call!!.cancel()
+                            callback?.fail(response.message())
                         } else {
                             RetryCounterManager.increaseCounter(counterId)
                             sendSubscriptionRequest(context, model, counterId)
@@ -896,6 +903,7 @@ object RequestSender {
                         )
                         call.cancel()
                         t.printStackTrace()
+                        callback?.fail(t.message)
                     } else {
                         RetryCounterManager.increaseCounter(counterId)
                         sendSubscriptionRequest(context, model, counterId)

@@ -13,6 +13,7 @@ import com.relateddigital.relateddigital_android.constants.Constants
 import com.relateddigital.relateddigital_android.geofence.GeofenceGetListCallback
 import com.relateddigital.relateddigital_android.inapp.VisilabsCallback
 import com.relateddigital.relateddigital_android.model.*
+import com.relateddigital.relateddigital_android.push.EuromessageCallback
 import com.relateddigital.relateddigital_android.recommendation.VisilabsTargetFilter
 import com.relateddigital.relateddigital_android.util.*
 import okhttp3.ResponseBody
@@ -585,7 +586,7 @@ object RequestHandler {
         )
     }
 
-    fun createSyncRequest(context: Context) {
+    fun createSyncRequest(context: Context, callback: EuromessageCallback? = null) {
         if (Build.VERSION.SDK_INT < Constants.SDK_MIN_API_VERSION) {
             Log.e(LOG_TAG, "RelatedDigital SDK requires min API level 21!")
             return
@@ -596,7 +597,7 @@ object RequestHandler {
         if(!model.isEqual(RelatedDigital.getPreviousModel()) && model.isValid(context)) {
             RelatedDigital.updatePreviousModel(context)
 
-            RequestSender.sendSubscriptionRequest(context, model, RetryCounterManager.counterId)
+            RequestSender.sendSubscriptionRequest(context, model, RetryCounterManager.counterId, callback)
         }
     }
 }
