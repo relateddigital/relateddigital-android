@@ -978,64 +978,128 @@ object RelatedDigital {
 
         RequestFormer.updateSessionParameters(context, pageName)
 
-        if (model!!.getIsInAppNotificationEnabled()) {
-            RequestHandler.createInAppNotificationRequest(context, model!!, pageName, properties, parent)
-            RequestHandler.createInAppActionRequest(context, model!!, pageName, properties, parent)
+        if(model != null) {
+            if (model!!.getIsInAppNotificationEnabled()) {
+                RequestHandler.createInAppNotificationRequest(
+                    context,
+                    model!!,
+                    pageName,
+                    properties,
+                    parent
+                )
+                RequestHandler.createInAppActionRequest(
+                    context,
+                    model!!,
+                    pageName,
+                    properties,
+                    parent
+                )
+            } else {
+                Log.e(
+                    LOG_TAG, "In-app notification is not enabled." +
+                            "Call RelatedDigital.setIsInAppNotificationEnabled() first"
+                )
+            }
+            RequestHandler.createLoggerRequest(context, model!!, pageName, properties)
+        } else {
+            Log.e(LOG_TAG, "Call RelatedDigital.init() first")
         }
-        RequestHandler.createLoggerRequest(context, model!!, pageName, properties)
     }
 
     @JvmStatic
     fun sync(context: Context, callback: EuromessageCallback? = null) {
-        RequestHandler.createSyncRequest(context, callback)
+        if(model != null) {
+            if(model!!.getIsPushNotificationEnabled()) {
+                RequestHandler.createSyncRequest(context, callback)
+            } else {
+                Log.e(
+                    LOG_TAG, "Push notification is not enabled." +
+                            "Call RelatedDigital.setIsPushNotificationEnabled() first"
+                )
+            }
+        } else {
+            Log.e(LOG_TAG, "Call RelatedDigital.init() first")
+        }
     }
 
     @JvmStatic
     fun setEmailPermit(context: Context, emailPermit: EmailPermit) {
-        if(emailPermit == EmailPermit.ACTIVE) {
-            model!!.add(context, Constants.EMAIL_PERMIT_KEY, "Y")
+        if(model != null) {
+            if(emailPermit == EmailPermit.ACTIVE) {
+                model!!.add(context, Constants.EMAIL_PERMIT_KEY, "Y")
+            } else {
+                model!!.add(context, Constants.EMAIL_PERMIT_KEY, "X")
+            }
         } else {
-            model!!.add(context, Constants.EMAIL_PERMIT_KEY, "X")
+            Log.e(LOG_TAG, "Call RelatedDigital.init() first")
         }
     }
 
     @JvmStatic
     fun setGsmPermit(context: Context, gsmPermit: GsmPermit) {
-        if(gsmPermit == GsmPermit.ACTIVE) {
-            model!!.add(context, Constants.GSM_PERMIT_KEY, "Y")
+        if(model != null) {
+            if(gsmPermit == GsmPermit.ACTIVE) {
+                model!!.add(context, Constants.GSM_PERMIT_KEY, "Y")
+            } else {
+                model!!.add(context, Constants.GSM_PERMIT_KEY, "X")
+            }
         } else {
-            model!!.add(context, Constants.GSM_PERMIT_KEY, "X")
+            Log.e(LOG_TAG, "Call RelatedDigital.init() first")
         }
     }
 
     @JvmStatic
     fun setTwitterId(context: Context, twitterId: String) {
-        model!!.add(context, Constants.TWITTER_KEY, twitterId)
+        if(model != null) {
+            model!!.add(context, Constants.TWITTER_KEY, twitterId)
+        } else {
+            Log.e(LOG_TAG, "Call RelatedDigital.init() first")
+        }
     }
 
     @JvmStatic
     fun setEmail(context: Context, email: String) {
-        model!!.add(context, Constants.EMAIL_KEY, email)
+        if(model != null) {
+            model!!.add(context, Constants.EMAIL_KEY, email)
+        } else {
+            Log.e(LOG_TAG, "Call RelatedDigital.init() first")
+        }
     }
 
     @JvmStatic
     fun setFacebookId(context: Context, facebookId: String) {
-        model!!.add(context, Constants.FACEBOOK_KEY, facebookId)
+        if(model != null) {
+            model!!.add(context, Constants.FACEBOOK_KEY, facebookId)
+        } else {
+            Log.e(LOG_TAG, "Call RelatedDigital.init() first")
+        }
     }
 
     @JvmStatic
     fun setRelatedDigitalUserId(context: Context, relatedDigitalUserId: String) {
-        model!!.add(context, Constants.RELATED_DIGITAL_USER_KEY, relatedDigitalUserId)
+        if(model != null) {
+            model!!.add(context, Constants.RELATED_DIGITAL_USER_KEY, relatedDigitalUserId)
+        } else {
+            Log.e(LOG_TAG, "Call RelatedDigital.init() first")
+        }
     }
 
     @JvmStatic
     fun setPhoneNumber(context: Context, msisdn: String) {
-        model!!.add(context, Constants.MSISDN_KEY, msisdn)
+        if(model != null) {
+            model!!.add(context, Constants.MSISDN_KEY, msisdn)
+        } else {
+            Log.e(LOG_TAG, "Call RelatedDigital.init() first")
+        }
     }
 
     @JvmStatic
     fun setUserProperty(context: Context, key: String, value: String) {
-        model!!.add(context, key, value)
+        if(model != null) {
+            model!!.add(context, key, value)
+        } else {
+            Log.e(LOG_TAG, "Call RelatedDigital.init() first")
+        }
     }
 
     @JvmStatic
@@ -1043,18 +1107,41 @@ object RelatedDigital {
         context: Context, email: String, emailPermit: EmailPermit,
         isCommercial: Boolean, callback: EuromessageCallback? = null
     ) {
-        setEmail(context, email)
-        setEmailPermit(context, emailPermit)
-        model!!.add(context, Constants.CONSENT_SOURCE_KEY, Constants.CONSENT_SOURCE_VALUE)
-        if (isCommercial) {
-            model!!.add(context, Constants.RECIPIENT_TYPE_KEY, Constants.RECIPIENT_TYPE_TACIR)
+        if(model != null) {
+            if(model!!.getIsPushNotificationEnabled()) {
+                setEmail(context, email)
+                setEmailPermit(context, emailPermit)
+                model!!.add(context, Constants.CONSENT_SOURCE_KEY, Constants.CONSENT_SOURCE_VALUE)
+                if (isCommercial) {
+                    model!!.add(
+                        context,
+                        Constants.RECIPIENT_TYPE_KEY,
+                        Constants.RECIPIENT_TYPE_TACIR
+                    )
+                } else {
+                    model!!.add(
+                        context,
+                        Constants.RECIPIENT_TYPE_KEY,
+                        Constants.RECIPIENT_TYPE_BIREYSEL
+                    )
+                }
+
+                model!!.add(
+                    context,
+                    Constants.CONSENT_TIME_KEY,
+                    AppUtils.getCurrentTurkeyDateString() as String
+                )
+
+                sync(context, callback)
+            } else {
+                Log.e(
+                    LOG_TAG, "Push notification is not enabled." +
+                            "Call RelatedDigital.setIsPushNotificationEnabled() first"
+                )
+            }
         } else {
-            model!!.add(context, Constants.RECIPIENT_TYPE_KEY, Constants.RECIPIENT_TYPE_BIREYSEL)
+            Log.e(LOG_TAG, "Call RelatedDigital.init() first")
         }
-
-        model!!.add(context, Constants.CONSENT_TIME_KEY, AppUtils.getCurrentTurkeyDateString() as String)
-
-        sync(context, callback)
     }
 
     private fun registerToFCM(context: Context?) {
@@ -1144,12 +1231,20 @@ object RelatedDigital {
      */
     @JvmStatic
     fun sendTheListOfAppsInstalled(context: Context) {
-        AppTracker.sendTheListOfAppsInstalled(context)
+        if(model != null) {
+            AppTracker.sendTheListOfAppsInstalled(context)
+        } else {
+            Log.e(LOG_TAG, "Call RelatedDigital.init() first")
+        }
     }
 
     @JvmStatic
     fun sendLocationPermission(context: Context) {
-        LocationPermissionHandler.sendLocationPermissionToTheServer(context)
+        if(model != null) {
+            LocationPermissionHandler.sendLocationPermissionToTheServer(context)
+        } else {
+            Log.e(LOG_TAG, "Call RelatedDigital.init() first")
+        }
     }
 
     private fun initVisilabsParameters() {
