@@ -1,11 +1,11 @@
 package com.relateddigital.relateddigital_android.network
 
-import android.R
 import android.app.FragmentTransaction
 import android.content.Context
 import android.content.Intent
 import android.util.Log
 import com.google.gson.Gson
+import com.relateddigital.relateddigital_android.RelatedDigital
 import com.relateddigital.relateddigital_android.api.*
 import com.relateddigital.relateddigital_android.constants.Constants
 import com.relateddigital.relateddigital_android.inapp.InAppManager
@@ -14,6 +14,7 @@ import com.relateddigital.relateddigital_android.inapp.scratchtowin.ScratchToWin
 import com.relateddigital.relateddigital_android.inapp.socialproof.SocialProofFragment
 import com.relateddigital.relateddigital_android.inapp.spintowin.SpinToWinActivity
 import com.relateddigital.relateddigital_android.model.*
+import com.relateddigital.relateddigital_android.model.Retention
 import com.relateddigital.relateddigital_android.push.EuromessageCallback
 import com.relateddigital.relateddigital_android.recommendation.RecommendationUtils
 import com.relateddigital.relateddigital_android.util.InAppNotificationTimer
@@ -248,7 +249,7 @@ object RequestSender {
                                             socialProofFragment.retainInstance = true
 
                                             val transaction: FragmentTransaction = currentRequest.parent!!.fragmentManager.beginTransaction()
-                                            transaction.add(R.id.content, socialProofFragment)
+                                            transaction.add(android.R.id.content, socialProofFragment)
                                             transaction.commit()
                                         }
                                         else -> {
@@ -907,6 +908,103 @@ object RequestSender {
                     } else {
                         RetryCounterManager.increaseCounter(counterId)
                         sendSubscriptionRequest(context, model, counterId)
+                    }
+                }
+            })
+        }
+    }
+
+    fun sendRetentionRequest(context: Context, retention: Retention, counterId: Int) {
+        val retentionInterface = RetentionApiClient.getClient(RelatedDigital.
+        getRelatedDigitalModel(context).getRequestTimeoutInSecond())
+            ?.create(ApiMethods::class.java)
+        val call: Call<Void> = retentionInterface!!.report(
+            RelatedDigital.
+            getRelatedDigitalModel(context).getUserAgent(),
+            retention
+        )
+
+        if(counterId != -1) {
+            call.enqueue(object : Callback<Void> {
+                override fun onResponse(
+                    call: Call<Void>?,
+                    response: Response<Void>
+                ) {
+                    if (response.isSuccessful) {
+                        RetryCounterManager.clearCounter(counterId)
+                        Log.i(
+                            LOG_TAG,
+                            "Sending the deliver request is success"
+                        )
+                    } else {
+                        if (RetryCounterManager.getCounterValue(counterId) >= 3) {
+                            RetryCounterManager.clearCounter(counterId)
+                            Log.e(
+                                LOG_TAG,
+                                "Sending the deliver request is failed after 3 attempts!!!"
+                            )
+                            call!!.cancel()
+                        } else {
+                            RetryCounterManager.increaseCounter(counterId)
+                            sendRetentionRequest(context, retention, counterId)
+                        }
+                    }
+                }
+
+                override fun onFailure(call: Call<Void>, t: Throwable) {
+                    if (RetryCounterManager.getCounterValue(counterId) >= 3) {
+                        RetryCounterManager.clearCounter(counterId)
+                        Log.e(
+                            LOG_TAG,
+                            "Sending the deliver request is failed after 3 attempts!!!"
+                        )
+                        call.cancel()
+                        t.printStackTrace()
+                    } else {
+                        RetryCounterManager.increaseCounter(counterId)
+                        sendRetentionRequest(context, retention, counterId)
+                    }
+                }
+            })
+        } else {
+            call.enqueue(object : Callback<Void> {
+                override fun onResponse(
+                    call: Call<Void>?,
+                    response: Response<Void>
+                ) {
+                    if (response.isSuccessful) {
+                        RetryCounterManager.clearCounter(counterId)
+                        Log.i(
+                            LOG_TAG,
+                            "Sending the deliver request is success"
+                        )
+                    } else {
+                        if (RetryCounterManager.getCounterValue(counterId) >= 3) {
+                            RetryCounterManager.clearCounter(counterId)
+                            Log.e(
+                                LOG_TAG,
+                                "Sending the deliver request is failed after 3 attempts!!!"
+                            )
+                            call!!.cancel()
+                        } else {
+                            RetryCounterManager.increaseCounter(counterId)
+                            sendRetentionRequest(context, retention, counterId)
+                        }
+                    }
+                }
+
+                override fun onFailure(call: Call<Void>, t: Throwable) {
+                    if (RetryCounterManager.getCounterValue(counterId) >= 3) {
+                        RetryCounterManager.clearCounter(counterId)
+                        Log.e(
+                            LOG_TAG,
+                            "Sending the deliver request is failed after 3 attempts!!!"
+                        )
+                        call.cancel()
+                        t.printStackTrace()
+                    } else {
+                        RetryCounterManager.increaseCounter(counterId)
+                        sendRetentionRequest(context, retention, counterId)
                     }
                 }
             })

@@ -1,6 +1,7 @@
 package com.relateddigital.relateddigital_android.api
 
 import com.relateddigital.relateddigital_android.model.*
+import com.relateddigital.relateddigital_android.model.Retention
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.http.*

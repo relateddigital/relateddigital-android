@@ -216,59 +216,12 @@
                 android:text="@string/push_notification_parameters"
                 android:textStyle="bold|italic" />
 
-
-            <TableLayout
-                android:id="@+id/tl_push_params"
+            <TextView
+                android:id="@+id/payload_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:stretchColumns="*">
-
-                <TableRow
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:textSize="16sp"
-                        android:padding="8dip"
-                        android:text="@string/last_push_time"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:id="@+id/tv_last_push_time"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:textSize="16sp"
-                        android:padding="8dip"
-                        android:text="" />
-                </TableRow>
-
-                <TableRow android:layout_width="0dp">
-                    <TextView
-                        android:text="@string/key"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:textSize="16sp"
-                        android:padding="8dip"
-                        android:textStyle="bold"
-                        android:background="@color/design_default_color_primary" />
-                    <TextView
-                        android:text="@string/value"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:textSize="16sp"
-                        android:padding="8dip"
-                        android:textStyle="bold"
-                        android:background="@color/design_default_color_primary"/>
-                </TableRow>
-
-            </TableLayout>
-
+                android:padding="10dp"
+                android:textStyle="bold" />
 
         </LinearLayout>
 

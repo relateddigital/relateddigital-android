@@ -1,11 +1,18 @@
 package com.relateddigital.androidexampleapp
 
 import android.app.Activity
+import android.content.Intent
+import android.graphics.Color
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
+import android.view.Gravity
 import android.view.View
-import android.widget.ArrayAdapter
-import android.widget.Toast
+import android.widget.*
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
+import com.google.gson.reflect.TypeToken
 import com.relateddigital.androidexampleapp.databinding.ActivityPushNotificationBinding
 import com.relateddigital.relateddigital_android.RelatedDigital
 import com.relateddigital.relateddigital_android.model.EmailPermit
@@ -13,7 +20,15 @@ import com.relateddigital.relateddigital_android.model.GsmPermit
 import com.relateddigital.relateddigital_android.model.Message
 import com.relateddigital.relateddigital_android.push.EuromessageCallback
 import com.relateddigital.relateddigital_android.push.PushMessageInterface
+import com.relateddigital.relateddigital_android.push.PushNotificationManager
+import com.relateddigital.relateddigital_android.push.TestPush
+import com.relateddigital.relateddigital_android.util.AppUtils
 import com.relateddigital.relateddigital_android.util.GoogleUtils
+import com.relateddigital.relateddigital_android.util.SharedPref
+import java.lang.Exception
+import java.text.DateFormat
+import java.text.SimpleDateFormat
+import java.util.*
 
 class PushNotificationActivity : AppCompatActivity() {
     companion object{
@@ -21,6 +36,7 @@ class PushNotificationActivity : AppCompatActivity() {
     }
     private lateinit var binding: ActivityPushNotificationBinding
     private lateinit var activity: Activity
+    private var isFirstResume = true
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityPushNotificationBinding.inflate(layoutInflater)
@@ -35,6 +51,7 @@ class PushNotificationActivity : AppCompatActivity() {
         showToken()
         createSpinners()
         setupPayloadButton()
+        setupTemplatePushButtons()
         setupSyncButton()
         setupRegisterEmailButton()
     }
@@ -89,6 +106,43 @@ class PushNotificationActivity : AppCompatActivity() {
                 }
             }
             RelatedDigital.getPushMessages(activity, pushMessageInterface)
+        }
+    }
+
+    private fun setupTemplatePushButtons() {
+        binding.btnText.setOnClickListener {
+            val notificationId = Random().nextInt()
+            val pushNotificationManager = PushNotificationManager()
+            val message: Message = Gson().fromJson(TestPush.testText, Message::class.java)
+            pushNotificationManager.generateNotification(
+                applicationContext,
+                message,
+                null,
+                notificationId
+            )
+        }
+
+
+        binding.btnImage.setOnClickListener {
+            val notificationId = Random().nextInt()
+            val pushNotificationManager = PushNotificationManager()
+            val message: Message = Gson().fromJson(TestPush.testImage, Message::class.java)
+            pushNotificationManager.generateNotification(
+                applicationContext, message, AppUtils.getBitMapFromUri(
+                    applicationContext, message.mediaUrl!!
+                ), notificationId
+            )
+        }
+
+        binding.btnCarousel.setOnClickListener {
+            val notificationId = Random().nextInt()
+            val pushNotificationManager = PushNotificationManager()
+            val message: Message = Gson().fromJson(TestPush.testCarousel, Message::class.java)
+            pushNotificationManager.generateCarouselNotification(
+                applicationContext,
+                message,
+                notificationId
+            )
         }
     }
 
@@ -163,5 +217,87 @@ class PushNotificationActivity : AppCompatActivity() {
                 Toast.makeText(this, "Invalid email", Toast.LENGTH_LONG).show()
             }
         }
+    }
+
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        if (intent != null) {
+            val bundle = intent.extras
+            if (bundle != null) {
+                val message = intent.extras!!.getSerializable("message") as Message?
+                if (message != null) {
+                    handlePush(message, intent)
+                } else {
+                    // Carousel push notification : an item was clicked
+                    val itemClickedUrl = bundle.getString("CarouselItemClickedUrl")
+                    if (itemClickedUrl != null && itemClickedUrl != "") {
+                        try {
+                            val viewIntent = Intent(Intent.ACTION_VIEW, Uri.parse(itemClickedUrl))
+                            viewIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                            startActivity(viewIntent)
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
+                    }
+                }
+            }
+        }
+        setPushParamsUI()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if(isFirstResume) {
+            isFirstResume = false
+            if (intent != null) {
+                val bundle = intent.extras
+                if (bundle != null) {
+                    val message = intent.extras!!.getSerializable("message") as Message?
+                    if (message != null) {
+                        handlePush(message, intent)
+                    } else {
+                        // Carousel push notification : an item was clicked
+                        val itemClickedUrl = bundle.getString("CarouselItemClickedUrl")
+                        if (itemClickedUrl != null && itemClickedUrl != "") {
+                            try {
+                                val viewIntent =
+                                    Intent(Intent.ACTION_VIEW, Uri.parse(itemClickedUrl))
+                                viewIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                                startActivity(viewIntent)
+                            } catch (e: Exception) {
+                                e.printStackTrace()
+                            }
+                        }
+                    }
+                }
+            }
+            setPushParamsUI()
+        }
+    }
+
+    private fun handlePush(message: Message, intent: Intent) {
+        val dateFormat: DateFormat = SimpleDateFormat("yyyy-MM-dd hh:mm:ss")
+        val lastPushTime = dateFormat.format(Calendar.getInstance().time)
+        SharedPref.writeString(applicationContext, Constants.LAST_PUSH_TIME, lastPushTime)
+        SharedPref.writeString(
+            applicationContext,
+            Constants.LAST_PUSH_PARAMS,
+            GsonBuilder().create().toJson(message.getParams())
+        )
+    }
+
+    private fun setPushParamsUI() {
+        val payloadStr = StringBuilder()
+        payloadStr.append(SharedPref.readString(applicationContext, Constants.LAST_PUSH_TIME)).append("\n\n")
+        val lastPushParamsString: String =
+            SharedPref.readString(applicationContext, Constants.LAST_PUSH_PARAMS)
+        val gson = Gson()
+        val paramsType = object : TypeToken<Map<String?, String?>?>() {}.type
+        val params = gson.fromJson<Map<String, String>>(lastPushParamsString, paramsType)
+            ?: return
+        for ((index, param) in params.entries.withIndex()) {
+            payloadStr.append(param.key).append(" : ").append(param.value).append("\n\n")
+        }
+        binding.payloadView.text = payloadStr.toString()
     }
 }

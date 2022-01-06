@@ -58,6 +58,15 @@
             </intent-filter>
         </service>
 
+        <receiver
+            android:name=".push.carousel.CarouselEventReceiver"
+            android:exported="false"
+            android:enabled="true"/>
+
+        <service
+            android:name=".push.services.RelatedDigitalOpenReportService"
+            android:exported="false"/>
+
     </application>
 
 </manifest>

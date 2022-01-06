@@ -171,5 +171,23 @@ class Constants {
 
         const val PAYLOAD_SP_KEY = "payload_sp"
         const val PAYLOAD_SP_ARRAY_KEY = "messages"
+
+        const val NOTIFICATION_ID = "NotificationId"
+        const val EVENT_CAROUSAL_ITEM_CLICKED_KEY = "CarouselItemClicked"
+        const val CAROUSAL_SET_UP_KEY = "CAROUSAL_SET_UP_KEY"
+        const val EVENT_LEFT_ARROW_CLICKED = 1
+        const val EVENT_RIGHT_ARROW_CLICKED = 2
+        const val EVENT_LEFT_ITEM_CLICKED = 3
+        const val EVENT_RIGHT_ITEM_CLICKED = 4
+        const val CAROUSAL_IMAGE_BEGENNING = "CarouselImage"
+        const val CAROUSAL_SMALL_ICON_FILE_NAME = "smallIconCarousel"
+        const val CAROUSAL_LARGE_ICON_FILE_NAME = "largeIconCarousel"
+        const val CAROUSAL_PLACEHOLDER_ICON_FILE_NAME = "placeHolderIconCarousel"
+        const val CAROUSAL_ITEM_CLICKED_KEY = "CarouselItemClickedKey"
+        const val CAROUSEL_ITEM_CLICKED_URL = "CarouselItemClickedUrl"
+        const val NOTIFICATION_CHANNEL_ID_KEY = "not_channel_id_key"
+        const val NOTIFICATION_CHANNEL_NAME_KEY = "not_channel_name_key"
+        const val NOTIFICATION_CHANNEL_DESCRIPTION_KEY = "not_channel_description_key"
+        const val NOTIFICATION_CHANNEL_SOUND_KEY = "not_channel_sound_key"
     }
 }

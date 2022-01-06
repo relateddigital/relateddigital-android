@@ -1,9 +1,15 @@
 package com.relateddigital.relateddigital_android.util
 
 import android.Manifest
+import android.content.ComponentName
+import android.content.ContentResolver
 import android.content.Context
+import android.content.Intent
+import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.content.res.Resources.NotFoundException
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.os.Build
 import android.os.Environment
 import android.telephony.TelephonyManager
@@ -19,9 +25,15 @@ import java.text.SimpleDateFormat
 import java.util.*
 import java.util.regex.Pattern
 import android.graphics.Typeface
+import android.media.RingtoneManager
+import android.net.Uri
+import android.os.StrictMode
+import android.os.StrictMode.ThreadPolicy
 import androidx.core.content.res.ResourcesCompat
 import com.relateddigital.relateddigital_android.inapp.FontFamily
+import com.relateddigital.relateddigital_android.model.Message
 import com.relateddigital.relateddigital_android.util.AppUtils.isFontResourceAvailable
+import java.net.URL
 
 
 object AppUtils {
@@ -409,4 +421,109 @@ object AppUtils {
         return Typeface.DEFAULT
     }
 
+    fun getBitMapFromUri(context: Context, photoUrl: String): Bitmap? {
+        val url: URL
+        var image: Bitmap? = null
+        try {
+            setThreadPool()
+            url = URL(photoUrl)
+            val connection = url.openConnection()
+            connection.readTimeout = 30000 // 30 sec
+            image = BitmapFactory.decodeStream(connection.getInputStream())
+        } catch (e: IOException) {
+            val element = Throwable().stackTrace[0]
+            LogUtils.formGraylogModel(
+                context,
+                "e",
+                "Getting bitmap from uri : " + e.message,
+                element.className + "/" + element.methodName + "/" + element.lineNumber
+            )
+            e.printStackTrace()
+        }
+        return image
+    }
+
+    private fun setThreadPool() {
+        val policy = ThreadPolicy.Builder().permitAll().build()
+        StrictMode.setThreadPolicy(policy)
+    }
+
+    fun getNotificationChannelId(context: Context, isNew: Boolean): String {
+        val oldChannelId: String =
+            SharedPref.readString(context, Constants.NOTIFICATION_CHANNEL_ID_KEY)
+        var newChannelId = oldChannelId
+        if (isNew) {
+            while (newChannelId == oldChannelId) {
+                newChannelId = Random().nextInt(100000).toString()
+            }
+        }
+        if (newChannelId.isEmpty()) {
+            newChannelId = Random().nextInt(100000).toString()
+        }
+        SharedPref.writeString(context, Constants.NOTIFICATION_CHANNEL_ID_KEY, newChannelId)
+        return newChannelId
+    }
+
+    fun getLaunchIntent(context: Context, message: Message?): Intent {
+        val packageManager = context.packageManager
+        val intent = packageManager.getLaunchIntentForPackage(context.packageName)
+        val componentName = intent!!.component
+        val notificationIntent = Intent.makeRestartActivityTask(componentName)
+        notificationIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+        notificationIntent.putExtra("message", message)
+        return notificationIntent
+    }
+
+    fun isResourceAvailable(context: Context?, resId: Int): Boolean {
+        if (context != null) {
+            try {
+                return context.resources.getResourceName(resId) != null
+            } catch (ignore: NotFoundException) {
+                val element = Throwable().stackTrace[0]
+                LogUtils.formGraylogModel(
+                    context,
+                    "e",
+                    "Checking if a resource is available : " + ignore.message,
+                    element.className + "/" + element.methodName + "/" + element.lineNumber
+                )
+            }
+        }
+        return false
+    }
+
+    fun getAppLabel(pContext: Context, defaultText: String?): String {
+        val lPackageManager = pContext.packageManager
+        var lApplicationInfo: ApplicationInfo? = null
+        try {
+            lApplicationInfo =
+                lPackageManager.getApplicationInfo(pContext.applicationInfo.packageName, 0)
+        } catch (e: PackageManager.NameNotFoundException) {
+            val element = Throwable().stackTrace[0]
+            LogUtils.formGraylogModel(
+                pContext,
+                "e",
+                "Getting application info : " + e.message,
+                element.className + "/" + element.methodName + "/" + element.lineNumber
+            )
+            e.printStackTrace()
+        }
+        return (if (lApplicationInfo != null) lPackageManager.getApplicationLabel(lApplicationInfo) else defaultText) as String
+    }
+
+    fun getSound(context: Context, sound: String?): Uri {
+        val id = context.resources.getIdentifier(sound, "raw", context.packageName)
+        return if (id != 0) {
+            Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + context.packageName + "/" + id)
+        } else {
+            RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
+        }
+    }
+
+    fun getApplicationName(context: Context): String {
+        val applicationInfo = context.applicationInfo
+        val stringId = applicationInfo.labelRes
+        return if (stringId == 0) applicationInfo.nonLocalizedLabel.toString() else context.getString(
+            stringId
+        )
+    }
 }

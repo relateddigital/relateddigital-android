@@ -13,7 +13,9 @@ import com.relateddigital.relateddigital_android.constants.Constants
 import com.relateddigital.relateddigital_android.geofence.GeofenceGetListCallback
 import com.relateddigital.relateddigital_android.inapp.VisilabsCallback
 import com.relateddigital.relateddigital_android.model.*
+import com.relateddigital.relateddigital_android.model.Retention
 import com.relateddigital.relateddigital_android.push.EuromessageCallback
+import com.relateddigital.relateddigital_android.push.RetentionType
 import com.relateddigital.relateddigital_android.recommendation.VisilabsTargetFilter
 import com.relateddigital.relateddigital_android.util.*
 import okhttp3.ResponseBody
@@ -25,6 +27,9 @@ import retrofit2.Response
 
 object RequestHandler {
     private const val LOG_TAG = "RequestHandler"
+
+    private var latestDeliverPushId: String = ""
+    private var latestOpenPushId: String = ""
 
     fun createLoggerRequest(
             context: Context, model: RelatedDigitalModel, pageName: String,
@@ -598,6 +603,66 @@ object RequestHandler {
             RelatedDigital.updatePreviousModel(context)
 
             RequestSender.sendSubscriptionRequest(context, model, RetryCounterManager.counterId, callback)
+        }
+    }
+
+    fun createRetentionRequest(
+        context: Context, type: RetentionType,
+        pushId: String?, emPushSp: String?
+    ) {
+        if (Build.VERSION.SDK_INT < Constants.SDK_MIN_API_VERSION) {
+            Log.e(LOG_TAG, "RelatedDigital SDK requires min API level 21!")
+            return
+        }
+
+        val latestPushId: String = when(type) {
+            RetentionType.DELIVER -> {
+                latestDeliverPushId
+            } else -> {
+                latestOpenPushId
+            }
+        }
+
+        if(!pushId.isNullOrEmpty() && pushId != latestPushId) {
+            when (type) {
+                RetentionType.DELIVER -> {
+                    latestDeliverPushId = pushId
+                }
+                else -> {
+                    latestOpenPushId = pushId
+                }
+            }
+
+            val retention = Retention()
+
+            if(GoogleUtils.checkPlayService(context)) {
+                retention.key = RelatedDigital.getRelatedDigitalModel(context).getGoogleAppAlias()
+            } else {
+                retention.key = RelatedDigital.getRelatedDigitalModel(context).getHuaweiAppAlias()
+            }
+
+            retention.pushId = pushId
+
+            when (type) {
+                RetentionType.DELIVER -> {
+                    retention.status = "D"
+                    retention.deliver = 1
+                }
+                else -> {
+                    retention.status = "O"
+                    retention.deliver = 0
+                }
+            }
+
+            retention.token = RelatedDigital.getRelatedDigitalModel(context).getToken()
+            retention.actionBtn = 0
+            retention.isMobile = 1
+
+            if(!emPushSp.isNullOrEmpty()) {
+                retention.emPushSp = emPushSp
+            }
+
+            RequestSender.sendRetentionRequest(context, retention, RetryCounterManager.counterId)
         }
     }
 }
