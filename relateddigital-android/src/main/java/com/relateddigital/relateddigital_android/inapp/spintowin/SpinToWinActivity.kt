@@ -2,16 +2,20 @@ package com.relateddigital.relateddigital_android.inapp.spintowin
 
 import android.content.ClipData
 import android.content.ClipboardManager
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.fragment.app.FragmentActivity
 import com.google.gson.Gson
 import com.relateddigital.relateddigital_android.R
 import com.relateddigital.relateddigital_android.model.SpinToWin
+import com.relateddigital.relateddigital_android.util.AppUtils
 
 class SpinToWinActivity : FragmentActivity(), SpinToWinCompleteInterface, SpinToWinCopyToClipboardInterface {
     private var jsonStr: String? = ""
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if (savedInstanceState != null) {
@@ -32,9 +36,18 @@ class SpinToWinActivity : FragmentActivity(), SpinToWinCompleteInterface, SpinTo
             }
         }
         if (jsonStr != null && jsonStr != "") {
-            val webViewDialogFragment: SpinToWinWebDialogFragment = SpinToWinWebDialogFragment.newInstance("spintowin.html", jsonStr)
-            webViewDialogFragment.setSpinToWinListeners(this, this)
-            webViewDialogFragment.display(supportFragmentManager)
+            val res = AppUtils.createSpinToWinCustomFontFiles(
+                this, jsonStr
+            )
+            if(res == null) {
+                Log.e(LOG_TAG, "Could not get the spin-to-win data properly!")
+                finish()
+            } else {
+                val webViewDialogFragment: SpinToWinWebDialogFragment =
+                    SpinToWinWebDialogFragment.newInstance(res[0], res[1], res[2])
+                webViewDialogFragment.setSpinToWinListeners(this, this)
+                webViewDialogFragment.display(supportFragmentManager)
+            }
         } else {
             Log.e(LOG_TAG, "Could not get the spin-to-win data properly!")
             finish()

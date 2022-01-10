@@ -1,7 +1,6 @@
 package com.relateddigital.relateddigital_android.util
 
 import android.Manifest
-import android.content.ComponentName
 import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
@@ -29,11 +28,17 @@ import android.media.RingtoneManager
 import android.net.Uri
 import android.os.StrictMode
 import android.os.StrictMode.ThreadPolicy
+import android.util.TypedValue
+import androidx.annotation.RequiresApi
 import androidx.core.content.res.ResourcesCompat
+import com.google.gson.Gson
 import com.relateddigital.relateddigital_android.inapp.FontFamily
 import com.relateddigital.relateddigital_android.model.Message
-import com.relateddigital.relateddigital_android.util.AppUtils.isFontResourceAvailable
+import com.relateddigital.relateddigital_android.model.SpinToWin
+import com.relateddigital.relateddigital_android.model.SpinToWinExtendedProps
+import java.net.URI
 import java.net.URL
+import java.nio.charset.StandardCharsets
 
 
 object AppUtils {
@@ -525,5 +530,222 @@ object AppUtils {
         return if (stringId == 0) applicationInfo.nonLocalizedLabel.toString() else context.getString(
             stringId
         )
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    fun createSpinToWinCustomFontFiles(context: Context, jsonStr: String?): ArrayList<String?>? {
+        var result: ArrayList<String?>? = null
+        var spinToWinModel: SpinToWin?
+        var extendedProps: SpinToWinExtendedProps?
+        val baseUrlPath = "file://" + context.filesDir.absolutePath + "/"
+        var htmlStr = ""
+        try {
+            spinToWinModel = Gson().fromJson(jsonStr, SpinToWin::class.java)
+            extendedProps = Gson().fromJson(
+                URI(spinToWinModel.actiondata!!.extendedProps).path,
+                SpinToWinExtendedProps::class.java
+            )
+        } catch (e: java.lang.Exception) {
+            Log.e("SpinToWin", "Extended properties could not be parsed properly!")
+            return null
+        }
+        if (spinToWinModel == null || extendedProps == null) {
+            return null
+        }
+        val displayNameFontFamily: String = extendedProps.displayNameFontFamily!!
+        val titleFontFamily: String = extendedProps.titleFontFamily!!
+        val textFontFamily: String = extendedProps.textFontFamily!!
+        val buttonFontFamily: String = extendedProps.buttonFontFamily!!
+        val promoCodeTitleFontFamily: String = extendedProps.promocodeTitleFontFamily!!
+        val copyButtonFontFamily: String = extendedProps.copyButtonFontFamily!!
+        val promoCodesSoldOutMessageFontFamily: String =
+            extendedProps.promocodesSoldOutMessageFontFamily!!
+        if (displayNameFontFamily == "custom") {
+            val fontExtension = getFontNameWithExtension(
+                context,
+                extendedProps.displayNameCustomFontFamilyAndroid!!
+            )
+            if (fontExtension.isNotEmpty()) {
+                htmlStr = writeToFile(
+                    context,
+                    extendedProps.displayNameCustomFontFamilyAndroid!!,
+                    fontExtension
+                )
+                spinToWinModel.fontFiles.add(fontExtension)
+            }
+        }
+        if (titleFontFamily == "custom") {
+            val fontExtension =
+                getFontNameWithExtension(context, extendedProps.titleCustomFontFamilyAndroid!!)
+            if (fontExtension.isNotEmpty()) {
+                htmlStr = writeToFile(
+                    context,
+                    extendedProps.titleCustomFontFamilyAndroid!!,
+                    fontExtension
+                )
+                spinToWinModel.fontFiles.add(fontExtension)
+            }
+        }
+        if (textFontFamily == "custom") {
+            val fontExtension =
+                getFontNameWithExtension(context, extendedProps.textCustomFontFamilyAndroid!!)
+            if (fontExtension.isNotEmpty()) {
+                htmlStr = writeToFile(
+                    context,
+                    extendedProps.textCustomFontFamilyAndroid!!,
+                    fontExtension
+                )
+                spinToWinModel.fontFiles.add(fontExtension)
+            }
+        }
+        if (buttonFontFamily == "custom") {
+            val fontExtension =
+                getFontNameWithExtension(context, extendedProps.buttonCustomFontFamilyAndroid!!)
+            if (fontExtension.isNotEmpty()) {
+                htmlStr = writeToFile(
+                    context,
+                    extendedProps.buttonCustomFontFamilyAndroid!!,
+                    fontExtension
+                )
+                spinToWinModel.fontFiles.add(fontExtension)
+            }
+        }
+        if (promoCodeTitleFontFamily == "custom") {
+            val fontExtension = getFontNameWithExtension(
+                context,
+                extendedProps.promocodeTitleCustomFontFamilyAndroid!!
+            )
+            if (fontExtension.isNotEmpty()) {
+                htmlStr = writeToFile(
+                    context,
+                    extendedProps.promocodeTitleCustomFontFamilyAndroid!!,
+                    fontExtension
+                )
+                spinToWinModel.fontFiles.add(fontExtension)
+            }
+        }
+        if (copyButtonFontFamily == "custom") {
+            val fontExtension = getFontNameWithExtension(
+                context,
+                extendedProps.copyButtonCustomFontFamilyAndroid!!
+            )
+            if (fontExtension.isNotEmpty()) {
+                htmlStr = writeToFile(
+                    context,
+                    extendedProps.copyButtonCustomFontFamilyAndroid!!,
+                    fontExtension
+                )
+                spinToWinModel.fontFiles.add(fontExtension)
+            }
+        }
+        if (promoCodesSoldOutMessageFontFamily == "custom") {
+            val fontExtension = getFontNameWithExtension(
+                context,
+                extendedProps.promocodesSoldOutMessageCustomFontFamilyAndroid!!
+            )
+            if (fontExtension.isNotEmpty()) {
+                htmlStr = writeToFile(
+                    context,
+                    extendedProps.promocodesSoldOutMessageCustomFontFamilyAndroid!!,
+                    fontExtension
+                )
+                spinToWinModel.fontFiles.add(fontExtension)
+            }
+        }
+        if (htmlStr.isNotEmpty()) {
+            result = ArrayList()
+            result.add(baseUrlPath)
+            result.add(htmlStr)
+            result.add(Gson().toJson(spinToWinModel, SpinToWin::class.java))
+        }
+        return result
+    }
+
+    private fun getFontNameWithExtension(context: Context, font: String): String {
+        val value = TypedValue()
+        return if (isFontResourceAvailable(context, font)) {
+            val id = context.resources.getIdentifier(font, "font", context.packageName)
+            context.resources.getValue(id, value, true)
+            val res = value.string.toString().split("/").toTypedArray()
+            res[res.size - 1]
+        } else {
+            ""
+        }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    private fun writeToFile(
+        context: Context,
+        fontName: String,
+        fontNameWithExtension: String
+    ): String {
+        val spinToWinFileName = "spintowin"
+        val baseUrlPath = "file://" + context.filesDir.absolutePath + "/"
+        var htmlString: String = ""
+        val spintowinRelatedDigitalCacheDir = context.filesDir
+        var `is`: InputStream? = null
+        var fos: FileOutputStream? = null
+        try {
+            val htmlFile = File("$spintowinRelatedDigitalCacheDir/$spinToWinFileName.html")
+            val jsFile = File("$spintowinRelatedDigitalCacheDir/$spinToWinFileName.js")
+            val fontFile = File("$spintowinRelatedDigitalCacheDir/$fontNameWithExtension")
+            htmlFile.createNewFile()
+            jsFile.createNewFile()
+            fontFile.createNewFile()
+            `is` = context.assets.open("$spinToWinFileName.html")
+            var bytes = getBytesFromInputStream(`is`)
+            `is`.close()
+            htmlString = String(bytes!!, StandardCharsets.UTF_8)
+            fos = FileOutputStream(htmlFile, false)
+            fos.write(bytes)
+            fos.close()
+            `is` = context.assets.open("$spinToWinFileName.js")
+            bytes = getBytesFromInputStream(`is`)
+            `is`.close()
+            fos = FileOutputStream(jsFile)
+            fos.write(bytes)
+            fos.close()
+            val fontId = context.resources.getIdentifier(fontName, "font", context.packageName)
+            `is` = context.resources.openRawResource(fontId)
+            bytes = getBytesFromInputStream(`is`)
+            `is`.close()
+            fos = FileOutputStream(fontFile)
+            fos.write(bytes)
+            fos.close()
+        } catch (e: java.lang.Exception) {
+            Log.e("SpinToWin", "Could not create spintowin cache files properly!")
+            e.printStackTrace()
+            return ""
+        } finally {
+            if (`is` != null) {
+                try {
+                    `is`.close()
+                } catch (e: java.lang.Exception) {
+                    Log.e("SpinToWin", "Could not close spintowin is stream properly!")
+                    e.printStackTrace()
+                }
+            }
+            if (fos != null) {
+                try {
+                    fos.close()
+                } catch (e: java.lang.Exception) {
+                    Log.e("SpinToWin", "Could not close spintowin fos stream properly!")
+                    e.printStackTrace()
+                }
+            }
+        }
+        return htmlString
+    }
+
+    @Throws(IOException::class)
+    private fun getBytesFromInputStream(`is`: InputStream): ByteArray? {
+        val os = ByteArrayOutputStream()
+        val buffer = ByteArray(0xFFFF)
+        var len = `is`.read(buffer)
+        while (len != -1) {
+            os.write(buffer, 0, len)
+            len = `is`.read(buffer)
+        }
+        return os.toByteArray()
     }
 }

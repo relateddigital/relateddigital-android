@@ -18,7 +18,8 @@ import com.relateddigital.relateddigital_android.constants.Constants
 class SpinToWinWebDialogFragment : DialogFragment() {
     private var webView: WebView? = null
     private var mResponse: String? = null
-    private var fileName: String? = ""
+    private var baseUrl: String? = ""
+    private var htmlString: String? = ""
     private var mIsRotation = false
     private var mListener: SpinToWinCompleteInterface? = null
     private var mCopyToClipboardInterface: SpinToWinCopyToClipboardInterface? = null
@@ -42,7 +43,8 @@ class SpinToWinWebDialogFragment : DialogFragment() {
         super.onCreate(savedInstanceState)
         setStyle(STYLE_NORMAL, R.style.AppTheme_FullScreenDialog)
         if (arguments != null) {
-            fileName = requireArguments().getString("filename")
+            baseUrl = requireArguments().getString("baseUrl")
+            htmlString = requireArguments().getString("htmlString")
             mResponse = requireArguments().getString("response")
             mJavaScriptInterface = SpinToWinJavaScriptInterface(this, mResponse!!)
             mJavaScriptInterface!!.setSpinToWinListeners(mListener, mCopyToClipboardInterface)
@@ -74,14 +76,14 @@ class SpinToWinWebDialogFragment : DialogFragment() {
         webView = view.findViewById(R.id.webview)
         webView!!.webChromeClient = webViewClient
         webView!!.settings.javaScriptEnabled = true
+        webView!!.settings.allowContentAccess = true
+        webView!!.settings.allowFileAccess = true
+
         if (Build.VERSION.SDK_INT >= Constants.SDK_MIN_API_VERSION) {
             webView!!.settings.mediaPlaybackRequiresUserGesture = false
         }
         mJavaScriptInterface?.let { webView!!.addJavascriptInterface(it, "Android") }
-        val folderPath = "file:android_asset/"
-        val fileName = fileName
-        val file = folderPath + fileName
-        webView!!.loadUrl(file)
+        webView!!.loadDataWithBaseURL(baseUrl, htmlString!!, "text/html", "utf-8", "about:blank")
         webView!!.reload()
         return view
     }
@@ -107,14 +109,16 @@ class SpinToWinWebDialogFragment : DialogFragment() {
         const val TAG = "WebViewDialogFragment"
 
         // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-        private const val ARG_PARAM1 = "filename"
-        private const val ARG_PARAM2 = "response"
+        private const val ARG_PARAM1 = "response"
+        private const val ARG_PARAM2 = "baseUrl"
+        private const val ARG_PARAM3 = "htmlString"
         private var mJavaScriptInterface: SpinToWinJavaScriptInterface? = null
-        fun newInstance(filename: String?, response: String?): SpinToWinWebDialogFragment {
+        fun newInstance(baseUrl: String?, htmlString: String?, response: String?): SpinToWinWebDialogFragment {
             val fragment = SpinToWinWebDialogFragment()
             val args = Bundle()
-            args.putString(ARG_PARAM1, filename)
-            args.putString(ARG_PARAM2, response)
+            args.putString(ARG_PARAM1, response)
+            args.putString(ARG_PARAM2, baseUrl)
+            args.putString(ARG_PARAM3, htmlString)
             mJavaScriptInterface = SpinToWinJavaScriptInterface(fragment, response!!)
             fragment.arguments = args
             return fragment
