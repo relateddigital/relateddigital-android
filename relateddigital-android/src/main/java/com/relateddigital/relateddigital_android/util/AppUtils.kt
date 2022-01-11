@@ -47,18 +47,26 @@ object AppUtils {
 
     private fun id(context: Context): String {
         if (sId.isEmpty()) {
-            val pm = context.packageManager
-            if (pm.checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, context.packageName)
-                    == PackageManager.PERMISSION_GRANTED &&
-                    pm.checkPermission(Manifest.permission.READ_EXTERNAL_STORAGE, context.packageName)
-                    == PackageManager.PERMISSION_GRANTED) {
-                try {
-                    sId = getIdFromExternalStorage(context)
-                } catch (e: Exception) {
-                    sId = ""
-                    e.printStackTrace()
-                }
-                if (sId.isEmpty()) {
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                if (Environment.isExternalStorageManager()) {
+                    try {
+                        sId = getIdFromExternalStorage(context)
+                    } catch (e: Exception) {
+                        sId = ""
+                        e.printStackTrace()
+                    }
+                    if (sId.isEmpty()) {
+                        val installation = File(context.filesDir, installationDir)
+                        sId = try {
+                            if (!installation.exists()) {
+                                writeInstallationFile(installation)
+                            }
+                            readInstallationFile(installation)
+                        } catch (e: Exception) {
+                            throw RuntimeException(e)
+                        }
+                    }
+                } else {
                     val installation = File(context.filesDir, installationDir)
                     sId = try {
                         if (!installation.exists()) {
@@ -70,14 +78,45 @@ object AppUtils {
                     }
                 }
             } else {
-                val installation = File(context.filesDir, installationDir)
-                sId = try {
-                    if (!installation.exists()) {
-                        writeInstallationFile(installation)
+                val pm = context.packageManager
+                if (pm.checkPermission(
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                        context.packageName
+                    )
+                    == PackageManager.PERMISSION_GRANTED &&
+                    pm.checkPermission(
+                        Manifest.permission.READ_EXTERNAL_STORAGE,
+                        context.packageName
+                    )
+                    == PackageManager.PERMISSION_GRANTED
+                ) {
+                    try {
+                        sId = getIdFromExternalStorage(context)
+                    } catch (e: Exception) {
+                        sId = ""
+                        e.printStackTrace()
                     }
-                    readInstallationFile(installation)
-                } catch (e: Exception) {
-                    throw RuntimeException(e)
+                    if (sId.isEmpty()) {
+                        val installation = File(context.filesDir, installationDir)
+                        sId = try {
+                            if (!installation.exists()) {
+                                writeInstallationFile(installation)
+                            }
+                            readInstallationFile(installation)
+                        } catch (e: Exception) {
+                            throw RuntimeException(e)
+                        }
+                    }
+                } else {
+                    val installation = File(context.filesDir, installationDir)
+                    sId = try {
+                        if (!installation.exists()) {
+                            writeInstallationFile(installation)
+                        }
+                        readInstallationFile(installation)
+                    } catch (e: Exception) {
+                        throw RuntimeException(e)
+                    }
                 }
             }
         }
