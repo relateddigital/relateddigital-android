@@ -12,6 +12,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.bumptech.glide.Glide
 import com.relateddigital.relateddigital_android.R
 import com.relateddigital.relateddigital_android.RelatedDigital
 import com.relateddigital.relateddigital_android.databinding.FragmentHalfScreenBinding
@@ -20,6 +21,7 @@ import com.relateddigital.relateddigital_android.inapp.InAppNotificationState
 import com.relateddigital.relateddigital_android.inapp.InAppUpdateDisplayState
 import com.relateddigital.relateddigital_android.model.InAppMessage
 import com.relateddigital.relateddigital_android.network.RequestHandler
+import com.relateddigital.relateddigital_android.util.AppUtils
 import com.squareup.picasso.Picasso
 
 /**
@@ -112,8 +114,14 @@ class HalfScreenFragment : Fragment() {
         } else {
             binding.topTitleView.visibility = View.GONE
         }
-        Picasso.get().load(mInAppMessage!!.mActionData!!.mImg)
+        if(AppUtils.isAnImage(mInAppMessage!!.mActionData!!.mImg)) {
+            Picasso.get().load(mInAppMessage!!.mActionData!!.mImg)
                 .into(binding.topImageView)
+        } else {
+            Glide.with(activity)
+                .load(mInAppMessage!!.mActionData!!.mImg)
+                .into(binding.topImageView)
+        }
         binding.topImageView.setOnClickListener {
             val uriString: String? = mInAppMessage!!.mActionData!!.mAndroidLnk
             val buttonInterface: InAppButtonInterface? = RelatedDigital.getInAppButtonInterface()
@@ -147,8 +155,14 @@ class HalfScreenFragment : Fragment() {
         } else {
             binding.botTitleView.visibility = View.GONE
         }
-        Picasso.get().load(mInAppMessage!!.mActionData!!.mImg)
+        if(AppUtils.isAnImage(mInAppMessage!!.mActionData!!.mImg)) {
+            Picasso.get().load(mInAppMessage!!.mActionData!!.mImg)
                 .into(binding.botImageView)
+        } else {
+            Glide.with(activity)
+                .load(mInAppMessage!!.mActionData!!.mImg)
+                .into(binding.botImageView)
+        }
         binding.botImageView.setOnClickListener {
             val uriString: String? = mInAppMessage!!.mActionData!!.mAndroidLnk
             val buttonInterface: InAppButtonInterface? = RelatedDigital.getInAppButtonInterface()

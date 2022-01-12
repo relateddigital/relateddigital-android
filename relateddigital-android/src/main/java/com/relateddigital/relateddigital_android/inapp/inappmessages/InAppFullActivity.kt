@@ -12,6 +12,7 @@ import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.widget.Toast
+import com.bumptech.glide.Glide
 import com.relateddigital.relateddigital_android.R
 import com.relateddigital.relateddigital_android.RelatedDigital
 import com.relateddigital.relateddigital_android.databinding.ActivityInAppFullBinding
@@ -20,6 +21,7 @@ import com.relateddigital.relateddigital_android.inapp.InAppNotificationState
 import com.relateddigital.relateddigital_android.inapp.InAppUpdateDisplayState
 import com.relateddigital.relateddigital_android.model.InAppMessage
 import com.relateddigital.relateddigital_android.network.RequestHandler
+import com.relateddigital.relateddigital_android.util.AppUtils
 import com.relateddigital.relateddigital_android.util.StringUtils
 import com.squareup.picasso.Picasso
 
@@ -85,7 +87,13 @@ class InAppFullActivity : Activity(), IVisilabs {
         }
         if (!mInApp!!.mActionData!!.mImg.isNullOrEmpty()) {
             binding.fivInAppImage.visibility = View.VISIBLE
-            Picasso.get().load(mInApp!!.mActionData!!.mImg).into(binding.fivInAppImage)
+            if(AppUtils.isAnImage(mInApp!!.mActionData!!.mImg)) {
+                Picasso.get().load(mInApp!!.mActionData!!.mImg).into(binding.fivInAppImage)
+            } else {
+                Glide.with(this)
+                    .load(mInApp!!.mActionData!!.mImg)
+                    .into(binding.fivInAppImage);
+            }
         } else {
             binding.fivInAppImage.visibility = View.GONE
         }

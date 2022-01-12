@@ -571,6 +571,27 @@ object AppUtils {
         )
     }
 
+    fun isAnImage(url: String?): Boolean {
+        var result = true
+        val splitArr: Array<String>
+        val extension: String
+        try {
+            if (!url.isNullOrEmpty()) {
+                splitArr = url.split("\\.").toTypedArray()
+                extension = splitArr[splitArr.size - 1]
+                if (extension.lowercase(Locale.ROOT) != "jpg" &&
+                    extension.lowercase(Locale.ROOT) != "png"
+                ) {
+                    result = false
+                }
+            }
+        } catch (e: Exception) {
+            Log.w("isAnImage", "Could not get the extension from url string!")
+        }
+        return result
+    }
+
+
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     fun createSpinToWinCustomFontFiles(context: Context, jsonStr: String?): ArrayList<String?>? {
         var result: ArrayList<String?>? = null
