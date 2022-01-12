@@ -1022,6 +1022,10 @@ object RelatedDigital {
         }
     }
 
+    private fun syncForRegisterEmail(context: Context, registerEmailModel: RelatedDigitalModel) {
+        RequestHandler.createRegisterEmailRequest(context, registerEmailModel)
+    }
+
     @JvmStatic
     fun setEmailPermit(context: Context, emailPermit: EmailPermit) {
         if(model != null) {
@@ -1103,6 +1107,24 @@ object RelatedDigital {
     }
 
     @JvmStatic
+    fun removeUserProperty(context: Context, key: String) {
+        if(model != null) {
+            model!!.remove(context, key)
+        } else {
+            Log.e(LOG_TAG, "Call RelatedDigital.init() first")
+        }
+    }
+
+    @JvmStatic
+    fun removeUserProperties(context: Context) {
+        if(model != null) {
+            model!!.removeAll(context)
+        } else {
+            Log.e(LOG_TAG, "Call RelatedDigital.init() first")
+        }
+    }
+
+    @JvmStatic
     fun registerEmail(
         context: Context, email: String, emailPermit: EmailPermit,
         isCommercial: Boolean, callback: EuromessageCallback? = null
@@ -1111,28 +1133,27 @@ object RelatedDigital {
             if(model!!.getIsPushNotificationEnabled()) {
                 setEmail(context, email)
                 setEmailPermit(context, emailPermit)
-                model!!.add(context, Constants.CONSENT_SOURCE_KEY, Constants.CONSENT_SOURCE_VALUE)
+                val registerEmailModel = createInitialModel(context)
+                registerEmailModel.copyFrom(context, model!!)
+                registerEmailModel.addWithoutSaving(Constants.CONSENT_SOURCE_KEY, Constants.CONSENT_SOURCE_VALUE)
                 if (isCommercial) {
-                    model!!.add(
-                        context,
+                    registerEmailModel.addWithoutSaving(
                         Constants.RECIPIENT_TYPE_KEY,
                         Constants.RECIPIENT_TYPE_TACIR
                     )
                 } else {
-                    model!!.add(
-                        context,
+                    registerEmailModel.addWithoutSaving(
                         Constants.RECIPIENT_TYPE_KEY,
                         Constants.RECIPIENT_TYPE_BIREYSEL
                     )
                 }
 
-                model!!.add(
-                    context,
+                registerEmailModel.addWithoutSaving(
                     Constants.CONSENT_TIME_KEY,
                     AppUtils.getCurrentTurkeyDateString() as String
                 )
 
-                sync(context, callback)
+                syncForRegisterEmail(context, registerEmailModel)
             } else {
                 Log.e(
                     LOG_TAG, "Push notification is not enabled." +

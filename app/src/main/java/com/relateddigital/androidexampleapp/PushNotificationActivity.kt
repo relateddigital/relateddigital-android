@@ -149,7 +149,6 @@ class PushNotificationActivity : AppCompatActivity() {
     private fun setupSyncButton() {
         binding.btnSync.setOnClickListener {
             if(binding.autotext.text.toString().isNotEmpty()) {
-                RelatedDigital.setEmailPermit(this, EmailPermit.ACTIVE)
                 RelatedDigital.setGsmPermit(this, GsmPermit.ACTIVE)
                 RelatedDigital.setTwitterId(this, "testTwitterId")
                 RelatedDigital.setEmail(this, binding.autotext.text.toString())

@@ -222,6 +222,10 @@ class RelatedDigitalModel(
         saveToSharedPrefs(context)
     }
 
+    fun addWithoutSaving(key: String, value: Any) {
+        extra[key] = value
+    }
+
     fun addAll(context: Context, extras: Map<String, Any>) {
         extra.putAll(extras)
         saveToSharedPrefs(context)
@@ -230,6 +234,17 @@ class RelatedDigitalModel(
     fun removeAll(context: Context) {
         extra.clear()
         saveToSharedPrefs(context)
+    }
+
+    fun remove(context: Context, key: String) {
+        try {
+            if (key.isNotEmpty()) {
+                extra.remove(key)
+                saveToSharedPrefs(context)
+            }
+        } catch (e: Exception) {
+            Log.w("remove user property", "something went wrong!")
+        }
     }
 
     fun getIsPushNotificationEnabled(): Boolean {

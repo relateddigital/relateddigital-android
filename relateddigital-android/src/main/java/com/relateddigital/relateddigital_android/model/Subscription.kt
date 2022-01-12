@@ -2,12 +2,11 @@ package com.relateddigital.relateddigital_android.model
 
 import android.content.Context
 import com.google.gson.annotations.SerializedName
-import com.relateddigital.relateddigital_android.RelatedDigital
 import com.relateddigital.relateddigital_android.util.GoogleUtils
 import java.io.Serializable
 import java.util.*
 
-class Subscription(context: Context) : Serializable {
+class Subscription(context: Context, model: RelatedDigitalModel) : Serializable {
     @SerializedName("token")
     var token: String? = null
 
@@ -51,7 +50,6 @@ class Subscription(context: Context) : Serializable {
     private var extra: MutableMap<String, Any?> = HashMap()
 
     init {
-        val model = RelatedDigital.getRelatedDigitalModel(context)
         token = model.getToken()
         appVersion = model.getAppVersion()
         appAlias = if(GoogleUtils.checkPlayService(context)) {

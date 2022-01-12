@@ -606,6 +606,15 @@ object RequestHandler {
         }
     }
 
+    fun createRegisterEmailRequest(context: Context, registerEmailModel: RelatedDigitalModel) {
+        if (Build.VERSION.SDK_INT < Constants.SDK_MIN_API_VERSION) {
+            Log.e(LOG_TAG, "RelatedDigital SDK requires min API level 21!")
+            return
+        }
+
+        RequestSender.sendSubscriptionRequest(context, registerEmailModel, RetryCounterManager.counterId, null)
+    }
+
     fun createRetentionRequest(
         context: Context, type: RetentionType,
         pushId: String?, emPushSp: String?

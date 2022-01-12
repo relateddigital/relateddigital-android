@@ -810,7 +810,7 @@ object RequestSender {
 
     fun sendSubscriptionRequest(context: Context, model: RelatedDigitalModel, counterId: Int,
                                 callback: EuromessageCallback? = null) {
-        val subscription = Subscription(context)
+        val subscription = Subscription(context, model)
 
         val subscriptionInterface = SubscriptionApiClient.getClient(model.getRequestTimeoutInSecond())
             ?.create(ApiMethods::class.java)
