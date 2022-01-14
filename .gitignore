@@ -33,3 +33,5 @@ local.properties
 /.idea/modules/relateddigital-android/androidexampleapp.relateddigital-android.iml
 /.idea/codeStyles/Project.xml
 /.idea/codeStyles/codeStyleConfig.xml
+/app/google-services.json
+/app/agconnect-services.json
