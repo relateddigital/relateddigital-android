@@ -53,20 +53,6 @@
             </intent-filter>
         </activity>
 
-        <service
-            android:name="com.relateddigital.relateddigital_android.geofence.GeofenceTransitionsIntentService"
-            android:enabled="true"
-            android:permission="android.permission.BIND_JOB_SERVICE" />
-
-        <receiver
-            android:name="com.relateddigital.relateddigital_android.geofence.GeofenceAlarm"
-            android:exported="false" />
-
-        <receiver
-            android:name="com.relateddigital.relateddigital_android.geofence.GeofenceBroadcastReceiver"
-            android:enabled="true"
-            android:exported="false"/>
-
     </application>
 
 </manifest>
