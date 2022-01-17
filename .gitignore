@@ -37,3 +37,4 @@ local.properties
 /.idea/codeStyles/codeStyleConfig.xml
 /app/google-services.json
 /app/agconnect-services.json
+/app/keystore.jks
