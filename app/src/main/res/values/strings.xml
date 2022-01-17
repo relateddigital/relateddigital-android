@@ -34,6 +34,7 @@
     <string name="nps_2">NPS 2</string>
     <string name="nps_3">NPS 3</string>
     <string name="half_screen">HALF SCREEN</string>
+    <string name="notification">NOTIFICATION</string>
     <string name="location_permission">SEND LOCATION PERMISSION</string>
     <string name="recommendation">RECOMMENDATION</string>
     <string name="favourite">FAVOURITE RESPONSE</string>

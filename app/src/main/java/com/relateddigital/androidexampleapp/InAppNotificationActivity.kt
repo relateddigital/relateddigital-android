@@ -1,6 +1,5 @@
 package com.relateddigital.androidexampleapp
 
-import android.R
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -14,6 +13,7 @@ import com.relateddigital.relateddigital_android.constants.Constants
 import com.relateddigital.relateddigital_android.inapp.VisilabsCallback
 import com.relateddigital.relateddigital_android.inapp.VisilabsResponse
 import com.relateddigital.relateddigital_android.inapp.countdowntimer.CountdownTimerFragment
+import com.relateddigital.relateddigital_android.inapp.notification.NotificationSmallFragment
 import com.relateddigital.relateddigital_android.inapp.shaketowin.ShakeToWinActivity
 import com.relateddigital.relateddigital_android.model.FavsResponse
 import com.relateddigital.relateddigital_android.network.RequestHandler
@@ -198,6 +198,19 @@ class InAppNotificationActivity : AppCompatActivity() {
 
             RequestHandler.createFavsResponseRequest(applicationContext, null,
                     Constants.FavoriteAttributeAction, callback)
+        }
+
+        binding.notification.setOnClickListener {
+            val notificationSmallFragment = NotificationSmallFragment.newInstance(0, null)
+
+            notificationSmallFragment.retainInstance = true
+
+            val transaction = this.fragmentManager.beginTransaction()
+            transaction.add(android.R.id.content, notificationSmallFragment)
+            transaction.commit()
+            //TODO : When BE is ready
+            //sendInAppRequest("notification")
+
         }
     }
 

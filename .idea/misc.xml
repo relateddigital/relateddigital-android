@@ -5,9 +5,11 @@
       <map>
         <entry key="app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.26666666666666666" />
         <entry key="app/src/main/res/drawable/rounded_corners_background.xml" value="0.26666666666666666" />
+        <entry key="app/src/main/res/layout/activity_in_app_notification_example.xml" value="0.17572463768115942" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.19746376811594202" />
         <entry key="app/src/main/res/layout/activity_push_notification.xml" value="0.19746376811594202" />
         <entry key="relateddigital-android/src/main/res/layout/carousel_notification_item.xml" value="0.1793478260869565" />
+        <entry key="relateddigital-android/src/main/res/layout/fragment_notification_small.xml" value="0.17572463768115942" />
       </map>
     </option>
   </component>
