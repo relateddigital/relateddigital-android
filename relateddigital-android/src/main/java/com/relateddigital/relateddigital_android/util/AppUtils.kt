@@ -620,13 +620,16 @@ object AppUtils {
         val copyButtonFontFamily: String = extendedProps.copyButtonFontFamily!!
         val promoCodesSoldOutMessageFontFamily: String =
             extendedProps.promocodesSoldOutMessageFontFamily!!
+
+        htmlStr = writeHtmlToFile(context)
+
         if (displayNameFontFamily == "custom") {
             val fontExtension = getFontNameWithExtension(
                 context,
                 extendedProps.displayNameCustomFontFamilyAndroid!!
             )
             if (fontExtension.isNotEmpty()) {
-                htmlStr = writeToFile(
+                writeFontToFile(
                     context,
                     extendedProps.displayNameCustomFontFamilyAndroid!!,
                     fontExtension
@@ -638,7 +641,7 @@ object AppUtils {
             val fontExtension =
                 getFontNameWithExtension(context, extendedProps.titleCustomFontFamilyAndroid!!)
             if (fontExtension.isNotEmpty()) {
-                htmlStr = writeToFile(
+                writeFontToFile(
                     context,
                     extendedProps.titleCustomFontFamilyAndroid!!,
                     fontExtension
@@ -650,7 +653,7 @@ object AppUtils {
             val fontExtension =
                 getFontNameWithExtension(context, extendedProps.textCustomFontFamilyAndroid!!)
             if (fontExtension.isNotEmpty()) {
-                htmlStr = writeToFile(
+                writeFontToFile(
                     context,
                     extendedProps.textCustomFontFamilyAndroid!!,
                     fontExtension
@@ -662,7 +665,7 @@ object AppUtils {
             val fontExtension =
                 getFontNameWithExtension(context, extendedProps.buttonCustomFontFamilyAndroid!!)
             if (fontExtension.isNotEmpty()) {
-                htmlStr = writeToFile(
+                writeFontToFile(
                     context,
                     extendedProps.buttonCustomFontFamilyAndroid!!,
                     fontExtension
@@ -676,7 +679,7 @@ object AppUtils {
                 extendedProps.promocodeTitleCustomFontFamilyAndroid!!
             )
             if (fontExtension.isNotEmpty()) {
-                htmlStr = writeToFile(
+                writeFontToFile(
                     context,
                     extendedProps.promocodeTitleCustomFontFamilyAndroid!!,
                     fontExtension
@@ -690,7 +693,7 @@ object AppUtils {
                 extendedProps.copyButtonCustomFontFamilyAndroid!!
             )
             if (fontExtension.isNotEmpty()) {
-                htmlStr = writeToFile(
+                writeFontToFile(
                     context,
                     extendedProps.copyButtonCustomFontFamilyAndroid!!,
                     fontExtension
@@ -704,7 +707,7 @@ object AppUtils {
                 extendedProps.promocodesSoldOutMessageCustomFontFamilyAndroid!!
             )
             if (fontExtension.isNotEmpty()) {
-                htmlStr = writeToFile(
+                writeFontToFile(
                     context,
                     extendedProps.promocodesSoldOutMessageCustomFontFamilyAndroid!!,
                     fontExtension
@@ -734,13 +737,8 @@ object AppUtils {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-    private fun writeToFile(
-        context: Context,
-        fontName: String,
-        fontNameWithExtension: String
-    ): String {
+    private fun writeHtmlToFile(context: Context): String {
         val spinToWinFileName = "spintowin"
-        val baseUrlPath = "file://" + context.filesDir.absolutePath + "/"
         var htmlString: String = ""
         val spintowinRelatedDigitalCacheDir = context.filesDir
         var `is`: InputStream? = null
@@ -748,10 +746,8 @@ object AppUtils {
         try {
             val htmlFile = File("$spintowinRelatedDigitalCacheDir/$spinToWinFileName.html")
             val jsFile = File("$spintowinRelatedDigitalCacheDir/$spinToWinFileName.js")
-            val fontFile = File("$spintowinRelatedDigitalCacheDir/$fontNameWithExtension")
             htmlFile.createNewFile()
             jsFile.createNewFile()
-            fontFile.createNewFile()
             `is` = context.assets.open("$spinToWinFileName.html")
             var bytes = getBytesFromInputStream(`is`)
             `is`.close()
@@ -763,13 +759,6 @@ object AppUtils {
             bytes = getBytesFromInputStream(`is`)
             `is`.close()
             fos = FileOutputStream(jsFile)
-            fos.write(bytes)
-            fos.close()
-            val fontId = context.resources.getIdentifier(fontName, "font", context.packageName)
-            `is` = context.resources.openRawResource(fontId)
-            bytes = getBytesFromInputStream(`is`)
-            `is`.close()
-            fos = FileOutputStream(fontFile)
             fos.write(bytes)
             fos.close()
         } catch (e: java.lang.Exception) {
@@ -795,6 +784,48 @@ object AppUtils {
             }
         }
         return htmlString
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    private fun writeFontToFile(
+        context: Context,
+        fontName: String,
+        fontNameWithExtension: String
+    ){
+        val spintowinRelatedDigitalCacheDir = context.filesDir
+        var `is`: InputStream? = null
+        var fos: FileOutputStream? = null
+        try {
+            val fontFile = File("$spintowinRelatedDigitalCacheDir/$fontNameWithExtension")
+            fontFile.createNewFile()
+            val fontId = context.resources.getIdentifier(fontName, "font", context.packageName)
+            `is` = context.resources.openRawResource(fontId)
+            val bytes = getBytesFromInputStream(`is`)
+            `is`.close()
+            fos = FileOutputStream(fontFile)
+            fos.write(bytes)
+            fos.close()
+        } catch (e: java.lang.Exception) {
+            Log.e("SpinToWin", "Could not create spintowin cache files properly!")
+            e.printStackTrace()
+        } finally {
+            if (`is` != null) {
+                try {
+                    `is`.close()
+                } catch (e: java.lang.Exception) {
+                    Log.e("SpinToWin", "Could not close spintowin is stream properly!")
+                    e.printStackTrace()
+                }
+            }
+            if (fos != null) {
+                try {
+                    fos.close()
+                } catch (e: java.lang.Exception) {
+                    Log.e("SpinToWin", "Could not close spintowin fos stream properly!")
+                    e.printStackTrace()
+                }
+            }
+        }
     }
 
     @Throws(IOException::class)

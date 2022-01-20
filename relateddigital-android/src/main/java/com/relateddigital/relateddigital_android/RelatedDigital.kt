@@ -980,20 +980,22 @@ object RelatedDigital {
 
         if(model != null) {
             if (model!!.getIsInAppNotificationEnabled()) {
-                RequestHandler.createInAppNotificationRequest(
-                    context,
-                    model!!,
-                    pageName,
-                    properties,
-                    parent
-                )
-                RequestHandler.createInAppActionRequest(
-                    context,
-                    model!!,
-                    pageName,
-                    properties,
-                    parent
-                )
+                if(parent != null) {
+                    RequestHandler.createInAppNotificationRequest(
+                        context,
+                        model!!,
+                        pageName,
+                        properties,
+                        parent
+                    )
+                    RequestHandler.createInAppActionRequest(
+                        context,
+                        model!!,
+                        pageName,
+                        properties,
+                        parent
+                    )
+                }
             } else {
                 Log.e(
                     LOG_TAG, "In-app notification is not enabled." +
