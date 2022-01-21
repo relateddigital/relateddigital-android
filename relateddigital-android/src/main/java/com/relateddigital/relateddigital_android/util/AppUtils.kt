@@ -572,21 +572,11 @@ object AppUtils {
     }
 
     fun isAnImage(url: String?): Boolean {
-        var result = true
-        val splitArr: Array<String>
-        val extension: String
-        try {
-            if (!url.isNullOrEmpty()) {
-                splitArr = url.split("\\.").toTypedArray()
-                extension = splitArr[splitArr.size - 1]
-                if (extension.lowercase(Locale.ROOT) != "jpg" &&
-                    extension.lowercase(Locale.ROOT) != "png"
-                ) {
-                    result = false
-                }
+        var result = false
+        if (!url.isNullOrEmpty()) {
+            if (url.contains(".jpg") || url.contains(".png")) {
+                result = true
             }
-        } catch (e: Exception) {
-            Log.w("isAnImage", "Could not get the extension from url string!")
         }
         return result
     }

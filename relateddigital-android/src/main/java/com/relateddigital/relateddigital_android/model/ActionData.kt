@@ -7,7 +7,6 @@ import com.google.gson.annotations.SerializedName
 import com.relateddigital.relateddigital_android.inapp.FontFamily
 import java.io.Serializable
 import java.util.*
-import com.relateddigital.relateddigital_android.util.AppUtils
 import com.relateddigital.relateddigital_android.util.AppUtils.isFontResourceAvailable
 
 
@@ -131,6 +130,10 @@ class ActionData : Serializable {
 
     @SerializedName("custom_font_family_android")
     var mCustomFontFamilyAndroid: String? = null
+
+    @SerializedName("carousel_items")
+    var carouselItems: List<InAppCarouselItem>? = null
+
 
     fun getFontFamily(context: Context): Typeface? {
         if (mFontFamily == null || mFontFamily == "") {

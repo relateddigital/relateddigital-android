@@ -9,7 +9,6 @@ import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -31,6 +30,8 @@ import com.relateddigital.relateddigital_android.network.RequestHandler
 import com.relateddigital.relateddigital_android.util.AppUtils
 import com.relateddigital.relateddigital_android.util.StringUtils
 import com.squareup.picasso.Picasso
+import com.relateddigital.relateddigital_android.model.InAppCarouselItem
+
 
 class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListener, SmileRating.OnRatingSelectedListener {
     internal enum class NpsSecondPopUpType {
@@ -48,6 +49,7 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
     private lateinit var bindingSecondPopUp: NpsSecondPopUpBinding
     private lateinit var bindingCarousel: CarouselBinding
     private var mIsCarousel = false
+    private var mCarouselItems: List<InAppCarouselItem>? = null
     private var mCarouselPosition = -1
     private var mIsRotation = false
     private var secondPopUpType = NpsSecondPopUpType.IMAGE_TEXT_BUTTON
@@ -71,6 +73,7 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
 
             if (mInAppMessage!!.mActionData!!.mMsgType == InAppNotificationType.CAROUSEL.toString()) {
                 mIsCarousel = true
+                mCarouselItems = mInAppMessage!!.mActionData!!.carouselItems
                 bindingCarousel = CarouselBinding.inflate(layoutInflater)
                 view = bindingCarousel.root
                 if (savedInstanceState != null) {
@@ -143,7 +146,7 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
             } else {
                 Glide.with(this)
                     .load(mInAppMessage!!.mActionData!!.mImg!!)
-                    .into(binding.ivTemplate);
+                    .into(binding.ivTemplate)
             }
         } else {
             binding.ivTemplate.visibility = View.GONE
@@ -473,7 +476,7 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
                     } else {
                         Glide.with(this)
                             .load(mInAppMessage!!.mActionData!!.mSecondPopupImg2)
-                            .into(bindingSecondPopUp.imageView2);
+                            .into(bindingSecondPopUp.imageView2)
                     }
                 }
             }
@@ -502,7 +505,7 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
             } else {
                 Glide.with(this)
                     .load(mInAppMessage!!.mActionData!!.mSecondPopupImg1)
-                    .into(bindingSecondPopUp.imageView);
+                    .into(bindingSecondPopUp.imageView)
             }
         }
         bindingSecondPopUp.titleView.typeface = mInAppMessage!!.mActionData!!.getFontFamily(this)
@@ -612,9 +615,7 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
 
     private fun showNps() {
         binding.ratingBar.visibility = View.VISIBLE
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            binding.ratingBar.progressTintList = ColorStateList.valueOf(ContextCompat.getColor(applicationContext, R.color.yellow))
-        }
+        binding.ratingBar.progressTintList = ColorStateList.valueOf(ContextCompat.getColor(applicationContext, R.color.yellow))
     }
 
     private fun showSmileRating() {
@@ -696,7 +697,7 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
                 finish()
             }
         }
-        for (i in 0 until carouselItemCount) {
+        for (i in mCarouselItems!!.indices) {
             val view = View(applicationContext)
             view.setBackgroundResource(R.drawable.dot_indicator_default)
             val layoutParams = LinearLayout.LayoutParams(
@@ -713,175 +714,37 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
         bindingCarousel.carouselTitle.visibility = View.VISIBLE
         bindingCarousel.carouselBodyText.visibility = View.VISIBLE
         bindingCarousel.carouselButton.visibility = View.VISIBLE
-        for (i in 0 until carouselItemCount) {
+        bindingCarousel.background.visibility = View.VISIBLE
+        bindingCarousel.couponContainer.visibility = View.VISIBLE
+        for (i in mCarouselItems!!.indices) {
             if (i == mCarouselPosition) {
                 bindingCarousel.dotIndicator.getChildAt(i).setBackgroundResource(R.drawable.dot_indicator_selected)
             } else {
                 bindingCarousel.dotIndicator.getChildAt(i).setBackgroundResource(R.drawable.dot_indicator_default)
             }
         }
-        when (mCarouselPosition) {
-            0 -> {
-                bindingCarousel.carouselContainer.setBackgroundColor(Color.parseColor("#CD2F2F"))
-                if(AppUtils.isAnImage("https://img.visilabs.net/in-app-message/uploaded_images/163_1100_154_20200603160304969.jpg")) {
-                    Picasso.get().load("https://img.visilabs.net/in-app-message/uploaded_images/163_1100_154_20200603160304969.jpg")
-                        .into(bindingCarousel.carouselImage)
-                } else {
-                    Glide.with(this)
-                        .load("https://img.visilabs.net/in-app-message/uploaded_images/163_1100_154_20200603160304969.jpg")
-                        .into(bindingCarousel.carouselImage);
-                }
-                bindingCarousel.carouselTitle.text = "Title1"
-                bindingCarousel.carouselTitle.setTextColor(Color.parseColor("#E8F279"))
-                bindingCarousel.carouselTitle.textSize = 32f
-                bindingCarousel.carouselBodyText.text = "Text1"
-                bindingCarousel.carouselBodyText.setTextColor(Color.parseColor("#E3A9E7"))
-                bindingCarousel.carouselBodyText.textSize = 24f
-                bindingCarousel.carouselButton.text = "Button1"
-                bindingCarousel.carouselButton.setTextColor(Color.parseColor("#000000"))
-                bindingCarousel.carouselButton.setBackgroundColor(Color.parseColor("#A9E7E4"))
-                bindingCarousel.carouselButton.textSize = 24f
-                bindingCarousel.carouselButton.setOnClickListener { //TODO : send report here
-                    if (buttonCallback != null) {
-                        RelatedDigital.setInAppButtonInterface(null)
-                        buttonCallback!!.onPress("https://www.relateddigital.com/")
-                    } else {
-                        try {
-                            val viewIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.relateddigital.com/"))
-                            viewIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                            startActivity(viewIntent)
-                        } catch (e: Exception) {
-                            Log.e(LOG_TAG, "The link is not formatted properly!")
-                        }
-                    }
-                    InAppUpdateDisplayState.releaseDisplayState(mIntentId)
-                    finish()
-                }
-            }
-            1 -> {
-                bindingCarousel.carouselContainer.setBackgroundColor(Color.parseColor("#77CD2F"))
-                bindingCarousel.carouselImage.visibility = View.GONE
-                bindingCarousel.carouselTitle.text = "Title2"
-                bindingCarousel.carouselTitle.setTextColor(Color.parseColor("#F5F43E"))
-                bindingCarousel.carouselTitle.textSize = 32f
-                bindingCarousel.carouselBodyText.text = "Text2"
-                bindingCarousel.carouselBodyText.setTextColor(Color.parseColor("#FFFFFF"))
-                bindingCarousel.carouselBodyText.textSize = 24f
-                bindingCarousel.carouselButton.text = "Button2"
-                bindingCarousel.carouselButton.setBackgroundColor(Color.parseColor("#27FB76"))
-                bindingCarousel.carouselButton.setTextColor(Color.parseColor("#000000"))
-                bindingCarousel.carouselButton.textSize = 24f
-                bindingCarousel.carouselButton.setOnClickListener { //TODO : send report here
-                    if (buttonCallback != null) {
-                        RelatedDigital.setInAppButtonInterface(null)
-                        buttonCallback!!.onPress("https://www.relateddigital.com/")
-                    } else {
-                        try {
-                            val viewIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.relateddigital.com/"))
-                            viewIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                            startActivity(viewIntent)
-                        } catch (e: Exception) {
-                            Log.e(LOG_TAG, "The link is not formatted properly!")
-                        }
-                    }
-                    InAppUpdateDisplayState.releaseDisplayState(mIntentId)
-                    finish()
-                }
-            }
-            2 -> {
-                bindingCarousel.carouselContainer.setBackgroundColor(Color.parseColor("#2FBBCD"))
-                if(AppUtils.isAnImage("https://img.visilabs.net/in-app-message/uploaded_images/163_1100_411_20210121113801841.jpg")) {
-                    Picasso.get().load("https://img.visilabs.net/in-app-message/uploaded_images/163_1100_411_20210121113801841.jpg")
-                        .into(bindingCarousel.carouselImage)
-                } else {
-                    Glide.with(this)
-                        .load("https://img.visilabs.net/in-app-message/uploaded_images/163_1100_411_20210121113801841.jpg")
-                        .into(bindingCarousel.carouselImage);
-                }
-                bindingCarousel.carouselTitle.text = "Title3"
-                bindingCarousel.carouselTitle.setTextColor(Color.parseColor("#FFFFFF"))
-                bindingCarousel.carouselTitle.textSize = 32f
-                bindingCarousel.carouselBodyText.text = "Text3"
-                bindingCarousel.carouselBodyText.setTextColor(Color.parseColor("#1D19E0"))
-                bindingCarousel.carouselBodyText.textSize = 24f
-                bindingCarousel.carouselButton.visibility = View.GONE
-            }
-            3 -> {
-                bindingCarousel.carouselContainer.setBackgroundColor(Color.parseColor("#C9CD2F"))
-                bindingCarousel.carouselImage.visibility = View.GONE
-                bindingCarousel.carouselTitle.text = "Title4"
-                bindingCarousel.carouselTitle.setTextColor(Color.parseColor("#E019D6"))
-                bindingCarousel.carouselTitle.textSize = 32f
-                bindingCarousel.carouselBodyText.visibility = View.GONE
-                bindingCarousel.carouselButton.text = "Button4"
-                bindingCarousel.carouselButton.setBackgroundColor(Color.parseColor("#E02B19"))
-                bindingCarousel.carouselButton.setTextColor(Color.parseColor("#080201"))
-                bindingCarousel.carouselButton.textSize = 24f
-                bindingCarousel.carouselButton.setOnClickListener { //TODO : send report here
-                    if (buttonCallback != null) {
-                        RelatedDigital.setInAppButtonInterface(null)
-                        buttonCallback!!.onPress("https://www.relateddigital.com/")
-                    } else {
-                        try {
-                            val viewIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.relateddigital.com/"))
-                            viewIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                            startActivity(viewIntent)
-                        } catch (e: Exception) {
-                            Log.e(LOG_TAG, "The link is not formatted properly!")
-                        }
-                    }
-                    InAppUpdateDisplayState.releaseDisplayState(mIntentId)
-                    finish()
-                }
-            }
-            4 -> {
-                bindingCarousel.carouselContainer.setBackgroundColor(Color.parseColor("#CD2FC5"))
-                if(AppUtils.isAnImage("https://e7.pngegg.com/pngimages/994/882/png-clipart-new-super-mario-bros-2-new-super-mario-bros-2-mario-luigi-superstar-saga-mario-heroes-super-mario-bros.png")) {
-                    Picasso.get().load("https://e7.pngegg.com/pngimages/994/882/png-clipart-new-super-mario-bros-2-new-super-mario-bros-2-mario-luigi-superstar-saga-mario-heroes-super-mario-bros.png")
-                        .into(bindingCarousel.carouselImage)
-                } else {
-                    Glide.with(this)
-                        .load("https://e7.pngegg.com/pngimages/994/882/png-clipart-new-super-mario-bros-2-new-super-mario-bros-2-mario-luigi-superstar-saga-mario-heroes-super-mario-bros.png")
-                        .into(bindingCarousel.carouselImage);
-                }
-                bindingCarousel.carouselTitle.visibility = View.GONE
-                bindingCarousel.carouselBodyText.text = "Text5"
-                bindingCarousel.carouselBodyText.setTextColor(ContextCompat.getColor(applicationContext, R.color.yellow))
-                bindingCarousel.carouselBodyText.textSize = 24f
-                bindingCarousel.carouselButton.visibility = View.GONE
-            }
-            else -> {
-            }
-        }
+
+        setupCarouselItem(mCarouselPosition)
     }
 
-    //TODO: return real carousel item count here
-    private val carouselItemCount: Int
-        get() =//TODO: return real carousel item count here
-            5
-
     private val isLastCarousel: Boolean
-        get() = mCarouselPosition == carouselItemCount - 1
+        get() = mCarouselPosition == mCarouselItems!!.size - 1
     private val isFirstCarousel: Boolean
         get() = mCarouselPosition == 0
 
     private fun cacheImages() {
         if (mIsCarousel) {
-            //TODO: cache all images for carousel
-            if (AppUtils.isAnImage("https://img.visilabs.net/in-app-message/uploaded_images/163_1100_154_20200603160304969.jpg")) {
-                Picasso.get()
-                    .load("https://img.visilabs.net/in-app-message/uploaded_images/163_1100_154_20200603160304969.jpg")
-                    .fetch()
-            }
-            if (AppUtils.isAnImage("https://img.visilabs.net/in-app-message/uploaded_images/163_1100_411_20210121113801841.jpg")) {
-                Picasso.get()
-                    .load("https://img.visilabs.net/in-app-message/uploaded_images/163_1100_411_20210121113801841.jpg")
-                    .fetch()
-            }
-            if (AppUtils.isAnImage("https://e7.pngegg.com/pngimages/994/882/png-clipart-new-super-mario-bros-2-new-super-mario-bros-2-mario-luigi-superstar-saga-mario-heroes-super-mario-bros.png")) {
-                Picasso.get()
-                    .load("https://e7.pngegg.com/pngimages/994/882/png-clipart-new-super-mario-bros-2-new-super-mario-bros-2-mario-luigi-superstar-saga-mario-heroes-super-mario-bros.png")
-                    .fetch()
+            for (i in mCarouselItems!!.indices) {
+                if (!mCarouselItems!![i].image.isNullOrEmpty()) {
+                    if (AppUtils.isAnImage(mCarouselItems!![i].image)) {
+                        Picasso.get().load(mCarouselItems!![i].image).fetch()
+                    }
+                }
+                if (!mCarouselItems!![i].backgroundImage.isNullOrEmpty()) {
+                    if (AppUtils.isAnImage(mCarouselItems!![i].backgroundImage)) {
+                        Picasso.get().load(mCarouselItems!![i].backgroundImage).fetch()
+                    }
+                }
             }
         } else {
             if (!mInAppMessage!!.mActionData!!.mImg.isNullOrEmpty()) {
@@ -901,6 +764,128 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
                     }
                 }
             }
+        }
+    }
+
+    private fun setupCarouselItem(position: Int) {
+        if (!mCarouselItems!![position].backgroundImage.isNullOrEmpty()) {
+            Picasso.get().load(mCarouselItems!![position].backgroundImage)
+                .into(bindingCarousel.background)
+        } else {
+            bindingCarousel.background.visibility = View.GONE
+            if (!mCarouselItems!![position].backgroundColor.isNullOrEmpty()) {
+                bindingCarousel.background.visibility = View.GONE
+                bindingCarousel.carouselContainer.setBackgroundColor(
+                    Color.parseColor(
+                        mCarouselItems!![position].backgroundColor
+                    )
+                )
+            }
+        }
+
+        if (!mCarouselItems!![position].image.isNullOrEmpty()) {
+            if (AppUtils.isAnImage(mCarouselItems!![position].image)) {
+                Picasso.get().load(mCarouselItems!![position].image)
+                    .into(bindingCarousel.carouselImage)
+            } else {
+                Glide.with(this)
+                    .load(mCarouselItems!![position].image)
+                    .into(bindingCarousel.carouselImage)
+            }
+        } else {
+            bindingCarousel.carouselImage.visibility = View.GONE
+        }
+
+        if (!mCarouselItems!![position].title.isNullOrEmpty()) {
+            bindingCarousel.carouselTitle.text = mCarouselItems!![position].title
+            bindingCarousel.carouselTitle.setTextColor(Color.parseColor(mCarouselItems!![position].titleColor))
+            bindingCarousel.carouselTitle.textSize =
+                mCarouselItems!![position].titleTextsize!!.toFloat() + 12
+            bindingCarousel.carouselTitle.typeface = mCarouselItems!![position].getTitleFontFamily(
+                this
+            )
+        } else {
+            bindingCarousel.carouselTitle.visibility = View.GONE
+        }
+
+        if (!mCarouselItems!![position].body.isNullOrEmpty()) {
+            bindingCarousel.carouselBodyText.text = mCarouselItems!![position].body
+            bindingCarousel.carouselBodyText.setTextColor(
+                Color.parseColor(
+                    mCarouselItems!![position].bodyColor
+                )
+            )
+            bindingCarousel.carouselBodyText.textSize =
+                mCarouselItems!![position].bodyTextsize!!.toFloat() + 8
+            bindingCarousel.carouselBodyText.typeface = mCarouselItems!![position].getBodyFontFamily(
+                this
+            )
+        } else {
+            bindingCarousel.carouselBodyText.visibility = View.GONE
+        }
+
+        if (!mCarouselItems!![position].promotionCode.isNullOrEmpty()) {
+            bindingCarousel.couponContainer.setBackgroundColor(
+                Color.parseColor(
+                    mCarouselItems!![position].promocodeBackgroundColor
+                )
+            )
+            bindingCarousel.couponCode.text = mCarouselItems!![position].promotionCode
+            bindingCarousel.couponCode.setTextColor(Color.parseColor(mCarouselItems!![position].promocodeTextColor))
+            bindingCarousel.couponContainer.setOnClickListener {
+                val clipboard =
+                    applicationContext.getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
+                val clip = ClipData.newPlainText(
+                    getString(R.string.coupon_code),
+                    mCarouselItems!![position].promotionCode
+                )
+                clipboard.setPrimaryClip(clip)
+                Toast.makeText(
+                    applicationContext,
+                    getString(R.string.copied_to_clipboard),
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        } else {
+            bindingCarousel.couponContainer.visibility = View.GONE
+        }
+
+        if (!mCarouselItems!![position].buttonText.isNullOrEmpty()) {
+            bindingCarousel.carouselButton.setBackgroundColor(
+                Color.parseColor(
+                    mCarouselItems!![position].buttonColor
+                )
+            )
+            bindingCarousel.carouselButton.text = mCarouselItems!![position].buttonText
+            bindingCarousel.carouselButton.setTextColor(Color.parseColor(mCarouselItems!![position].buttonTextColor))
+            bindingCarousel.carouselButton.textSize =
+                mCarouselItems!![position].buttonTextsize!!.toFloat() + 12
+            bindingCarousel.carouselButton.typeface = mCarouselItems!![position].getButtonFontFamily(
+                this
+            )
+            bindingCarousel.carouselButton.setOnClickListener {
+                RequestHandler.createInAppNotificationClickRequest(applicationContext, mInAppMessage, rateReport)
+                if (buttonCallback != null) {
+                    RelatedDigital.setInAppButtonInterface(null)
+                    buttonCallback!!.onPress(mCarouselItems!![position].androidLnk)
+                } else {
+                    try {
+                        val viewIntent = Intent(
+                            Intent.ACTION_VIEW, Uri.parse(
+                                mCarouselItems!![position].androidLnk
+                            )
+                        )
+                        viewIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        startActivity(viewIntent)
+                    } catch (e: java.lang.Exception) {
+                        Log.e(LOG_TAG, "The link is not formatted properly!")
+                    }
+                }
+                InAppUpdateDisplayState.releaseDisplayState(mIntentId)
+                finish()
+            }
+        } else {
+            bindingCarousel.carouselButton.visibility = View.GONE
         }
     }
 

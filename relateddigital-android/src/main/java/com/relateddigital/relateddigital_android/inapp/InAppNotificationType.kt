@@ -58,7 +58,7 @@ enum class InAppNotificationType {
     },
     CAROUSEL {
         override fun toString(): String {
-            return "carousel" //TODO: Check this string when the real data comes.
+            return "carousel"
         }
     },
     NPS_AND_SECOND_POP_UP {
