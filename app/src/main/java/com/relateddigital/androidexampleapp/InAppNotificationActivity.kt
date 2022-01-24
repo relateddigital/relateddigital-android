@@ -104,7 +104,7 @@ class InAppNotificationActivity : AppCompatActivity() {
             countdownTimerFragment.retainInstance = true
 
             val transaction = fragmentManager.beginTransaction()
-            transaction.add(R.id.content, countdownTimerFragment)
+            transaction.add(android.R.id.content, countdownTimerFragment)
             transaction.commit()
             //TODO when backend side gets ready, check below
             //sendInAppRequest("countdowntimer");
