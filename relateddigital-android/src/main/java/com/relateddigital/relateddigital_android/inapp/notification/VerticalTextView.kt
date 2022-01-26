@@ -6,8 +6,14 @@ import android.util.AttributeSet
 import android.view.Gravity
 import androidx.appcompat.widget.AppCompatTextView
 
-class VerticalTextView(context: Context?, attrs: AttributeSet?) : AppCompatTextView(context!!, attrs) {
+class VerticalTextView(
+    context: Context?,
+    attrs: AttributeSet?
+) :
+    AppCompatTextView(context!!, attrs) {
     var topDown = false
+    var isRight = false
+    var isCircle = false
     override fun onMeasure(
         widthMeasureSpec: Int,
         heightMeasureSpec: Int
@@ -34,10 +40,45 @@ class VerticalTextView(context: Context?, attrs: AttributeSet?) : AppCompatTextV
             canvas.translate(0f, height.toFloat())
             canvas.rotate(-90f)
         }
-        canvas.translate(
-            compoundPaddingLeft.toFloat(),
-            extendedPaddingTop.toFloat()
-        )
+        if (isCircle) {
+            if (topDown) {
+                if (isRight) {
+                    canvas.translate(
+                        compoundPaddingLeft.toFloat(), (
+                                extendedPaddingTop + 28).toFloat()
+                    )
+                } else {
+                    canvas.translate(
+                        compoundPaddingLeft.toFloat(), (
+                                extendedPaddingTop + 80).toFloat()
+                    )
+                }
+            } else {
+                if (isRight) {
+                    canvas.translate(
+                        compoundPaddingLeft.toFloat(), (
+                                extendedPaddingTop + 80).toFloat()
+                    )
+                } else {
+                    canvas.translate(
+                        compoundPaddingLeft.toFloat(), (
+                                extendedPaddingTop + 28).toFloat()
+                    )
+                }
+            }
+        } else {
+            if (topDown) {
+                canvas.translate(
+                    compoundPaddingLeft.toFloat(), (
+                            extendedPaddingTop + 20).toFloat()
+                )
+            } else {
+                canvas.translate(
+                    compoundPaddingLeft.toFloat(), (
+                            extendedPaddingTop + 20).toFloat()
+                )
+            }
+        }
         layout.draw(canvas)
         canvas.restore()
     }

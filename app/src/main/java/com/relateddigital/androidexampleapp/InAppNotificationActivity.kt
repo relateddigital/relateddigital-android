@@ -13,9 +13,10 @@ import com.relateddigital.relateddigital_android.constants.Constants
 import com.relateddigital.relateddigital_android.inapp.VisilabsCallback
 import com.relateddigital.relateddigital_android.inapp.VisilabsResponse
 import com.relateddigital.relateddigital_android.inapp.countdowntimer.CountdownTimerFragment
-import com.relateddigital.relateddigital_android.inapp.notification.NotificationSmallFragment
+import com.relateddigital.relateddigital_android.inapp.notification.InAppNotificationFragment
 import com.relateddigital.relateddigital_android.inapp.shaketowin.ShakeToWinActivity
 import com.relateddigital.relateddigital_android.model.FavsResponse
+import com.relateddigital.relateddigital_android.model.InAppNotificationModel
 import com.relateddigital.relateddigital_android.network.RequestHandler
 import java.util.*
 
@@ -200,12 +201,14 @@ class InAppNotificationActivity : AppCompatActivity() {
         }
 
         binding.notification.setOnClickListener {
-            val notificationSmallFragment = NotificationSmallFragment.newInstance(0, null)
+            val inAppNotificationFragment = InAppNotificationFragment.newInstance(
+                InAppNotificationModel()
+            )
 
-            notificationSmallFragment.retainInstance = true
+            inAppNotificationFragment.retainInstance = true
 
             val transaction = this.fragmentManager.beginTransaction()
-            transaction.add(android.R.id.content, notificationSmallFragment)
+            transaction.add(android.R.id.content, inAppNotificationFragment)
             transaction.commit()
             //TODO : When BE is ready
             //sendInAppRequest("notification")
