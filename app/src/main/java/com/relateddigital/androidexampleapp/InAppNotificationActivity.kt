@@ -112,7 +112,7 @@ class InAppNotificationActivity : AppCompatActivity() {
         }
 
         binding.inAppCarouselButton.setOnClickListener {
-            sendInAppRequest("carousel")
+            sendInAppRequest("inappcarousel")
         }
 
         binding.shakeToWinButton.setOnClickListener {
