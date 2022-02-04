@@ -1,7 +1,6 @@
 package com.relateddigital.relateddigital_android.inapp.halfscreen
 
-import android.app.ActionBar
-import android.app.Fragment
+import androidx.fragment.app.Fragment
 import android.content.Intent
 import android.graphics.Color
 import android.net.Uri
@@ -66,16 +65,16 @@ class HalfScreenFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mStateId = arguments.getInt(ARG_PARAM1)
-        mInAppState = arguments.getParcelable(ARG_PARAM2)
+        mStateId = requireArguments().getInt(ARG_PARAM1)
+        mInAppState = requireArguments().getParcelable(ARG_PARAM2)
         if (mInAppState != null) {
             mInAppMessage = mInAppState!!.getInAppMessage()
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View {
-        binding = FragmentHalfScreenBinding.inflate(inflater!!, container, false)
+        binding = FragmentHalfScreenBinding.inflate(inflater, container, false)
         val view: View = binding.root
 
         hideStatusBar()
@@ -110,7 +109,7 @@ class HalfScreenFragment : Fragment() {
             binding.topTitleView.text = mInAppMessage!!.mActionData!!.mMsgTitle
             binding.topTitleView.setTextColor(Color.parseColor(mInAppMessage!!.mActionData!!.mMsgTitleColor))
             binding.topTitleView.textSize = mInAppMessage!!.mActionData!!.mMsgTitleTextSize!!.toFloat() * 2 + 14
-            binding.topTitleView.typeface = mInAppMessage!!.mActionData!!.getFontFamily(activity)
+            binding.topTitleView.typeface = mInAppMessage!!.mActionData!!.getFontFamily(requireActivity())
         } else {
             binding.topTitleView.visibility = View.GONE
         }
@@ -118,14 +117,14 @@ class HalfScreenFragment : Fragment() {
             Picasso.get().load(mInAppMessage!!.mActionData!!.mImg)
                 .into(binding.topImageView)
         } else {
-            Glide.with(activity)
+            Glide.with(requireActivity())
                 .load(mInAppMessage!!.mActionData!!.mImg)
                 .into(binding.topImageView)
         }
         binding.topImageView.setOnClickListener {
             val uriString: String? = mInAppMessage!!.mActionData!!.mAndroidLnk
             val buttonInterface: InAppButtonInterface? = RelatedDigital.getInAppButtonInterface()
-            RequestHandler.createInAppNotificationClickRequest(activity, mInAppMessage, null)
+            RequestHandler.createInAppNotificationClickRequest(requireActivity(), mInAppMessage, null)
             if (buttonInterface != null) {
                 RelatedDigital.setInAppButtonInterface(null)
                 buttonInterface.onPress(uriString)
@@ -134,7 +133,7 @@ class HalfScreenFragment : Fragment() {
                     try {
                         val uri: Uri = Uri.parse(uriString)
                         val viewIntent = Intent(Intent.ACTION_VIEW, uri)
-                        activity.startActivity(viewIntent)
+                        requireActivity().startActivity(viewIntent)
                     } catch (e: Exception) {
                         Log.i(LOG_TAG, "Can't parse notification URI, will not take any action", e)
                     }
@@ -151,7 +150,7 @@ class HalfScreenFragment : Fragment() {
             binding.botTitleView.text = mInAppMessage!!.mActionData!!.mMsgTitle
             binding.botTitleView.setTextColor(Color.parseColor(mInAppMessage!!.mActionData!!.mMsgTitleColor))
             binding.botTitleView.textSize = mInAppMessage!!.mActionData!!.mMsgTitleTextSize!!.toFloat() * 2 + 14
-            binding.botTitleView.typeface = mInAppMessage!!.mActionData!!.getFontFamily(activity)
+            binding.botTitleView.typeface = mInAppMessage!!.mActionData!!.getFontFamily(requireActivity())
         } else {
             binding.botTitleView.visibility = View.GONE
         }
@@ -159,14 +158,14 @@ class HalfScreenFragment : Fragment() {
             Picasso.get().load(mInAppMessage!!.mActionData!!.mImg)
                 .into(binding.botImageView)
         } else {
-            Glide.with(activity)
+            Glide.with(requireActivity())
                 .load(mInAppMessage!!.mActionData!!.mImg)
                 .into(binding.botImageView)
         }
         binding.botImageView.setOnClickListener {
             val uriString: String? = mInAppMessage!!.mActionData!!.mAndroidLnk
             val buttonInterface: InAppButtonInterface? = RelatedDigital.getInAppButtonInterface()
-            RequestHandler.createInAppNotificationClickRequest(activity, mInAppMessage, null)
+            RequestHandler.createInAppNotificationClickRequest(requireActivity(), mInAppMessage, null)
             if (buttonInterface != null) {
                 RelatedDigital.setInAppButtonInterface(null)
                 buttonInterface.onPress(uriString)
@@ -175,7 +174,7 @@ class HalfScreenFragment : Fragment() {
                     try {
                         val uri: Uri = Uri.parse(uriString)
                         val viewIntent = Intent(Intent.ACTION_VIEW, uri)
-                        activity.startActivity(viewIntent)
+                        requireActivity().startActivity(viewIntent)
                     } catch (e: Exception) {
                         Log.i(LOG_TAG, "Can't parse notification URI, will not take any action", e)
                     }
@@ -207,21 +206,21 @@ class HalfScreenFragment : Fragment() {
     private fun endFragment() {
         if (activity != null) {
             InAppUpdateDisplayState.releaseDisplayState(mStateId)
-            activity.fragmentManager.beginTransaction().remove(this@HalfScreenFragment).commit()
+            requireActivity().supportFragmentManager.beginTransaction().remove(this@HalfScreenFragment).commit()
         }
     }
 
     private fun hideStatusBar() {
-        val decorView = activity.window.decorView
+        val decorView = requireActivity().window.decorView
         val uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN
         decorView.systemUiVisibility = uiOptions
-        activity.actionBar?.hide()
+        requireActivity().actionBar?.hide()
     }
 
     private fun showStatusBar() {
         if (activity != null) {
             ViewCompat.getWindowInsetsController(
-                activity.window.decorView
+                requireActivity().window.decorView
             )?.show(WindowInsetsCompat.Type.systemBars())
         }
     }

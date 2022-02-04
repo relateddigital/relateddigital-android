@@ -52,8 +52,8 @@ class InAppBottomSheetFragment : BottomSheetDialogFragment() {
         }
         binding.tvTitle.text = mInAppMessage!!.mActionData!!.mMsgTitle!!.replace("\\n", "\n")
         binding.tvBody.text = mInAppMessage!!.mActionData!!.mMsgBody!!.replace("\\n", "\n")
-        binding.tvButton.text = mInAppMessage!!.mActionData!!.mBtnText!!.toUpperCase(Locale.ROOT)
-        binding.tvClose.text = mInAppMessage!!.mActionData!!.mCloseButtonText!!.toUpperCase(Locale.ROOT)
+        binding.tvButton.text = mInAppMessage!!.mActionData!!.mBtnText!!.uppercase(Locale.ROOT)
+        binding.tvClose.text = mInAppMessage!!.mActionData!!.mCloseButtonText!!.uppercase(Locale.ROOT)
         setListeners()
         return view
     }

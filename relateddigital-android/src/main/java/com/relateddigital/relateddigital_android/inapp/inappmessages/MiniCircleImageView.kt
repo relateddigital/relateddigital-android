@@ -7,6 +7,7 @@ import android.os.Build
 import android.util.AttributeSet
 import android.util.TypedValue
 import androidx.appcompat.widget.AppCompatImageView
+import androidx.core.content.ContextCompat
 
 class MiniCircleImageView : AppCompatImageView {
     constructor(context: Context?) : super(context!!) {
@@ -26,7 +27,7 @@ class MiniCircleImageView : AppCompatImageView {
         if (Build.VERSION.SDK_INT >= 23) {
             mWhitePaint!!.color = resources.getColor(android.R.color.white, null)
         } else {
-            mWhitePaint!!.color = resources.getColor(android.R.color.white)
+            mWhitePaint!!.color = ContextCompat.getColor(context, android.R.color.white)
         }
         mWhitePaint!!.style = Paint.Style.STROKE
         val r = resources

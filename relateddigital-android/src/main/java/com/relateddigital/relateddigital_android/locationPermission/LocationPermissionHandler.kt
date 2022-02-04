@@ -9,9 +9,7 @@ import java.util.*
 object LocationPermissionHandler {
 
     fun sendLocationPermissionToTheServer(context: Context) {
-        val locationPermission: LocationPermission = AppUtils.getLocationPermissionStatus(context)
-        var locationPermissionStr = ""
-        locationPermissionStr = when (locationPermission) {
+        val locationPermissionStr: String = when (AppUtils.getLocationPermissionStatus(context)) {
             LocationPermission.ALWAYS -> {
                 Constants.LOC_PERMISSION_ALWAYS_REQUEST_VAL
             }

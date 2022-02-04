@@ -46,7 +46,8 @@ object PersistentTargetManager {
                 } else if (count > 1) {
                     val previousParameterValue: String = SharedPref.readString(context, storeKey,
                             "")
-                    val parameterValueToStore = StringBuilder(parameterValue + "|" +
+                    val parameterValueToStore = StringBuilder(
+                        "$parameterValue|" +
                             SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
                                     .format(now))
                     if (previousParameterValue.isNotEmpty()) {

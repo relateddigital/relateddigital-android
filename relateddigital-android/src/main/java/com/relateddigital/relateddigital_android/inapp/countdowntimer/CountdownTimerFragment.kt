@@ -10,6 +10,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.relateddigital.relateddigital_android.R
@@ -84,14 +85,14 @@ class CountdownTimerFragment : Fragment() {
 
     private fun adjustTop() {
         //TODO remove the code below when the actual data gets ready
-        binding.countdownTimerContainerTop.setBackgroundColor(resources.getColor(R.color.blue))
-        binding.titleTop.setTextColor(resources.getColor(R.color.white))
+        binding.countdownTimerContainerTop.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.blue))
+        binding.titleTop.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
         binding.titleTop.text = "Sana Özel Fırsatı Kaçırma!"
-        binding.bodyTextTop.setTextColor(resources.getColor(R.color.white))
+        binding.bodyTextTop.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
         binding.bodyTextTop.text = "Bugün sana özel indirim kodu için geri sayım başladı."
-        binding.buttonTop.setBackgroundColor(resources.getColor(R.color.white))
+        binding.buttonTop.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.white))
         binding.buttonTop.text = "Alışverişe Başla"
-        binding.buttonTop.setTextColor(resources.getColor(R.color.black))
+        binding.buttonTop.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
         binding.countdownTimerContainerBot.visibility = View.GONE
         adjustCouponViewTop()
         adjustTimerViewTop()
@@ -100,14 +101,14 @@ class CountdownTimerFragment : Fragment() {
 
     private fun adjustBottom() {
         //TODO remove the code below when the actual data gets ready
-        binding.countdownTimerContainerBot.setBackgroundColor(resources.getColor(R.color.blue))
-        binding.titleBot.setTextColor(resources.getColor(R.color.white))
+        binding.countdownTimerContainerBot.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.blue))
+        binding.titleBot.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
         binding.titleBot.text = "Sana Özel Fırsatı Kaçırma!"
-        binding.bodyTextBot.setTextColor(resources.getColor(R.color.white))
+        binding.bodyTextBot.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
         binding.bodyTextBot.text = "Bugün sana özel indirim kodu için geri sayım başladı."
-        binding.buttonBot.setBackgroundColor(resources.getColor(R.color.white))
+        binding.buttonBot.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.white))
         binding.buttonBot.text = "Alışverişe Başla"
-        binding.buttonBot.setTextColor(resources.getColor(R.color.black))
+        binding.buttonBot.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
         binding.countdownTimerContainerTop.visibility = View.GONE
         adjustCouponViewBot()
         adjustTimerViewBot()
@@ -118,8 +119,8 @@ class CountdownTimerFragment : Fragment() {
         //TODO if there is coupon code
         binding.couponTop.visibility = View.VISIBLE
         binding.couponTextTop.text = "1D48KNSDF92A"
-        binding.couponTextTop.setTextColor(resources.getColor(R.color.black))
-        binding.couponTop.setBackgroundColor(resources.getColor(R.color.white))
+        binding.couponTextTop.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
+        binding.couponTop.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.white))
         binding.couponButtonTop.setOnClickListener {
             //TODO: send click report here
             val clipboard = requireActivity().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
@@ -135,8 +136,8 @@ class CountdownTimerFragment : Fragment() {
         //TODO if there is coupon code
         binding.couponBot.visibility = View.VISIBLE
         binding.couponTextBot.text = "1D48KNSDF92A"
-        binding.couponTextBot.setTextColor(resources.getColor(R.color.black))
-        binding.couponBot.setBackgroundColor(resources.getColor(R.color.white))
+        binding.couponTextBot.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
+        binding.couponBot.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.white))
         binding.couponButtonBot.setOnClickListener {
             //TODO: send click report here
             val clipboard = requireActivity().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
@@ -245,15 +246,15 @@ class CountdownTimerFragment : Fragment() {
         //TODO check the format here and set the visibilities of the views accordingly
         //TODO: convert bigger part like week to smaller parts like day if necessary according to the format
         binding.weekNumTop.text = mWeekNum.toString()
-        binding.weekNumTop.setTextColor(resources.getColor(R.color.white))
+        binding.weekNumTop.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
         binding.dayNumTop.text = mDayNum.toString()
-        binding.dayNumTop.setTextColor(resources.getColor(R.color.white))
+        binding.dayNumTop.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
         binding.hourNumTop.text = mHourNum.toString()
-        binding.hourNumTop.setTextColor(resources.getColor(R.color.white))
+        binding.hourNumTop.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
         binding.minuteNumTop.text = mMinuteNum.toString()
-        binding.minuteNumTop.setTextColor(resources.getColor(R.color.white))
+        binding.minuteNumTop.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
         binding.secNumTop.text = mSecondNum.toString()
-        binding.secNumTop.setTextColor(resources.getColor(R.color.white))
+        binding.secNumTop.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
         startTimer()
     }
 
@@ -262,15 +263,15 @@ class CountdownTimerFragment : Fragment() {
         //TODO check the format here and set the visibilities of the views accordingly
         //TODO: convert bigger part like week to smaller parts like day if necessary according to the format
         binding.weekNumBot.text = mWeekNum.toString()
-        binding.weekNumBot.setTextColor(resources.getColor(R.color.white))
+        binding.weekNumBot.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
         binding.dayNumBot.text = mDayNum.toString()
-        binding.dayNumBot.setTextColor(resources.getColor(R.color.white))
+        binding.dayNumBot.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
         binding.hourNumBot.text = mHourNum.toString()
-        binding.hourNumBot.setTextColor(resources.getColor(R.color.white))
+        binding.hourNumBot.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
         binding.minuteNumBot.text = mMinuteNum.toString()
-        binding.minuteNumBot.setTextColor(resources.getColor(R.color.white))
+        binding.minuteNumBot.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
         binding.secNumBot.text = mSecondNum.toString()
-        binding.secNumBot.setTextColor(resources.getColor(R.color.white))
+        binding.secNumBot.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
         startTimer()
     }
 

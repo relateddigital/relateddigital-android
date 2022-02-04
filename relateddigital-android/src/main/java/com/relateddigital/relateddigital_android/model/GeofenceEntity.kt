@@ -1,4 +1,4 @@
-package com.relateddigital.relateddigital_android.geofence
+package com.relateddigital.relateddigital_android.model
 
 import com.google.android.gms.location.Geofence
 

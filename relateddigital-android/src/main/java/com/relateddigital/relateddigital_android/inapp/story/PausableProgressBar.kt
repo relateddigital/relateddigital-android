@@ -121,7 +121,7 @@ internal class PausableProgressBar @JvmOverloads constructor(
         }
     }
 
-    private class PausableScaleAnimation internal constructor(
+    private class PausableScaleAnimation(
         fromX: Float, toX: Float, fromY: Float,
         toY: Float, pivotXType: Int, pivotXValue: Float, pivotYType: Int,
         pivotYValue: Float

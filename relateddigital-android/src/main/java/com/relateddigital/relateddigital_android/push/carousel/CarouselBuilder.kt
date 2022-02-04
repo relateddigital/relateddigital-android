@@ -105,8 +105,7 @@ class CarouselBuilder private constructor(private val context: Context, notifica
     }
 
     fun setNotificationPriority(priority: Int): CarouselBuilder {
-        if (priority >= NotificationCompat.PRIORITY_MIN && priority <= NotificationCompat.PRIORITY_MAX) {
-        } else {
+        if (!(priority >= NotificationCompat.PRIORITY_MIN && priority <= NotificationCompat.PRIORITY_MAX)) {
             Log.i(TAG, "Invalid priority")
         }
         return this

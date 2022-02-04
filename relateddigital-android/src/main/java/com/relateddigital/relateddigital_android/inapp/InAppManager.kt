@@ -1,10 +1,11 @@
 package com.relateddigital.relateddigital_android.inapp
 
-import android.R
 import android.app.Activity
 import android.content.Intent
 import android.util.Log
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
+import androidx.fragment.app.FragmentTransaction
 import com.relateddigital.relateddigital_android.constants.Constants
 import com.relateddigital.relateddigital_android.inapp.halfscreen.HalfScreenFragment
 import com.relateddigital.relateddigital_android.inapp.inappmessages.*
@@ -195,9 +196,8 @@ class InAppManager(
                     stateID,
                     inAppUpdateDisplayState.getDisplayState() as InAppNotificationState
             )
-            inAppMiniFragment.retainInstance = true
-            val transaction = parent.fragmentManager.beginTransaction()
-            transaction.add(android.R.id.content, inAppMiniFragment)
+            val transaction : FragmentTransaction = (parent as FragmentActivity).supportFragmentManager.beginTransaction()
+            transaction.replace(android.R.id.content, inAppMiniFragment)
             transaction.commit()
         }
     }
@@ -210,10 +210,8 @@ class InAppManager(
         if (inAppUpdateDisplayState.getDisplayState() != null) {
             val halfScreenFragment = HalfScreenFragment.newInstance(stateID, inAppUpdateDisplayState.getDisplayState() as InAppNotificationState)
 
-            halfScreenFragment.retainInstance = true
-
-            val transaction = parent.fragmentManager.beginTransaction()
-            transaction.add(R.id.content, halfScreenFragment)
+            val transaction : FragmentTransaction = (parent as FragmentActivity).supportFragmentManager.beginTransaction()
+            transaction.replace(android.R.id.content, halfScreenFragment)
             transaction.commit()
         }
     }

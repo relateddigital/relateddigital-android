@@ -1,6 +1,5 @@
 package com.relateddigital.relateddigital_android.util
 
-import android.R
 import android.app.Activity
 import android.graphics.Bitmap
 import android.graphics.Color
@@ -16,9 +15,9 @@ object ActivityImageUtils {
         scaleHeight: Int,
         relativeScaleIfTrue: Boolean
     ): Bitmap? {
-        var scaleWidth = scaleWidth
-        var scaleHeight = scaleHeight
-        val someView = activity.findViewById<View>(R.id.content)
+        var scaleWidthLoc = scaleWidth
+        var scaleHeightLoc = scaleHeight
+        val someView = activity.findViewById<View>(android.R.id.content)
         val rootView = someView.rootView
         val originalCacheState = rootView.isDrawingCacheEnabled
         rootView.isDrawingCacheEnabled = true
@@ -31,12 +30,12 @@ object ActivityImageUtils {
         var scaled: Bitmap? = null
         if (null != original && original.width > 0 && original.height > 0) {
             if (relativeScaleIfTrue) {
-                scaleWidth = original.width / scaleWidth
-                scaleHeight = original.height / scaleHeight
+                scaleWidthLoc = original.width / scaleWidthLoc
+                scaleHeightLoc = original.height / scaleHeightLoc
             }
-            if (scaleWidth > 0 && scaleHeight > 0) {
+            if (scaleWidthLoc > 0 && scaleHeightLoc > 0) {
                 try {
-                    scaled = Bitmap.createScaledBitmap(original, scaleWidth, scaleHeight, false)
+                    scaled = Bitmap.createScaledBitmap(original, scaleWidthLoc, scaleHeightLoc, false)
                 } catch (error: OutOfMemoryError) {
                     Log.i(
                         LOGTAG,

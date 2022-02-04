@@ -5,8 +5,6 @@ import java.io.Serializable
 import android.graphics.Typeface
 import androidx.core.content.res.ResourcesCompat
 import com.relateddigital.relateddigital_android.inapp.FontFamily
-
-import com.relateddigital.relateddigital_android.util.AppUtils
 import com.relateddigital.relateddigital_android.util.AppUtils.isFontResourceAvailable
 import java.util.*
 

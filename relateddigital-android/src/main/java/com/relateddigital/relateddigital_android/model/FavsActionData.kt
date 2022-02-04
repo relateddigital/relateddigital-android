@@ -12,7 +12,7 @@ class FavsActionData : Serializable {
     var attributes: Array<String?>? = null
 
     override fun toString(): String {
-        return "Actiondata [favorites = " + favorites + ", attributes = " + Arrays.toString(
+        return "Actiondata [favorites = $favorites, attributes = " + Arrays.toString(
                 attributes
         ) + "]"
     }

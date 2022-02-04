@@ -12,7 +12,6 @@ import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
 import android.view.View.OnTouchListener
-import android.view.WindowManager
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
@@ -25,11 +24,8 @@ import com.relateddigital.relateddigital_android.network.RequestHandler
 import com.relateddigital.relateddigital_android.util.PersistentTargetManager
 import com.squareup.picasso.Picasso
 import java.util.*
-import com.relateddigital.relateddigital_android.model.ExtendedProps
-
 import com.google.gson.Gson
 import java.net.URI
-import com.relateddigital.relateddigital_android.util.AppUtils
 import com.relateddigital.relateddigital_android.util.AppUtils.getFontFamily
 
 

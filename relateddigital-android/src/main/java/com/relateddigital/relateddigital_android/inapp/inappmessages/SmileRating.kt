@@ -207,7 +207,7 @@ open class SmileRating : BaseRating {
         // mHeight = mWidth / 5.3f;
         mHeight = mWidth / (5.3f * 1.3f)
         mCenterY = mHeight / 2f
-        mFaceCenter!!.y = mCenterY
+        mFaceCenter.y = mCenterY
         divisions = mHeight / 32f
         mTextPaint.textSize = mHeight / 4.5f
         mSmileys = Smileys.newInstance(mWidth.roundToInt(), mHeight.roundToInt())
@@ -292,11 +292,11 @@ open class SmileRating : BaseRating {
                         mScaleRect.centerX(), mScaleRect.centerY())
                 mDummyDrawPah.reset()
                 mDummyDrawPah.addPath(mSmilePath, mScaleMatrix)
-                canvas.drawCircle(mFaceCenter!!.x, mFaceCenter.y,
+                canvas.drawCircle(mFaceCenter.x, mFaceCenter.y,
                         nonSelectedScale * (mHeight / 2f), mBackgroundPaint)
                 canvas.drawPath(mDummyDrawPah, mPathPaint)
             } else {
-                canvas.drawCircle(mFaceCenter!!.x, mFaceCenter.y, mHeight / 2f, mBackgroundPaint)
+                canvas.drawCircle(mFaceCenter.x, mFaceCenter.y, mHeight / 2f, mBackgroundPaint)
                 canvas.drawPath(mSmilePath, mPathPaint)
             }
         }
@@ -397,14 +397,14 @@ open class SmileRating : BaseRating {
         when (action) {
             MotionEvent.ACTION_DOWN -> {
                 mClickAnalyser!!.start(x, y)
-                mFaceClickEngaged = isSmileyBounds(mFaceCenter!!.x, mFaceCenter.y,
+                mFaceClickEngaged = isSmileyBounds(mFaceCenter.x, mFaceCenter.y,
                         x, y, mCenterY)
                 mPrevX = x
             }
             MotionEvent.ACTION_MOVE -> {
                 mClickAnalyser!!.move(x, y)
                 if (mClickAnalyser!!.isMoved && mFaceClickEngaged) {
-                    moveSmile(mFaceCenter!!.x - (mPrevX - x))
+                    moveSmile(mFaceCenter.x - (mPrevX - x))
                 }
                 mPrevX = x
             }
@@ -425,7 +425,7 @@ open class SmileRating : BaseRating {
         if (NONE == mSelectedSmile) {
             return
         }
-        val currentPosition: Float = mFaceCenter!!.x
+        val currentPosition: Float = mFaceCenter.x
         var distance = Int.MAX_VALUE.toFloat()
         var point: Point? = null
         @Smiley var smile: Int = NONE
@@ -519,8 +519,6 @@ open class SmileRating : BaseRating {
      */
     /**
      * Set the selected smiley
-     *
-     * @param smile is the smiley type you want this rating bar to show as selected smile
      */
     @get:Smiley
     var selectedSmile: Int
@@ -532,7 +530,7 @@ open class SmileRating : BaseRating {
     /**
      * @return the selected rating level from range of 1 to 5
      */
-    public val rating: Int
+    val rating: Int
         get() = selectedSmile + 1
 
     /**

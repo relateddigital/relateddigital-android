@@ -23,7 +23,6 @@ import de.hdodenhof.circleimageview.CircleImageView
 import java.net.URI
 import java.net.URISyntaxException
 import java.util.*
-import com.relateddigital.relateddigital_android.util.AppUtils
 import com.relateddigital.relateddigital_android.util.AppUtils.getFontFamily
 
 

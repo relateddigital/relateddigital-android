@@ -1,6 +1,6 @@
 package com.relateddigital.relateddigital_android.inapp.socialproof
 
-import android.app.Fragment
+import androidx.fragment.app.Fragment
 import android.graphics.Color
 import android.graphics.Typeface
 import android.os.Bundle
@@ -40,7 +40,7 @@ class SocialProofFragment : Fragment() {
     private var mFontFamily = Typeface.DEFAULT
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mModel = arguments.getSerializable(ARG_PARAM1) as ProductStatNotifier
+        mModel = requireArguments().getSerializable(ARG_PARAM1) as ProductStatNotifier
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -230,21 +230,21 @@ class SocialProofFragment : Fragment() {
             mTimer!!.cancel()
         }
         if (activity != null) {
-            activity.fragmentManager.beginTransaction().remove(this@SocialProofFragment).commit()
+            requireActivity().supportFragmentManager.beginTransaction().remove(this@SocialProofFragment).commit()
         }
     }
 
     private fun hideStatusBar() {
-        val decorView = activity.window.decorView
+        val decorView = requireActivity().window.decorView
         val uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN
         decorView.systemUiVisibility = uiOptions
-        activity.actionBar?.hide()
+        requireActivity().actionBar?.hide()
     }
 
     private fun showStatusBar() {
         if (activity != null) {
             ViewCompat.getWindowInsetsController(
-                activity.window.decorView
+                requireActivity().window.decorView
             )?.show(WindowInsetsCompat.Type.systemBars())
         }
     }

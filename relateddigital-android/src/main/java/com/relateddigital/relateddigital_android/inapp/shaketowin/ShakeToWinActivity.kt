@@ -14,7 +14,7 @@ import android.util.Log
 import android.view.View
 import android.widget.Toast
 import com.google.android.exoplayer2.MediaItem
-import com.google.android.exoplayer2.SimpleExoPlayer
+import com.google.android.exoplayer2.ExoPlayer
 import com.relateddigital.relateddigital_android.R
 import com.relateddigital.relateddigital_android.databinding.ActivityShakeToWinStep1Binding
 import com.relateddigital.relateddigital_android.databinding.ActivityShakeToWinStep2Binding
@@ -36,7 +36,7 @@ class ShakeToWinActivity : Activity(), SensorEventListener {
     private var mTimerAfterShaking: Timer? = null
     private var isShaken = false
     private var isStep3 = false
-    private var player: SimpleExoPlayer? = null
+    private var player: ExoPlayer? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         bindingStep1 = ActivityShakeToWinStep1Binding.inflate(layoutInflater)
@@ -220,7 +220,7 @@ class ShakeToWinActivity : Activity(), SensorEventListener {
 
     private fun setupCloseButtonStep3() {
         bindingStep3.closeButton.setBackgroundResource(closeIconStep3)
-        bindingStep3.closeButton.setOnClickListener(View.OnClickListener { finish() })
+        bindingStep3.closeButton.setOnClickListener { finish() }
     }
 
     //TODO when real data comes:
@@ -265,7 +265,7 @@ class ShakeToWinActivity : Activity(), SensorEventListener {
     }
 
     private fun initializePlayer() {
-        player = SimpleExoPlayer.Builder(this).build()
+        player = ExoPlayer.Builder(this).build()
         bindingStep2.videoView.player = player
         val mediaItem = MediaItem.fromUri(
                 "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4") //TODO : real url here

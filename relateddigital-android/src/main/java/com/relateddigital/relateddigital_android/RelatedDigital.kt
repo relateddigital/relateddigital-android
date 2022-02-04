@@ -6,10 +6,9 @@ import android.app.ActivityManager.RunningAppProcessInfo
 import android.content.Context
 import android.os.Build
 import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import androidx.annotation.RequiresApi
-import androidx.core.app.NotificationManagerCompat
-import androidx.core.content.contentValuesOf
 import com.google.firebase.FirebaseApp
 import com.google.gson.Gson
 import com.relateddigital.relateddigital_android.appTracker.AppTracker
@@ -24,7 +23,6 @@ import com.relateddigital.relateddigital_android.push.EuromessageCallback
 import com.relateddigital.relateddigital_android.push.PushMessageInterface
 import com.relateddigital.relateddigital_android.remoteConfig.RemoteConfigHelper
 import com.relateddigital.relateddigital_android.util.*
-import org.json.JSONArray
 import org.json.JSONObject
 import java.lang.Exception
 import java.util.*
@@ -1201,7 +1199,7 @@ object RelatedDigital {
                         activity.applicationContext,
                         pushMessages
                     )
-                    activity.runOnUiThread(Runnable { callback.success(orderedPushMessages) })
+                    activity.runOnUiThread { callback.success(orderedPushMessages) }
                 } catch (e: Exception) {
                     SharedPref.writeString(
                         activity.applicationContext,
@@ -1215,15 +1213,15 @@ object RelatedDigital {
                         "De-serializing JSON string of push message : " + e.message,
                         element.className + "/" + element.methodName + "/" + element.lineNumber
                     )
-                    activity.runOnUiThread(Runnable { callback.fail(e.message!!) })
+                    activity.runOnUiThread { callback.fail(e.message!!) }
                 }
             } else {
-                activity.runOnUiThread(Runnable {
+                activity.runOnUiThread {
                     callback.fail(
                         "There is not any push notification sent " +
                                 "(or saved) in the last 30 days"
                     )
-                })
+                }
             }
         }) {}.start()
     }
@@ -1315,7 +1313,7 @@ object RelatedDigital {
     }
 
     private fun createRemoteConfigJob(context: Context) {
-        mHandler = Handler()
+        mHandler = Handler(Looper.getMainLooper())
         mRunnable = object : Runnable {
             @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
             override fun run() {

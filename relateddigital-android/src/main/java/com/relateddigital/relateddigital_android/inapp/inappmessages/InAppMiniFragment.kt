@@ -2,15 +2,15 @@ package com.relateddigital.relateddigital_android.inapp.inappmessages
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.*
-import android.app.Fragment
+import androidx.fragment.app.Fragment
 import com.relateddigital.relateddigital_android.R
 import com.relateddigital.relateddigital_android.RelatedDigital
 import com.relateddigital.relateddigital_android.databinding.FragmentInAppMiniBinding
@@ -48,7 +48,7 @@ class InAppMiniFragment: Fragment() {
                 remove()
             } else {
                 binding!!.tvInAppTitleMini.text = mInAppMessage!!.mActionData!!.mMsgTitle!!.replace("\\n", "\n")
-                binding!!.tvInAppTitleMini.typeface = mInAppMessage!!.mActionData!!.getFontFamily(activity)
+                binding!!.tvInAppTitleMini.typeface = mInAppMessage!!.mActionData!!.getFontFamily(requireActivity())
                 if (!mInAppMessage!!.mActionData!!.mImg.equals("")) {
                     binding!!.ivInAppImageMini.visibility = View.VISIBLE
                     Picasso.get().load(mInAppMessage!!.mActionData!!.mImg).into(binding!!.ivInAppImageMini)
@@ -75,7 +75,7 @@ class InAppMiniFragment: Fragment() {
     override fun onStart() {
         super.onStart()
         if (mCleanedUp) {
-            mParent!!.fragmentManager.beginTransaction().remove(this).commit()
+            requireActivity().supportFragmentManager.beginTransaction().remove(this).commit()
         }
     }
 
@@ -94,7 +94,7 @@ class InAppMiniFragment: Fragment() {
     override fun onAttach(activity: Activity) {
         super.onAttach(activity)
         mParent = activity
-        mHandler = Handler()
+        mHandler = Handler(Looper.getMainLooper())
         mRemover = Runnable { this@InAppMiniFragment.remove() }
         if (mInAppMessage == null || mInAppNotificationState == null) {
             Log.e(LOG_TAG, "InAppMessage is null! Could not get display state!")
@@ -108,11 +108,11 @@ class InAppMiniFragment: Fragment() {
     @SuppressLint("ClickableViewAccessibility")
     private fun displayMiniInApp() {
         mDisplayMini = Runnable {
-            view!!.visibility = View.VISIBLE
-            view!!.setBackgroundColor(mInAppNotificationState!!.getHighlightColor())
-            view!!.setOnTouchListener { _, event -> mDetector!!.onTouchEvent(event) }
-            view!!.startAnimation(AnimationManager.getMiniTranslateAnimation(activity))
-            binding!!.ivInAppImageMini.startAnimation(AnimationManager.getMiniScaleAnimation(activity))
+            requireView().visibility = View.VISIBLE
+            requireView().setBackgroundColor(mInAppNotificationState!!.getHighlightColor())
+            requireView().setOnTouchListener { _, event -> mDetector!!.onTouchEvent(event) }
+            requireView().startAnimation(AnimationManager.getMiniTranslateAnimation(requireActivity()))
+            binding!!.ivInAppImageMini.startAnimation(AnimationManager.getMiniScaleAnimation(requireActivity()))
         }
     }
 
@@ -174,8 +174,8 @@ class InAppMiniFragment: Fragment() {
             InAppUpdateDisplayState.releaseDisplayState(mInAppStateId)
             try {
                 if (!mParent!!.isFinishing) {
-                    val fragmentManager = mParent!!.fragmentManager
-                    val transaction = fragmentManager.beginTransaction()
+                    val fragmentManager = requireActivity().supportFragmentManager
+                    val transaction = requireActivity().supportFragmentManager.beginTransaction()
                     transaction.remove(this).commitAllowingStateLoss()
                 }
             } catch (e: Exception) {
@@ -190,9 +190,9 @@ class InAppMiniFragment: Fragment() {
         if (mParent != null && !mCleanedUp) {
             mHandler!!.removeCallbacks(mRemover!!)
             mHandler!!.removeCallbacks(mDisplayMini!!)
-            val fragmentManager = mParent!!.fragmentManager
+            val fragmentManager = requireActivity().supportFragmentManager
             try {
-                val transaction = fragmentManager.beginTransaction()
+                val transaction = requireActivity().supportFragmentManager.beginTransaction()
                 transaction.setCustomAnimations(0, R.anim.anim_slide_down).remove(this).commitAllowingStateLoss()
                 InAppUpdateDisplayState.releaseDisplayState(mInAppStateId)
                 mCleanedUp = true

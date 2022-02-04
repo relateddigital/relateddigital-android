@@ -18,7 +18,6 @@ import com.google.gson.Gson
 import com.relateddigital.relateddigital_android.R
 import com.relateddigital.relateddigital_android.constants.Constants
 import com.relateddigital.relateddigital_android.databinding.ActivityMailSubscriptionFormBinding
-import com.relateddigital.relateddigital_android.inapp.FontFamily
 import com.relateddigital.relateddigital_android.inapp.InAppNotificationState
 import com.relateddigital.relateddigital_android.inapp.InAppUpdateDisplayState
 import com.relateddigital.relateddigital_android.model.ExtendedProps
@@ -107,7 +106,7 @@ class MailSubscriptionFormActivity : Activity() {
 
     private fun setBody() {
         binding.tvBody.text = mMailSubscriptionForm!!.actiondata!!.message!!.replace("\\n", "\n")
-        binding.tvBody.setTypeface(mExtendedProps!!.getTextFontFamily(this))
+        binding.tvBody.typeface = mExtendedProps!!.getTextFontFamily(this)
         binding.tvBody.setTextColor(Color.parseColor(mExtendedProps!!.text_color))
         binding.tvBody.textSize = mExtendedProps!!.text_size!!.toFloat() + 8
     }
@@ -227,7 +226,7 @@ class MailSubscriptionFormActivity : Activity() {
             val outerHtml = matcher.group(0)
             val innerText = matcher.group(1)
             val s = "<a href=\"$url\">$innerText</a>"
-            textLoc = textLoc.replace(outerHtml, s)
+            textLoc = textLoc.replace(outerHtml!!, s)
         }
         if (!linkMatched) {
             textLoc = "<a href=\"$url\">$text</a>"

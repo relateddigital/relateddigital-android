@@ -49,7 +49,7 @@ class Carousel : Parcelable {
     private constructor(`in`: Parcel) {
         if (`in`.readByte().toInt() == 0x01) {
             carouselItems = ArrayList<CarouselItem>()
-            `in`.readList(carouselItems!!, CarouselItem::class.java.getClassLoader())
+            `in`.readList(carouselItems!!, CarouselItem::class.java.classLoader)
         } else {
             carouselItems = null
         }
@@ -64,8 +64,8 @@ class Carousel : Parcelable {
         smallIconResourceId = `in`.readInt()
         largeIcon = `in`.readString()
         caraousalPlaceholder = `in`.readString()
-        leftItem = `in`.readValue(CarouselItem::class.java.getClassLoader()) as CarouselItem?
-        rightItem = `in`.readValue(CarouselItem::class.java.getClassLoader()) as CarouselItem?
+        leftItem = `in`.readValue(CarouselItem::class.java.classLoader) as CarouselItem?
+        rightItem = `in`.readValue(CarouselItem::class.java.classLoader) as CarouselItem?
         isImagesInCarousel = `in`.readByte().toInt() != 0x00
     }
 

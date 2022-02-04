@@ -92,7 +92,7 @@ class InAppFullActivity : Activity(), IVisilabs {
             } else {
                 Glide.with(this)
                     .load(mInApp!!.mActionData!!.mImg)
-                    .into(binding.fivInAppImage);
+                    .into(binding.fivInAppImage)
             }
         } else {
             binding.fivInAppImage.visibility = View.GONE

@@ -240,7 +240,7 @@ object AppUtils {
 
     @Throws(Exception::class)
     private fun getIdFromExternalStorage(context: Context): String {
-        var ID: String = ""
+        var ID: String
         val state = Environment.getExternalStorageState()
         if (state == Environment.MEDIA_MOUNTED) {
             val sdcard = Environment.getExternalStorageDirectory()
@@ -268,7 +268,7 @@ object AppUtils {
                     if (sId.isEmpty()) {
                         fos.write(UUID.randomUUID().toString().toByteArray())
                     } else {
-                        fos.write(sId!!.toByteArray())
+                        fos.write(sId.toByteArray())
                     }
                 } catch (e: Exception) {
                     e.printStackTrace()
@@ -585,10 +585,9 @@ object AppUtils {
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     fun createSpinToWinCustomFontFiles(context: Context, jsonStr: String?): ArrayList<String?>? {
         var result: ArrayList<String?>? = null
-        var spinToWinModel: SpinToWin?
-        var extendedProps: SpinToWinExtendedProps?
+        val spinToWinModel: SpinToWin?
+        val extendedProps: SpinToWinExtendedProps?
         val baseUrlPath = "file://" + context.filesDir.absolutePath + "/"
-        var htmlStr = ""
         try {
             spinToWinModel = Gson().fromJson(jsonStr, SpinToWin::class.java)
             extendedProps = Gson().fromJson(
@@ -611,7 +610,7 @@ object AppUtils {
         val promoCodesSoldOutMessageFontFamily: String =
             extendedProps.promocodesSoldOutMessageFontFamily!!
 
-        htmlStr = writeHtmlToFile(context)
+        val htmlStr: String = writeHtmlToFile(context)
 
         if (displayNameFontFamily == "custom") {
             val fontExtension = getFontNameWithExtension(
@@ -729,7 +728,7 @@ object AppUtils {
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     private fun writeHtmlToFile(context: Context): String {
         val spinToWinFileName = "spintowin"
-        var htmlString: String = ""
+        val htmlString: String
         val spintowinRelatedDigitalCacheDir = context.filesDir
         var `is`: InputStream? = null
         var fos: FileOutputStream? = null

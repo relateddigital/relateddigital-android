@@ -2,13 +2,10 @@ package com.relateddigital.relateddigital_android.util
 
 import android.content.Context
 import android.util.Log
-import com.google.gson.Gson
 import com.relateddigital.relateddigital_android.RelatedDigital
 import com.relateddigital.relateddigital_android.api.ApiMethods
 import com.relateddigital.relateddigital_android.api.GraylogApiClient
-import com.relateddigital.relateddigital_android.constants.Constants
 import com.relateddigital.relateddigital_android.model.GraylogModel
-import com.relateddigital.relateddigital_android.model.RelatedDigitalModel
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response

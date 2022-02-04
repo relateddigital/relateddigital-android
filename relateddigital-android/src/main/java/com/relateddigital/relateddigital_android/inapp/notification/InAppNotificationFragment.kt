@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.MultiTransformation
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
@@ -145,7 +146,7 @@ class InAppNotificationFragment : Fragment() {
                             .into(bindingRt.smallSquareBackgroundImageRt)
                     }
                 } else {
-                    bindingRt.smallSquareContainerRt.setBackgroundColor(resources.getColor(R.color.blue))
+                    bindingRt.smallSquareContainerRt.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.blue))
                     bindingRt.smallSquareBackgroundImageRt.visibility = View.GONE
                 }
                 bindingRt.smallCircleContainerRt.visibility = View.GONE
@@ -169,11 +170,11 @@ class InAppNotificationFragment : Fragment() {
                     bindingRt.smallSquareTextRt.setBackgroundResource(R.drawable.rounded_corners_left)
                     bindingRt.smallSquareImageRt.setBackgroundResource(R.drawable.rounded_corners_left)
                     val gd = bindingRt.smallSquareContainerRt.background as GradientDrawable
-                    gd.setColor(resources.getColor(R.color.blue))
+                    gd.setColor(ContextCompat.getColor(requireContext(), R.color.blue))
                     val gdText = bindingRt.smallSquareTextRt.background as GradientDrawable
-                    gdText.setColor(resources.getColor(R.color.blue))
+                    gdText.setColor(ContextCompat.getColor(requireContext(), R.color.blue))
                     val gdImage = bindingRt.smallSquareImageRt.background as GradientDrawable
-                    gdImage.setColor(resources.getColor(R.color.blue))
+                    gdImage.setColor(ContextCompat.getColor(requireContext(), R.color.blue))
                     bindingRt.smallSquareBackgroundImageRt.visibility = View.GONE
                 }
                 bindingRt.smallCircleContainerRt.visibility = View.GONE
@@ -198,13 +199,13 @@ class InAppNotificationFragment : Fragment() {
                     bindingRt.smallCircleImageRt.setBackgroundResource(R.drawable.left_half_circle)
                     val gdCircle =
                         bindingRt.smallCircleContainerRt.background as GradientDrawable
-                    gdCircle.setColor(resources.getColor(R.color.blue))
+                    gdCircle.setColor(ContextCompat.getColor(requireContext(), R.color.blue))
                     val gdCircleText =
                         bindingRt.smallCircleTextRt.background as GradientDrawable
-                    gdCircleText.setColor(resources.getColor(R.color.blue))
+                    gdCircleText.setColor(ContextCompat.getColor(requireContext(), R.color.blue))
                     val gdCircleImage =
                         bindingRt.smallCircleImageRt.background as GradientDrawable
-                    gdCircleImage.setColor(resources.getColor(R.color.blue))
+                    gdCircleImage.setColor(ContextCompat.getColor(requireContext(), R.color.blue))
                     bindingRt.smallCircleBackgroundImageRt.visibility = View.GONE
                 }
                 bindingRt.smallSquareContainerRt.visibility = View.GONE
@@ -219,7 +220,7 @@ class InAppNotificationFragment : Fragment() {
             } else {
                 bindingRt.arrowCircleRt.text = getString(R.string.notification_right_arrow)
             }
-            bindingRt.arrowCircleRt.setTextColor(resources.getColor(R.color.white))
+            bindingRt.arrowCircleRt.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
             if (isSmallImage) {
                 Glide.with(requireActivity())
                     .asBitmap()
@@ -234,14 +235,14 @@ class InAppNotificationFragment : Fragment() {
                 bindingRt.smallCircleTextRt.visibility = View.GONE
             } else {
                 bindingRt.smallCircleTextRt.text = "Discount"
-                bindingRt.smallCircleTextRt.setTextColor(resources.getColor(R.color.white))
-                bindingRt.smallCircleTextRt.setTypeface(Typeface.MONOSPACE)
+                bindingRt.smallCircleTextRt.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+                bindingRt.smallCircleTextRt.typeface = Typeface.MONOSPACE
                 bindingRt.smallCircleImageRt.visibility = View.GONE
                 bindingRt.smallCircleTextRt.topDown = isTopToBottom
                 bindingRt.smallCircleTextRt.isCircle = true
                 bindingRt.smallCircleTextRt.isRight = isRight
             }
-            bindingRt.smallCircleContainerRt.setOnClickListener { v ->
+            bindingRt.smallCircleContainerRt.setOnClickListener {
                 if (isExpanded) {
                     isExpanded = false
                     bindingRt.bigContainerRt.visibility = View.GONE
@@ -261,7 +262,7 @@ class InAppNotificationFragment : Fragment() {
             } else {
                 bindingRt.arrowSquareRt.text = getString(R.string.notification_right_arrow)
             }
-            bindingRt.arrowSquareRt.setTextColor(resources.getColor(R.color.white))
+            bindingRt.arrowSquareRt.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
             if (isSmallImage) {
                 if(shape == Shape.SOFT_EDGE) {
                     Glide.with(requireActivity())
@@ -282,7 +283,7 @@ class InAppNotificationFragment : Fragment() {
                 bindingRt.smallSquareTextRt.visibility = View.GONE
             } else {
                 bindingRt.smallSquareTextRt.text = "Discount"
-                bindingRt.smallSquareTextRt.setTextColor(resources.getColor(R.color.white))
+                bindingRt.smallSquareTextRt.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
                 bindingRt.smallSquareTextRt.typeface = Typeface.MONOSPACE
                 bindingRt.smallSquareImageRt.visibility = View.GONE
                 bindingRt.smallSquareTextRt.topDown = isTopToBottom
@@ -306,12 +307,12 @@ class InAppNotificationFragment : Fragment() {
                 .load("https://digitalsynopsis.com/wp-content/uploads/2019/11/color-schemes-palettes-feature-image.jpg")
                 .into(bindingRt.bigBackgroundImageRt)
         } else {
-            bindingRt.bigContainerRt.setBackgroundColor(resources.getColor(R.color.blue))
+            bindingRt.bigContainerRt.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.blue))
             bindingRt.bigBackgroundImageRt.visibility = View.GONE
         }
         Picasso.get().load("https://upload.wikimedia.org//wikipedia/en/a/a9/MarioNSMBUDeluxe.png")
             .into(bindingRt.bigImageRt)
-        bindingRt.bigContainerRt.setOnClickListener { v ->
+        bindingRt.bigContainerRt.setOnClickListener {
             // TODO : Check buttonInterface first
             // TODO : send report here
             val viewIntent =
@@ -343,7 +344,7 @@ class InAppNotificationFragment : Fragment() {
                             .into(bindingRm.smallSquareBackgroundImageRm)
                     }
                 } else {
-                    bindingRm.smallSquareContainerRm.setBackgroundColor(resources.getColor(R.color.blue))
+                    bindingRm.smallSquareContainerRm.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.blue))
                     bindingRm.smallSquareBackgroundImageRm.visibility = View.GONE
                 }
                 bindingRm.smallCircleContainerRm.visibility = View.GONE
@@ -367,11 +368,11 @@ class InAppNotificationFragment : Fragment() {
                     bindingRm.smallSquareTextRm.setBackgroundResource(R.drawable.rounded_corners_left)
                     bindingRm.smallSquareImageRm.setBackgroundResource(R.drawable.rounded_corners_left)
                     val gd = bindingRm.smallSquareContainerRm.background as GradientDrawable
-                    gd.setColor(resources.getColor(R.color.blue))
+                    gd.setColor(ContextCompat.getColor(requireContext(), R.color.blue))
                     val gdText = bindingRm.smallSquareTextRm.background as GradientDrawable
-                    gdText.setColor(resources.getColor(R.color.blue))
+                    gdText.setColor(ContextCompat.getColor(requireContext(), R.color.blue))
                     val gdImage = bindingRm.smallSquareImageRm.background as GradientDrawable
-                    gdImage.setColor(resources.getColor(R.color.blue))
+                    gdImage.setColor(ContextCompat.getColor(requireContext(), R.color.blue))
                     bindingRm.smallSquareBackgroundImageRm.visibility = View.GONE
                 }
                 bindingRm.smallCircleContainerRm.visibility = View.GONE
@@ -396,13 +397,13 @@ class InAppNotificationFragment : Fragment() {
                     bindingRm.smallCircleImageRm.setBackgroundResource(R.drawable.left_half_circle)
                     val gdCircle =
                         bindingRm.smallCircleContainerRm.background as GradientDrawable
-                    gdCircle.setColor(resources.getColor(R.color.blue))
+                    gdCircle.setColor(ContextCompat.getColor(requireContext(), R.color.blue))
                     val gdCircleText =
                         bindingRm.smallCircleTextRm.background as GradientDrawable
-                    gdCircleText.setColor(resources.getColor(R.color.blue))
+                    gdCircleText.setColor(ContextCompat.getColor(requireContext(), R.color.blue))
                     val gdCircleImage =
                         bindingRm.smallCircleImageRm.background as GradientDrawable
-                    gdCircleImage.setColor(resources.getColor(R.color.blue))
+                    gdCircleImage.setColor(ContextCompat.getColor(requireContext(), R.color.blue))
                     bindingRm.smallCircleBackgroundImageRm.visibility = View.GONE
                 }
                 bindingRm.smallSquareContainerRm.visibility = View.GONE
@@ -417,7 +418,7 @@ class InAppNotificationFragment : Fragment() {
             } else {
                 bindingRm.arrowCircleRm.text = getString(R.string.notification_right_arrow)
             }
-            bindingRm.arrowCircleRm.setTextColor(resources.getColor(R.color.white))
+            bindingRm.arrowCircleRm.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
             if (isSmallImage) {
                 Glide.with(requireActivity())
                     .asBitmap()
@@ -432,14 +433,14 @@ class InAppNotificationFragment : Fragment() {
                 bindingRm.smallCircleTextRm.visibility = View.GONE
             } else {
                 bindingRm.smallCircleTextRm.text = "Discount"
-                bindingRm.smallCircleTextRm.setTextColor(resources.getColor(R.color.white))
-                bindingRm.smallCircleTextRm.setTypeface(Typeface.MONOSPACE)
+                bindingRm.smallCircleTextRm.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+                bindingRm.smallCircleTextRm.typeface = Typeface.MONOSPACE
                 bindingRm.smallCircleImageRm.visibility = View.GONE
                 bindingRm.smallCircleTextRm.topDown = isTopToBottom
                 bindingRm.smallCircleTextRm.isCircle = true
                 bindingRm.smallCircleTextRm.isRight = isRight
             }
-            bindingRm.smallCircleContainerRm.setOnClickListener { v ->
+            bindingRm.smallCircleContainerRm.setOnClickListener {
                 if (isExpanded) {
                     isExpanded = false
                     bindingRm.bigContainerRm.visibility = View.GONE
@@ -459,7 +460,7 @@ class InAppNotificationFragment : Fragment() {
             } else {
                 bindingRm.arrowSquareRm.text = getString(R.string.notification_right_arrow)
             }
-            bindingRm.arrowSquareRm.setTextColor(resources.getColor(R.color.white))
+            bindingRm.arrowSquareRm.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
             if (isSmallImage) {
                 if(shape == Shape.SOFT_EDGE) {
                     Glide.with(requireActivity())
@@ -480,14 +481,14 @@ class InAppNotificationFragment : Fragment() {
                 bindingRm.smallSquareTextRm.visibility = View.GONE
             } else {
                 bindingRm.smallSquareTextRm.text = "Discount"
-                bindingRm.smallSquareTextRm.setTextColor(resources.getColor(R.color.white))
-                bindingRm.smallSquareTextRm.setTypeface(Typeface.MONOSPACE)
+                bindingRm.smallSquareTextRm.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+                bindingRm.smallSquareTextRm.typeface = Typeface.MONOSPACE
                 bindingRm.smallSquareImageRm.visibility = View.GONE
                 bindingRm.smallSquareTextRm.topDown = isTopToBottom
                 bindingRm.smallCircleTextRm.isCircle = false
                 bindingRm.smallCircleTextRm.isRight = isRight
             }
-            bindingRm.smallSquareContainerRm.setOnClickListener { v ->
+            bindingRm.smallSquareContainerRm.setOnClickListener {
                 if (isExpanded) {
                     isExpanded = false
                     bindingRm.bigContainerRm.visibility = View.GONE
@@ -504,12 +505,12 @@ class InAppNotificationFragment : Fragment() {
                 .load("https://digitalsynopsis.com/wp-content/uploads/2019/11/color-schemes-palettes-feature-image.jpg")
                 .into(bindingRm.bigBackgroundImageRm)
         } else {
-            bindingRm.bigContainerRm.setBackgroundColor(resources.getColor(R.color.blue))
+            bindingRm.bigContainerRm.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.blue))
             bindingRm.bigBackgroundImageRm.visibility = View.GONE
         }
         Picasso.get().load("https://upload.wikimedia.org//wikipedia/en/a/a9/MarioNSMBUDeluxe.png")
             .into(bindingRm.bigImageRm)
-        bindingRm.bigContainerRm.setOnClickListener { v ->
+        bindingRm.bigContainerRm.setOnClickListener {
             // TODO : Check buttonInterface first
             // TODO : send report here
             val viewIntent =
@@ -541,10 +542,10 @@ class InAppNotificationFragment : Fragment() {
                             .into(bindingRb.smallSquareBackgroundImageRb)
                     }
                 } else {
-                    bindingRb.smallSquareContainerRb.setBackgroundColor(resources.getColor(R.color.blue))
-                    bindingRb.smallSquareBackgroundImageRb.setVisibility(View.GONE)
+                    bindingRb.smallSquareContainerRb.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.blue))
+                    bindingRb.smallSquareBackgroundImageRb.visibility = View.GONE
                 }
-                bindingRb.smallCircleContainerRb.setVisibility(View.GONE)
+                bindingRb.smallCircleContainerRb.visibility = View.GONE
             }
             Shape.SOFT_EDGE -> {
                 if (isBackgroundImage) {
@@ -565,11 +566,11 @@ class InAppNotificationFragment : Fragment() {
                     bindingRb.smallSquareTextRb.setBackgroundResource(R.drawable.rounded_corners_left)
                     bindingRb.smallSquareImageRb.setBackgroundResource(R.drawable.rounded_corners_left)
                     val gd = bindingRb.smallSquareContainerRb.background as GradientDrawable
-                    gd.setColor(resources.getColor(R.color.blue))
+                    gd.setColor(ContextCompat.getColor(requireContext(), R.color.blue))
                     val gdText = bindingRb.smallSquareTextRb.background as GradientDrawable
-                    gdText.setColor(resources.getColor(R.color.blue))
+                    gdText.setColor(ContextCompat.getColor(requireContext(), R.color.blue))
                     val gdImage = bindingRb.smallSquareImageRb.background as GradientDrawable
-                    gdImage.setColor(resources.getColor(R.color.blue))
+                    gdImage.setColor(ContextCompat.getColor(requireContext(), R.color.blue))
                     bindingRb.smallSquareBackgroundImageRb.visibility = View.GONE
                 }
                 bindingRb.smallCircleContainerRb.visibility = View.GONE
@@ -594,13 +595,13 @@ class InAppNotificationFragment : Fragment() {
                     bindingRb.smallCircleImageRb.setBackgroundResource(R.drawable.left_half_circle)
                     val gdCircle =
                         bindingRb.smallCircleContainerRb.background as GradientDrawable
-                    gdCircle.setColor(resources.getColor(R.color.blue))
+                    gdCircle.setColor(ContextCompat.getColor(requireContext(), R.color.blue))
                     val gdCircleText =
                         bindingRb.smallCircleTextRb.background as GradientDrawable
-                    gdCircleText.setColor(resources.getColor(R.color.blue))
+                    gdCircleText.setColor(ContextCompat.getColor(requireContext(), R.color.blue))
                     val gdCircleImage =
                         bindingRb.smallCircleImageRb.background as GradientDrawable
-                    gdCircleImage.setColor(resources.getColor(R.color.blue))
+                    gdCircleImage.setColor(ContextCompat.getColor(requireContext(), R.color.blue))
                     bindingRb.smallCircleBackgroundImageRb.visibility = View.GONE
                 }
                 bindingRb.smallSquareContainerRb.visibility = View.GONE
@@ -615,7 +616,7 @@ class InAppNotificationFragment : Fragment() {
             } else {
                 bindingRb.arrowCircleRb.text = getString(R.string.notification_right_arrow)
             }
-            bindingRb.arrowCircleRb.setTextColor(resources.getColor(R.color.white))
+            bindingRb.arrowCircleRb.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
             if (isSmallImage) {
                 Glide.with(requireActivity())
                     .asBitmap()
@@ -630,14 +631,14 @@ class InAppNotificationFragment : Fragment() {
                 bindingRb.smallCircleTextRb.visibility = View.GONE
             } else {
                 bindingRb.smallCircleTextRb.text = "Discount"
-                bindingRb.smallCircleTextRb.setTextColor(resources.getColor(R.color.white))
-                bindingRb.smallCircleTextRb.setTypeface(Typeface.MONOSPACE)
+                bindingRb.smallCircleTextRb.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+                bindingRb.smallCircleTextRb.typeface = Typeface.MONOSPACE
                 bindingRb.smallCircleImageRb.visibility = View.GONE
                 bindingRb.smallCircleTextRb.topDown = isTopToBottom
                 bindingRb.smallCircleTextRb.isCircle = true
                 bindingRb.smallCircleTextRb.isRight = isRight
             }
-            bindingRb.smallCircleContainerRb.setOnClickListener { v ->
+            bindingRb.smallCircleContainerRb.setOnClickListener {
                 if (isExpanded) {
                     isExpanded = false
                     bindingRb.bigContainerRb.visibility = View.GONE
@@ -657,7 +658,7 @@ class InAppNotificationFragment : Fragment() {
             } else {
                 bindingRb.arrowSquareRb.text = getString(R.string.notification_right_arrow)
             }
-            bindingRb.arrowSquareRb.setTextColor(resources.getColor(R.color.white))
+            bindingRb.arrowSquareRb.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
             if (isSmallImage) {
                 if(shape == Shape.SOFT_EDGE) {
                     Glide.with(requireActivity())
@@ -678,7 +679,7 @@ class InAppNotificationFragment : Fragment() {
                 bindingRb.smallSquareTextRb.visibility = View.GONE
             } else {
                 bindingRb.smallSquareTextRb.text = "Discount"
-                bindingRb.smallSquareTextRb.setTextColor(resources.getColor(R.color.white))
+                bindingRb.smallSquareTextRb.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
                 bindingRb.smallSquareTextRb.typeface = Typeface.MONOSPACE
                 bindingRb.smallSquareImageRb.visibility = View.GONE
                 bindingRb.smallSquareTextRb.topDown = isTopToBottom
@@ -702,7 +703,7 @@ class InAppNotificationFragment : Fragment() {
                 .load("https://digitalsynopsis.com/wp-content/uploads/2019/11/color-schemes-palettes-feature-image.jpg")
                 .into(bindingRb.bigBackgroundImageRb)
         } else {
-            bindingRb.bigContainerRb.setBackgroundColor(resources.getColor(R.color.blue))
+            bindingRb.bigContainerRb.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.blue))
             bindingRb.bigBackgroundImageRb.visibility = View.GONE
         }
         Picasso.get().load("https://upload.wikimedia.org//wikipedia/en/a/a9/MarioNSMBUDeluxe.png")
@@ -739,7 +740,7 @@ class InAppNotificationFragment : Fragment() {
                             .into(bindingLt.smallSquareBackgroundImageLt)
                     }
                 } else {
-                    bindingLt.smallSquareContainerLt.setBackgroundColor(resources.getColor(R.color.blue))
+                    bindingLt.smallSquareContainerLt.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.blue))
                     bindingLt.smallSquareBackgroundImageLt.visibility = View.GONE
                 }
                 bindingLt.smallCircleContainerLt.visibility = View.GONE
@@ -763,11 +764,11 @@ class InAppNotificationFragment : Fragment() {
                     bindingLt.smallSquareTextLt.setBackgroundResource(R.drawable.rounded_corners_right)
                     bindingLt.smallSquareImageLt.setBackgroundResource(R.drawable.rounded_corners_right)
                     val gd = bindingLt.smallSquareContainerLt.background as GradientDrawable
-                    gd.setColor(resources.getColor(R.color.blue))
+                    gd.setColor(ContextCompat.getColor(requireContext(), R.color.blue))
                     val gdText = bindingLt.smallSquareTextLt.background as GradientDrawable
-                    gdText.setColor(resources.getColor(R.color.blue))
+                    gdText.setColor(ContextCompat.getColor(requireContext(), R.color.blue))
                     val gdImage = bindingLt.smallSquareImageLt.background as GradientDrawable
-                    gdImage.setColor(resources.getColor(R.color.blue))
+                    gdImage.setColor(ContextCompat.getColor(requireContext(), R.color.blue))
                     bindingLt.smallSquareBackgroundImageLt.visibility = View.GONE
                 }
                 bindingLt.smallCircleContainerLt.visibility = View.GONE
@@ -792,13 +793,13 @@ class InAppNotificationFragment : Fragment() {
                     bindingLt.smallCircleImageLt.setBackgroundResource(R.drawable.right_half_circle)
                     val gdCircle =
                         bindingLt.smallCircleContainerLt.background as GradientDrawable
-                    gdCircle.setColor(resources.getColor(R.color.blue))
+                    gdCircle.setColor(ContextCompat.getColor(requireContext(), R.color.blue))
                     val gdCircleText =
                         bindingLt.smallCircleTextLt.background as GradientDrawable
-                    gdCircleText.setColor(resources.getColor(R.color.blue))
+                    gdCircleText.setColor(ContextCompat.getColor(requireContext(), R.color.blue))
                     val gdCircleImage =
                         bindingLt.smallCircleImageLt.background as GradientDrawable
-                    gdCircleImage.setColor(resources.getColor(R.color.blue))
+                    gdCircleImage.setColor(ContextCompat.getColor(requireContext(), R.color.blue))
                     bindingLt.smallCircleBackgroundImageLt.visibility = View.GONE
                 }
                 bindingLt.smallSquareContainerLt.visibility = View.GONE
@@ -813,7 +814,7 @@ class InAppNotificationFragment : Fragment() {
             } else {
                 bindingLt.arrowCircleLt.text = getString(R.string.notification_left_arrow)
             }
-            bindingLt.arrowCircleLt.setTextColor(resources.getColor(R.color.white))
+            bindingLt.arrowCircleLt.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
             if (isSmallImage) {
                 Glide.with(requireActivity())
                     .asBitmap()
@@ -828,14 +829,14 @@ class InAppNotificationFragment : Fragment() {
                 bindingLt.smallCircleTextLt.visibility = View.GONE
             } else {
                 bindingLt.smallCircleTextLt.text = "Discount"
-                bindingLt.smallCircleTextLt.setTextColor(resources.getColor(R.color.white))
+                bindingLt.smallCircleTextLt.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
                 bindingLt.smallCircleTextLt.typeface = Typeface.MONOSPACE
                 bindingLt.smallCircleImageLt.visibility = View.GONE
                 bindingLt.smallCircleTextLt.topDown = isTopToBottom
                 bindingLt.smallCircleTextLt.isCircle = true
                 bindingLt.smallCircleTextLt.isRight = isRight
             }
-            bindingLt.smallCircleContainerLt.setOnClickListener { v ->
+            bindingLt.smallCircleContainerLt.setOnClickListener {
                 if (isExpanded) {
                     isExpanded = false
                     bindingLt.bigContainerLt.visibility = View.GONE
@@ -855,7 +856,7 @@ class InAppNotificationFragment : Fragment() {
             } else {
                 bindingLt.arrowSquareLt.text = getString(R.string.notification_left_arrow)
             }
-            bindingLt.arrowSquareLt.setTextColor(resources.getColor(R.color.white))
+            bindingLt.arrowSquareLt.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
             if (isSmallImage) {
                 if(shape == Shape.SOFT_EDGE) {
                     Glide.with(requireActivity())
@@ -876,14 +877,14 @@ class InAppNotificationFragment : Fragment() {
                 bindingLt.smallSquareTextLt.visibility = View.GONE
             } else {
                 bindingLt.smallSquareTextLt.text = "Discount"
-                bindingLt.smallSquareTextLt.setTextColor(resources.getColor(R.color.white))
+                bindingLt.smallSquareTextLt.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
                 bindingLt.smallSquareTextLt.typeface = Typeface.MONOSPACE
                 bindingLt.smallSquareImageLt.visibility = View.GONE
                 bindingLt.smallSquareTextLt.topDown = isTopToBottom
                 bindingLt.smallCircleTextLt.isCircle = false
                 bindingLt.smallCircleTextLt.isRight = isRight
             }
-            bindingLt.smallSquareContainerLt.setOnClickListener { v ->
+            bindingLt.smallSquareContainerLt.setOnClickListener {
                 if (isExpanded) {
                     isExpanded = false
                     bindingLt.bigContainerLt.visibility = View.GONE
@@ -900,7 +901,7 @@ class InAppNotificationFragment : Fragment() {
                 .load("https://digitalsynopsis.com/wp-content/uploads/2019/11/color-schemes-palettes-feature-image.jpg")
                 .into(bindingLt.bigBackgroundImageLt)
         } else {
-            bindingLt.bigContainerLt.setBackgroundColor(resources.getColor(R.color.blue))
+            bindingLt.bigContainerLt.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.blue))
             bindingLt.bigBackgroundImageLt.visibility = View.GONE
         }
         Picasso.get().load("https://upload.wikimedia.org//wikipedia/en/a/a9/MarioNSMBUDeluxe.png")
@@ -937,7 +938,7 @@ class InAppNotificationFragment : Fragment() {
                             .into(bindingLm.smallSquareBackgroundImageLm)
                     }
                 } else {
-                    bindingLm.smallSquareContainerLm.setBackgroundColor(resources.getColor(R.color.blue))
+                    bindingLm.smallSquareContainerLm.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.blue))
                     bindingLm.smallSquareBackgroundImageLm.visibility = View.GONE
                 }
                 bindingLm.smallCircleContainerLm.visibility = View.GONE
@@ -961,11 +962,11 @@ class InAppNotificationFragment : Fragment() {
                     bindingLm.smallSquareTextLm.setBackgroundResource(R.drawable.rounded_corners_right)
                     bindingLm.smallSquareImageLm.setBackgroundResource(R.drawable.rounded_corners_right)
                     val gd = bindingLm.smallSquareContainerLm.background as GradientDrawable
-                    gd.setColor(resources.getColor(R.color.blue))
+                    gd.setColor(ContextCompat.getColor(requireContext(), R.color.blue))
                     val gdText = bindingLm.smallSquareTextLm.background as GradientDrawable
-                    gdText.setColor(resources.getColor(R.color.blue))
+                    gdText.setColor(ContextCompat.getColor(requireContext(), R.color.blue))
                     val gdImage = bindingLm.smallSquareImageLm.background as GradientDrawable
-                    gdImage.setColor(resources.getColor(R.color.blue))
+                    gdImage.setColor(ContextCompat.getColor(requireContext(), R.color.blue))
                     bindingLm.smallSquareBackgroundImageLm.visibility = View.GONE
                 }
                 bindingLm.smallCircleContainerLm.visibility = View.GONE
@@ -990,14 +991,14 @@ class InAppNotificationFragment : Fragment() {
                     bindingLm.smallCircleImageLm.setBackgroundResource(R.drawable.right_half_circle)
                     val gdCircle =
                         bindingLm.smallCircleContainerLm.background as GradientDrawable
-                    gdCircle.setColor(resources.getColor(R.color.blue))
+                    gdCircle.setColor(ContextCompat.getColor(requireContext(), R.color.blue))
                     val gdCircleText =
                         bindingLm.smallCircleTextLm.background as GradientDrawable
-                    gdCircleText.setColor(resources.getColor(R.color.blue))
+                    gdCircleText.setColor(ContextCompat.getColor(requireContext(), R.color.blue))
                     val gdCircleImage =
                         bindingLm.smallCircleImageLm.background as GradientDrawable
-                    gdCircleImage.setColor(resources.getColor(R.color.blue))
-                    bindingLm.smallCircleBackgroundImageLm.setVisibility(View.GONE)
+                    gdCircleImage.setColor(ContextCompat.getColor(requireContext(), R.color.blue))
+                    bindingLm.smallCircleBackgroundImageLm.visibility = View.GONE
                 }
                 bindingLm.smallSquareContainerLm.visibility = View.GONE
             }
@@ -1011,7 +1012,7 @@ class InAppNotificationFragment : Fragment() {
             } else {
                 bindingLm.arrowCircleLm.text = getString(R.string.notification_left_arrow)
             }
-            bindingLm.arrowCircleLm.setTextColor(resources.getColor(R.color.white))
+            bindingLm.arrowCircleLm.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
             if (isSmallImage) {
                 Glide.with(requireActivity())
                     .asBitmap()
@@ -1026,14 +1027,14 @@ class InAppNotificationFragment : Fragment() {
                 bindingLm.smallCircleTextLm.visibility = View.GONE
             } else {
                 bindingLm.smallCircleTextLm.text = "Discount"
-                bindingLm.smallCircleTextLm.setTextColor(resources.getColor(R.color.white))
+                bindingLm.smallCircleTextLm.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
                 bindingLm.smallCircleTextLm.typeface = Typeface.MONOSPACE
                 bindingLm.smallCircleImageLm.visibility = View.GONE
                 bindingLm.smallCircleTextLm.topDown = isTopToBottom
                 bindingLm.smallCircleTextLm.isCircle = true
                 bindingLm.smallCircleTextLm.isRight = isRight
             }
-            bindingLm.smallCircleContainerLm.setOnClickListener { v ->
+            bindingLm.smallCircleContainerLm.setOnClickListener {
                 if (isExpanded) {
                     isExpanded = false
                     bindingLm.bigContainerLm.visibility = View.GONE
@@ -1053,7 +1054,7 @@ class InAppNotificationFragment : Fragment() {
             } else {
                 bindingLm.arrowSquareLm.text = getString(R.string.notification_left_arrow)
             }
-            bindingLm.arrowSquareLm.setTextColor(resources.getColor(R.color.white))
+            bindingLm.arrowSquareLm.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
             if (isSmallImage) {
                 if(shape == Shape.SOFT_EDGE) {
                     Glide.with(requireActivity())
@@ -1074,14 +1075,14 @@ class InAppNotificationFragment : Fragment() {
                 bindingLm.smallSquareTextLm.visibility = View.GONE
             } else {
                 bindingLm.smallSquareTextLm.text = "Discount"
-                bindingLm.smallSquareTextLm.setTextColor(resources.getColor(R.color.white))
-                bindingLm.smallSquareTextLm.setTypeface(Typeface.MONOSPACE)
+                bindingLm.smallSquareTextLm.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+                bindingLm.smallSquareTextLm.typeface = Typeface.MONOSPACE
                 bindingLm.smallSquareImageLm.visibility = View.GONE
                 bindingLm.smallSquareTextLm.topDown = isTopToBottom
                 bindingLm.smallCircleTextLm.isCircle = false
                 bindingLm.smallCircleTextLm.isRight = isRight
             }
-            bindingLm.smallSquareContainerLm.setOnClickListener { v ->
+            bindingLm.smallSquareContainerLm.setOnClickListener {
                 if (isExpanded) {
                     isExpanded = false
                     bindingLm.bigContainerLm.visibility = View.GONE
@@ -1098,7 +1099,7 @@ class InAppNotificationFragment : Fragment() {
                 .load("https://digitalsynopsis.com/wp-content/uploads/2019/11/color-schemes-palettes-feature-image.jpg")
                 .into(bindingLm.bigBackgroundImageLm)
         } else {
-            bindingLm.bigContainerLm.setBackgroundColor(resources.getColor(R.color.blue))
+            bindingLm.bigContainerLm.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.blue))
             bindingLm.bigBackgroundImageLm.visibility = View.GONE
         }
         Picasso.get().load("https://upload.wikimedia.org//wikipedia/en/a/a9/MarioNSMBUDeluxe.png")
@@ -1135,7 +1136,7 @@ class InAppNotificationFragment : Fragment() {
                             .into(bindingLb.smallSquareBackgroundImageLb)
                     }
                 } else {
-                    bindingLb.smallSquareContainerLb.setBackgroundColor(resources.getColor(R.color.blue))
+                    bindingLb.smallSquareContainerLb.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.blue))
                     bindingLb.smallSquareBackgroundImageLb.visibility = View.GONE
                 }
                 bindingLb.smallCircleContainerLb.visibility = View.GONE
@@ -1159,11 +1160,11 @@ class InAppNotificationFragment : Fragment() {
                     bindingLb.smallSquareTextLb.setBackgroundResource(R.drawable.rounded_corners_right)
                     bindingLb.smallSquareImageLb.setBackgroundResource(R.drawable.rounded_corners_right)
                     val gd = bindingLb.smallSquareContainerLb.background as GradientDrawable
-                    gd.setColor(resources.getColor(R.color.blue))
+                    gd.setColor(ContextCompat.getColor(requireContext(), R.color.blue))
                     val gdText = bindingLb.smallSquareTextLb.background as GradientDrawable
-                    gdText.setColor(resources.getColor(R.color.blue))
+                    gdText.setColor(ContextCompat.getColor(requireContext(), R.color.blue))
                     val gdImage = bindingLb.smallSquareImageLb.background as GradientDrawable
-                    gdImage.setColor(resources.getColor(R.color.blue))
+                    gdImage.setColor(ContextCompat.getColor(requireContext(), R.color.blue))
                     bindingLb.smallSquareBackgroundImageLb.visibility = View.GONE
                 }
                 bindingLb.smallCircleContainerLb.visibility = View.GONE
@@ -1188,14 +1189,14 @@ class InAppNotificationFragment : Fragment() {
                     bindingLb.smallCircleImageLb.setBackgroundResource(R.drawable.right_half_circle)
                     val gdCircle =
                         bindingLb.smallCircleContainerLb.background as GradientDrawable
-                    gdCircle.setColor(resources.getColor(R.color.blue))
+                    gdCircle.setColor(ContextCompat.getColor(requireContext(), R.color.blue))
                     val gdCircleText =
                         bindingLb.smallCircleTextLb.background as GradientDrawable
-                    gdCircleText.setColor(resources.getColor(R.color.blue))
+                    gdCircleText.setColor(ContextCompat.getColor(requireContext(), R.color.blue))
                     val gdCircleImage =
                         bindingLb.smallCircleImageLb.background as GradientDrawable
-                    gdCircleImage.setColor(resources.getColor(R.color.blue))
-                    bindingLb.smallCircleBackgroundImageLb.setVisibility(View.GONE)
+                    gdCircleImage.setColor(ContextCompat.getColor(requireContext(), R.color.blue))
+                    bindingLb.smallCircleBackgroundImageLb.visibility = View.GONE
                 }
                 bindingLb.smallSquareContainerLb.visibility = View.GONE
             }
@@ -1209,7 +1210,7 @@ class InAppNotificationFragment : Fragment() {
             } else {
                 bindingLb.arrowCircleLb.text = getString(R.string.notification_left_arrow)
             }
-            bindingLb.arrowCircleLb.setTextColor(resources.getColor(R.color.white))
+            bindingLb.arrowCircleLb.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
             if (isSmallImage) {
                 Glide.with(requireActivity())
                     .asBitmap()
@@ -1224,7 +1225,7 @@ class InAppNotificationFragment : Fragment() {
                 bindingLb.smallCircleTextLb.visibility = View.GONE
             } else {
                 bindingLb.smallCircleTextLb.text = "Discount"
-                bindingLb.smallCircleTextLb.setTextColor(resources.getColor(R.color.white))
+                bindingLb.smallCircleTextLb.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
                 bindingLb.smallCircleTextLb.typeface = Typeface.MONOSPACE
                 bindingLb.smallCircleImageLb.visibility = View.GONE
                 bindingLb.smallCircleTextLb.topDown = isTopToBottom
@@ -1251,7 +1252,7 @@ class InAppNotificationFragment : Fragment() {
             } else {
                 bindingLb.arrowSquareLb.text = getString(R.string.notification_left_arrow)
             }
-            bindingLb.arrowSquareLb.setTextColor(resources.getColor(R.color.white))
+            bindingLb.arrowSquareLb.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
             if (isSmallImage) {
                 if(shape == Shape.SOFT_EDGE) {
                     Glide.with(requireActivity())
@@ -1272,14 +1273,14 @@ class InAppNotificationFragment : Fragment() {
                 bindingLb.smallSquareTextLb.visibility = View.GONE
             } else {
                 bindingLb.smallSquareTextLb.text = "Discount"
-                bindingLb.smallSquareTextLb.setTextColor(resources.getColor(R.color.white))
+                bindingLb.smallSquareTextLb.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
                 bindingLb.smallSquareTextLb.typeface = Typeface.MONOSPACE
                 bindingLb.smallSquareImageLb.visibility = View.GONE
                 bindingLb.smallSquareTextLb.topDown = isTopToBottom
                 bindingLb.smallCircleTextLb.isCircle = false
                 bindingLb.smallCircleTextLb.isRight = isRight
             }
-            bindingLb.smallSquareContainerLb.setOnClickListener { v ->
+            bindingLb.smallSquareContainerLb.setOnClickListener {
                 if (isExpanded) {
                     isExpanded = false
                     bindingLb.bigContainerLb.visibility = View.GONE
@@ -1296,12 +1297,12 @@ class InAppNotificationFragment : Fragment() {
                 .load("https://digitalsynopsis.com/wp-content/uploads/2019/11/color-schemes-palettes-feature-image.jpg")
                 .into(bindingLb.bigBackgroundImageLb)
         } else {
-            bindingLb.bigContainerLb.setBackgroundColor(resources.getColor(R.color.blue))
+            bindingLb.bigContainerLb.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.blue))
             bindingLb.bigBackgroundImageLb.visibility = View.GONE
         }
         Picasso.get().load("https://upload.wikimedia.org//wikipedia/en/a/a9/MarioNSMBUDeluxe.png")
             .into(bindingLb.bigImageLb)
-        bindingLb.bigContainerLb.setOnClickListener { v ->
+        bindingLb.bigContainerLb.setOnClickListener {
             // TODO : Check buttonInterface first
             // TODO : send report here
             val viewIntent =

@@ -4,11 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.os.Build
 import android.util.Log
-import com.google.gson.Gson
 import com.relateddigital.relateddigital_android.RelatedDigital
-import com.relateddigital.relateddigital_android.api.ApiMethods
-import com.relateddigital.relateddigital_android.api.SApiClient
-import com.relateddigital.relateddigital_android.api.SubscriptionApiClient
 import com.relateddigital.relateddigital_android.constants.Constants
 import com.relateddigital.relateddigital_android.geofence.GeofenceGetListCallback
 import com.relateddigital.relateddigital_android.inapp.VisilabsCallback
@@ -18,12 +14,8 @@ import com.relateddigital.relateddigital_android.push.EuromessageCallback
 import com.relateddigital.relateddigital_android.push.RetentionType
 import com.relateddigital.relateddigital_android.recommendation.VisilabsTargetFilter
 import com.relateddigital.relateddigital_android.util.*
-import okhttp3.ResponseBody
 import org.json.JSONArray
 import org.json.JSONObject
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
 object RequestHandler {
     private const val LOG_TAG = "RequestHandler"

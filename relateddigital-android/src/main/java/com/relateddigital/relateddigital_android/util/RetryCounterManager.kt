@@ -66,8 +66,7 @@ object RetryCounterManager {
     }
 
     fun getCounterValue(id: Int): Int {
-        val result: Int
-        result = when (id) {
+        val result: Int = when (id) {
             1 -> {
                 counter1
             }

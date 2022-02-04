@@ -10,7 +10,7 @@ interface GeofenceGetListCallback {
     /**
      * Will be run if the target call is successful
      *
-     * @param message the response data
+     * @param response the response data
      * @param url requested url
      */
     fun success(response: List<GeofenceListResponse?>?, url: String)

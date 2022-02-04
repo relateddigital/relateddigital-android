@@ -7,7 +7,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.LinearLayout
 import com.relateddigital.relateddigital_android.R
-import com.relateddigital.relateddigital_android.inapp.inappmessages.RatingGrid
 
 class NpsWithNumbersView(context: Context?, attrs: AttributeSet?) : LinearLayout(context, attrs) {
     private var mRatingGrid: RatingGrid? = null

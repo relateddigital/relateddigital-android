@@ -1,9 +1,10 @@
 package com.relateddigital.relateddigital_android.network
 
-import android.app.FragmentTransaction
+import androidx.fragment.app.FragmentTransaction
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import androidx.fragment.app.FragmentActivity
 import com.google.gson.Gson
 import com.relateddigital.relateddigital_android.RelatedDigital
 import com.relateddigital.relateddigital_android.api.*
@@ -246,10 +247,8 @@ object RequestSender {
                                         actionsResponse.mProductStatNotifierList!!.isNotEmpty() -> {
                                             val socialProofFragment: SocialProofFragment = SocialProofFragment.newInstance(actionsResponse.mProductStatNotifierList!![0])
 
-                                            socialProofFragment.retainInstance = true
-
-                                            val transaction: FragmentTransaction = currentRequest.parent!!.fragmentManager.beginTransaction()
-                                            transaction.add(android.R.id.content, socialProofFragment)
+                                            val transaction : FragmentTransaction= (currentRequest.parent!! as FragmentActivity).supportFragmentManager.beginTransaction()
+                                            transaction.replace(android.R.id.content, socialProofFragment)
                                             transaction.commit()
                                         }
                                         else -> {
@@ -739,7 +738,7 @@ object RequestSender {
                                 response.headers(), response.raw().request.url.toString(),
                                 model, Domain.GEOFENCE_TRIGGER, context
                             )
-                            var rawJsonResponse = ""
+                            val rawJsonResponse: String
                             try {
                                 rawJsonResponse = response.body()!!.string()
                                 if (rawJsonResponse != "") {
@@ -1034,10 +1033,10 @@ object RequestSender {
             if (cookies.size > 0) {
                 for (cookie in cookies) {
                     val fields = cookie.split(";").toTypedArray()
-                    if (fields[0].toLowerCase(Locale.ROOT).contains(
-                                    Constants.LOAD_BALANCE_PREFIX.toLowerCase(
-                                            Locale.ROOT
-                                    )
+                    if (fields[0].lowercase(Locale.ROOT).contains(
+                            Constants.LOAD_BALANCE_PREFIX.lowercase(
+                                Locale.ROOT
+                            )
                             )) {
                         val cookieKeyValue = fields[0].split("=").toTypedArray()
                         if (cookieKeyValue.size > 1) {
@@ -1052,10 +1051,10 @@ object RequestSender {
                             }
                         }
                     }
-                    if (fields[0].toLowerCase(Locale.ROOT).contains(
-                                    Constants.OM_3_KEY.toLowerCase(
-                                            Locale.ROOT
-                                    )
+                    if (fields[0].lowercase(Locale.ROOT).contains(
+                            Constants.OM_3_KEY.lowercase(
+                                Locale.ROOT
+                            )
                             )) {
                         val cookieKeyValue = fields[0].split("=").toTypedArray()
                         if (cookieKeyValue.size > 1 || model.getCookie() != null) {

@@ -302,16 +302,16 @@ object RequestFormer {
         if (model.getCookie() != null) {
             val loadBalanceCookieKey = model.getCookie()!!.getLoggerCookieKey()
             val loadBalanceCookieValue = model.getCookie()!!.getLoggerCookieValue()
-            val Om3rdCookieValue = model.getCookie()!!.getLoggerOM3rdCookieValue()
+            val om3rdCookieValue = model.getCookie()!!.getLoggerOM3rdCookieValue()
             var cookieString = ""
             if (loadBalanceCookieKey.isNotEmpty() && loadBalanceCookieValue.isNotEmpty()) {
                 cookieString = "$loadBalanceCookieKey=$loadBalanceCookieValue"
             }
-            if (Om3rdCookieValue.isNotEmpty()) {
+            if (om3rdCookieValue.isNotEmpty()) {
                 if (cookieString != "") {
                     cookieString = "$cookieString;"
                 }
-                cookieString = cookieString + Constants.OM_3_REQUEST_KEY + "=" + Om3rdCookieValue
+                cookieString = cookieString + Constants.OM_3_REQUEST_KEY + "=" + om3rdCookieValue
             }
             if (cookieString != "") {
                 headerMap["Cookie"] = cookieString

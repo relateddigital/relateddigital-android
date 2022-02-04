@@ -625,9 +625,9 @@ class RelatedDigitalModel(
         } else {
             fromModel.getCookie()
         }
-        extra = HashMap<String, Any>()
+        extra = HashMap()
         for (i in fromModel.getExtra().keys.toTypedArray().indices) {
-            val key = fromModel.getExtra().keys.toTypedArray()[i] as String
+            val key = fromModel.getExtra().keys.toTypedArray()[i]
             extra[key] = fromModel.getExtra()[key]!!
         }
     }
