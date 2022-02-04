@@ -25,9 +25,7 @@ class InAppAlertFragment : DialogFragment() {
     private var mInAppMessage: InAppMessage? = null
     private var mContext: Context? = null
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val alertDialogBuilder = AlertDialog.Builder(
-            mParent!!, R.style.AlertDialogStyle
-        )
+        val alertDialogBuilder = AlertDialog.Builder(mParent!!)
         if (mInAppMessage == null) {
             cleanUp()
         } else {

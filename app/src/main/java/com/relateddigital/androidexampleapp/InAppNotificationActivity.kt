@@ -91,7 +91,7 @@ class InAppNotificationActivity : AppCompatActivity() {
         binding.socialProofButton.setOnClickListener {
             val parameters: HashMap<String, String> = HashMap()
             parameters["OM.inapptype"] = "socialproof"
-            parameters["OM.pv"] = "CV7933-837-837"
+            parameters["OM.pv"] = "584992"
             RelatedDigital.customEvent(
                     context = applicationContext,
                     pageName = "in-app",

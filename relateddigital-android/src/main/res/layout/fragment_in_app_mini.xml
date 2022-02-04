@@ -10,7 +10,7 @@
         android:layout_width="75dp"
         android:layout_height="match_parent"
         android:contentDescription="@string/com_visilabs_android_notification_image"
-        android:scaleType="centerInside" />
+        android:scaleType="centerCrop" />
 
     <TextView
         android:id="@+id/tv_in_app_title_mini"

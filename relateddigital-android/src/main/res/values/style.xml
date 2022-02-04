@@ -18,11 +18,6 @@
         <attr name="isIndicator" format="boolean" />
     </declare-styleable>
 
-    <style name="AlertDialogStyle" parent="Theme.AppCompat.Light.Dialog.Alert">
-        <item name="android:windowBackground">@android:color/white</item>
-        <item name="android:textColorPrimary">@android:color/black</item>
-    </style>
-
     <style name="AppTheme.FullScreenDialog" parent="Theme.MaterialComponents.Light.Dialog">
         <item name="android:windowIsFloating">false</item>
         <item name="android:windowBackground">@android:color/white</item>
