@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/ll_back"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -19,18 +18,19 @@
             <LinearLayout
                 android:id="@+id/ll_text_container"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="0dp"
                 android:layout_weight="1"
                 android:clickable="true"
                 android:focusableInTouchMode="true"
                 android:orientation="vertical"
-                android:visibility="visible">
+                android:visibility="visible"
+                android:focusable="true">
 
                 <ImageButton
                     android:id="@+id/ib_close"
                     android:layout_width="25dp"
                     android:layout_height="25dp"
-                    android:layout_gravity="top|right"
+                    android:layout_gravity="top|end"
                     android:layout_margin="5dp"
                     android:textColor="#fff" />
 
@@ -40,8 +40,8 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="0dp"
                     android:ellipsize="end"
-                    android:gravity="left"
-                    android:paddingLeft="10dp"
+                    android:gravity="start"
+                    android:paddingStart="10dp"
                     android:textColor="#fff"
                     android:textSize="15sp"
                     android:textStyle="bold" />
@@ -51,7 +51,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:ellipsize="end"
-                    android:gravity="left"
+                    android:gravity="start"
                     android:paddingLeft="10dp"
                     android:paddingTop="5dp"
                     android:paddingRight="10dp"
@@ -70,7 +70,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:ellipsize="end"
-                    android:gravity="left"
+                    android:gravity="start"
                     android:paddingLeft="10dp"
                     android:paddingRight="10dp"
                     android:visibility="gone" />
@@ -95,7 +95,7 @@
                         android:clickable="true"
                         android:ellipsize="end"
                         android:focusable="true"
-                        android:gravity="left"
+                        android:gravity="start"
                         android:paddingLeft="10dp"
                         android:paddingTop="5dp"
                         android:paddingRight="10dp"
@@ -122,7 +122,7 @@
                         android:clickable="true"
                         android:ellipsize="end"
                         android:focusable="true"
-                        android:gravity="left"
+                        android:gravity="start"
                         android:paddingLeft="10dp"
                         android:paddingTop="5dp"
                         android:paddingRight="10dp"
@@ -134,7 +134,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:ellipsize="end"
-                    android:gravity="left"
+                    android:gravity="start"
                     android:paddingLeft="10dp"
                     android:paddingRight="10dp"
                     android:paddingBottom="5dp"
@@ -149,7 +149,6 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom"
                 android:padding="5dp"
-                android:text="OK"
                 android:textAllCaps="false" />
         </LinearLayout>
 

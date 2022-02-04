@@ -65,7 +65,6 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="@dimen/ct_coupon_code_margin_right"
-                        android:layout_marginRight="@dimen/ct_coupon_code_margin_right"
                         android:padding="@dimen/ct_button_padding"
                         android:textSize="@dimen/ct_coupon_code_text_size" />
 
@@ -75,7 +74,6 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center|end"
                         android:layout_marginEnd="@dimen/ct_coupon_copy_margin_right"
-                        android:layout_marginRight="@dimen/ct_coupon_copy_margin_right"
                         android:background="@drawable/content_copy_24" />
                 </FrameLayout>
 

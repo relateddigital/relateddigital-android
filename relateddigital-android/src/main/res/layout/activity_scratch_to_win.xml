@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.relateddigital.relateddigital_android.inapp.scratchtowin.ContainerScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/scratch_to_win_container"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
@@ -15,7 +13,7 @@
             android:id="@+id/close_button"
             android:layout_width="25dp"
             android:layout_height="25dp"
-            android:layout_gravity="top|right"
+            android:layout_gravity="top|end"
             android:layout_margin="5dp"
             android:textColor="#fff" />
 
@@ -102,7 +100,7 @@
             android:layout_marginTop="8dp"
             android:layout_marginRight="20dp"
             android:ellipsize="end"
-            android:gravity="left"
+            android:gravity="start"
             android:paddingLeft="10dp"
             android:paddingRight="10dp"
             android:visibility="gone" />
@@ -112,22 +110,19 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:layout_marginLeft="16dp"
             android:layout_marginTop="8dp">
 
             <CheckBox
                 android:id="@+id/email_permit_checkbox"
                 android:layout_width="25dp"
                 android:layout_height="25dp"
-                android:layout_marginEnd="12dp"
-                android:layout_marginRight="12dp" />
+                android:layout_marginEnd="12dp" />
 
             <TextView
                 android:id="@+id/email_permit_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_toEndOf="@+id/email_permit_checkbox"
-                android:layout_toRightOf="@+id/email_permit_checkbox"
                 android:gravity="center_vertical"
                 android:minHeight="25dp" />
 
@@ -136,8 +131,7 @@
                 android:layout_width="25dp"
                 android:layout_height="25dp"
                 android:layout_below="@+id/email_permit_checkbox"
-                android:layout_marginEnd="12dp"
-                android:layout_marginRight="12dp" />
+                android:layout_marginEnd="12dp" />
 
             <TextView
                 android:id="@+id/consent_text"
@@ -145,7 +139,6 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/email_permit_checkbox"
                 android:layout_toEndOf="@+id/consent_checkbox"
-                android:layout_toRightOf="@+id/consent_checkbox"
                 android:gravity="center_vertical"
                 android:minHeight="25dp" />
         </RelativeLayout>
@@ -158,7 +151,7 @@
             android:layout_marginTop="8dp"
             android:layout_marginRight="20dp"
             android:ellipsize="end"
-            android:gravity="left"
+            android:gravity="start"
             android:paddingLeft="10dp"
             android:paddingRight="10dp"
             android:visibility="gone" />
