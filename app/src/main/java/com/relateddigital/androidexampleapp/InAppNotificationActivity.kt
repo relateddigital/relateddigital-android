@@ -102,10 +102,8 @@ class InAppNotificationActivity : AppCompatActivity() {
         binding.countdownTimerButton.setOnClickListener {
             val countdownTimerFragment: CountdownTimerFragment = CountdownTimerFragment.newInstance(0, null)
 
-            countdownTimerFragment.retainInstance = true
-
-            val transaction = fragmentManager.beginTransaction()
-            transaction.add(android.R.id.content, countdownTimerFragment)
+            val transaction = supportFragmentManager.beginTransaction()
+            transaction.replace(android.R.id.content, countdownTimerFragment)
             transaction.commit()
             //TODO when backend side gets ready, check below
             //sendInAppRequest("countdowntimer");
@@ -123,7 +121,7 @@ class InAppNotificationActivity : AppCompatActivity() {
         }
 
         binding.appTrackerButton.setOnClickListener {
-            RelatedDigital.sendTheListOfAppsInstalled(applicationContext);
+            RelatedDigital.sendTheListOfAppsInstalled(applicationContext)
         }
 
         binding.nps1Button.setOnClickListener {
@@ -139,7 +137,7 @@ class InAppNotificationActivity : AppCompatActivity() {
         }
 
         binding.halfScreenButton.setOnClickListener {
-            sendInAppRequest("halfscreen");
+            sendInAppRequest("halfscreen")
         }
 
         binding.locationPermissionButton.setOnClickListener {
@@ -205,10 +203,8 @@ class InAppNotificationActivity : AppCompatActivity() {
                 InAppNotificationModel()
             )
 
-            inAppNotificationFragment.retainInstance = true
-
-            val transaction = this.fragmentManager.beginTransaction()
-            transaction.add(android.R.id.content, inAppNotificationFragment)
+            val transaction = supportFragmentManager.beginTransaction()
+            transaction.replace(android.R.id.content, inAppNotificationFragment)
             transaction.commit()
             //TODO : When BE is ready
             //sendInAppRequest("notification")

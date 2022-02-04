@@ -1,6 +1,6 @@
 package com.relateddigital.relateddigital_android.inapp.notification
 
-import android.app.Fragment
+import androidx.fragment.app.Fragment
 import android.content.Intent
 import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
@@ -153,7 +153,7 @@ class InAppNotificationFragment : Fragment() {
             Shape.SOFT_EDGE -> {
                 if (isBackgroundImage) {
                     if(!isSmallImage) {
-                        Glide.with(activity)
+                        Glide.with(requireActivity())
                             .asBitmap()
                             .transform(
                                 MultiTransformation(
@@ -181,7 +181,7 @@ class InAppNotificationFragment : Fragment() {
             Shape.CIRCLE -> {
                 if (isBackgroundImage) {
                     if(!isSmallImage) {
-                        Glide.with(activity)
+                        Glide.with(requireActivity())
                             .asBitmap()
                             .transform(
                                 MultiTransformation(
@@ -221,7 +221,7 @@ class InAppNotificationFragment : Fragment() {
             }
             bindingRt.arrowCircleRt.setTextColor(resources.getColor(R.color.white))
             if (isSmallImage) {
-                Glide.with(activity)
+                Glide.with(requireActivity())
                     .asBitmap()
                     .transform(
                         MultiTransformation(
@@ -264,7 +264,7 @@ class InAppNotificationFragment : Fragment() {
             bindingRt.arrowSquareRt.setTextColor(resources.getColor(R.color.white))
             if (isSmallImage) {
                 if(shape == Shape.SOFT_EDGE) {
-                    Glide.with(activity)
+                    Glide.with(requireActivity())
                         .asBitmap()
                         .transform(
                             MultiTransformation(
@@ -316,7 +316,7 @@ class InAppNotificationFragment : Fragment() {
             // TODO : send report here
             val viewIntent =
                 Intent(Intent.ACTION_VIEW, Uri.parse("https://www.relateddigital.com/"))
-            activity.startActivity(viewIntent)
+            requireActivity().startActivity(viewIntent)
             endFragment()
         }
     }
@@ -351,7 +351,7 @@ class InAppNotificationFragment : Fragment() {
             Shape.SOFT_EDGE -> {
                 if (isBackgroundImage) {
                     if(!isSmallImage) {
-                        Glide.with(activity)
+                        Glide.with(requireActivity())
                             .asBitmap()
                             .transform(
                                 MultiTransformation(
@@ -379,7 +379,7 @@ class InAppNotificationFragment : Fragment() {
             Shape.CIRCLE -> {
                 if (isBackgroundImage) {
                     if(!isSmallImage) {
-                        Glide.with(activity)
+                        Glide.with(requireActivity())
                             .asBitmap()
                             .transform(
                                 MultiTransformation(
@@ -419,7 +419,7 @@ class InAppNotificationFragment : Fragment() {
             }
             bindingRm.arrowCircleRm.setTextColor(resources.getColor(R.color.white))
             if (isSmallImage) {
-                Glide.with(activity)
+                Glide.with(requireActivity())
                     .asBitmap()
                     .transform(
                         MultiTransformation(
@@ -462,7 +462,7 @@ class InAppNotificationFragment : Fragment() {
             bindingRm.arrowSquareRm.setTextColor(resources.getColor(R.color.white))
             if (isSmallImage) {
                 if(shape == Shape.SOFT_EDGE) {
-                    Glide.with(activity)
+                    Glide.with(requireActivity())
                         .asBitmap()
                         .transform(
                             MultiTransformation(
@@ -514,7 +514,7 @@ class InAppNotificationFragment : Fragment() {
             // TODO : send report here
             val viewIntent =
                 Intent(Intent.ACTION_VIEW, Uri.parse("https://www.relateddigital.com/"))
-            activity.startActivity(viewIntent)
+            requireActivity().startActivity(viewIntent)
             endFragment()
         }
     }
@@ -549,7 +549,7 @@ class InAppNotificationFragment : Fragment() {
             Shape.SOFT_EDGE -> {
                 if (isBackgroundImage) {
                     if(!isSmallImage) {
-                        Glide.with(activity)
+                        Glide.with(requireActivity())
                             .asBitmap()
                             .transform(
                                 MultiTransformation(
@@ -577,7 +577,7 @@ class InAppNotificationFragment : Fragment() {
             Shape.CIRCLE -> {
                 if (isBackgroundImage) {
                     if(!isSmallImage) {
-                        Glide.with(activity)
+                        Glide.with(requireActivity())
                             .asBitmap()
                             .transform(
                                 MultiTransformation(
@@ -617,7 +617,7 @@ class InAppNotificationFragment : Fragment() {
             }
             bindingRb.arrowCircleRb.setTextColor(resources.getColor(R.color.white))
             if (isSmallImage) {
-                Glide.with(activity)
+                Glide.with(requireActivity())
                     .asBitmap()
                     .transform(
                         MultiTransformation(
@@ -660,7 +660,7 @@ class InAppNotificationFragment : Fragment() {
             bindingRb.arrowSquareRb.setTextColor(resources.getColor(R.color.white))
             if (isSmallImage) {
                 if(shape == Shape.SOFT_EDGE) {
-                    Glide.with(activity)
+                    Glide.with(requireActivity())
                         .asBitmap()
                         .transform(
                             MultiTransformation(
@@ -712,7 +712,7 @@ class InAppNotificationFragment : Fragment() {
             // TODO : send report here
             val viewIntent =
                 Intent(Intent.ACTION_VIEW, Uri.parse("https://www.relateddigital.com/"))
-            activity.startActivity(viewIntent)
+            requireActivity().startActivity(viewIntent)
             endFragment()
         }
     }
@@ -747,7 +747,7 @@ class InAppNotificationFragment : Fragment() {
             Shape.SOFT_EDGE -> {
                 if (isBackgroundImage) {
                     if(!isSmallImage) {
-                        Glide.with(activity)
+                        Glide.with(requireActivity())
                             .asBitmap()
                             .transform(
                                 MultiTransformation(
@@ -775,7 +775,7 @@ class InAppNotificationFragment : Fragment() {
             Shape.CIRCLE -> {
                 if (isBackgroundImage) {
                     if(!isSmallImage) {
-                        Glide.with(activity)
+                        Glide.with(requireActivity())
                             .asBitmap()
                             .transform(
                                 MultiTransformation(
@@ -815,7 +815,7 @@ class InAppNotificationFragment : Fragment() {
             }
             bindingLt.arrowCircleLt.setTextColor(resources.getColor(R.color.white))
             if (isSmallImage) {
-                Glide.with(activity)
+                Glide.with(requireActivity())
                     .asBitmap()
                     .transform(
                         MultiTransformation(
@@ -858,7 +858,7 @@ class InAppNotificationFragment : Fragment() {
             bindingLt.arrowSquareLt.setTextColor(resources.getColor(R.color.white))
             if (isSmallImage) {
                 if(shape == Shape.SOFT_EDGE) {
-                    Glide.with(activity)
+                    Glide.with(requireActivity())
                         .asBitmap()
                         .transform(
                             MultiTransformation(
@@ -910,7 +910,7 @@ class InAppNotificationFragment : Fragment() {
             // TODO : send report here
             val viewIntent =
                 Intent(Intent.ACTION_VIEW, Uri.parse("https://www.relateddigital.com/"))
-            activity.startActivity(viewIntent)
+            requireActivity().startActivity(viewIntent)
             endFragment()
         }
     }
@@ -945,7 +945,7 @@ class InAppNotificationFragment : Fragment() {
             Shape.SOFT_EDGE -> {
                 if (isBackgroundImage) {
                     if(!isSmallImage) {
-                        Glide.with(activity)
+                        Glide.with(requireActivity())
                             .asBitmap()
                             .transform(
                                 MultiTransformation(
@@ -973,7 +973,7 @@ class InAppNotificationFragment : Fragment() {
             Shape.CIRCLE -> {
                 if (isBackgroundImage) {
                     if(!isSmallImage) {
-                        Glide.with(activity)
+                        Glide.with(requireActivity())
                             .asBitmap()
                             .transform(
                                 MultiTransformation(
@@ -1013,7 +1013,7 @@ class InAppNotificationFragment : Fragment() {
             }
             bindingLm.arrowCircleLm.setTextColor(resources.getColor(R.color.white))
             if (isSmallImage) {
-                Glide.with(activity)
+                Glide.with(requireActivity())
                     .asBitmap()
                     .transform(
                         MultiTransformation(
@@ -1056,7 +1056,7 @@ class InAppNotificationFragment : Fragment() {
             bindingLm.arrowSquareLm.setTextColor(resources.getColor(R.color.white))
             if (isSmallImage) {
                 if(shape == Shape.SOFT_EDGE) {
-                    Glide.with(activity)
+                    Glide.with(requireActivity())
                         .asBitmap()
                         .transform(
                             MultiTransformation(
@@ -1108,7 +1108,7 @@ class InAppNotificationFragment : Fragment() {
             // TODO : send report here
             val viewIntent =
                 Intent(Intent.ACTION_VIEW, Uri.parse("https://www.relateddigital.com/"))
-            activity.startActivity(viewIntent)
+            requireActivity().startActivity(viewIntent)
             endFragment()
         }
     }
@@ -1143,7 +1143,7 @@ class InAppNotificationFragment : Fragment() {
             Shape.SOFT_EDGE -> {
                 if (isBackgroundImage) {
                     if(!isSmallImage) {
-                        Glide.with(activity)
+                        Glide.with(requireActivity())
                             .asBitmap()
                             .transform(
                                 MultiTransformation(
@@ -1171,7 +1171,7 @@ class InAppNotificationFragment : Fragment() {
             Shape.CIRCLE -> {
                 if (isBackgroundImage) {
                     if(!isSmallImage) {
-                        Glide.with(activity)
+                        Glide.with(requireActivity())
                             .asBitmap()
                             .transform(
                                 MultiTransformation(
@@ -1211,7 +1211,7 @@ class InAppNotificationFragment : Fragment() {
             }
             bindingLb.arrowCircleLb.setTextColor(resources.getColor(R.color.white))
             if (isSmallImage) {
-                Glide.with(activity)
+                Glide.with(requireActivity())
                     .asBitmap()
                     .transform(
                         MultiTransformation(
@@ -1254,7 +1254,7 @@ class InAppNotificationFragment : Fragment() {
             bindingLb.arrowSquareLb.setTextColor(resources.getColor(R.color.white))
             if (isSmallImage) {
                 if(shape == Shape.SOFT_EDGE) {
-                    Glide.with(activity)
+                    Glide.with(requireActivity())
                         .asBitmap()
                         .transform(
                             MultiTransformation(
@@ -1306,7 +1306,7 @@ class InAppNotificationFragment : Fragment() {
             // TODO : send report here
             val viewIntent =
                 Intent(Intent.ACTION_VIEW, Uri.parse("https://www.relateddigital.com/"))
-            activity.startActivity(viewIntent)
+            requireActivity().startActivity(viewIntent)
             endFragment()
         }
     }
@@ -1318,7 +1318,7 @@ class InAppNotificationFragment : Fragment() {
 
     private fun endFragment() {
         if (activity != null) {
-            activity.fragmentManager.beginTransaction().remove(this@InAppNotificationFragment)
+            requireActivity().supportFragmentManager.beginTransaction().remove(this@InAppNotificationFragment)
                 .commit()
         }
     }

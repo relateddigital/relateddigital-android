@@ -1,6 +1,6 @@
 package com.relateddigital.relateddigital_android.inapp.countdowntimer
 
-import android.app.Fragment
+import androidx.fragment.app.Fragment
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -35,8 +35,8 @@ class CountdownTimerFragment : Fragment() {
     private lateinit var binding: FragmentCountdownTimerBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mStateId = arguments.getInt(ARG_PARAM1)
-        mInAppState = arguments.getParcelable(ARG_PARAM2)
+        mStateId = requireArguments().getInt(ARG_PARAM1)
+        mInAppState = requireArguments().getParcelable(ARG_PARAM2)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -122,11 +122,11 @@ class CountdownTimerFragment : Fragment() {
         binding.couponTop.setBackgroundColor(resources.getColor(R.color.white))
         binding.couponButtonTop.setOnClickListener {
             //TODO: send click report here
-            val clipboard = activity.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+            val clipboard = requireActivity().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
             //TODO: get coupon text from the response instead of view here
             val clip = ClipData.newPlainText(getString(R.string.coupon_code), binding.couponTextTop.text.toString())
             clipboard.setPrimaryClip(clip)
-            Toast.makeText(activity, getString(R.string.copied_to_clipboard), Toast.LENGTH_LONG).show()
+            Toast.makeText(requireActivity(), getString(R.string.copied_to_clipboard), Toast.LENGTH_LONG).show()
             //TODO track this click later
         }
     }
@@ -139,11 +139,11 @@ class CountdownTimerFragment : Fragment() {
         binding.couponBot.setBackgroundColor(resources.getColor(R.color.white))
         binding.couponButtonBot.setOnClickListener {
             //TODO: send click report here
-            val clipboard = activity.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+            val clipboard = requireActivity().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
             //TODO: get coupon text from the response instead of view here
             val clip = ClipData.newPlainText(getString(R.string.coupon_code), binding.couponTextBot.text.toString())
             clipboard.setPrimaryClip(clip)
-            Toast.makeText(activity, getString(R.string.copied_to_clipboard), Toast.LENGTH_LONG).show()
+            Toast.makeText(requireActivity(), getString(R.string.copied_to_clipboard), Toast.LENGTH_LONG).show()
             //TODO track this click later
         }
     }
@@ -295,7 +295,7 @@ class CountdownTimerFragment : Fragment() {
 
     private fun reAdjustTimerViews() {
         calculateTimeFields()
-        activity.runOnUiThread {
+        requireActivity().runOnUiThread {
             try {
                 if (mIsTop) {
                     if (binding.weekNumTop.visibility != View.GONE) {
@@ -376,7 +376,7 @@ class CountdownTimerFragment : Fragment() {
         if (mTimer != null) {
             mTimer!!.cancel()
         }
-        activity.runOnUiThread { Toast.makeText(activity, getString(R.string.time_is_over), Toast.LENGTH_LONG).show() }
+        requireActivity().runOnUiThread { Toast.makeText(activity, getString(R.string.time_is_over), Toast.LENGTH_LONG).show() }
     }
 
     private fun endFragment() {
@@ -384,21 +384,21 @@ class CountdownTimerFragment : Fragment() {
             mTimer!!.cancel()
         }
         if (activity != null) {
-            activity.fragmentManager.beginTransaction().remove(this@CountdownTimerFragment).commit()
+            requireActivity().supportFragmentManager.beginTransaction().remove(this@CountdownTimerFragment).commit()
         }
     }
 
     private fun hideStatusBar() {
-        val decorView = activity.window.decorView
+        val decorView = requireActivity().window.decorView
         val uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN
         decorView.systemUiVisibility = uiOptions
-        activity.actionBar?.hide()
+        requireActivity().actionBar?.hide()
     }
 
     private fun showStatusBar() {
         if (activity != null) {
             ViewCompat.getWindowInsetsController(
-                activity.window.decorView
+                requireActivity().window.decorView
             )?.show(WindowInsetsCompat.Type.systemBars())
         }
     }

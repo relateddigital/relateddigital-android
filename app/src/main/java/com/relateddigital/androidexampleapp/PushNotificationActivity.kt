@@ -2,12 +2,9 @@ package com.relateddigital.androidexampleapp
 
 import android.app.Activity
 import android.content.Intent
-import android.graphics.Color
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
-import android.view.Gravity
 import android.view.View
 import android.widget.*
 import com.google.gson.Gson
@@ -65,7 +62,7 @@ class PushNotificationActivity : AppCompatActivity() {
     }
 
     private fun createSpinners() {
-        val registerEmailCommercialSpinnerItems = arrayOf<String>(
+        val registerEmailCommercialSpinnerItems = arrayOf(
             Constants.EURO_RECIPIENT_TYPE_BIREYSEL,
             Constants.EURO_RECIPIENT_TYPE_TACIR
         )
@@ -294,7 +291,7 @@ class PushNotificationActivity : AppCompatActivity() {
         val paramsType = object : TypeToken<Map<String?, String?>?>() {}.type
         val params = gson.fromJson<Map<String, String>>(lastPushParamsString, paramsType)
             ?: return
-        for ((index, param) in params.entries.withIndex()) {
+        for (param in params.entries) {
             payloadStr.append(param.key).append(" : ").append(param.value).append("\n\n")
         }
         binding.payloadView.text = payloadStr.toString()
