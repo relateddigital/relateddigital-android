@@ -151,7 +151,7 @@ class StoryActivity : Activity(), StoriesProgressView.StoriesListener {
             Picasso.get().load(mStories!!.thumbnail).into(mIvCover)
         }
         mTvCover.text = mStories!!.title
-        if (mExtendedProps != null && mExtendedProps!!.storyz_label_color != null) {
+        if (mExtendedProps != null && !mExtendedProps!!.storyz_label_color.isNullOrEmpty()) {
             mTvCover.setTextColor(Color.parseColor(mExtendedProps!!.storyz_label_color))
         }
 

@@ -70,8 +70,8 @@ class StorySkinBasedAdapter(var mContext: Context) :
             e.printStackTrace()
         }
 
-        if (extendedProps?.storyz_label_color != null) {
-            storyHolder.tvStoryName.setTextColor(Color.parseColor(extendedProps.storyz_label_color))
+        if (!extendedProps?.storyz_label_color.isNullOrEmpty()) {
+            storyHolder.tvStoryName.setTextColor(Color.parseColor(extendedProps?.storyz_label_color))
         }
 
         storyHolder.tvStoryName.typeface = getFontFamily(
