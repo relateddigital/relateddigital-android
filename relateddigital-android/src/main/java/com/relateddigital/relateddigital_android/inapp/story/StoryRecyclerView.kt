@@ -24,51 +24,76 @@ class StoryRecyclerView : RecyclerView {
     constructor(context: Context?, attrs: AttributeSet?) : super(context!!, attrs) {}
     constructor(context: Context?, attrs: AttributeSet?, defStyle: Int) : super(context!!, attrs, defStyle) {}
 
-    fun setStoryAction(context: Context?, storyItemClickListener: StoryItemClickListener?) {
-        if (RelatedDigital.isBlocked(context!!)) {
+    fun setStoryAction(context: Context, storyItemClickListener: StoryItemClickListener?) {
+        if (RelatedDigital.isBlocked(context)) {
             Log.w(TAG, "Too much server load, ignoring the request!")
             return
         }
-        mStoryItemClickListener = storyItemClickListener
-        val parameters = HashMap<String, String>()
-        parameters[Constants.REQUEST_ACTION_TYPE_KEY] = Constants.STORY_ACTION_TYPE_VAL
-        RequestHandler.createStoryActionRequest(mContext, getStoryCallback(context, null), parameters)
+
+        if(RelatedDigital.getRelatedDigitalModel(context).getIsInAppNotificationEnabled()) {
+            mStoryItemClickListener = storyItemClickListener
+            val parameters = HashMap<String, String>()
+            parameters[Constants.REQUEST_ACTION_TYPE_KEY] = Constants.STORY_ACTION_TYPE_VAL
+            RequestHandler.createStoryActionRequest(
+                mContext,
+                getStoryCallback(context, null),
+                parameters
+            )
+        }
     }
 
-    fun setStoryActionId(context: Context?, actionId: String, storyItemClickListener: StoryItemClickListener?) {
+    fun setStoryActionId(context: Context, actionId: String, storyItemClickListener: StoryItemClickListener?) {
         if (RelatedDigital.isBlocked(mContext)) {
             Log.w(TAG, "Too much server load, ignoring the request!")
             return
         }
-        mStoryItemClickListener = storyItemClickListener
-        val parameters = HashMap<String, String>()
-        parameters[Constants.REQUEST_ACTION_ID_KEY] = actionId
-        RequestHandler.createStoryActionRequest(mContext, getStoryCallback(context, null), parameters)
+        if(RelatedDigital.getRelatedDigitalModel(context).getIsInAppNotificationEnabled()) {
+            mStoryItemClickListener = storyItemClickListener
+            val parameters = HashMap<String, String>()
+            parameters[Constants.REQUEST_ACTION_ID_KEY] = actionId
+            RequestHandler.createStoryActionRequest(
+                mContext,
+                getStoryCallback(context, null),
+                parameters
+            )
+        }
     }
 
-    fun setStoryActionWithRequestCallback(context: Context?, storyItemClickListener: StoryItemClickListener?,
+    fun setStoryActionWithRequestCallback(context: Context, storyItemClickListener: StoryItemClickListener?,
                                           storyRequestListener: StoryRequestListener?) {
-        if (RelatedDigital.isBlocked(context!!)) {
+        if (RelatedDigital.isBlocked(context)) {
             Log.w(TAG, "Too much server load, ignoring the request!")
             return
         }
-        mStoryItemClickListener = storyItemClickListener
-        val parameters = HashMap<String, String>()
-        parameters[Constants.REQUEST_ACTION_TYPE_KEY] = Constants.STORY_ACTION_TYPE_VAL
-        RequestHandler.createStoryActionRequest(mContext, getStoryCallback(context, storyRequestListener), parameters)
+        if(RelatedDigital.getRelatedDigitalModel(context).getIsInAppNotificationEnabled()) {
+            mStoryItemClickListener = storyItemClickListener
+            val parameters = HashMap<String, String>()
+            parameters[Constants.REQUEST_ACTION_TYPE_KEY] = Constants.STORY_ACTION_TYPE_VAL
+            RequestHandler.createStoryActionRequest(
+                mContext,
+                getStoryCallback(context, storyRequestListener),
+                parameters
+            )
+        }
     }
 
-    fun setStoryActionIdWithRequestCallback(context: Context?, actionId: String,
+    fun setStoryActionIdWithRequestCallback(context: Context, actionId: String,
                                             storyItemClickListener: StoryItemClickListener?,
                                             storyRequestListener: StoryRequestListener?) {
-        if (RelatedDigital.isBlocked(mContext)) {
+        if (RelatedDigital.isBlocked(context)) {
             Log.w(TAG, "Too much server load, ignoring the request!")
             return
         }
-        mStoryItemClickListener = storyItemClickListener
-        val parameters = HashMap<String, String>()
-        parameters[Constants.REQUEST_ACTION_ID_KEY] = actionId
-        RequestHandler.createStoryActionRequest(mContext, getStoryCallback(context, storyRequestListener), parameters)
+        if(RelatedDigital.getRelatedDigitalModel(context).getIsInAppNotificationEnabled()) {
+            mStoryItemClickListener = storyItemClickListener
+            val parameters = HashMap<String, String>()
+            parameters[Constants.REQUEST_ACTION_ID_KEY] = actionId
+            RequestHandler.createStoryActionRequest(
+                mContext,
+                getStoryCallback(context, storyRequestListener),
+                parameters
+            )
+        }
     }
 
     private fun getStoryCallback(context: Context?, storyRequestListener: StoryRequestListener?): VisilabsCallback {
