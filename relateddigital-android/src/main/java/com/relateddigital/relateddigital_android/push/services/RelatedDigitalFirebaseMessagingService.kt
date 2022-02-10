@@ -142,10 +142,15 @@ class RelatedDigitalFirebaseMessagingService : FirebaseMessagingService() {
                 )
             }
 
-            RequestHandler.createRetentionRequest(
-                this, RetentionType.DELIVER,
-                pushMessage.pushId, pushMessage.emPushSp
-            )
+            if (pushMessage.deliver != null &&
+                pushMessage.deliver!!.lowercase() == "true"
+            ) {
+                RequestHandler.createRetentionRequest(
+                    this, RetentionType.DELIVER,
+                    pushMessage.pushId, pushMessage.emPushSp
+                )
+            }
+
             PayloadUtils.addPushMessage(this, pushMessage)
         } else {
             Log.d(LOG_TAG, "remoteMessageData transform problem")
