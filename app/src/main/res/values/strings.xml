@@ -5,7 +5,7 @@
     <string name="push_notification_page_label">Push Notification</string>
     <string name="login_page_label">Login/Logout</string>
     <string name="story_page_label">Story</string>
-    <string name="login_page">LOGIN PAGE</string>
+    <string name="event_page">EVENT PAGE</string>
     <string name="story_page">STORY PAGE</string>
     <string name="in_app_notification_page">IN-APP NOTIFICATION PAGE</string>
     <string name="push_notification_page">PUSH NOTIFICATION PAGE</string>

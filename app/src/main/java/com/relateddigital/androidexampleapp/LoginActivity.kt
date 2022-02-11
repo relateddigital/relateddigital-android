@@ -16,22 +16,14 @@ import java.util.*
 class LoginActivity : AppCompatActivity() {
     private lateinit var binding: ActivityLoginBinding
     private var exVisitor: String? = null
-    var token = ""
-    var appID = "relateddigital-android-test"
+    var token = RelatedDigital.getRelatedDigitalModel(this).getToken()
+    var appID = RelatedDigital.getRelatedDigitalModel(this).getGoogleAppAlias()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        FirebaseMessaging.getInstance().token
-            .addOnCompleteListener(OnCompleteListener { task ->
-                if (!task.isSuccessful) {
-                    Log.e("token", "getInstanceId failed", task.exception)
-                    return@OnCompleteListener
-                }
-                token = task.result
-
-            })
         binding = ActivityLoginBinding.inflate(layoutInflater)
         val view: View = binding.root
         setContentView(view)
+
         exVisitor = Math.random().toString() + "test@gmail.com"
         binding.tvExvisitorId.setText(exVisitor)
         binding.btnLogin.setOnClickListener {
