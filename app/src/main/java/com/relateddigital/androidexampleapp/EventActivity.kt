@@ -2,25 +2,22 @@ package com.relateddigital.androidexampleapp
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.PreferenceManager
-import com.google.android.gms.tasks.OnCompleteListener
-import com.google.firebase.messaging.FirebaseMessaging
-import com.relateddigital.androidexampleapp.databinding.ActivityLoginBinding
+import com.relateddigital.androidexampleapp.databinding.ActivityEventBinding
 import com.relateddigital.relateddigital_android.RelatedDigital
 import java.util.*
 
-class LoginActivity : AppCompatActivity() {
-    private lateinit var binding: ActivityLoginBinding
+class EventActivity : AppCompatActivity() {
+    private lateinit var binding: ActivityEventBinding
     private var exVisitor: String? = null
     var token = RelatedDigital.getRelatedDigitalModel(this).getToken()
     var appID = RelatedDigital.getRelatedDigitalModel(this).getGoogleAppAlias()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityLoginBinding.inflate(layoutInflater)
+        binding = ActivityEventBinding.inflate(layoutInflater)
         val view: View = binding.root
         setContentView(view)
 

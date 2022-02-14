@@ -106,11 +106,13 @@ class RelatedDigitalHuaweiMessagingService : HmsMessageService() {
                     Constants.NOTIFICATION_CHANNEL_DESCRIPTION_KEY,
                     PushNotificationManager.getChannelDescription(this)
                 )
-                SharedPref.writeString(
-                    this,
-                    Constants.NOTIFICATION_CHANNEL_SOUND_KEY,
-                    pushMessage.sound!!
-                )
+                if(!pushMessage.sound.isNullOrEmpty()) {
+                    SharedPref.writeString(
+                        this,
+                        Constants.NOTIFICATION_CHANNEL_SOUND_KEY,
+                        pushMessage.sound!!
+                    )
+                }
             }
             when (pushMessage.getPushType()) {
                 PushType.Image -> if (pushMessage.getElements() != null) {

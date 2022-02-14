@@ -3,7 +3,7 @@
     <string name="main_page_label">Related Digital Android Demo</string>
     <string name="in_app_notification_page_label">In-App Notification</string>
     <string name="push_notification_page_label">Push Notification</string>
-    <string name="login_page_label">Login/Logout</string>
+    <string name="event_page_label">Event</string>
     <string name="story_page_label">Story</string>
     <string name="event_page">EVENT PAGE</string>
     <string name="story_page">STORY PAGE</string>

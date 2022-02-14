@@ -34,7 +34,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.loginPage.setOnClickListener {
-            val intent = Intent(this@MainActivity, LoginActivity::class.java)
+            val intent = Intent(this@MainActivity, EventActivity::class.java)
             startActivity(intent)
         }
 
