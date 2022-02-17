@@ -41,7 +41,7 @@ class CarouselBuilder private constructor(private val context: Context, notifica
     private var leftItemDescription: String? = null
     private var rightItemTitle: String? = null
     private var rightItemDescription: String? = null
-    var message: Message? = null
+    private lateinit var message: Message
     private var mBuilder: NotificationCompat.Builder
     private var carouselNotificationId =
         9873715 //Random id for notification. Will cancel any notification that have existing same id.
@@ -173,7 +173,7 @@ class CarouselBuilder private constructor(private val context: Context, notifica
         }
     }
 
-    fun buildCarousel(message: Message?) {
+    fun buildCarousel(message: Message) {
         this.message = message
         var isImagesInCarous = false
         var numberofImages = 0
@@ -264,7 +264,7 @@ class CarouselBuilder private constructor(private val context: Context, notifica
                 context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager?
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && mNotifyManager != null) {
                 PushNotificationManager.createNotificationChannel(
-                    mNotifyManager, message!!.sound,
+                    mNotifyManager, message.sound,
                     context
                 )
             }
@@ -583,7 +583,7 @@ class CarouselBuilder private constructor(private val context: Context, notifica
         bundle.putParcelable(Constants.CAROUSAL_ITEM_CLICKED_KEY, cItem)
         bundle.putString(
             Constants.CAROUSEL_ITEM_CLICKED_URL,
-            message!!.getElements()!![cItem!!.id!!.toInt() - 1].url
+            message.getElements()!![cItem!!.id!!.toInt() - 1].url
         )
         val intentStr: String =
             SharedPref.readString(context.applicationContext, Constants.INTENT_NAME)

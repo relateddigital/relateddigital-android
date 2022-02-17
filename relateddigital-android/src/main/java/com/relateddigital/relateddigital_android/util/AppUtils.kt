@@ -518,6 +518,35 @@ object AppUtils {
         return notificationIntent
     }
 
+    fun getStartActivityIntent(context: Context, pushMessage: Message) : Intent{
+        val intentStr: String =
+            SharedPref.readString(context, Constants.INTENT_NAME)
+        var intent: Intent
+        if (intentStr.isNotEmpty()) {
+            try {
+                intent = Intent(context, Class.forName(intentStr))
+                intent.putExtra("message", pushMessage)
+            } catch (e: java.lang.Exception) {
+                val element = Throwable().stackTrace[0]
+                LogUtils.formGraylogModel(
+                    context,
+                    "e",
+                    "Navigating to the activity of the customer : " + e.message,
+                    element.className + "/" + element.methodName + "/" + element.lineNumber
+                )
+                Log.e("PushClick : ", "The class could not be found!")
+                intent = getLaunchIntent(context, pushMessage)
+                return intent
+            }
+        } else {
+            intent = getLaunchIntent(context, pushMessage)
+        }
+        intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+
+        return intent
+    }
+
     fun isResourceAvailable(context: Context?, resId: Int): Boolean {
         if (context != null) {
             try {

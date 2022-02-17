@@ -272,6 +272,9 @@ class PushNotificationActivity : AppCompatActivity() {
     }
 
     private fun handlePush(message: Message, intent: Intent) {
+        // Send open report
+        RelatedDigital.sendPushNotificationOpenReport(this, message)
+
         val dateFormat: DateFormat = SimpleDateFormat("yyyy-MM-dd hh:mm:ss")
         val lastPushTime = dateFormat.format(Calendar.getInstance().time)
         SharedPref.writeString(applicationContext, Constants.LAST_PUSH_TIME, lastPushTime)

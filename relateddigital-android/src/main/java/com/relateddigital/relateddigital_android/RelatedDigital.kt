@@ -21,6 +21,7 @@ import com.relateddigital.relateddigital_android.network.RequestFormer
 import com.relateddigital.relateddigital_android.network.RequestHandler
 import com.relateddigital.relateddigital_android.push.EuromessageCallback
 import com.relateddigital.relateddigital_android.push.PushMessageInterface
+import com.relateddigital.relateddigital_android.push.RetentionType
 import com.relateddigital.relateddigital_android.remoteConfig.RemoteConfigHelper
 import com.relateddigital.relateddigital_android.util.*
 import org.json.JSONObject
@@ -948,6 +949,19 @@ object RelatedDigital {
                 model!!.setExVisitorId(context, "", true)
                 model!!.setCookieId(context, null)
             }
+        }
+    }
+
+    @JvmStatic
+    fun sendPushNotificationOpenReport(context: Context, message: Message) {
+        if (model!!.getIsPushNotificationEnabled()) {
+            RequestHandler.createRetentionRequest(
+                context, RetentionType.OPEN,
+                message.pushId, message.emPushSp
+            )
+        } else {
+            Log.e(LOG_TAG, "Push notification is not enabled." +
+                    "Call RelatedDigital.setIsPushNotificationEnabled() first")
         }
     }
 

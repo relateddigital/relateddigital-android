@@ -23,7 +23,6 @@ import com.relateddigital.relateddigital_android.model.CarouselItem
 import com.relateddigital.relateddigital_android.model.Element
 import com.relateddigital.relateddigital_android.model.Message
 import com.relateddigital.relateddigital_android.push.carousel.CarouselBuilder
-import com.relateddigital.relateddigital_android.push.services.RelatedDigitalOpenReportService
 import com.relateddigital.relateddigital_android.util.AppUtils
 import com.relateddigital.relateddigital_android.util.ImageUtils
 import com.relateddigital.relateddigital_android.util.LogUtils
@@ -59,15 +58,14 @@ class PushNotificationManager {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && mNotificationManager != null) {
                 createNotificationChannel(mNotificationManager, pushMessage.sound, context)
             }
-            intent = Intent(context, RelatedDigitalOpenReportService::class.java)
-            intent!!.putExtra("message", pushMessage)
+            intent = AppUtils.getStartActivityIntent(context, pushMessage)
             val contentIntent: PendingIntent = if (Build.VERSION.SDK_INT > Build.VERSION_CODES.R) {
-                PendingIntent.getService(
+                PendingIntent.getActivity(
                     context, notificationId,
                     intent!!, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
                 )
             } else {
-                PendingIntent.getService(
+                PendingIntent.getActivity(
                     context, notificationId,
                     intent!!, PendingIntent.FLAG_UPDATE_CURRENT
                 )
@@ -88,7 +86,7 @@ class PushNotificationManager {
 
     fun createNotificationBuilder(
         context: Context, contentTitle: String?,
-        contentText: String?, pushMessage: Message?,
+        contentText: String?, pushMessage: Message,
         notificationId: Int
     ): NotificationCompat.Builder {
         val title = if (TextUtils.isEmpty(contentTitle)) " " else contentTitle!!
@@ -121,15 +119,14 @@ class PushNotificationManager {
         } else {
             largeIconBitmap = null
         }
-        intent = Intent(context, RelatedDigitalOpenReportService::class.java)
-        intent!!.putExtra("message", pushMessage)
+        intent = AppUtils.getStartActivityIntent(context, pushMessage)
         val contentIntent: PendingIntent = if (Build.VERSION.SDK_INT > Build.VERSION_CODES.R) {
-            PendingIntent.getService(
+            PendingIntent.getActivity(
                 context, notificationId,
                 intent!!, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )
         } else {
-            PendingIntent.getService(
+            PendingIntent.getActivity(
                 context, notificationId,
                 intent!!, PendingIntent.FLAG_UPDATE_CURRENT
             )
