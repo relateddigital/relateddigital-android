@@ -5,6 +5,7 @@ import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
 import com.google.gson.Gson
+import com.relateddigital.relateddigital_android.RelatedDigital
 import com.relateddigital.relateddigital_android.constants.Constants
 import com.relateddigital.relateddigital_android.model.Message
 import org.json.JSONArray
@@ -12,6 +13,7 @@ import org.json.JSONObject
 import java.lang.Exception
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.HashMap
 
 object PayloadUtils {
     private const val LOG_TAG = "PayloadUtils"
@@ -68,6 +70,26 @@ object PayloadUtils {
             }
         }
         return messages
+    }
+
+    fun sendUtmParametersEvent(context: Context, message: Message) {
+        val params = message.getParams()
+        val properties = HashMap<String, String>()
+
+        if(params.isNotEmpty()) {
+            for (param in params.entries) {
+                if (param.key == Constants.UTM_SOURCE || param.key == Constants.UTM_MEDIUM ||
+                    param.key == Constants.UTM_CAMPAIGN || param.key == Constants.UTM_CONTENT ||
+                    param.key == Constants.UTM_TERM
+                ) {
+                    properties[param.key] = param.value
+                }
+            }
+
+            if (properties.isNotEmpty()) {
+                RelatedDigital.sendCampaignParameters(context, properties)
+            }
+        }
     }
 
     private fun isPushIdAvailable(

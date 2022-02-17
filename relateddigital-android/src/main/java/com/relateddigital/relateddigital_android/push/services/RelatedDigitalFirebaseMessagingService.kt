@@ -155,6 +155,8 @@ class RelatedDigitalFirebaseMessagingService : FirebaseMessagingService() {
                 )
             }
 
+            PayloadUtils.sendUtmParametersEvent(this, pushMessage)
+
             PayloadUtils.addPushMessage(this, pushMessage)
         } else {
             Log.d(LOG_TAG, "remoteMessageData transform problem")
