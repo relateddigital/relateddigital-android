@@ -9,36 +9,37 @@ import android.content.pm.PackageManager
 import android.content.res.Resources.NotFoundException
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.os.Build
-import android.os.Environment
-import android.telephony.TelephonyManager
-import android.util.Log
-import androidx.core.app.NotificationManagerCompat
-import androidx.core.content.ContextCompat
-import com.relateddigital.relateddigital_android.BuildConfig
-import com.relateddigital.relateddigital_android.constants.Constants
-import com.relateddigital.relateddigital_android.locationPermission.LocationPermission
-import com.relateddigital.relateddigital_android.model.UtilResultModel
-import java.io.*
-import java.text.SimpleDateFormat
-import java.util.*
-import java.util.regex.Pattern
 import android.graphics.Typeface
 import android.media.RingtoneManager
 import android.net.Uri
+import android.os.Build
+import android.os.Environment
 import android.os.StrictMode
 import android.os.StrictMode.ThreadPolicy
+import android.telephony.TelephonyManager
+import android.util.Log
 import android.util.TypedValue
 import androidx.annotation.RequiresApi
+import androidx.core.app.NotificationManagerCompat
+import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import com.google.gson.Gson
+import com.relateddigital.relateddigital_android.BuildConfig
+import com.relateddigital.relateddigital_android.constants.Constants
 import com.relateddigital.relateddigital_android.inapp.FontFamily
+import com.relateddigital.relateddigital_android.locationPermission.LocationPermission
 import com.relateddigital.relateddigital_android.model.Message
 import com.relateddigital.relateddigital_android.model.SpinToWin
 import com.relateddigital.relateddigital_android.model.SpinToWinExtendedProps
+import com.relateddigital.relateddigital_android.model.UtilResultModel
+import java.io.*
 import java.net.URI
 import java.net.URL
 import java.nio.charset.StandardCharsets
+import java.text.SimpleDateFormat
+import java.util.*
+import java.util.regex.Pattern
+import android.provider.Settings
 
 
 object AppUtils {
@@ -740,6 +741,23 @@ object AppUtils {
             result.add(Gson().toJson(spinToWinModel, SpinToWin::class.java))
         }
         return result
+    }
+
+    fun goToNotificationSettings(context: Context) {
+        try {
+            val intent = Intent()
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                intent.action = Settings.ACTION_APP_NOTIFICATION_SETTINGS
+                intent.putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
+            } else {
+                intent.action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+                intent.data = Uri.parse("package:" + context.packageName)
+            }
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            context.startActivity(intent)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     private fun getFontNameWithExtension(context: Context, font: String): String {

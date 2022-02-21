@@ -327,12 +327,28 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
                     RelatedDigital.setInAppButtonInterface(null)
                     buttonCallback!!.onPress(mInAppMessage!!.mActionData!!.mAndroidLnk)
                 } else {
-                    if (!mInAppMessage!!.mActionData!!.mAndroidLnk.isNullOrEmpty()) {
-                        try {
-                            val viewIntent = Intent(Intent.ACTION_VIEW, StringUtils.getURIfromUrlString(mInAppMessage!!.mActionData!!.mAndroidLnk))
-                            startActivity(viewIntent)
-                        } catch (e: ActivityNotFoundException) {
-                            Log.i("Visilabs", "User doesn't have an activity for notification URI")
+                    if(mInAppMessage!!.mActionData!!.mMsgType == InAppNotificationType.IMAGE_TEXT_BUTTON.toString()) {
+                        //TODO: Check if it should be directed to browser or settings page here
+                        if(true) {
+                            if (!mInAppMessage!!.mActionData!!.mAndroidLnk.isNullOrEmpty()) {
+                                try {
+                                    val viewIntent = Intent(Intent.ACTION_VIEW, StringUtils.getURIfromUrlString(mInAppMessage!!.mActionData!!.mAndroidLnk))
+                                    startActivity(viewIntent)
+                                } catch (e: ActivityNotFoundException) {
+                                    Log.i(LOG_TAG, "User doesn't have an activity for notification URI")
+                                }
+                            }
+                        } else {
+                            AppUtils.goToNotificationSettings(applicationContext)
+                        }
+                    } else {
+                        if (!mInAppMessage!!.mActionData!!.mAndroidLnk.isNullOrEmpty()) {
+                            try {
+                                val viewIntent = Intent(Intent.ACTION_VIEW, StringUtils.getURIfromUrlString(mInAppMessage!!.mActionData!!.mAndroidLnk))
+                                startActivity(viewIntent)
+                            } catch (e: ActivityNotFoundException) {
+                                Log.i(LOG_TAG, "User doesn't have an activity for notification URI")
+                            }
                         }
                     }
                 }
