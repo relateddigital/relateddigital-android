@@ -18,6 +18,7 @@ import androidx.core.content.ContextCompat
 import com.bumptech.glide.Glide
 import com.relateddigital.relateddigital_android.R
 import com.relateddigital.relateddigital_android.RelatedDigital
+import com.relateddigital.relateddigital_android.constants.Constants
 import com.relateddigital.relateddigital_android.databinding.ActivityInAppNotificationBinding
 import com.relateddigital.relateddigital_android.databinding.CarouselBinding
 import com.relateddigital.relateddigital_android.databinding.NpsSecondPopUpBinding
@@ -328,8 +329,7 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
                     buttonCallback!!.onPress(mInAppMessage!!.mActionData!!.mAndroidLnk)
                 } else {
                     if(mInAppMessage!!.mActionData!!.mMsgType == InAppNotificationType.IMAGE_TEXT_BUTTON.toString()) {
-                        //TODO: Check if it should be directed to browser or settings page here
-                        if(true) {
+                        if(mInAppMessage!!.mActionData!!.mButtonFunction == Constants.BUTTON_LINK) {
                             if (!mInAppMessage!!.mActionData!!.mAndroidLnk.isNullOrEmpty()) {
                                 try {
                                     val viewIntent = Intent(Intent.ACTION_VIEW, StringUtils.getURIfromUrlString(mInAppMessage!!.mActionData!!.mAndroidLnk))

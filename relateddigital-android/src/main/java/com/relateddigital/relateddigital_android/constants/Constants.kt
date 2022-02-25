@@ -195,5 +195,9 @@ class Constants {
         const val UTM_CAMPAIGN = "utm_campaign"
         const val UTM_CONTENT = "utm_content"
         const val UTM_TERM = "utm_term"
+
+        const val BUTTON_LINK = "link"
+        const val BUTTON_REDIRECT = "redirect"
+
     }
 }

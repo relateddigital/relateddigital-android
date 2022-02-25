@@ -134,6 +134,9 @@ class ActionData : Serializable {
     @SerializedName("carousel_items")
     var carouselItems: List<InAppCarouselItem>? = null
 
+    @SerializedName("button_function")
+    var mButtonFunction: String? = null
+
 
     fun getFontFamily(context: Context): Typeface? {
         if (mFontFamily == null || mFontFamily == "") {
