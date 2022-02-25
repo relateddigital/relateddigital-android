@@ -28,7 +28,7 @@ class GeofenceAlarm : BroadcastReceiver() {
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val i = Intent(context, GeofenceAlarm::class.java)
         val pi: PendingIntent = if (Build.VERSION.SDK_INT > Build.VERSION_CODES.R) {
-            PendingIntent.getBroadcast(context, 0, i, PendingIntent.FLAG_IMMUTABLE)
+            PendingIntent.getBroadcast(context, 0, i, PendingIntent.FLAG_MUTABLE)
         } else {
             PendingIntent.getBroadcast(context, 0, i, 0)
         }
