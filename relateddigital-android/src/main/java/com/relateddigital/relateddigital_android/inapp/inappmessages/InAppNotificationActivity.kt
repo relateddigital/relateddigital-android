@@ -254,124 +254,208 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
     }
 
     private fun setTitle() {
-        binding.tvTitle.visibility = View.VISIBLE
-        binding.tvTitle.typeface = mInAppMessage!!.mActionData!!.getFontFamily(this)
-        binding.tvTitle.text = mInAppMessage!!.mActionData!!.mMsgTitle!!.replace("\\n", "\n")
-        if (!mInAppMessage!!.mActionData!!.mMsgTitleColor.isNullOrEmpty()) {
-            try {
-                binding.tvTitle.setTextColor(Color.parseColor(mInAppMessage!!.mActionData!!.mMsgTitleColor))
-            } catch (e: Exception) {
-                Log.w(LOG_TAG, "Could not parse the data given for message title color\nSetting the default value.")
-                e.printStackTrace()
-                binding.tvTitle.setTextColor(ContextCompat.getColor(applicationContext, R.color.blue))
-            }
+        if(mInAppMessage!!.mActionData!!.mMsgTitle.isNullOrEmpty()) {
+            binding.tvTitle.visibility = View.GONE
         } else {
-            binding.tvTitle.setTextColor(ContextCompat.getColor(applicationContext, R.color.blue))
-        }
-        try {
-            binding.tvTitle.textSize = mInAppMessage!!.mActionData!!.mMsgBodyTextSize!!.toFloat() + 12
-        } catch (e: Exception) {
-            Log.w(LOG_TAG, "Could not parse the data given for message body text size\nSetting the default value.")
-            e.printStackTrace()
-            binding.tvTitle.textSize = 16f
+            if(!mInAppMessage!!.mActionData!!.mMsgTitleBackgroundColor.isNullOrEmpty()) {
+                binding.tvTitle.setBackgroundColor(Color.parseColor(mInAppMessage!!.mActionData!!.mMsgTitleBackgroundColor))
+            }
+            binding.tvTitle.visibility = View.VISIBLE
+            binding.tvTitle.typeface = mInAppMessage!!.mActionData!!.getFontFamily(this)
+            binding.tvTitle.text = mInAppMessage!!.mActionData!!.mMsgTitle!!.replace("\\n", "\n")
+            if (!mInAppMessage!!.mActionData!!.mMsgTitleColor.isNullOrEmpty()) {
+                try {
+                    binding.tvTitle.setTextColor(Color.parseColor(mInAppMessage!!.mActionData!!.mMsgTitleColor))
+                } catch (e: Exception) {
+                    Log.w(
+                        LOG_TAG,
+                        "Could not parse the data given for message title color\nSetting the default value."
+                    )
+                    e.printStackTrace()
+                    binding.tvTitle.setTextColor(
+                        ContextCompat.getColor(
+                            applicationContext,
+                            R.color.blue
+                        )
+                    )
+                }
+            } else {
+                binding.tvTitle.setTextColor(
+                    ContextCompat.getColor(
+                        applicationContext,
+                        R.color.blue
+                    )
+                )
+            }
+            try {
+                binding.tvTitle.textSize =
+                    mInAppMessage!!.mActionData!!.mMsgBodyTextSize!!.toFloat() + 12
+            } catch (e: Exception) {
+                Log.w(
+                    LOG_TAG,
+                    "Could not parse the data given for message body text size\nSetting the default value."
+                )
+                e.printStackTrace()
+                binding.tvTitle.textSize = 16f
+            }
         }
     }
 
     private fun setBody() {
-        binding.tvBody.text = mInAppMessage!!.mActionData!!.mMsgBody!!.replace("\\n", "\n")
-        binding.tvBody.typeface = mInAppMessage!!.mActionData!!.getFontFamily(this)
-        binding.tvBody.visibility = View.VISIBLE
-        if (!mInAppMessage!!.mActionData!!.mMsgBodyColor.isNullOrEmpty()) {
-            try {
-                binding.tvBody.setTextColor(Color.parseColor(mInAppMessage!!.mActionData!!.mMsgBodyColor))
-            } catch (e: Exception) {
-                Log.w(LOG_TAG, "Could not parse the data given for message body color\nSetting the default value.")
-                e.printStackTrace()
+        if(mInAppMessage!!.mActionData!!.mMsgBody.isNullOrEmpty()) {
+            binding.tvBody.visibility = View.GONE
+        } else {
+            if(!mInAppMessage!!.mActionData!!.mMsgBodyBackgroundColor.isNullOrEmpty()) {
+                binding.tvBody.setBackgroundColor(Color.parseColor(mInAppMessage!!.mActionData!!.mMsgBodyBackgroundColor))
             }
-        }
-        try {
-            binding.tvBody.textSize = mInAppMessage!!.mActionData!!.mMsgBodyTextSize!!.toFloat() + 8
-        } catch (e: Exception) {
-            Log.w(LOG_TAG, "Could not parse the data given for message body text size\nSetting the default value.")
-            e.printStackTrace()
-            binding.tvBody.textSize = 12f
+            binding.tvBody.text = mInAppMessage!!.mActionData!!.mMsgBody!!.replace("\\n", "\n")
+            binding.tvBody.typeface = mInAppMessage!!.mActionData!!.getFontFamily(this)
+            binding.tvBody.visibility = View.VISIBLE
+            if (!mInAppMessage!!.mActionData!!.mMsgBodyColor.isNullOrEmpty()) {
+                try {
+                    binding.tvBody.setTextColor(Color.parseColor(mInAppMessage!!.mActionData!!.mMsgBodyColor))
+                } catch (e: Exception) {
+                    Log.w(
+                        LOG_TAG,
+                        "Could not parse the data given for message body color\nSetting the default value."
+                    )
+                    e.printStackTrace()
+                }
+            }
+            try {
+                binding.tvBody.textSize =
+                    mInAppMessage!!.mActionData!!.mMsgBodyTextSize!!.toFloat() + 8
+            } catch (e: Exception) {
+                Log.w(
+                    LOG_TAG,
+                    "Could not parse the data given for message body text size\nSetting the default value."
+                )
+                e.printStackTrace()
+                binding.tvBody.textSize = 12f
+            }
         }
     }
 
     private fun setButton() {
-        binding.btnTemplate.typeface = mInAppMessage!!.mActionData!!.getFontFamily(this)
-        binding.btnTemplate.visibility = View.VISIBLE
-        binding.btnTemplate.text = mInAppMessage!!.mActionData!!.mBtnText
-        if (!mInAppMessage!!.mActionData!!.mButtonTextColor.isNullOrEmpty()) {
-            try {
-                binding.btnTemplate.setTextColor(Color.parseColor(mInAppMessage!!.mActionData!!.mButtonTextColor))
-            } catch (e: Exception) {
-                Log.w(LOG_TAG, "Could not parse the data given for button text color\nSetting the default value.")
-                e.printStackTrace()
-                binding.btnTemplate.setTextColor(ContextCompat.getColor(applicationContext, R.color.black))
-            }
+        if(mInAppMessage!!.mActionData!!.mBtnText.isNullOrEmpty()) {
+            binding.btnTemplate.visibility = View.GONE
         } else {
-            binding.btnTemplate.setTextColor(ContextCompat.getColor(applicationContext, R.color.black))
-        }
-        if (!mInAppMessage!!.mActionData!!.mButtonColor.isNullOrEmpty()) {
-            try {
-                binding.btnTemplate.setBackgroundColor(Color.parseColor(mInAppMessage!!.mActionData!!.mButtonColor))
-            } catch (e: Exception) {
-                Log.w(LOG_TAG, "Could not parse the data given for button color\nSetting the default value.")
-                e.printStackTrace()
-            }
-        }
-        binding.btnTemplate.setOnClickListener {
-            if (npsType == NpsType.NONE) {
-                RequestHandler.createInAppNotificationClickRequest(applicationContext, mInAppMessage, rateReport)
-                if (buttonCallback != null) {
-                    RelatedDigital.setInAppButtonInterface(null)
-                    buttonCallback!!.onPress(mInAppMessage!!.mActionData!!.mAndroidLnk)
-                } else {
-                    if(mInAppMessage!!.mActionData!!.mMsgType == InAppNotificationType.IMAGE_TEXT_BUTTON.toString()) {
-                        if(mInAppMessage!!.mActionData!!.mButtonFunction == Constants.BUTTON_LINK) {
-                            if (!mInAppMessage!!.mActionData!!.mAndroidLnk.isNullOrEmpty()) {
-                                try {
-                                    val viewIntent = Intent(Intent.ACTION_VIEW, StringUtils.getURIfromUrlString(mInAppMessage!!.mActionData!!.mAndroidLnk))
-                                    startActivity(viewIntent)
-                                } catch (e: ActivityNotFoundException) {
-                                    Log.i(LOG_TAG, "User doesn't have an activity for notification URI")
-                                }
-                            }
-                        } else {
-                            AppUtils.goToNotificationSettings(applicationContext)
-                        }
-                    } else {
-                        if (!mInAppMessage!!.mActionData!!.mAndroidLnk.isNullOrEmpty()) {
-                            try {
-                                val viewIntent = Intent(Intent.ACTION_VIEW, StringUtils.getURIfromUrlString(mInAppMessage!!.mActionData!!.mAndroidLnk))
-                                startActivity(viewIntent)
-                            } catch (e: ActivityNotFoundException) {
-                                Log.i(LOG_TAG, "User doesn't have an activity for notification URI")
-                            }
-                        }
-                    }
+            binding.btnTemplate.typeface = mInAppMessage!!.mActionData!!.getFontFamily(this)
+            binding.btnTemplate.visibility = View.VISIBLE
+            binding.btnTemplate.text = mInAppMessage!!.mActionData!!.mBtnText
+            if (!mInAppMessage!!.mActionData!!.mButtonTextColor.isNullOrEmpty()) {
+                try {
+                    binding.btnTemplate.setTextColor(Color.parseColor(mInAppMessage!!.mActionData!!.mButtonTextColor))
+                } catch (e: Exception) {
+                    Log.w(
+                        LOG_TAG,
+                        "Could not parse the data given for button text color\nSetting the default value."
+                    )
+                    e.printStackTrace()
+                    binding.btnTemplate.setTextColor(
+                        ContextCompat.getColor(
+                            applicationContext,
+                            R.color.black
+                        )
+                    )
                 }
-                InAppUpdateDisplayState.releaseDisplayState(mIntentId)
-                finish()
             } else {
-                if (isRatingEntered) {
-                    RequestHandler.createInAppNotificationClickRequest(applicationContext, mInAppMessage, rateReport)
+                binding.btnTemplate.setTextColor(
+                    ContextCompat.getColor(
+                        applicationContext,
+                        R.color.black
+                    )
+                )
+            }
+            if (!mInAppMessage!!.mActionData!!.mButtonColor.isNullOrEmpty()) {
+                try {
+                    binding.btnTemplate.setBackgroundColor(Color.parseColor(mInAppMessage!!.mActionData!!.mButtonColor))
+                } catch (e: Exception) {
+                    Log.w(
+                        LOG_TAG,
+                        "Could not parse the data given for button color\nSetting the default value."
+                    )
+                    e.printStackTrace()
+                }
+            }
+            binding.btnTemplate.setOnClickListener {
+                if (npsType == NpsType.NONE) {
+                    RequestHandler.createInAppNotificationClickRequest(
+                        applicationContext,
+                        mInAppMessage,
+                        rateReport
+                    )
                     if (buttonCallback != null) {
                         RelatedDigital.setInAppButtonInterface(null)
                         buttonCallback!!.onPress(mInAppMessage!!.mActionData!!.mAndroidLnk)
                     } else {
-                        if (!mInAppMessage!!.mActionData!!.mAndroidLnk.isNullOrEmpty()) {
-                            try {
-                                val viewIntent = Intent(Intent.ACTION_VIEW, StringUtils.getURIfromUrlString(mInAppMessage!!.mActionData!!.mAndroidLnk))
-                                startActivity(viewIntent)
-                            } catch (e: ActivityNotFoundException) {
-                                Log.i("Visilabs", "User doesn't have an activity for notification URI")
+                        if (mInAppMessage!!.mActionData!!.mMsgType == InAppNotificationType.IMAGE_TEXT_BUTTON.toString()) {
+                            if (mInAppMessage!!.mActionData!!.mButtonFunction == Constants.BUTTON_LINK) {
+                                if (!mInAppMessage!!.mActionData!!.mAndroidLnk.isNullOrEmpty()) {
+                                    try {
+                                        val viewIntent = Intent(
+                                            Intent.ACTION_VIEW,
+                                            StringUtils.getURIfromUrlString(mInAppMessage!!.mActionData!!.mAndroidLnk)
+                                        )
+                                        startActivity(viewIntent)
+                                    } catch (e: ActivityNotFoundException) {
+                                        Log.i(
+                                            LOG_TAG,
+                                            "User doesn't have an activity for notification URI"
+                                        )
+                                    }
+                                }
+                            } else {
+                                AppUtils.goToNotificationSettings(applicationContext)
+                            }
+                        } else {
+                            if (!mInAppMessage!!.mActionData!!.mAndroidLnk.isNullOrEmpty()) {
+                                try {
+                                    val viewIntent = Intent(
+                                        Intent.ACTION_VIEW,
+                                        StringUtils.getURIfromUrlString(mInAppMessage!!.mActionData!!.mAndroidLnk)
+                                    )
+                                    startActivity(viewIntent)
+                                } catch (e: ActivityNotFoundException) {
+                                    Log.i(
+                                        LOG_TAG,
+                                        "User doesn't have an activity for notification URI"
+                                    )
+                                }
                             }
                         }
                     }
                     InAppUpdateDisplayState.releaseDisplayState(mIntentId)
                     finish()
+                } else {
+                    if (isRatingEntered) {
+                        RequestHandler.createInAppNotificationClickRequest(
+                            applicationContext,
+                            mInAppMessage,
+                            rateReport
+                        )
+                        if (buttonCallback != null) {
+                            RelatedDigital.setInAppButtonInterface(null)
+                            buttonCallback!!.onPress(mInAppMessage!!.mActionData!!.mAndroidLnk)
+                        } else {
+                            if (!mInAppMessage!!.mActionData!!.mAndroidLnk.isNullOrEmpty()) {
+                                try {
+                                    val viewIntent = Intent(
+                                        Intent.ACTION_VIEW,
+                                        StringUtils.getURIfromUrlString(mInAppMessage!!.mActionData!!.mAndroidLnk)
+                                    )
+                                    startActivity(viewIntent)
+                                } catch (e: ActivityNotFoundException) {
+                                    Log.i(
+                                        "Visilabs",
+                                        "User doesn't have an activity for notification URI"
+                                    )
+                                }
+                            }
+                        }
+                        InAppUpdateDisplayState.releaseDisplayState(mIntentId)
+                        finish()
+                    }
                 }
             }
         }

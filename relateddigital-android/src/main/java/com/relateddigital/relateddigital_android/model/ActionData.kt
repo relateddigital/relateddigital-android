@@ -134,6 +134,12 @@ class ActionData : Serializable {
     @SerializedName("carousel_items")
     var carouselItems: List<InAppCarouselItem>? = null
 
+    @SerializedName("msg_title_backgroundcolor")
+    var mMsgTitleBackgroundColor: String? = null
+
+    @SerializedName("msg_body_backgroundcolor")
+    var mMsgBodyBackgroundColor: String? = null
+
     @SerializedName("button_function")
     var mButtonFunction: String? = null
 
