@@ -27,7 +27,6 @@ import com.relateddigital.relateddigital_android.recommendation.VisilabsTargetFi
 import com.relateddigital.relateddigital_android.remoteConfig.RemoteConfigHelper
 import com.relateddigital.relateddigital_android.util.*
 import org.json.JSONObject
-import java.lang.Exception
 import java.util.*
 
 
@@ -974,6 +973,35 @@ object RelatedDigital {
             return
         } else {
             customEvent(context, Constants.PAGE_NAME_REQUEST_VAL, properties)
+        }
+    }
+
+    @JvmStatic
+    fun trackRecommendationClick(context: Context, qs: String?) {
+        if (model != null) {
+            if (model!!.getIsInAppNotificationEnabled()) {
+                val parameters = HashMap<String, String>()
+                if (!qs.isNullOrEmpty()) {
+                    val tempMultiQuery = qs.split("&".toRegex()).toTypedArray()
+                    for (s in tempMultiQuery) {
+                        val tempQueryString = s.split("=".toRegex(), 2).toTypedArray()
+                        if (tempQueryString.size == 2) {
+                            parameters[tempQueryString[0]] = tempQueryString[1]
+                        }
+                    }
+                }
+                RequestHandler.createLoggerRequest(
+                    context, model!!, Constants.PAGE_NAME_REQUEST_VAL,
+                    parameters
+                )
+            } else {
+                Log.e(
+                    LOG_TAG, "In-app notification is not enabled." +
+                            "Call RelatedDigital.setIsInAppNotificationEnabled() first"
+                )
+            }
+        } else {
+            Log.e(LOG_TAG, "Call RelatedDigital.init() first")
         }
     }
 
