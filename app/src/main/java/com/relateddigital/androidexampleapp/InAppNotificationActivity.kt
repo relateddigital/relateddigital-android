@@ -170,8 +170,11 @@ class InAppNotificationActivity : AppCompatActivity() {
                 }
             }
 
-            /*RequestHandler.createRecommendationRequest(applicationContext, zoneId,
-                    productCode, callback)*/
+            /*RelatedDigital.getRecommendations(
+                context = applicationContext,
+                zoneId = zoneId,
+                productCode = productCode,
+                visilabsCallback = callback)*/
         }
 
         binding.favouriteResponseButton.setOnClickListener {
@@ -194,8 +197,11 @@ class InAppNotificationActivity : AppCompatActivity() {
                 }
             }
 
-            RequestHandler.createFavsResponseRequest(applicationContext, null,
-                    Constants.FavoriteAttributeAction, callback)
+            RelatedDigital.getFavorites(
+                context = applicationContext,
+                actionId = null,
+                actionType = Constants.FavoriteAttributeAction,
+                visilabsCallback = callback)
         }
 
         binding.notification.setOnClickListener {

@@ -15,6 +15,7 @@ import com.relateddigital.relateddigital_android.appTracker.AppTracker
 import com.relateddigital.relateddigital_android.constants.Constants
 import com.relateddigital.relateddigital_android.geofence.GeofenceStarter
 import com.relateddigital.relateddigital_android.inapp.InAppButtonInterface
+import com.relateddigital.relateddigital_android.inapp.VisilabsCallback
 import com.relateddigital.relateddigital_android.locationPermission.LocationPermissionHandler
 import com.relateddigital.relateddigital_android.model.*
 import com.relateddigital.relateddigital_android.network.RequestFormer
@@ -22,6 +23,7 @@ import com.relateddigital.relateddigital_android.network.RequestHandler
 import com.relateddigital.relateddigital_android.push.EuromessageCallback
 import com.relateddigital.relateddigital_android.push.PushMessageInterface
 import com.relateddigital.relateddigital_android.push.RetentionType
+import com.relateddigital.relateddigital_android.recommendation.VisilabsTargetFilter
 import com.relateddigital.relateddigital_android.remoteConfig.RemoteConfigHelper
 import com.relateddigital.relateddigital_android.util.*
 import org.json.JSONObject
@@ -1277,6 +1279,54 @@ object RelatedDigital {
     fun sendLocationPermission(context: Context) {
         if(model != null) {
             LocationPermissionHandler.sendLocationPermissionToTheServer(context)
+        } else {
+            Log.e(LOG_TAG, "Call RelatedDigital.init() first")
+        }
+    }
+
+    @JvmStatic
+    fun getFavorites(
+        context: Context,
+        actionId: String? = null,
+        actionType: String? = null,
+        visilabsCallback: VisilabsCallback,
+        properties: HashMap<String, String>? = null
+    ) {
+        if (model != null) {
+            if (model!!.getIsInAppNotificationEnabled()) {
+                RequestHandler.createFavsResponseRequest(
+                    context, actionId,
+                    actionType, visilabsCallback, properties)
+            } else {
+                Log.e(
+                    LOG_TAG, "In-app notification is not enabled." +
+                            "Call RelatedDigital.setIsInAppNotificationEnabled() first"
+                )
+            }
+        } else {
+            Log.e(LOG_TAG, "Call RelatedDigital.init() first")
+        }
+    }
+
+    @JvmStatic
+    fun getRecommendations(
+        context: Context,
+        zoneId: String,
+        productCode: String,
+        visilabsCallback: VisilabsCallback,
+        properties: HashMap<String, String>? = null,
+        filters: List<VisilabsTargetFilter>? = null,
+    ) {
+        if (model != null) {
+            if (model!!.getIsInAppNotificationEnabled()) {
+                RequestHandler.createRecommendationRequest(context, zoneId,
+                    productCode, visilabsCallback, properties, filters)
+            } else {
+                Log.e(
+                    LOG_TAG, "In-app notification is not enabled." +
+                            "Call RelatedDigital.setIsInAppNotificationEnabled() first"
+                )
+            }
         } else {
             Log.e(LOG_TAG, "Call RelatedDigital.init() first")
         }
