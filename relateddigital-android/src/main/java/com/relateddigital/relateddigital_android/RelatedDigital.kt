@@ -888,7 +888,7 @@ object RelatedDigital {
     }
 
     @JvmStatic
-    fun singUp(context: Context, exVisitorId: String, properties: HashMap<String, String>? = null,
+    fun signUp(context: Context, exVisitorId: String, properties: HashMap<String, String>? = null,
               parent: Activity? = null) {
         if (StringUtils.isNullOrWhiteSpace(exVisitorId)) {
             Log.e(LOG_TAG,
