@@ -388,22 +388,6 @@ object RelatedDigital {
     }
 
     @JvmStatic
-    fun setMaxGeofenceCount(context: Context, maxGeofenceCount: Int) {
-        if (model != null) {
-            model!!.setMaxGeofenceCount(context, maxGeofenceCount)
-        } else {
-            if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
-                model = Gson().fromJson(SharedPref.readString(context,
-                        Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
-                model!!.setMaxGeofenceCount(context, maxGeofenceCount)
-            } else {
-                model = createInitialModel(context)
-                model!!.setMaxGeofenceCount(context, maxGeofenceCount)
-            }
-        }
-    }
-
-    @JvmStatic
     fun setAdvertisingIdentifier(context: Context, advertisingIdentifier: String) {
         if (model != null) {
             model!!.setAdvertisingIdentifier(context, advertisingIdentifier)
@@ -604,22 +588,6 @@ object RelatedDigital {
             } else {
                 Log.e(LOG_TAG, "requestTimeoutInSecond has never been set before!!")
                 30
-            }
-        }
-    }
-
-    @JvmStatic
-    fun getMaxGeofenceCount(context: Context): Int {
-        return if (model != null) {
-            model!!.getMaxGeofenceCount()
-        } else {
-            if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
-                model = Gson().fromJson(SharedPref.readString(context,
-                        Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
-                model!!.getMaxGeofenceCount()
-            } else {
-                Log.e(LOG_TAG, "maxGeofenceCount has never been set before!!")
-                100
             }
         }
     }
