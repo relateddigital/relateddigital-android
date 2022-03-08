@@ -1,33 +1,45 @@
-# relateddigital-android
-relateddigital-android
+<p align="center">
+  <a target="_blank" rel="noopener noreferrer" href="https://github.com/relateddigital/relateddigital-android"><img src="https://github.com/relateddigital/relateddigital-android/blob/master/app/relateddigital.png" alt="Related Digital Android Library" width="500" style="max-width:100%;"></a>
+</p>
 
-# Dependency
+# Latest Version 
 
- - In your project-level build.gradle file, add mavenCentral() to repositories e.g.
+***April 1, 2022*** - [RelatedDigital v1.0.0](https://github.com/relateddigital/relateddigital-android/releases)
+
+# About SDK
+
+This SDK has been developed to be the Android client for the Related Digital services.
+
+It is written in Kotlin.
+
+You can find the documents about how to use the SDK on the following links:
+
+[documents-eng](https://relateddigital.atlassian.net/wiki/spaces/KB/pages/2207318047/Android)
+
+[documents-tr](https://relateddigital.atlassian.net/wiki/spaces/RMCKBT/pages/2201583629/Android)
+
+
+# Installation
+
+Related Digital Android SDK requires minimum API level 21.
+
+Please, add Maven jitpack repository into your project-level build.gradle file as shown below:
  ```java
- buildscript {
-    repositories {
-        google()
-        mavenCentral()
-	...
-    }
-	...
- }
-	
- allprojects {
-     repositories {
-         google()
-         mavenCentral()
-	 ...
-     }
-     ...
- }
+allprojects {
+	repositories {
+		...
+		maven { url 'https://jitpack.io' }
+	}
+}
  ```
- 
- - In your app-level build.gradle file, add the line below to the dependencies
+
+Please, add the dependency of relateddigital-android library into your module-level build.gradle file as shown below:
+
  ```java
- implementation 'io.github.relateddigital:relateddigital-android:1.0.0'
+implementation 'com.github.relateddigital:relateddigital-android:1.0.0'
  ```
- 
-# TODOs
-  - Lock mechanism for in-app actions like for the in-app messages
+
+# Licences
+
+
+[Related Digital](https://www.relateddigital.com/)
