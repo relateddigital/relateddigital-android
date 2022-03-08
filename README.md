@@ -4,7 +4,7 @@
 
 # Latest Version 
 
-***April 1, 2022*** - [RelatedDigital v1.0.0](https://github.com/relateddigital/relateddigital-android/releases)
+***April 1, 2022*** - [v1.0.0](https://github.com/relateddigital/relateddigital-android/releases)
 
 # About SDK
 
@@ -14,9 +14,9 @@ It is written in Kotlin.
 
 You can find the documents about how to use the SDK on the following links:
 
-[documents-eng](https://relateddigital.atlassian.net/wiki/spaces/KB/pages/2207318047/Android)
+[documents-eng](https://relateddigital.atlassian.net/wiki/spaces/KB/pages/2207809583/Setup)
 
-[documents-tr](https://relateddigital.atlassian.net/wiki/spaces/RMCKBT/pages/2201583629/Android)
+[documents-tr](https://relateddigital.atlassian.net/wiki/spaces/RMCKBT/pages/2204827661/Kurulum)
 
 
 # Installation
