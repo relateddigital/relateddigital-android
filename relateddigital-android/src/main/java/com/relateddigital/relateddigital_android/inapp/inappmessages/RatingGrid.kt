@@ -16,7 +16,7 @@ class RatingGrid : GridView {
     private val mAdapter: CellAdapter = CellAdapter()
     private var mRateCount = 0
     private lateinit var mColors: IntArray
-    var selectedRate = 0
+    var selectedRate = -1
         private set
     private var mCells = HashMap<Int, IntArray>()
 
@@ -52,7 +52,11 @@ class RatingGrid : GridView {
         }
 
         override fun getItem(position: Int): Any {
-            return position + 1
+            return if(mRateCount == 10) {
+                position + 1
+            } else {
+                position
+            }
         }
 
         override fun getItemId(position: Int): Long {
@@ -61,7 +65,11 @@ class RatingGrid : GridView {
 
         override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
             val ratingCell: RatingCell
-            val cellValue = position + 1
+            val cellValue = if(mRateCount == 10) {
+                position + 1
+            } else {
+                position
+            }
             val cellColors = mCells[cellValue]
             ratingCell = if (convertView == null) {
                 RatingCell.create(parent, inflater, cellValue, cellColors)

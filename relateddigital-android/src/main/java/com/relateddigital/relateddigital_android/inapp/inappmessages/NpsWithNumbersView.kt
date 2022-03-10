@@ -10,15 +10,20 @@ import com.relateddigital.relateddigital_android.R
 
 class NpsWithNumbersView(context: Context?, attrs: AttributeSet?) : LinearLayout(context, attrs) {
     private var mRatingGrid: RatingGrid? = null
-    private val mRateCount: Int
+    private var mRateCount: Int
     private var mColors: IntArray
     override fun onFinishInflate() {
         super.onFinishInflate()
         mRatingGrid = findViewById<View>(R.id.rating_grid) as RatingGrid
     }
 
-    fun setColors(colors: IntArray) {
+    fun setColors(colors: IntArray, isFromZero: Boolean) {
         mColors = colors
+        mRateCount = if(isFromZero) {
+            11
+        } else {
+            10
+        }
         mRatingGrid!!.init(mRateCount, mColors)
     }
 

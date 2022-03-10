@@ -7,6 +7,11 @@ import kotlin.math.abs
 object ColorUtils {
     fun calculateGradientColors(rateCount: Int, colors: IntArray): HashMap<Int, IntArray> {
         val cells = HashMap<Int, IntArray>()
+        val startIdx = if(rateCount == 10) {
+            1
+        } else {
+            0
+        }
         if (colors.size == 2) {
             val red1 = Color.red(colors[0])
             val red2 = Color.red(colors[1])
@@ -17,11 +22,11 @@ object ColorUtils {
             val redInterval = abs(red1 - red2) / (rateCount + 1) * if (red1 < red2) 1 else -1
             val greenInterval = abs(green1 - green2) / (rateCount + 1) * if (green1 < green2) 1 else -1
             val blueInterval = abs(blue1 - blue2) / (rateCount + 1) * if (blue1 < blue2) 1 else -1
-            for (i in 1 until rateCount + 1) {
+            for (i in startIdx until 11) {
                 val firstColor = Color.argb(255,
-                        red1 + (i - 1) * redInterval,
-                        green1 + (i - 1) * greenInterval,
-                        blue1 + (i - 1) * blueInterval)
+                        red1 + (i - startIdx) * redInterval,
+                        green1 + (i - startIdx) * greenInterval,
+                        blue1 + (i - startIdx) * blueInterval)
                 val secondColor = Color.argb(255,
                         red1 + i * redInterval,
                         green1 + i * greenInterval,
@@ -44,18 +49,18 @@ object ColorUtils {
             val redInterval2 = abs(red2 - red3) / (rateCount / 2 + 1) * if (red2 < red3) 1 else -1
             val greenInterval2 = abs(green2 - green3) / (rateCount / 2 + 1) * if (green2 < green3) 1 else -1
             val blueInterval2 = abs(blue2 - blue3) / (rateCount / 2 + 1) * if (blue2 < blue3) 1 else -1
-            for (i in 1 until rateCount / 2 + 1) {
+            for (i in startIdx until rateCount / 2 + 1) {
                 val firstColor = Color.argb(255,
-                        red1 + (i - 1) * redInterval1,
-                        green1 + (i - 1) * greenInterval1,
-                        blue1 + (i - 1) * blueInterval1)
+                        red1 + (i - startIdx) * redInterval1,
+                        green1 + (i - startIdx) * greenInterval1,
+                        blue1 + (i - startIdx) * blueInterval1)
                 val secondColor = Color.argb(255,
                         red1 + i * redInterval1,
                         green1 + i * greenInterval1,
                         blue1 + i * blueInterval1)
                 cells[i] = intArrayOf(firstColor, secondColor)
             }
-            for (i in rateCount / 2 + 1 until rateCount + 1) {
+            for (i in rateCount / 2 + 1 until 11) {
                 val firstColor = Color.argb(255,
                         red2 + (i - rateCount / 2 - 1) * redInterval2,
                         green2 + (i - rateCount / 2 - 1) * greenInterval2,
@@ -67,7 +72,7 @@ object ColorUtils {
                 cells[i] = intArrayOf(firstColor, secondColor)
             }
         } else {
-            for (i in 1 until rateCount + 1) {
+            for (i in startIdx until 11) {
                 cells[i] = intArrayOf(colors[0])
             }
         }

@@ -475,7 +475,7 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
                     result = true // Since the default is "GREAT", no need to check if the user chose something.
                 }
                 NpsType.NPS_WITH_NUMBERS -> {
-                    if (binding.npsWithNumbersView.selectedRate != 0) {
+                    if (binding.npsWithNumbersView.selectedRate != -1) {
                         result = true
                     }
                 }
@@ -728,7 +728,10 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
         for (i in mInAppMessage!!.mActionData!!.mNumberColors!!.indices) {
             colors[i] = Color.parseColor(mInAppMessage!!.mActionData!!.mNumberColors!![i])
         }
-        binding.npsWithNumbersView.setColors(colors)
+
+        //TODO : real control here for isFromZero parameter when BE ready
+        val isFromZero = false
+        binding.npsWithNumbersView.setColors(colors, isFromZero)
     }
 
     private val closeIcon: Int
