@@ -21,8 +21,9 @@ class SpinToWinWebDialogFragment : DialogFragment() {
     private var baseUrl: String? = ""
     private var htmlString: String? = ""
     private var mIsRotation = false
-    private var mListener: SpinToWinCompleteInterface? = null
-    private var mCopyToClipboardInterface: SpinToWinCopyToClipboardInterface? = null
+    private lateinit var mListener: SpinToWinCompleteInterface
+    private lateinit var mCopyToClipboardInterface: SpinToWinCopyToClipboardInterface
+    private lateinit var mSpinToWinShowCodeInterface: SpinToWinShowCodeInterface
 
     fun display(fragmentManagerLoc: FragmentManager?): SpinToWinWebDialogFragment {
         this.show(fragmentManagerLoc!!, TAG)
@@ -47,7 +48,7 @@ class SpinToWinWebDialogFragment : DialogFragment() {
             htmlString = requireArguments().getString("htmlString")
             mResponse = requireArguments().getString("response")
             mJavaScriptInterface = SpinToWinJavaScriptInterface(this, mResponse!!)
-            mJavaScriptInterface!!.setSpinToWinListeners(mListener, mCopyToClipboardInterface)
+            mJavaScriptInterface!!.setSpinToWinListeners(mListener, mCopyToClipboardInterface, mSpinToWinShowCodeInterface)
         }
     }
 
@@ -100,9 +101,14 @@ class SpinToWinWebDialogFragment : DialogFragment() {
     val javaScriptInterface: SpinToWinJavaScriptInterface?
         get() = mJavaScriptInterface
 
-    fun setSpinToWinListeners(listener: SpinToWinCompleteInterface?, copyToClipboardInterface: SpinToWinCopyToClipboardInterface?) {
+    fun setSpinToWinListeners(
+        listener: SpinToWinCompleteInterface,
+        copyToClipboardInterface: SpinToWinCopyToClipboardInterface,
+        spinToWinShowCodeInterface: SpinToWinShowCodeInterface
+    ) {
         mListener = listener
         mCopyToClipboardInterface = copyToClipboardInterface
+        mSpinToWinShowCodeInterface = spinToWinShowCodeInterface
     }
 
     companion object {

@@ -41,7 +41,7 @@ class HalfScreenFragment : Fragment() {
          *
          * @param stateId Parameter 1.
          * @param inAppState Parameter 2.
-         * @return A new instance of fragment SocialProofFragment.
+         * @return A new instance of fragment HalfScreenFragment.
          */
         fun newInstance(stateId: Int, inAppState: InAppNotificationState?): HalfScreenFragment {
             val fragment = HalfScreenFragment()
@@ -229,5 +229,4 @@ class HalfScreenFragment : Fragment() {
         super.onDestroyView()
         showStatusBar()
     }
-
 }

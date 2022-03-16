@@ -21,8 +21,9 @@ import java.util.*
 class SpinToWinJavaScriptInterface internal constructor(webViewDialogFragment: SpinToWinWebDialogFragment,
                                                         @get:JavascriptInterface val response: String) {
     var mWebViewDialogFragment: SpinToWinWebDialogFragment = webViewDialogFragment
-    private var mListener: SpinToWinCompleteInterface? = null
-    private var mCopyToClipboardInterface: SpinToWinCopyToClipboardInterface? = null
+    private lateinit var mListener: SpinToWinCompleteInterface
+    private lateinit var mCopyToClipboardInterface: SpinToWinCopyToClipboardInterface
+    private lateinit var mSpinToWinShowCodeInterface: SpinToWinShowCodeInterface
 
     private val spinToWinModel: SpinToWin = Gson().fromJson(this.response, SpinToWin::class.java)
     private var subEmail = ""
@@ -33,7 +34,7 @@ class SpinToWinJavaScriptInterface internal constructor(webViewDialogFragment: S
     @JavascriptInterface
     fun close() {
         mWebViewDialogFragment.dismiss()
-        mListener!!.onCompleted()
+        mListener.onCompleted()
     }
 
     /**
@@ -45,7 +46,7 @@ class SpinToWinJavaScriptInterface internal constructor(webViewDialogFragment: S
     @JavascriptInterface
     fun copyToClipboard(couponCode: String?) {
         mWebViewDialogFragment.dismiss()
-        mCopyToClipboardInterface!!.copyToClipboard(couponCode)
+        mCopyToClipboardInterface.copyToClipboard(couponCode)
     }
 
     /**
@@ -154,6 +155,7 @@ class SpinToWinJavaScriptInterface internal constructor(webViewDialogFragment: S
                     val finalSelectedSliceText = selectedSliceText
                     val finalSelectedIndex = selectedIndex
                     val myRunnable = Runnable {
+                        mSpinToWinShowCodeInterface.onCodeShown(finalSelectedCode)
                         sendPromotionCodeInfo(finalSelectedCode, finalSelectedSliceText)
                         mWebViewDialogFragment.getWebView()!!.evaluateJavascript(
                                 "window.chooseSlice($finalSelectedIndex,'$finalSelectedCode');",
@@ -186,6 +188,7 @@ class SpinToWinJavaScriptInterface internal constructor(webViewDialogFragment: S
                 val promotionCode: String = jsonResponse.getString("promocode")
                 val mainHandler = Handler(Looper.getMainLooper())
                 val myRunnable = Runnable {
+                    mSpinToWinShowCodeInterface.onCodeShown(promotionCode)
                     sendPromotionCodeInfo(promotionCode, sliceText)
                     mWebViewDialogFragment.getWebView()!!.evaluateJavascript(
                             "window.chooseSlice($idx,'$promotionCode');",
@@ -222,6 +225,7 @@ class SpinToWinJavaScriptInterface internal constructor(webViewDialogFragment: S
                         val mainHandler = Handler(Looper.getMainLooper())
                         val finalSelectedIndex = selectedIndex
                         val myRunnable = Runnable {
+                            mSpinToWinShowCodeInterface.onCodeShown(finalSelectedCode)
                             sendPromotionCodeInfo(finalSelectedCode, finalSelectedSliceText)
                             mWebViewDialogFragment.getWebView()!!.evaluateJavascript(
                                     "window.chooseSlice($finalSelectedIndex,'$finalSelectedCode');",
@@ -246,10 +250,14 @@ class SpinToWinJavaScriptInterface internal constructor(webViewDialogFragment: S
         }
     }
 
-    fun setSpinToWinListeners(listener: SpinToWinCompleteInterface?,
-                              copyToClipboardInterface: SpinToWinCopyToClipboardInterface?) {
+    fun setSpinToWinListeners(
+        listener: SpinToWinCompleteInterface,
+        copyToClipboardInterface: SpinToWinCopyToClipboardInterface,
+        spinToWinShowCodeInterface: SpinToWinShowCodeInterface
+    ) {
         mListener = listener
         mCopyToClipboardInterface = copyToClipboardInterface
+        mSpinToWinShowCodeInterface = spinToWinShowCodeInterface
     }
 
     private fun sendPromotionCodeInfo(promotionCode: String, sliceText: String) {

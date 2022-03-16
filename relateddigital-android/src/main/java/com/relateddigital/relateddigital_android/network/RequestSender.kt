@@ -18,6 +18,7 @@ import com.relateddigital.relateddigital_android.model.*
 import com.relateddigital.relateddigital_android.model.Retention
 import com.relateddigital.relateddigital_android.push.EuromessageCallback
 import com.relateddigital.relateddigital_android.recommendation.RecommendationUtils
+import com.relateddigital.relateddigital_android.util.ActivityUtils
 import com.relateddigital.relateddigital_android.util.InAppNotificationTimer
 import com.relateddigital.relateddigital_android.util.RetryCounterManager
 import com.relateddigital.relateddigital_android.util.SharedPref
@@ -211,6 +212,7 @@ object RequestSender {
                                 if (actionsResponse != null) {
                                     when {
                                         actionsResponse.mSpinToWinList!!.isNotEmpty() -> {
+                                            ActivityUtils.parentActivity = currentRequest.parent
                                             val intent =
                                                     Intent(
                                                             currentRequest.parent,

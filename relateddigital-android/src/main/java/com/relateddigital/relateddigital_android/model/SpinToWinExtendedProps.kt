@@ -141,4 +141,16 @@ class SpinToWinExtendedProps : Serializable {
 
     @SerializedName("promocodes_soldout_message_background_color")
     var promocodesSoldOutMessageBackgroundColor: String? = null
+
+    @SerializedName("promocode_banner_text")
+    var promocode_banner_text: String? = null
+
+    @SerializedName("promocode_banner_text_color")
+    var promocode_banner_text_color: String? = null
+
+    @SerializedName("promocode_banner_background_color")
+    var promocode_banner_background_color: String? = null
+
+    @SerializedName("promocode_banner_button_label")
+    var promocode_banner_button_label: String? = null
 }
