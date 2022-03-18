@@ -361,6 +361,17 @@
                 android:padding="@dimen/in_app_button_padding"
                 android:text="@string/notification" />
 
+            <Button
+                android:id="@+id/mailSubsFormHalfButton"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="@dimen/in_app_button_left_right_margin"
+                android:layout_marginEnd="@dimen/in_app_button_left_right_margin"
+                android:layout_weight="1"
+                android:background="@drawable/rounded_corners_background"
+                android:padding="@dimen/in_app_button_padding"
+                android:text="@string/mail_subs_form_half" />
+
         </LinearLayout>
 
     </LinearLayout>
