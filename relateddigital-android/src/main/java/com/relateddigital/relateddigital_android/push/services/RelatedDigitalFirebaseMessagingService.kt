@@ -71,95 +71,104 @@ class RelatedDigitalFirebaseMessagingService : FirebaseMessagingService() {
 
         Log.d(LOG_TAG, "FirebasePayload : " + Gson().toJson(pushMessage))
 
-        val pushNotificationManager = PushNotificationManager()
+        if(!pushMessage.silent.isNullOrEmpty() && pushMessage.silent == "true") {
+            Log.i("RDFirebase", "Silent Push")
+            RequestHandler.createRetentionRequest(
+                this, RetentionType.SILENT,
+                pushMessage.pushId, pushMessage.emPushSp
+            )
+        } else {
 
-        if (pushMessage.getPushType() != null && pushMessage.pushId != null) {
-            val notificationId = Random().nextInt()
-            val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager?
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && notificationManager != null) {
-                val channelName: String =
-                    SharedPref.readString(this, Constants.NOTIFICATION_CHANNEL_NAME_KEY)
-                val channelDescription: String =
-                    SharedPref.readString(this, Constants.NOTIFICATION_CHANNEL_DESCRIPTION_KEY)
-                val channelSound: String =
-                    SharedPref.readString(this, Constants.NOTIFICATION_CHANNEL_SOUND_KEY)
-                if (channelName != PushNotificationManager.getChannelName(this) ||
-                    channelDescription != PushNotificationManager.getChannelDescription(this) ||
-                    channelSound != pushMessage.sound
-                ) {
-                    val oldChannelId: String =
-                        SharedPref.readString(this, Constants.NOTIFICATION_CHANNEL_ID_KEY)
-                    if (oldChannelId.isNotEmpty()) {
-                        notificationManager.deleteNotificationChannel(oldChannelId)
+            if (pushMessage.getPushType() != null && pushMessage.pushId != null) {
+                val pushNotificationManager = PushNotificationManager()
+                val notificationId = Random().nextInt()
+                val notificationManager =
+                    getSystemService(NOTIFICATION_SERVICE) as NotificationManager?
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && notificationManager != null) {
+                    val channelName: String =
+                        SharedPref.readString(this, Constants.NOTIFICATION_CHANNEL_NAME_KEY)
+                    val channelDescription: String =
+                        SharedPref.readString(this, Constants.NOTIFICATION_CHANNEL_DESCRIPTION_KEY)
+                    val channelSound: String =
+                        SharedPref.readString(this, Constants.NOTIFICATION_CHANNEL_SOUND_KEY)
+                    if (channelName != PushNotificationManager.getChannelName(this) ||
+                        channelDescription != PushNotificationManager.getChannelDescription(this) ||
+                        channelSound != pushMessage.sound
+                    ) {
+                        val oldChannelId: String =
+                            SharedPref.readString(this, Constants.NOTIFICATION_CHANNEL_ID_KEY)
+                        if (oldChannelId.isNotEmpty()) {
+                            notificationManager.deleteNotificationChannel(oldChannelId)
+                        }
+                        AppUtils.getNotificationChannelId(this, true)
+                    } else {
+                        AppUtils.getNotificationChannelId(this, false)
                     }
-                    AppUtils.getNotificationChannelId(this, true)
-                } else {
-                    AppUtils.getNotificationChannelId(this, false)
-                }
 
-                SharedPref.writeString(
-                    this,
-                    Constants.NOTIFICATION_CHANNEL_NAME_KEY,
-                    PushNotificationManager.getChannelName(this)
-                )
-                SharedPref.writeString(
-                    this,
-                    Constants.NOTIFICATION_CHANNEL_DESCRIPTION_KEY,
-                    PushNotificationManager.getChannelDescription(this)
-                )
-
-                if(!pushMessage.sound.isNullOrEmpty()) {
                     SharedPref.writeString(
                         this,
-                        Constants.NOTIFICATION_CHANNEL_SOUND_KEY,
-                        pushMessage.sound!!
+                        Constants.NOTIFICATION_CHANNEL_NAME_KEY,
+                        PushNotificationManager.getChannelName(this)
                     )
+                    SharedPref.writeString(
+                        this,
+                        Constants.NOTIFICATION_CHANNEL_DESCRIPTION_KEY,
+                        PushNotificationManager.getChannelDescription(this)
+                    )
+
+                    if (!pushMessage.sound.isNullOrEmpty()) {
+                        SharedPref.writeString(
+                            this,
+                            Constants.NOTIFICATION_CHANNEL_SOUND_KEY,
+                            pushMessage.sound!!
+                        )
+                    }
                 }
-            }
-            when (pushMessage.getPushType()) {
-                PushType.Image -> if (pushMessage.getElements() != null) {
-                    pushNotificationManager.generateCarouselNotification(
+                when (pushMessage.getPushType()) {
+                    PushType.Image -> if (pushMessage.getElements() != null) {
+                        pushNotificationManager.generateCarouselNotification(
+                            this,
+                            pushMessage,
+                            notificationId
+                        )
+                    } else {
+                        pushNotificationManager.generateNotification(
+                            this,
+                            pushMessage,
+                            AppUtils.getBitMapFromUri(this, pushMessage.mediaUrl!!),
+                            notificationId
+                        )
+                    }
+                    PushType.Text -> pushNotificationManager.generateNotification(
                         this,
                         pushMessage,
+                        null,
                         notificationId
                     )
-                } else {
-                    pushNotificationManager.generateNotification(
+                    PushType.Video -> {}
+                    else -> pushNotificationManager.generateNotification(
                         this,
                         pushMessage,
-                        AppUtils.getBitMapFromUri(this, pushMessage.mediaUrl!!),
+                        null,
                         notificationId
                     )
                 }
-                PushType.Text -> pushNotificationManager.generateNotification(
-                    this,
-                    pushMessage,
-                    null,
-                    notificationId
-                )
-                PushType.Video -> {}
-                else -> pushNotificationManager.generateNotification(
-                    this,
-                    pushMessage,
-                    null,
-                    notificationId
-                )
+
+                if (pushMessage.deliver != null &&
+                    pushMessage.deliver!!.lowercase() == "true"
+                ) {
+                    RequestHandler.createRetentionRequest(
+                        this, RetentionType.DELIVER,
+                        pushMessage.pushId, pushMessage.emPushSp
+                    )
+                }
+
+                PayloadUtils.sendUtmParametersEvent(this, pushMessage)
+
+                PayloadUtils.addPushMessage(this, pushMessage)
+            } else {
+                Log.d(LOG_TAG, "remoteMessageData transform problem")
             }
-
-            if (pushMessage.deliver != null &&
-                pushMessage.deliver!!.lowercase() == "true"
-            ) {
-                RequestHandler.createRetentionRequest(
-                    this, RetentionType.DELIVER,
-                    pushMessage.pushId, pushMessage.emPushSp
-                )
-            }
-
-            PayloadUtils.sendUtmParametersEvent(this, pushMessage)
-
-            PayloadUtils.addPushMessage(this, pushMessage)
-        } else {
-            Log.d(LOG_TAG, "remoteMessageData transform problem")
         }
     }
 }

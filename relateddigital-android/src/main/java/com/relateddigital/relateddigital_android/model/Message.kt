@@ -33,6 +33,8 @@ class Message : Serializable {
         private set
     var deliver: String?
         private set
+    var silent: String?
+        private set
     private var pushType: PushType? = null
     var collapseKey: String?
         private set
@@ -57,6 +59,7 @@ class Message : Serializable {
         sound = bundle["sound"]
         emPushSp = bundle["emPushSp"]
         deliver = bundle["deliver"]
+        silent = bundle["silent"]
         campaignId = bundle["cId"]
         pushType = if (bundle["pushType"] != null) {
             PushType.valueOf(bundle["pushType"]!!)
@@ -112,6 +115,7 @@ class Message : Serializable {
         sound = bundle.getString("sound")
         emPushSp = bundle.getString("emPushSp")
         deliver = bundle.getString("deliver")
+        silent = bundle.getString("silent")
         campaignId = bundle.getString("cId")
         pushType = if (bundle.getString("pushType") != null) {
             PushType.valueOf(bundle.getString("pushType")!!)

@@ -617,7 +617,7 @@ object RequestHandler {
         }
 
         val latestPushId: String = when(type) {
-            RetentionType.DELIVER -> {
+            RetentionType.DELIVER, RetentionType.SILENT -> {
                 latestDeliverPushId
             } else -> {
                 latestOpenPushId
@@ -626,7 +626,7 @@ object RequestHandler {
 
         if(!pushId.isNullOrEmpty() && pushId != latestPushId) {
             when (type) {
-                RetentionType.DELIVER -> {
+                RetentionType.DELIVER, RetentionType.SILENT -> {
                     latestDeliverPushId = pushId
                 }
                 else -> {
@@ -647,6 +647,10 @@ object RequestHandler {
             when (type) {
                 RetentionType.DELIVER -> {
                     retention.status = "D"
+                    retention.deliver = 1
+                }
+                RetentionType.SILENT -> {
+                    retention.status = "S"
                     retention.deliver = 1
                 }
                 else -> {
