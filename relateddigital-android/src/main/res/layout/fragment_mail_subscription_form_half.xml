@@ -5,11 +5,12 @@
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="280dp"
+        android:layout_height="300dp"
         android:layout_alignParentBottom="true"
         android:orientation="horizontal">
 
         <LinearLayout
+            android:id="@+id/parent_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="horizontal">
@@ -45,35 +46,39 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="4dp"
+                    android:gravity="center"
                     android:layout_marginTop="4dp" />
 
                 <EditText
-                    android:id="@+id/et_email"
+                    android:id="@+id/email_view"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginBottom="4dp"
+                    android:background="@drawable/rectangle_rounded_box"
                     android:inputType="textEmailAddress"
-                    android:layout_marginBottom="4dp"
+                    android:textColorHint="@color/dark_gray"
+                    android:textColor="@color/black"
                     android:paddingLeft="10dp"
-                    android:layout_marginTop="4dp"
-                    android:paddingRight="10dp" />
+                    android:paddingTop="8dp"
+                    android:paddingRight="10dp"
+                    android:paddingBottom="8dp"/>
 
                 <LinearLayout
-                    android:id="@+id/ll_email_permit"
+                    android:id="@+id/email_consent1_container"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
-                    android:layout_marginBottom="4dp"
-                    android:layout_marginTop="4dp"
                     android:orientation="horizontal">
 
                     <CheckBox
-                        android:id="@+id/cb_email_permit"
+                        android:id="@+id/email_consent1_cb"
                         android:layout_width="25dp"
                         android:layout_height="25dp"
                         android:layout_margin="5dp" />
 
                     <TextView
-                        android:id="@+id/tv_email_permit"
+                        android:id="@+id/email_consent1"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:clickable="true"
@@ -87,22 +92,20 @@
                 </LinearLayout>
 
                 <LinearLayout
-                    android:id="@+id/ll_consent"
+                    android:id="@+id/email_consent2_container"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
-                    android:layout_marginBottom="4dp"
-                    android:layout_marginTop="4dp"
                     android:orientation="horizontal">
 
                     <CheckBox
-                        android:id="@+id/cb_consent"
+                        android:id="@+id/email_consent2_cb"
                         android:layout_width="25dp"
                         android:layout_height="25dp"
                         android:layout_margin="5dp" />
 
                     <TextView
-                        android:id="@+id/tv_consent"
+                        android:id="@+id/email_consent2"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:clickable="true"
@@ -114,6 +117,16 @@
                         android:paddingRight="10dp"
                         android:paddingBottom="5dp" />
                 </LinearLayout>
+
+                <TextView
+                    android:id="@+id/invalid_message"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:gravity="start"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
+                    android:visibility="gone" />
 
                 <Button
                     android:id="@+id/btn"
@@ -129,6 +142,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="4dp"
+                    android:gravity="center"
                     android:layout_marginTop="4dp" />
 
             </LinearLayout>

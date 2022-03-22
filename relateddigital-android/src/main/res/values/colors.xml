@@ -11,6 +11,8 @@
     <color name="gray_scale">#8AFFFFFF</color>
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
+    <color name="dark_gray">#8C8989</color>
+    <color name="purple_200">#FFBB86FC</color>
 
     <color name="bottom_sheet_button_color">#00897B</color>
 </resources>

@@ -1,17 +1,23 @@
 package com.relateddigital.relateddigital_android.inapp.mailsubsform
 
+import android.graphics.Color
 import android.os.Bundle
+import android.text.Html
+import android.text.Spanned
+import android.text.method.LinkMovementMethod
+import android.util.Patterns
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import com.relateddigital.relateddigital_android.R
 import com.relateddigital.relateddigital_android.databinding.FragmentMailSubscriptionFormHalfBinding
 import com.relateddigital.relateddigital_android.model.MailSubscriptionFormHalf
-import com.relateddigital.relateddigital_android.util.AppUtils
 import com.squareup.picasso.Picasso
+import java.util.regex.Pattern
 
 /**
  * A simple [Fragment] subclass.
@@ -70,8 +76,8 @@ class MailSubscriptionFormHalfFragment : Fragment() {
         setupCloseButton()
 
         //TODO : set the values from real data here
-        isImageRight = false
-        isTextTop = false
+        isImageRight = true
+        isTextTop = true
 
         binding.imageViewLeft.visibility = View.VISIBLE
         binding.container.visibility = View.VISIBLE
@@ -79,8 +85,8 @@ class MailSubscriptionFormHalfFragment : Fragment() {
         binding.titleView.visibility = View.VISIBLE
         binding.bodyTextViewTop.visibility = View.VISIBLE
         binding.bodyTextViewBot.visibility = View.VISIBLE
-        binding.llEmailPermit.visibility = View.VISIBLE
-        binding.llConsent.visibility = View.VISIBLE
+        binding.emailConsent1Container.visibility = View.VISIBLE
+        binding.emailConsent2Container.visibility = View.VISIBLE
 
         if (/*!mInApp!!.mActionData!!.mImg.isNullOrEmpty()*/true) {
             if(isImageRight) {
@@ -127,13 +133,62 @@ class MailSubscriptionFormHalfFragment : Fragment() {
         binding.container.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.blue))
         binding.titleView.text = "İlk Siparişine Özel İndirim"
         binding.titleView.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+        binding.titleView.textSize = 20f
         binding.btn.text = "Kaydol"
+        binding.btn.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+        binding.btn.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.purple_200))
         binding.btn.setOnClickListener {
-            //TODO: send mail subscription here
+            val email: String = binding.emailView.text.toString()
+            if (checkEmail(email)) {
+                binding.invalidMessage.visibility = View.GONE
+            } else {
+                binding.invalidMessage.visibility = View.VISIBLE
+                binding.invalidMessage.setTextColor(Color.RED)
+                binding.invalidMessage.text = "Lütfen geçerli bir email adresi giriniz"
+                return@setOnClickListener
+            }
+            if (!checkCheckBoxes()) {
+                return@setOnClickListener
+            }
+
+            //TODO : open this
+            /*RequestHandler.createInAppActionClickRequest(applicationContext, mMailSubscriptionForm!!.actiondata!!.report)
+            RequestHandler.createSubsJsonRequest(applicationContext, "subscription_email", mMailSubscriptionForm!!.actid!!,
+                mMailSubscriptionForm!!.actiondata!!.auth!!, email)*/
+
+            Toast.makeText(activity, "E-posta adresiniz başarıyla kaydedildi!", Toast.LENGTH_SHORT).show()
             endFragment()
         }
 
+        binding.parentContainer.setOnClickListener{}
+
+        binding.emailView.hint = "email address"
+
         //TODO : email consent texts here.second one may not be available.
+        if (/*mMailSubscriptionForm!!.actiondata!!
+                .emailpermit_text.isNullOrEmpty()*/ false
+        ) {
+            binding.emailConsent1Container.visibility = View.GONE
+        } else {
+            binding.emailConsent1.movementMethod = LinkMovementMethod.getInstance()
+            binding.emailConsent1.text = createHtml("email izin 1",
+                "https://www.relateddigital.com/"
+            )
+            binding.emailConsent1.textSize = 12f
+            binding.emailConsent1.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+        }
+        if (/*mMailSubscriptionForm!!.actiondata!!
+                .emailpermit_text.isNullOrEmpty()*/ false
+        ) {
+            binding.emailConsent2Container.visibility = View.GONE
+        } else {
+            binding.emailConsent2.movementMethod = LinkMovementMethod.getInstance()
+            binding.emailConsent2.text = createHtml("email izin 2",
+                "https://www.relateddigital.com/"
+            )
+            binding.emailConsent2.textSize = 12f
+            binding.emailConsent2.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+        }
     }
 
     private fun setupCloseButton() {
@@ -152,5 +207,60 @@ class MailSubscriptionFormHalfFragment : Fragment() {
 
     private fun endFragment() {
         requireActivity().supportFragmentManager.beginTransaction().remove(this@MailSubscriptionFormHalfFragment).commit()
+    }
+
+    //Email Permit TextEmail Permit <LINK>TextEmail</LINK> Permit Text
+    private fun createHtml(text: String, url: String?): Spanned {
+        var textLoc = text
+        if (url == null || url.isEmpty() || !Patterns.WEB_URL.matcher(url).matches()) {
+            return Html.fromHtml(url!!.replace("<LINK>", "").replace("</LINK>", ""))
+        }
+        val pattern = Pattern.compile("<LINK>(.+?)</LINK>")
+        val matcher = pattern.matcher(textLoc)
+        var linkMatched = false
+        while (matcher.find()) {
+            linkMatched = true
+            val outerHtml = matcher.group(0)
+            val innerText = matcher.group(1)
+            val s = "<a href=\"$url\">$innerText</a>"
+            textLoc = textLoc.replace(outerHtml!!, s)
+        }
+        if (!linkMatched) {
+            textLoc = "<a href=\"$url\">$text</a>"
+        }
+        return Html.fromHtml(textLoc)
+    }
+
+    private fun checkEmail(email: String): Boolean {
+        return Patterns.EMAIL_ADDRESS.matcher(email).matches()
+    }
+
+    private fun checkCheckBoxes(): Boolean {
+        var isCheckboxesOk = true
+        if (binding.emailConsent1Container.visibility != View.GONE) {
+            if (!binding.emailConsent1Cb.isChecked) {
+                isCheckboxesOk = false
+                binding.invalidMessage.visibility = View.VISIBLE
+                binding.invalidMessage.setTextColor(Color.RED)
+                binding.invalidMessage.text = "Lütfen kullanım koşullarını kabul ediyorumu onaylayınız."
+                return isCheckboxesOk
+            } else {
+                isCheckboxesOk = true
+                binding.invalidMessage.visibility = View.GONE
+            }
+        }
+        if (binding.emailConsent2Container.visibility != View.GONE) {
+            if (!binding.emailConsent2Cb.isChecked) {
+                isCheckboxesOk = false
+                binding.invalidMessage.visibility = View.VISIBLE
+                binding.invalidMessage.setTextColor(Color.RED)
+                binding.invalidMessage.text = "Lütfen kullanım koşullarını kabul ediyorumu onaylayınız."
+                return isCheckboxesOk
+            } else {
+                isCheckboxesOk = true
+                binding.invalidMessage.visibility = View.GONE
+            }
+        }
+        return isCheckboxesOk
     }
 }
