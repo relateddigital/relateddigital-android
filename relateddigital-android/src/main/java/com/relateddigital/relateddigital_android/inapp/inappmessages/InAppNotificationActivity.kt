@@ -12,9 +12,12 @@ import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.PagerSnapHelper
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.SnapHelper
 import com.bumptech.glide.Glide
 import com.relateddigital.relateddigital_android.R
 import com.relateddigital.relateddigital_android.RelatedDigital
@@ -31,10 +34,10 @@ import com.relateddigital.relateddigital_android.network.RequestHandler
 import com.relateddigital.relateddigital_android.util.AppUtils
 import com.relateddigital.relateddigital_android.util.StringUtils
 import com.squareup.picasso.Picasso
-import com.relateddigital.relateddigital_android.model.InAppCarouselItem
 
 
-class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListener, SmileRating.OnRatingSelectedListener {
+class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListener,
+    SmileRating.OnRatingSelectedListener, CarouselFinishInterface, CarouselButtonInterface {
     internal enum class NpsSecondPopUpType {
         IMAGE_TEXT_BUTTON, IMAGE_TEXT_BUTTON_IMAGE, FEEDBACK_FORM
     }
@@ -49,9 +52,6 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
     private lateinit var binding: ActivityInAppNotificationBinding
     private lateinit var bindingSecondPopUp: NpsSecondPopUpBinding
     private lateinit var bindingCarousel: CarouselBinding
-    private var mIsCarousel = false
-    private var mCarouselItems: List<InAppCarouselItem>? = null
-    private var mCarouselPosition = -1
     private var mIsRotation = false
     private var secondPopUpType = NpsSecondPopUpType.IMAGE_TEXT_BUTTON
     private var npsType = NpsType.NONE
@@ -73,41 +73,17 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
             val view: View
 
             if (mInAppMessage!!.mActionData!!.mMsgType == InAppNotificationType.CAROUSEL.toString()) {
-                mIsCarousel = true
-                mCarouselItems = mInAppMessage!!.mActionData!!.carouselItems
                 bindingCarousel = CarouselBinding.inflate(layoutInflater)
                 view = bindingCarousel.root
-                if (savedInstanceState != null) {
-                    mCarouselPosition = savedInstanceState.getInt(CAROUSEL_LAST_INDEX_KEY, -1)
-                }
             } else {
-                mIsCarousel = false
                 binding = ActivityInAppNotificationBinding.inflate(layoutInflater)
                 view = binding.root
             }
             cacheImages()
             setContentView(view)
             if (isShowingInApp) {
-                if (mIsCarousel) {
-                    if (mCarouselPosition == -1) {
-                        mCarouselPosition = 0
-                    }
-                    bindingCarousel.carouselContainer.setOnTouchListener(object : OnSwipeTouchListener(applicationContext) {
-                        override fun onSwipeRight() {
-                            if (!isFirstCarousel) {
-                                mCarouselPosition--
-                                setupViewCarousel()
-                            }
-                        }
-
-                        override fun onSwipeLeft() {
-                            if (!isLastCarousel) {
-                                mCarouselPosition++
-                                setupViewCarousel()
-                            }
-                        }
-                    })
-                    setupInitialViewCarousel()
+                if (mInAppMessage!!.mActionData!!.mMsgType == InAppNotificationType.CAROUSEL.toString()) {
+                    setupCarousel()
                 } else {
                     setUpView()
                 }
@@ -121,9 +97,6 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putInt(INTENT_ID_KEY, mIntentId)
-        if (mIsCarousel) {
-            outState.putInt(CAROUSEL_LAST_INDEX_KEY, mCarouselPosition)
-        }
         mIsRotation = true
     }
 
@@ -786,209 +759,44 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
         }
     }
 
-    private fun setupInitialViewCarousel() {
-        if (mInAppMessage!!.mActionData!!.mCloseEventTrigger.equals("backgroundclick")) {
-            bindingCarousel.carouselCloseButton.visibility = View.GONE
-            setFinishOnTouchOutside(true)
-        } else {
-            setFinishOnTouchOutside(
-                !mInAppMessage!!.mActionData!!.mCloseEventTrigger.equals("closebutton")
-            )
-            bindingCarousel.carouselCloseButton.setBackgroundResource(closeIcon)
-            bindingCarousel.carouselCloseButton.setOnClickListener {
-                InAppUpdateDisplayState.releaseDisplayState(mIntentId)
-                finish()
-            }
-        }
-        for (i in mCarouselItems!!.indices) {
-            val view = View(applicationContext)
-            view.setBackgroundResource(R.drawable.dot_indicator_default)
-            val layoutParams = LinearLayout.LayoutParams(
-                    40, 40)
-            layoutParams.setMargins(10, 0, 10, 0)
-            view.layoutParams = layoutParams
-            bindingCarousel.dotIndicator.addView(view)
-        }
-        setupViewCarousel()
+    private fun setupCarousel() {
+        setFinishOnTouchOutside(
+            !mInAppMessage!!.mActionData!!.mCloseEventTrigger.equals("closebutton")
+        )
+
+        val layoutManager: RecyclerView.LayoutManager = LinearLayoutManager(this,
+        LinearLayoutManager.HORIZONTAL, false)
+
+        bindingCarousel.carouselRecyclerView.layoutManager = layoutManager
+
+        val carouselAdapter = CarouselAdapter(this, this, this)
+
+        bindingCarousel.carouselRecyclerView.adapter = carouselAdapter
+
+        val snapHelper: SnapHelper = PagerSnapHelper()
+
+        snapHelper.attachToRecyclerView(bindingCarousel.carouselRecyclerView)
+
+        carouselAdapter.setMessage(mInAppMessage)
     }
-
-    private fun setupViewCarousel() {
-        bindingCarousel.carouselImage.visibility = View.VISIBLE
-        bindingCarousel.carouselTitle.visibility = View.VISIBLE
-        bindingCarousel.carouselBodyText.visibility = View.VISIBLE
-        bindingCarousel.carouselButton.visibility = View.VISIBLE
-        bindingCarousel.background.visibility = View.VISIBLE
-        bindingCarousel.couponContainer.visibility = View.VISIBLE
-        for (i in mCarouselItems!!.indices) {
-            if (i == mCarouselPosition) {
-                bindingCarousel.dotIndicator.getChildAt(i).setBackgroundResource(R.drawable.dot_indicator_selected)
-            } else {
-                bindingCarousel.dotIndicator.getChildAt(i).setBackgroundResource(R.drawable.dot_indicator_default)
-            }
-        }
-
-        setupCarouselItem(mCarouselPosition)
-    }
-
-    private val isLastCarousel: Boolean
-        get() = mCarouselPosition == mCarouselItems!!.size - 1
-    private val isFirstCarousel: Boolean
-        get() = mCarouselPosition == 0
 
     private fun cacheImages() {
-        if (mIsCarousel) {
-            for (i in mCarouselItems!!.indices) {
-                if (!mCarouselItems!![i].image.isNullOrEmpty()) {
-                    if (AppUtils.isAnImage(mCarouselItems!![i].image)) {
-                        Picasso.get().load(mCarouselItems!![i].image).fetch()
-                    }
-                }
-                if (!mCarouselItems!![i].backgroundImage.isNullOrEmpty()) {
-                    if (AppUtils.isAnImage(mCarouselItems!![i].backgroundImage)) {
-                        Picasso.get().load(mCarouselItems!![i].backgroundImage).fetch()
-                    }
-                }
-            }
-        } else {
-            if (!mInAppMessage!!.mActionData!!.mImg.isNullOrEmpty()) {
-                if(AppUtils.isAnImage(mInAppMessage!!.mActionData!!.mImg)) {
-                    Picasso.get().load(mInAppMessage!!.mActionData!!.mImg).fetch()
-                }
-            }
-            if (mInAppMessage!!.mActionData!!.mMsgType === InAppNotificationType.NPS_AND_SECOND_POP_UP.toString()) {
-                if (!mInAppMessage!!.mActionData!!.mSecondPopupImg1.isNullOrEmpty()) {
-                    if(AppUtils.isAnImage(mInAppMessage!!.mActionData!!.mSecondPopupImg1)) {
-                        Picasso.get().load(mInAppMessage!!.mActionData!!.mSecondPopupImg1).fetch()
-                    }
-                }
-                if (!mInAppMessage!!.mActionData!!.mSecondPopupImg2.isNullOrEmpty()) {
-                    if(AppUtils.isAnImage(mInAppMessage!!.mActionData!!.mSecondPopupImg2)) {
-                        Picasso.get().load(mInAppMessage!!.mActionData!!.mSecondPopupImg2).fetch()
-                    }
-                }
+        if (!mInAppMessage!!.mActionData!!.mImg.isNullOrEmpty()) {
+            if(AppUtils.isAnImage(mInAppMessage!!.mActionData!!.mImg)) {
+                Picasso.get().load(mInAppMessage!!.mActionData!!.mImg).fetch()
             }
         }
-    }
-
-    private fun setupCarouselItem(position: Int) {
-        if (!mCarouselItems!![position].backgroundImage.isNullOrEmpty()) {
-            Picasso.get().load(mCarouselItems!![position].backgroundImage)
-                .into(bindingCarousel.background)
-        } else {
-            bindingCarousel.background.visibility = View.GONE
-            if (!mCarouselItems!![position].backgroundColor.isNullOrEmpty()) {
-                bindingCarousel.background.visibility = View.GONE
-                bindingCarousel.carouselContainer.setBackgroundColor(
-                    Color.parseColor(
-                        mCarouselItems!![position].backgroundColor
-                    )
-                )
-            }
-        }
-
-        if (!mCarouselItems!![position].image.isNullOrEmpty()) {
-            if (AppUtils.isAnImage(mCarouselItems!![position].image)) {
-                Picasso.get().load(mCarouselItems!![position].image)
-                    .into(bindingCarousel.carouselImage)
-            } else {
-                Glide.with(this)
-                    .load(mCarouselItems!![position].image)
-                    .into(bindingCarousel.carouselImage)
-            }
-        } else {
-            bindingCarousel.carouselImage.visibility = View.GONE
-        }
-
-        if (!mCarouselItems!![position].title.isNullOrEmpty()) {
-            bindingCarousel.carouselTitle.text = mCarouselItems!![position].title
-            bindingCarousel.carouselTitle.setTextColor(Color.parseColor(mCarouselItems!![position].titleColor))
-            bindingCarousel.carouselTitle.textSize =
-                mCarouselItems!![position].titleTextsize!!.toFloat() + 12
-            bindingCarousel.carouselTitle.typeface = mCarouselItems!![position].getTitleFontFamily(
-                this
-            )
-        } else {
-            bindingCarousel.carouselTitle.visibility = View.GONE
-        }
-
-        if (!mCarouselItems!![position].body.isNullOrEmpty()) {
-            bindingCarousel.carouselBodyText.text = mCarouselItems!![position].body
-            bindingCarousel.carouselBodyText.setTextColor(
-                Color.parseColor(
-                    mCarouselItems!![position].bodyColor
-                )
-            )
-            bindingCarousel.carouselBodyText.textSize =
-                mCarouselItems!![position].bodyTextsize!!.toFloat() + 8
-            bindingCarousel.carouselBodyText.typeface = mCarouselItems!![position].getBodyFontFamily(
-                this
-            )
-        } else {
-            bindingCarousel.carouselBodyText.visibility = View.GONE
-        }
-
-        if (!mCarouselItems!![position].promotionCode.isNullOrEmpty()) {
-            bindingCarousel.couponContainer.setBackgroundColor(
-                Color.parseColor(
-                    mCarouselItems!![position].promocodeBackgroundColor
-                )
-            )
-            bindingCarousel.couponCode.text = mCarouselItems!![position].promotionCode
-            bindingCarousel.couponCode.setTextColor(Color.parseColor(mCarouselItems!![position].promocodeTextColor))
-            bindingCarousel.couponContainer.setOnClickListener {
-                val clipboard =
-                    applicationContext.getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
-                val clip = ClipData.newPlainText(
-                    getString(R.string.coupon_code),
-                    mCarouselItems!![position].promotionCode
-                )
-                clipboard.setPrimaryClip(clip)
-                Toast.makeText(
-                    applicationContext,
-                    getString(R.string.copied_to_clipboard),
-                    Toast.LENGTH_LONG
-                ).show()
-            }
-        } else {
-            bindingCarousel.couponContainer.visibility = View.GONE
-        }
-
-        if (!mCarouselItems!![position].buttonText.isNullOrEmpty()) {
-            bindingCarousel.carouselButton.setBackgroundColor(
-                Color.parseColor(
-                    mCarouselItems!![position].buttonColor
-                )
-            )
-            bindingCarousel.carouselButton.text = mCarouselItems!![position].buttonText
-            bindingCarousel.carouselButton.setTextColor(Color.parseColor(mCarouselItems!![position].buttonTextColor))
-            bindingCarousel.carouselButton.textSize =
-                mCarouselItems!![position].buttonTextsize!!.toFloat() + 12
-            bindingCarousel.carouselButton.typeface = mCarouselItems!![position].getButtonFontFamily(
-                this
-            )
-            bindingCarousel.carouselButton.setOnClickListener {
-                RequestHandler.createInAppNotificationClickRequest(applicationContext, mInAppMessage, rateReport)
-                if (buttonCallback != null) {
-                    RelatedDigital.setInAppButtonInterface(null)
-                    buttonCallback!!.onPress(mCarouselItems!![position].androidLnk)
-                } else {
-                    try {
-                        val viewIntent = Intent(
-                            Intent.ACTION_VIEW, Uri.parse(
-                                mCarouselItems!![position].androidLnk
-                            )
-                        )
-                        viewIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                        startActivity(viewIntent)
-                    } catch (e: java.lang.Exception) {
-                        Log.e(LOG_TAG, "The link is not formatted properly!")
-                    }
+        if (mInAppMessage!!.mActionData!!.mMsgType === InAppNotificationType.NPS_AND_SECOND_POP_UP.toString()) {
+            if (!mInAppMessage!!.mActionData!!.mSecondPopupImg1.isNullOrEmpty()) {
+                if(AppUtils.isAnImage(mInAppMessage!!.mActionData!!.mSecondPopupImg1)) {
+                    Picasso.get().load(mInAppMessage!!.mActionData!!.mSecondPopupImg1).fetch()
                 }
-                InAppUpdateDisplayState.releaseDisplayState(mIntentId)
-                finish()
             }
-        } else {
-            bindingCarousel.carouselButton.visibility = View.GONE
+            if (!mInAppMessage!!.mActionData!!.mSecondPopupImg2.isNullOrEmpty()) {
+                if(AppUtils.isAnImage(mInAppMessage!!.mActionData!!.mSecondPopupImg2)) {
+                    Picasso.get().load(mInAppMessage!!.mActionData!!.mSecondPopupImg2).fetch()
+                }
+            }
         }
     }
 
@@ -996,5 +804,26 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
         private const val LOG_TAG = "Template Activity"
         const val INTENT_ID_KEY = "INTENT_ID_KEY"
         private const val CAROUSEL_LAST_INDEX_KEY = "carousel_last_index"
+    }
+
+    override fun onFinish() {
+        InAppUpdateDisplayState.releaseDisplayState(mIntentId)
+        finish()
+    }
+
+    override fun onPress(link: String?) {
+        if(link.isNullOrEmpty()) {
+            Log.e("InAppCarousel", "The link is not formatted properly!")
+            return
+        }
+        try {
+            val viewIntent = Intent(
+                Intent.ACTION_VIEW, Uri.parse(link)
+            )
+            viewIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            startActivity(viewIntent)
+        } catch (e: Exception) {
+            Log.e("InAppCarousel", "The link is not formatted properly!")
+        }
     }
 }
