@@ -41,6 +41,10 @@
             android:noHistory="true"
             android:theme="@style/Theme.AppCompat.Light.Dialog.Alert"
             android:windowSoftInputMode="adjustResize" />
+        <activity android:name=".util.PermissionActivity"
+            android:theme="@style/Theme.Transparent"
+            android:noHistory="true"/>
+
 
         <service
             android:name=".push.services.RelatedDigitalFirebaseMessagingService"

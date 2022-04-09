@@ -1,6 +1,8 @@
 package com.relateddigital.relateddigital_android.model
 
-enum class PushType(private val nameStr: String) {
+import java.io.Serializable
+
+enum class PushType(private val nameStr: String) : Serializable {
     Text("Text"), Image("Image"), Carousel("Carousel"), Video("Video");
 
     fun equalsName(otherName: String): Boolean {

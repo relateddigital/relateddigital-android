@@ -10,6 +10,7 @@ import com.relateddigital.relateddigital_android.util.SharedPref
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.lang.Exception
 import java.util.*
 
 
@@ -23,21 +24,28 @@ object RemoteConfigHelper {
             val call: Call<List<String>> = remoteConfigApiInterface.getRemoteConfig(headers)
             call.enqueue(object : Callback<List<String>> {
                 override fun onResponse(call: Call<List<String>>, response: Response<List<String>>) {
-                    Log.i(LOG_TAG, "Successful Request : " + response.raw().request.url.toString())
-                    val profileIds = response.body()!!
-                    var isMatch = false
-                    if (profileIds.isNotEmpty()) {
-                        for (i in profileIds.indices) {
-                            if (RelatedDigital.getRelatedDigitalModel(context).getProfileId() == profileIds[i]) {
-                                isMatch = true
-                                setBlockState(context, true)
-                                break
+                    try {
+                        Log.i(LOG_TAG, "Successful Request : " + response.raw().request.url.toString())
+                        val profileIds = response.body()
+                        var isMatch = false
+                        if (!profileIds.isNullOrEmpty()) {
+                            for (i in profileIds.indices) {
+                                if (RelatedDigital.getRelatedDigitalModel(context)
+                                        .getProfileId() == profileIds[i]
+                                ) {
+                                    isMatch = true
+                                    setBlockState(context, true)
+                                    break
+                                }
                             }
-                        }
-                        if (!isMatch) {
+                            if (!isMatch) {
+                                setBlockState(context, false)
+                            }
+                        } else {
                             setBlockState(context, false)
                         }
-                    } else {
+                    } catch (e: Exception) {
+                        Log.i(LOG_TAG, "Could not parse the response!")
                         setBlockState(context, false)
                     }
                 }

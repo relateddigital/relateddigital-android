@@ -22,6 +22,9 @@ class ActionResponse : Serializable {
     @SerializedName("Story")
     var mStory: List<BannerStory>? = null
 
+    @SerializedName("Drawer")
+    var mDrawer: List<Drawer>? = null
+
     @SerializedName("VERSION")
     var version: Int? = null
 
@@ -54,9 +57,16 @@ class ActionResponse : Serializable {
         set(productStatNotifierList) {
             mProductStatNotifierList = productStatNotifierList
         }
+
     var story: List<BannerStory>?
         get() = mStory
         set(story) {
             mStory = story
+        }
+
+    var drawer: List<Drawer>?
+        get() = mDrawer
+        set(story) {
+            mDrawer = drawer
         }
 }

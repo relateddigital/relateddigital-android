@@ -8,6 +8,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.PowerManager
+import com.relateddigital.relateddigital_android.RelatedDigital
 
 class GeofenceAlarm : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
@@ -32,11 +33,13 @@ class GeofenceAlarm : BroadcastReceiver() {
         } else {
             PendingIntent.getBroadcast(context, 0, i, 0)
         }
-        val fifteenMinutes = 15 * 60 * 1000
+
+        val interval = RelatedDigital.getRelatedDigitalModel(context).getGeofencingIntervalInMinute()
+        val minutes = interval * 60 * 1000
         alarmManager.setRepeating(
             AlarmManager.ELAPSED_REALTIME_WAKEUP,
             0,
-            fifteenMinutes.toLong(),
+            minutes.toLong(),
             pi
         )
     }

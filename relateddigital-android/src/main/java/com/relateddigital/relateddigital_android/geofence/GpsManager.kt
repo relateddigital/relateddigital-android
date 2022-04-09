@@ -12,6 +12,7 @@ import android.os.Looper
 import android.util.Log
 import androidx.core.content.ContextCompat
 import com.google.android.gms.location.*
+import com.relateddigital.relateddigital_android.RelatedDigital
 import com.relateddigital.relateddigital_android.model.GeoFenceEntity
 import com.relateddigital.relateddigital_android.model.GeofenceListResponse
 import com.relateddigital.relateddigital_android.network.RequestHandler
@@ -245,7 +246,12 @@ class GpsManager(context: Context) {
             mApplication,
             Manifest.permission.ACCESS_FINE_LOCATION
         ) == PackageManager.PERMISSION_GRANTED
-        if (accessFineLocationPermission) {
+        val accessCoarseLocationPermission = ContextCompat.checkSelfPermission(
+            mApplication,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+
+        if (accessFineLocationPermission || accessCoarseLocationPermission) {
             mGeofencingClient!!.addGeofences(
                 getAddGeofencingRequest(geofences),
                 geofencePendingIntent!!
@@ -302,8 +308,9 @@ class GpsManager(context: Context) {
         get() = mLastKnownLocation
         set(location) {
             mFusedLocationClient!!.removeLocationUpdates(mLocationCallback!!)
-            val fifteenMinutesBefore = Calendar.getInstance() // current date/time
-            fifteenMinutesBefore.add(Calendar.MINUTE, -15)
+            val minutesBefore = Calendar.getInstance() // current date/time
+            val amount = RelatedDigital.getRelatedDigitalModel(mApplication).getGeofencingIntervalInMinute() * -1
+            minutesBefore.add(Calendar.MINUTE, amount)
             if (mLastKnownLocation == null && location == null) return
             if (mLastKnownLocation == null) {
                 mLastKnownLocation = location
@@ -318,7 +325,7 @@ class GpsManager(context: Context) {
                     }
                 }
             }
-            if (!mFirstServerCheck || mLastServerCheck.before(fifteenMinutesBefore)) {
+            if (!mFirstServerCheck || mLastServerCheck.before(minutesBefore)) {
                 setupGeofences()
                 mLastServerCheck = Calendar.getInstance()
                 mFirstServerCheck = true

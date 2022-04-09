@@ -27,6 +27,7 @@ class RelatedDigitalModel(
         private var dataSource: String,
         private var requestTimeoutInSecond: Int = 30,
         private var maxGeofenceCount: Int = 100,
+        private var geofencingIntervalInMinute: Int = 15,
         private var appVersion: String,
         private var pushPermissionStatus: String,
         private var apiVersion: String = "Android",
@@ -100,6 +101,11 @@ class RelatedDigitalModel(
 
     fun setMaxGeofenceCount(context: Context, maxGeofenceCount: Int) {
         this.maxGeofenceCount = maxGeofenceCount
+        saveToSharedPrefs(context)
+    }
+
+    fun setGeofencingIntervalInMinute(context: Context, geofencingIntervalInMinute: Int) {
+        this.geofencingIntervalInMinute = geofencingIntervalInMinute
         saveToSharedPrefs(context)
     }
 
@@ -287,6 +293,10 @@ class RelatedDigitalModel(
         return maxGeofenceCount
     }
 
+    fun getGeofencingIntervalInMinute(): Int {
+        return geofencingIntervalInMinute
+    }
+
     fun getAppVersion(): String {
         return appVersion
     }
@@ -408,6 +418,9 @@ class RelatedDigitalModel(
         }
         if(model.getMaxGeofenceCount() != null) {
             this.maxGeofenceCount = model.getMaxGeofenceCount()
+        }
+        if(model.getGeofencingIntervalInMinute() != null) {
+            this.geofencingIntervalInMinute = model.getGeofencingIntervalInMinute()
         }
         if(model.getAdvertisingIdentifier() != null) {
             this.advertisingIdentifier = model.getAdvertisingIdentifier()
@@ -550,6 +563,7 @@ class RelatedDigitalModel(
         dataSource = fromModel.getDataSource()
         requestTimeoutInSecond = fromModel.getRequestTimeoutInSecond()
         maxGeofenceCount = fromModel.getMaxGeofenceCount()
+        geofencingIntervalInMinute = fromModel.getGeofencingIntervalInMinute()
         appVersion = if(fromModel.getAppVersion().isNullOrEmpty()) {
             AppUtils.getAppVersion(context)
         } else {

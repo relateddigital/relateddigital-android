@@ -11,9 +11,16 @@ object GeofenceStarter {
     private var gpsManager: GpsManager? = null
 
     fun startGpsManager(context: Context) {
-        val per =
-            ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
-        if (per != PackageManager.PERMISSION_GRANTED) {
+        val accessFineLocationPermission = ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+        val accessCoarseLocationPermission = ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+
+        if (!(accessFineLocationPermission || accessCoarseLocationPermission)) {
             geofencePermissionTimer?.cancel()
             geofencePermissionTimer = Timer("startGpsManager", false)
             val task: TimerTask = object : TimerTask() {

@@ -1,23 +1,32 @@
 package com.relateddigital.relateddigital_android.inapp.notification
 
-import androidx.fragment.app.Fragment
 import android.content.Intent
-import android.graphics.Typeface
+import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.MultiTransformation
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.GranularRoundedCorners
+import com.google.gson.Gson
 import com.relateddigital.relateddigital_android.R
+import com.relateddigital.relateddigital_android.RelatedDigital
 import com.relateddigital.relateddigital_android.databinding.*
-import com.relateddigital.relateddigital_android.model.InAppNotificationModel
+import com.relateddigital.relateddigital_android.inapp.InAppButtonInterface
+import com.relateddigital.relateddigital_android.model.Drawer
+import com.relateddigital.relateddigital_android.model.DrawerExtendedProps
+import com.relateddigital.relateddigital_android.model.MailSubReport
+import com.relateddigital.relateddigital_android.network.RequestHandler
 import com.squareup.picasso.Picasso
+import java.net.URI
+import java.net.URISyntaxException
 
 /**
  * A simple [Fragment] subclass.
@@ -39,6 +48,9 @@ class InAppNotificationFragment : Fragment() {
     private lateinit var bindingRt: FragmentInAppNotificationRtBinding
     private lateinit var bindingRm: FragmentInAppNotificationRmBinding
     private lateinit var bindingRb: FragmentInAppNotificationRbBinding
+
+    private var response: Drawer? = null
+    private var mExtendedProps: DrawerExtendedProps? = null
     private var isRight = true
     private lateinit var positionOnScreen: PositionOnScreen
     private var isTopToBottom = true
@@ -46,26 +58,77 @@ class InAppNotificationFragment : Fragment() {
     private var isSmallImage = false
     private var shape = Shape.SOFT_EDGE
     private var isArrow = false
-    private var isBackgroundImage = false
+    private var isMiniBackgroundImage = false
+    private var isMaxiBackgroundImage = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // TODO : get the real data here and if rotation, get mModel from savedInstanceState
-        //mModel = (InAppNotificationModel) getArguments().getSerializable(ARG_PARAM1);
+        response = if (savedInstanceState != null) {
+            savedInstanceState.getSerializable("drawer") as Drawer?
+        } else {
+            requireArguments().getSerializable(ARG_PARAM1) as Drawer?
+        }
+
+        if (response == null) {
+            Log.e(LOG_TAG, "The data could not get properly!")
+            endFragment()
+        } else {
+            try {
+                mExtendedProps = Gson().fromJson(
+                    URI(response!!.getActionData()!!.getExtendedProps()).path,
+                    DrawerExtendedProps::class.java
+                )
+            } catch (e: URISyntaxException) {
+                e.printStackTrace()
+                endFragment()
+            } catch (e: Exception) {
+                e.printStackTrace()
+                endFragment()
+            }
+        }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?): View {
         val view: View
 
-        // TODO : get from the real data here
-        isRight = true
-        isTopToBottom = true
-        positionOnScreen = PositionOnScreen.BOTTOM
-        isSmallImage = true
-        shape = Shape.SOFT_EDGE
-        isArrow = true
-        isBackgroundImage = true
+        isRight = response!!.getActionData()!!.getPos() != "topLeft" &&
+                response!!.getActionData()!!.getPos() != "left" &&
+                response!!.getActionData()!!.getPos() != "bottomLeft"
+
+        positionOnScreen = if (response!!.getActionData()!!.getPos() == "topRight" ||
+            response!!.getActionData()!!.getPos() == "topLeft"
+        ) {
+            PositionOnScreen.TOP
+        } else if (response!!.getActionData()!!.getPos() == "right" ||
+            response!!.getActionData()!!.getPos() == "left"
+        ) {
+            PositionOnScreen.MIDDLE
+        } else {
+            PositionOnScreen.BOTTOM
+        }
+
+        isTopToBottom = mExtendedProps!!.getMiniTextOrientation() == "topToBottom"
+
+        isSmallImage = !response!!.getActionData()!!.getContentMinimizedImage().isNullOrEmpty()
+
+        shape = when(response!!.getActionData()!!.getShape()) {
+            "circle" -> {
+                Shape.CIRCLE
+            }
+            "roundedCorners" -> {
+                Shape.SOFT_EDGE
+            }
+            else -> {
+                Shape.SHARP_EDGE
+            }
+        }
+
+        isArrow = !mExtendedProps!!.getArrowColor().isNullOrEmpty()
+
+        isMiniBackgroundImage = !mExtendedProps!!.getMiniBackgroundImage().isNullOrEmpty()
+
+        isMaxiBackgroundImage = !mExtendedProps!!.getMaxiBackgroundImage().isNullOrEmpty()
 
         if (isRight) {
             when (positionOnScreen) {
@@ -104,6 +167,7 @@ class InAppNotificationFragment : Fragment() {
                 }
             }
         }
+
         setupInitialView()
         return view
     }
@@ -125,7 +189,6 @@ class InAppNotificationFragment : Fragment() {
     }
 
     private fun adjustRt() {
-        //TODO : from real data here
         bindingRt.smallSquareContainerRt.visibility = View.VISIBLE
         bindingRt.smallCircleContainerRt.visibility = View.VISIBLE
         bindingRt.arrowSquareRt.visibility = View.VISIBLE
@@ -137,23 +200,29 @@ class InAppNotificationFragment : Fragment() {
         bindingRt.smallCircleBackgroundImageRt.visibility = View.VISIBLE
         bindingRt.smallSquareBackgroundImageRt.visibility = View.VISIBLE
         bindingRt.bigContainerRt.visibility = View.GONE
+
         when (shape) {
             Shape.SHARP_EDGE -> {
-                if (isBackgroundImage) {
-                    if(!isSmallImage) {
-                        Picasso.get()
-                            .load("https://digitalsynopsis.com/wp-content/uploads/2019/11/color-schemes-palettes-feature-image.jpg")
+                if (isMiniBackgroundImage) {
+                    if (!isSmallImage) {
+                        Picasso.get().load(mExtendedProps!!.getMiniBackgroundImage())
                             .into(bindingRt.smallSquareBackgroundImageRt)
                     }
                 } else {
-                    bindingRt.smallSquareContainerRt.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.blue))
+                    if (!mExtendedProps!!.getMiniBackgroundColor().isNullOrEmpty()) {
+                        bindingRt.smallSquareContainerRt.setBackgroundColor(
+                            Color.parseColor(mExtendedProps!!.getMiniBackgroundColor())
+                        )
+                    } else {
+                        bindingRt.smallSquareContainerRt.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.white))
+                    }
                     bindingRt.smallSquareBackgroundImageRt.visibility = View.GONE
                 }
                 bindingRt.smallCircleContainerRt.visibility = View.GONE
             }
             Shape.SOFT_EDGE -> {
-                if (isBackgroundImage) {
-                    if(!isSmallImage) {
+                if (isMiniBackgroundImage) {
+                    if (!isSmallImage) {
                         Glide.with(requireActivity())
                             .asBitmap()
                             .transform(
@@ -162,7 +231,7 @@ class InAppNotificationFragment : Fragment() {
                                     GranularRoundedCorners(40f, 0f, 0f, 40f)
                                 )
                             )
-                            .load("https://digitalsynopsis.com/wp-content/uploads/2019/11/color-schemes-palettes-feature-image.jpg")
+                            .load(mExtendedProps!!.getMiniBackgroundImage())
                             .into(bindingRt.smallSquareBackgroundImageRt)
                     }
                 } else {
@@ -170,18 +239,30 @@ class InAppNotificationFragment : Fragment() {
                     bindingRt.smallSquareTextRt.setBackgroundResource(R.drawable.rounded_corners_left)
                     bindingRt.smallSquareImageRt.setBackgroundResource(R.drawable.rounded_corners_left)
                     val gd = bindingRt.smallSquareContainerRt.background as GradientDrawable
-                    gd.setColor(ContextCompat.getColor(requireContext(), R.color.blue))
+                    if (!mExtendedProps!!.getMiniBackgroundColor().isNullOrEmpty()) {
+                        gd.setColor(Color.parseColor(mExtendedProps!!.getMiniBackgroundColor()))
+                    } else {
+                        gd.setColor(ContextCompat.getColor(requireContext(), R.color.white))
+                    }
                     val gdText = bindingRt.smallSquareTextRt.background as GradientDrawable
-                    gdText.setColor(ContextCompat.getColor(requireContext(), R.color.blue))
+                    if (!mExtendedProps!!.getMiniBackgroundColor().isNullOrEmpty()) {
+                        gdText.setColor(Color.parseColor(mExtendedProps!!.getMiniBackgroundColor()))
+                    } else {
+                        gdText.setColor(ContextCompat.getColor(requireContext(), R.color.white))
+                    }
                     val gdImage = bindingRt.smallSquareImageRt.background as GradientDrawable
-                    gdImage.setColor(ContextCompat.getColor(requireContext(), R.color.blue))
+                    if (!mExtendedProps!!.getMiniBackgroundColor().isNullOrEmpty()) {
+                        gdImage.setColor(Color.parseColor(mExtendedProps!!.getMiniBackgroundColor()))
+                    } else {
+                        gdImage.setColor(ContextCompat.getColor(requireContext(), R.color.white))
+                    }
                     bindingRt.smallSquareBackgroundImageRt.visibility = View.GONE
                 }
                 bindingRt.smallCircleContainerRt.visibility = View.GONE
             }
             Shape.CIRCLE -> {
-                if (isBackgroundImage) {
-                    if(!isSmallImage) {
+                if (isMiniBackgroundImage) {
+                    if (!isSmallImage) {
                         Glide.with(requireActivity())
                             .asBitmap()
                             .transform(
@@ -190,27 +271,37 @@ class InAppNotificationFragment : Fragment() {
                                     GranularRoundedCorners(500f, 0f, 0f, 500f)
                                 )
                             )
-                            .load("https://digitalsynopsis.com/wp-content/uploads/2019/11/color-schemes-palettes-feature-image.jpg")
+                            .load(mExtendedProps!!.getMiniBackgroundImage())
                             .into(bindingRt.smallCircleBackgroundImageRt)
                     }
                 } else {
                     bindingRt.smallCircleContainerRt.setBackgroundResource(R.drawable.left_half_circle)
                     bindingRt.smallCircleTextRt.setBackgroundResource(R.drawable.left_half_circle)
                     bindingRt.smallCircleImageRt.setBackgroundResource(R.drawable.left_half_circle)
-                    val gdCircle =
-                        bindingRt.smallCircleContainerRt.background as GradientDrawable
-                    gdCircle.setColor(ContextCompat.getColor(requireContext(), R.color.blue))
-                    val gdCircleText =
-                        bindingRt.smallCircleTextRt.background as GradientDrawable
-                    gdCircleText.setColor(ContextCompat.getColor(requireContext(), R.color.blue))
-                    val gdCircleImage =
-                        bindingRt.smallCircleImageRt.background as GradientDrawable
-                    gdCircleImage.setColor(ContextCompat.getColor(requireContext(), R.color.blue))
+                    val gdCircle = bindingRt.smallCircleContainerRt.background as GradientDrawable
+                    if (!mExtendedProps!!.getMiniBackgroundColor().isNullOrEmpty()) {
+                        gdCircle.setColor(Color.parseColor(mExtendedProps!!.getMiniBackgroundColor()))
+                    } else {
+                        gdCircle.setColor(ContextCompat.getColor(requireContext(), R.color.white))
+                    }
+                    val gdCircleText = bindingRt.smallCircleTextRt.background as GradientDrawable
+                    if (!mExtendedProps!!.getMiniBackgroundColor().isNullOrEmpty()) {
+                        gdCircleText.setColor(Color.parseColor(mExtendedProps!!.getMiniBackgroundColor()))
+                    } else {
+                        gdCircleText.setColor(ContextCompat.getColor(requireContext(), R.color.white))
+                    }
+                    val gdCircleImage = bindingRt.smallCircleImageRt.background as GradientDrawable
+                    if (!mExtendedProps!!.getMiniBackgroundColor().isNullOrEmpty()) {
+                        gdCircleImage.setColor(Color.parseColor(mExtendedProps!!.getMiniBackgroundColor()))
+                    } else {
+                        gdCircleImage.setColor(ContextCompat.getColor(requireContext(), R.color.white))
+                    }
                     bindingRt.smallCircleBackgroundImageRt.visibility = View.GONE
                 }
                 bindingRt.smallSquareContainerRt.visibility = View.GONE
             }
         }
+
         if (shape == Shape.CIRCLE) {
             if (!isArrow) {
                 bindingRt.arrowCircleRt.visibility = View.GONE
@@ -220,7 +311,11 @@ class InAppNotificationFragment : Fragment() {
             } else {
                 bindingRt.arrowCircleRt.text = getString(R.string.notification_right_arrow)
             }
-            bindingRt.arrowCircleRt.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+            if (!mExtendedProps!!.getArrowColor().isNullOrEmpty()) {
+                bindingRt.arrowCircleRt.setTextColor(Color.parseColor(mExtendedProps!!.getArrowColor()))
+            } else {
+                bindingRt.arrowCircleRt.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+            }
             if (isSmallImage) {
                 Glide.with(requireActivity())
                     .asBitmap()
@@ -230,13 +325,22 @@ class InAppNotificationFragment : Fragment() {
                             GranularRoundedCorners(500f, 0f, 0f, 500f)
                         )
                     )
-                    .load("https://www.kimbuldu.com/resimler/Dogus-Grubunu-Kim-Kurdu.jpg")
+                    .load(response!!.getActionData()!!.getContentMinimizedImage())
                     .into(bindingRt.smallCircleImageRt)
                 bindingRt.smallCircleTextRt.visibility = View.GONE
             } else {
-                bindingRt.smallCircleTextRt.text = "Discount"
-                bindingRt.smallCircleTextRt.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
-                bindingRt.smallCircleTextRt.typeface = Typeface.MONOSPACE
+                bindingRt.smallCircleTextRt.text =
+                    response!!.getActionData()!!.getContentMinimizedText()
+                if (!mExtendedProps!!.getMiniTextColor().isNullOrEmpty()) {
+                    bindingRt.smallCircleTextRt.setTextColor(
+                        Color.parseColor(
+                            mExtendedProps!!.getMiniTextColor()
+                        )
+                    )
+                } else {
+                    bindingRt.smallCircleTextRt.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+                }
+                bindingRt.smallCircleTextRt.typeface = mExtendedProps!!.getMiniFontFamily(requireActivity())
                 bindingRt.smallCircleImageRt.visibility = View.GONE
                 bindingRt.smallCircleTextRt.topDown = isTopToBottom
                 bindingRt.smallCircleTextRt.isCircle = true
@@ -262,9 +366,13 @@ class InAppNotificationFragment : Fragment() {
             } else {
                 bindingRt.arrowSquareRt.text = getString(R.string.notification_right_arrow)
             }
-            bindingRt.arrowSquareRt.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+            if (!mExtendedProps!!.getArrowColor().isNullOrEmpty()) {
+                bindingRt.arrowSquareRt.setTextColor(Color.parseColor(mExtendedProps!!.getArrowColor()))
+            } else {
+                bindingRt.arrowSquareRt.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+            }
             if (isSmallImage) {
-                if(shape == Shape.SOFT_EDGE) {
+                if (shape == Shape.SOFT_EDGE) {
                     Glide.with(requireActivity())
                         .asBitmap()
                         .transform(
@@ -273,18 +381,26 @@ class InAppNotificationFragment : Fragment() {
                                 GranularRoundedCorners(40f, 0f, 0f, 40f)
                             )
                         )
-                        .load("https://www.kimbuldu.com/resimler/Dogus-Grubunu-Kim-Kurdu.jpg")
+                        .load(response!!.getActionData()!!.getContentMinimizedImage())
                         .into(bindingRt.smallSquareImageRt)
                 } else {
-                    Picasso.get()
-                        .load("https://www.kimbuldu.com/resimler/Dogus-Grubunu-Kim-Kurdu.jpg")
+                    Picasso.get().load(response!!.getActionData()!!.getContentMinimizedImage())
                         .into(bindingRt.smallSquareImageRt)
                 }
                 bindingRt.smallSquareTextRt.visibility = View.GONE
             } else {
-                bindingRt.smallSquareTextRt.text = "Discount"
-                bindingRt.smallSquareTextRt.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
-                bindingRt.smallSquareTextRt.typeface = Typeface.MONOSPACE
+                bindingRt.smallSquareTextRt.text =
+                    response!!.getActionData()!!.getContentMinimizedText()
+                if (!mExtendedProps!!.getMiniTextColor().isNullOrEmpty()) {
+                    bindingRt.smallSquareTextRt.setTextColor(
+                        Color.parseColor(
+                            mExtendedProps!!.getMiniTextColor()
+                        )
+                    )
+                } else {
+                    bindingRt.smallSquareTextRt.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+                }
+                bindingRt.smallSquareTextRt.typeface = mExtendedProps!!.getMiniFontFamily(requireActivity())
                 bindingRt.smallSquareImageRt.visibility = View.GONE
                 bindingRt.smallSquareTextRt.topDown = isTopToBottom
                 bindingRt.smallCircleTextRt.isCircle = false
@@ -302,28 +418,64 @@ class InAppNotificationFragment : Fragment() {
                 }
             }
         }
-        if (isBackgroundImage) {
-            Picasso.get()
-                .load("https://digitalsynopsis.com/wp-content/uploads/2019/11/color-schemes-palettes-feature-image.jpg")
+
+        if (isMaxiBackgroundImage) {
+            Picasso.get().load(mExtendedProps!!.getMaxiBackgroundImage())
                 .into(bindingRt.bigBackgroundImageRt)
         } else {
-            bindingRt.bigContainerRt.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.blue))
+            if (!mExtendedProps!!.getMaxiBackgroundColor().isNullOrEmpty()) {
+                bindingRt.bigContainerRt.setBackgroundColor(Color.parseColor(mExtendedProps!!.getMaxiBackgroundColor()))
+            } else {
+                bindingRt.bigContainerRt.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.white))
+            }
             bindingRt.bigBackgroundImageRt.visibility = View.GONE
         }
-        Picasso.get().load("https://upload.wikimedia.org//wikipedia/en/a/a9/MarioNSMBUDeluxe.png")
-            .into(bindingRt.bigImageRt)
+
+        if (!response!!.getActionData()!!.getContentMaximizedImage().isNullOrEmpty()) {
+            Picasso.get().load(response!!.getActionData()!!.getContentMaximizedImage())
+                .into(bindingRt.bigImageRt)
+        }
+
         bindingRt.bigContainerRt.setOnClickListener {
-            // TODO : Check buttonInterface first
-            // TODO : send report here
-            val viewIntent =
-                Intent(Intent.ACTION_VIEW, Uri.parse("https://www.relateddigital.com/"))
-            requireActivity().startActivity(viewIntent)
-            endFragment()
+            val uriString = response!!.getActionData()!!.getAndroidLnk()
+            val buttonInterface: InAppButtonInterface? =
+                RelatedDigital.getInAppButtonInterface()
+            var report: MailSubReport?
+            try {
+                report = MailSubReport()
+                report.impression = response!!.getActionData()!!.getReport()!!.getImpression()
+                report.click = response!!.getActionData()!!.getReport()!!.getClick()
+            } catch (e: Exception) {
+                Log.e(LOG_TAG, "There is no report to send!")
+                e.printStackTrace()
+                report = null
+            }
+            if (report != null) {
+                RequestHandler.createInAppActionClickRequest(requireActivity(), report)
+            }
+            if (buttonInterface != null) {
+                RelatedDigital.setInAppButtonInterface(null)
+                buttonInterface.onPress(uriString)
+            } else {
+                if (!uriString.isNullOrEmpty()) {
+                    val uri: Uri
+                    try {
+                        uri = Uri.parse(uriString)
+                        val viewIntent = Intent(Intent.ACTION_VIEW, uri)
+                        requireActivity().startActivity(viewIntent)
+                    } catch (e: Exception) {
+                        Log.i(
+                            LOG_TAG,
+                            "Can't parse notification URI, will not take any action",
+                            e
+                        )
+                    }
+                }
+            }
         }
     }
 
     private fun adjustRm() {
-        //TODO : from real data here
         bindingRm.smallSquareContainerRm.visibility = View.VISIBLE
         bindingRm.smallCircleContainerRm.visibility = View.VISIBLE
         bindingRm.arrowSquareRm.visibility = View.VISIBLE
@@ -335,23 +487,29 @@ class InAppNotificationFragment : Fragment() {
         bindingRm.smallCircleBackgroundImageRm.visibility = View.VISIBLE
         bindingRm.smallSquareBackgroundImageRm.visibility = View.VISIBLE
         bindingRm.bigContainerRm.visibility = View.GONE
+
         when (shape) {
             Shape.SHARP_EDGE -> {
-                if (isBackgroundImage) {
-                    if(!isSmallImage) {
-                        Picasso.get()
-                            .load("https://digitalsynopsis.com/wp-content/uploads/2019/11/color-schemes-palettes-feature-image.jpg")
+                if (isMiniBackgroundImage) {
+                    if (!isSmallImage) {
+                        Picasso.get().load(mExtendedProps!!.getMiniBackgroundImage())
                             .into(bindingRm.smallSquareBackgroundImageRm)
                     }
                 } else {
-                    bindingRm.smallSquareContainerRm.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.blue))
+                    if (!mExtendedProps!!.getMiniBackgroundColor().isNullOrEmpty()) {
+                        bindingRm.smallSquareContainerRm.setBackgroundColor(
+                            Color.parseColor(mExtendedProps!!.getMiniBackgroundColor())
+                        )
+                    } else {
+                        bindingRm.smallSquareContainerRm.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.white))
+                    }
                     bindingRm.smallSquareBackgroundImageRm.visibility = View.GONE
                 }
                 bindingRm.smallCircleContainerRm.visibility = View.GONE
             }
             Shape.SOFT_EDGE -> {
-                if (isBackgroundImage) {
-                    if(!isSmallImage) {
+                if (isMiniBackgroundImage) {
+                    if (!isSmallImage) {
                         Glide.with(requireActivity())
                             .asBitmap()
                             .transform(
@@ -360,7 +518,7 @@ class InAppNotificationFragment : Fragment() {
                                     GranularRoundedCorners(40f, 0f, 0f, 40f)
                                 )
                             )
-                            .load("https://digitalsynopsis.com/wp-content/uploads/2019/11/color-schemes-palettes-feature-image.jpg")
+                            .load(mExtendedProps!!.getMiniBackgroundImage())
                             .into(bindingRm.smallSquareBackgroundImageRm)
                     }
                 } else {
@@ -368,18 +526,30 @@ class InAppNotificationFragment : Fragment() {
                     bindingRm.smallSquareTextRm.setBackgroundResource(R.drawable.rounded_corners_left)
                     bindingRm.smallSquareImageRm.setBackgroundResource(R.drawable.rounded_corners_left)
                     val gd = bindingRm.smallSquareContainerRm.background as GradientDrawable
-                    gd.setColor(ContextCompat.getColor(requireContext(), R.color.blue))
+                    if (!mExtendedProps!!.getMiniBackgroundColor().isNullOrEmpty()) {
+                        gd.setColor(Color.parseColor(mExtendedProps!!.getMiniBackgroundColor()))
+                    } else {
+                        gd.setColor(ContextCompat.getColor(requireContext(), R.color.white))
+                    }
                     val gdText = bindingRm.smallSquareTextRm.background as GradientDrawable
-                    gdText.setColor(ContextCompat.getColor(requireContext(), R.color.blue))
+                    if (!mExtendedProps!!.getMiniBackgroundColor().isNullOrEmpty()) {
+                        gdText.setColor(Color.parseColor(mExtendedProps!!.getMiniBackgroundColor()))
+                    } else {
+                        gdText.setColor(ContextCompat.getColor(requireContext(), R.color.white))
+                    }
                     val gdImage = bindingRm.smallSquareImageRm.background as GradientDrawable
-                    gdImage.setColor(ContextCompat.getColor(requireContext(), R.color.blue))
+                    if (!mExtendedProps!!.getMiniBackgroundColor().isNullOrEmpty()) {
+                        gdImage.setColor(Color.parseColor(mExtendedProps!!.getMiniBackgroundColor()))
+                    } else {
+                        gdImage.setColor(ContextCompat.getColor(requireContext(), R.color.white))
+                    }
                     bindingRm.smallSquareBackgroundImageRm.visibility = View.GONE
                 }
                 bindingRm.smallCircleContainerRm.visibility = View.GONE
             }
             Shape.CIRCLE -> {
-                if (isBackgroundImage) {
-                    if(!isSmallImage) {
+                if (isMiniBackgroundImage) {
+                    if (!isSmallImage) {
                         Glide.with(requireActivity())
                             .asBitmap()
                             .transform(
@@ -388,27 +558,37 @@ class InAppNotificationFragment : Fragment() {
                                     GranularRoundedCorners(500f, 0f, 0f, 500f)
                                 )
                             )
-                            .load("https://digitalsynopsis.com/wp-content/uploads/2019/11/color-schemes-palettes-feature-image.jpg")
+                            .load(mExtendedProps!!.getMiniBackgroundImage())
                             .into(bindingRm.smallCircleBackgroundImageRm)
                     }
                 } else {
                     bindingRm.smallCircleContainerRm.setBackgroundResource(R.drawable.left_half_circle)
                     bindingRm.smallCircleTextRm.setBackgroundResource(R.drawable.left_half_circle)
                     bindingRm.smallCircleImageRm.setBackgroundResource(R.drawable.left_half_circle)
-                    val gdCircle =
-                        bindingRm.smallCircleContainerRm.background as GradientDrawable
-                    gdCircle.setColor(ContextCompat.getColor(requireContext(), R.color.blue))
-                    val gdCircleText =
-                        bindingRm.smallCircleTextRm.background as GradientDrawable
-                    gdCircleText.setColor(ContextCompat.getColor(requireContext(), R.color.blue))
-                    val gdCircleImage =
-                        bindingRm.smallCircleImageRm.background as GradientDrawable
-                    gdCircleImage.setColor(ContextCompat.getColor(requireContext(), R.color.blue))
+                    val gdCircle = bindingRm.smallCircleContainerRm.background as GradientDrawable
+                    if (!mExtendedProps!!.getMiniBackgroundColor().isNullOrEmpty()) {
+                        gdCircle.setColor(Color.parseColor(mExtendedProps!!.getMiniBackgroundColor()))
+                    } else {
+                        gdCircle.setColor(ContextCompat.getColor(requireContext(), R.color.white))
+                    }
+                    val gdCircleText = bindingRm.smallCircleTextRm.background as GradientDrawable
+                    if (!mExtendedProps!!.getMiniBackgroundColor().isNullOrEmpty()) {
+                        gdCircleText.setColor(Color.parseColor(mExtendedProps!!.getMiniBackgroundColor()))
+                    } else {
+                        gdCircleText.setColor(ContextCompat.getColor(requireContext(), R.color.white))
+                    }
+                    val gdCircleImage = bindingRm.smallCircleImageRm.background as GradientDrawable
+                    if (!mExtendedProps!!.getMiniBackgroundColor().isNullOrEmpty()) {
+                        gdCircleImage.setColor(Color.parseColor(mExtendedProps!!.getMiniBackgroundColor()))
+                    } else {
+                        gdCircleImage.setColor(ContextCompat.getColor(requireContext(), R.color.white))
+                    }
                     bindingRm.smallCircleBackgroundImageRm.visibility = View.GONE
                 }
                 bindingRm.smallSquareContainerRm.visibility = View.GONE
             }
         }
+
         if (shape == Shape.CIRCLE) {
             if (!isArrow) {
                 bindingRm.arrowCircleRm.visibility = View.GONE
@@ -418,7 +598,11 @@ class InAppNotificationFragment : Fragment() {
             } else {
                 bindingRm.arrowCircleRm.text = getString(R.string.notification_right_arrow)
             }
-            bindingRm.arrowCircleRm.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+            if (!mExtendedProps!!.getArrowColor().isNullOrEmpty()) {
+                bindingRm.arrowCircleRm.setTextColor(Color.parseColor(mExtendedProps!!.getArrowColor()))
+            } else {
+                bindingRm.arrowCircleRm.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+            }
             if (isSmallImage) {
                 Glide.with(requireActivity())
                     .asBitmap()
@@ -428,13 +612,22 @@ class InAppNotificationFragment : Fragment() {
                             GranularRoundedCorners(500f, 0f, 0f, 500f)
                         )
                     )
-                    .load("https://www.kimbuldu.com/resimler/Dogus-Grubunu-Kim-Kurdu.jpg")
+                    .load(response!!.getActionData()!!.getContentMinimizedImage())
                     .into(bindingRm.smallCircleImageRm)
                 bindingRm.smallCircleTextRm.visibility = View.GONE
             } else {
-                bindingRm.smallCircleTextRm.text = "Discount"
-                bindingRm.smallCircleTextRm.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
-                bindingRm.smallCircleTextRm.typeface = Typeface.MONOSPACE
+                bindingRm.smallCircleTextRm.text =
+                    response!!.getActionData()!!.getContentMinimizedText()
+                if (!mExtendedProps!!.getMiniTextColor().isNullOrEmpty()) {
+                    bindingRm.smallCircleTextRm.setTextColor(
+                        Color.parseColor(
+                            mExtendedProps!!.getMiniTextColor()
+                        )
+                    )
+                } else {
+                    bindingRm.smallCircleTextRm.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+                }
+                bindingRm.smallCircleTextRm.typeface = mExtendedProps!!.getMiniFontFamily(requireActivity())
                 bindingRm.smallCircleImageRm.visibility = View.GONE
                 bindingRm.smallCircleTextRm.topDown = isTopToBottom
                 bindingRm.smallCircleTextRm.isCircle = true
@@ -460,9 +653,13 @@ class InAppNotificationFragment : Fragment() {
             } else {
                 bindingRm.arrowSquareRm.text = getString(R.string.notification_right_arrow)
             }
-            bindingRm.arrowSquareRm.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+            if (!mExtendedProps!!.getArrowColor().isNullOrEmpty()) {
+                bindingRm.arrowSquareRm.setTextColor(Color.parseColor(mExtendedProps!!.getArrowColor()))
+            } else {
+                bindingRm.arrowSquareRm.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+            }
             if (isSmallImage) {
-                if(shape == Shape.SOFT_EDGE) {
+                if (shape == Shape.SOFT_EDGE) {
                     Glide.with(requireActivity())
                         .asBitmap()
                         .transform(
@@ -471,18 +668,26 @@ class InAppNotificationFragment : Fragment() {
                                 GranularRoundedCorners(40f, 0f, 0f, 40f)
                             )
                         )
-                        .load("https://www.kimbuldu.com/resimler/Dogus-Grubunu-Kim-Kurdu.jpg")
+                        .load(response!!.getActionData()!!.getContentMinimizedImage())
                         .into(bindingRm.smallSquareImageRm)
                 } else {
-                    Picasso.get()
-                        .load("https://www.kimbuldu.com/resimler/Dogus-Grubunu-Kim-Kurdu.jpg")
+                    Picasso.get().load(response!!.getActionData()!!.getContentMinimizedImage())
                         .into(bindingRm.smallSquareImageRm)
                 }
                 bindingRm.smallSquareTextRm.visibility = View.GONE
             } else {
-                bindingRm.smallSquareTextRm.text = "Discount"
-                bindingRm.smallSquareTextRm.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
-                bindingRm.smallSquareTextRm.typeface = Typeface.MONOSPACE
+                bindingRm.smallSquareTextRm.text =
+                    response!!.getActionData()!!.getContentMinimizedText()
+                if (!mExtendedProps!!.getMiniTextColor().isNullOrEmpty()) {
+                    bindingRm.smallSquareTextRm.setTextColor(
+                        Color.parseColor(
+                            mExtendedProps!!.getMiniTextColor()
+                        )
+                    )
+                } else {
+                    bindingRm.smallSquareTextRm.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+                }
+                bindingRm.smallSquareTextRm.typeface = mExtendedProps!!.getMiniFontFamily(requireActivity())
                 bindingRm.smallSquareImageRm.visibility = View.GONE
                 bindingRm.smallSquareTextRm.topDown = isTopToBottom
                 bindingRm.smallCircleTextRm.isCircle = false
@@ -500,28 +705,64 @@ class InAppNotificationFragment : Fragment() {
                 }
             }
         }
-        if (isBackgroundImage) {
-            Picasso.get()
-                .load("https://digitalsynopsis.com/wp-content/uploads/2019/11/color-schemes-palettes-feature-image.jpg")
+
+        if (isMaxiBackgroundImage) {
+            Picasso.get().load(mExtendedProps!!.getMaxiBackgroundImage())
                 .into(bindingRm.bigBackgroundImageRm)
         } else {
-            bindingRm.bigContainerRm.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.blue))
+            if (!mExtendedProps!!.getMaxiBackgroundColor().isNullOrEmpty()) {
+                bindingRm.bigContainerRm.setBackgroundColor(Color.parseColor(mExtendedProps!!.getMaxiBackgroundColor()))
+            } else {
+                bindingRm.bigContainerRm.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.white))
+            }
             bindingRm.bigBackgroundImageRm.visibility = View.GONE
         }
-        Picasso.get().load("https://upload.wikimedia.org//wikipedia/en/a/a9/MarioNSMBUDeluxe.png")
-            .into(bindingRm.bigImageRm)
+
+        if (!response!!.getActionData()!!.getContentMaximizedImage().isNullOrEmpty()) {
+            Picasso.get().load(response!!.getActionData()!!.getContentMaximizedImage())
+                .into(bindingRm.bigImageRm)
+        }
+
         bindingRm.bigContainerRm.setOnClickListener {
-            // TODO : Check buttonInterface first
-            // TODO : send report here
-            val viewIntent =
-                Intent(Intent.ACTION_VIEW, Uri.parse("https://www.relateddigital.com/"))
-            requireActivity().startActivity(viewIntent)
-            endFragment()
+            val uriString = response!!.getActionData()!!.getAndroidLnk()
+            val buttonInterface: InAppButtonInterface? =
+                RelatedDigital.getInAppButtonInterface()
+            var report: MailSubReport?
+            try {
+                report = MailSubReport()
+                report.impression = response!!.getActionData()!!.getReport()!!.getImpression()
+                report.click = response!!.getActionData()!!.getReport()!!.getClick()
+            } catch (e: Exception) {
+                Log.e(LOG_TAG, "There is no report to send!")
+                e.printStackTrace()
+                report = null
+            }
+            if (report != null) {
+                RequestHandler.createInAppActionClickRequest(requireActivity(), report)
+            }
+            if (buttonInterface != null) {
+                RelatedDigital.setInAppButtonInterface(null)
+                buttonInterface.onPress(uriString)
+            } else {
+                if (!uriString.isNullOrEmpty()) {
+                    val uri: Uri
+                    try {
+                        uri = Uri.parse(uriString)
+                        val viewIntent = Intent(Intent.ACTION_VIEW, uri)
+                        requireActivity().startActivity(viewIntent)
+                    } catch (e: Exception) {
+                        Log.i(
+                            LOG_TAG,
+                            "Can't parse notification URI, will not take any action",
+                            e
+                        )
+                    }
+                }
+            }
         }
     }
 
     private fun adjustRb() {
-        //TODO : from real data here
         bindingRb.smallSquareContainerRb.visibility = View.VISIBLE
         bindingRb.smallCircleContainerRb.visibility = View.VISIBLE
         bindingRb.arrowSquareRb.visibility = View.VISIBLE
@@ -533,23 +774,29 @@ class InAppNotificationFragment : Fragment() {
         bindingRb.smallCircleBackgroundImageRb.visibility = View.VISIBLE
         bindingRb.smallSquareBackgroundImageRb.visibility = View.VISIBLE
         bindingRb.bigContainerRb.visibility = View.GONE
+
         when (shape) {
             Shape.SHARP_EDGE -> {
-                if (isBackgroundImage) {
-                    if(!isSmallImage) {
-                        Picasso.get()
-                            .load("https://digitalsynopsis.com/wp-content/uploads/2019/11/color-schemes-palettes-feature-image.jpg")
+                if (isMiniBackgroundImage) {
+                    if (!isSmallImage) {
+                        Picasso.get().load(mExtendedProps!!.getMiniBackgroundImage())
                             .into(bindingRb.smallSquareBackgroundImageRb)
                     }
                 } else {
-                    bindingRb.smallSquareContainerRb.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.blue))
+                    if (!mExtendedProps!!.getMiniBackgroundColor().isNullOrEmpty()) {
+                        bindingRb.smallSquareContainerRb.setBackgroundColor(
+                            Color.parseColor(mExtendedProps!!.getMiniBackgroundColor())
+                        )
+                    } else {
+                        bindingRb.smallSquareContainerRb.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.white))
+                    }
                     bindingRb.smallSquareBackgroundImageRb.visibility = View.GONE
                 }
                 bindingRb.smallCircleContainerRb.visibility = View.GONE
             }
             Shape.SOFT_EDGE -> {
-                if (isBackgroundImage) {
-                    if(!isSmallImage) {
+                if (isMiniBackgroundImage) {
+                    if (!isSmallImage) {
                         Glide.with(requireActivity())
                             .asBitmap()
                             .transform(
@@ -558,7 +805,7 @@ class InAppNotificationFragment : Fragment() {
                                     GranularRoundedCorners(40f, 0f, 0f, 40f)
                                 )
                             )
-                            .load("https://digitalsynopsis.com/wp-content/uploads/2019/11/color-schemes-palettes-feature-image.jpg")
+                            .load(mExtendedProps!!.getMiniBackgroundImage())
                             .into(bindingRb.smallSquareBackgroundImageRb)
                     }
                 } else {
@@ -566,18 +813,30 @@ class InAppNotificationFragment : Fragment() {
                     bindingRb.smallSquareTextRb.setBackgroundResource(R.drawable.rounded_corners_left)
                     bindingRb.smallSquareImageRb.setBackgroundResource(R.drawable.rounded_corners_left)
                     val gd = bindingRb.smallSquareContainerRb.background as GradientDrawable
-                    gd.setColor(ContextCompat.getColor(requireContext(), R.color.blue))
+                    if (!mExtendedProps!!.getMiniBackgroundColor().isNullOrEmpty()) {
+                        gd.setColor(Color.parseColor(mExtendedProps!!.getMiniBackgroundColor()))
+                    } else {
+                        gd.setColor(ContextCompat.getColor(requireContext(), R.color.white))
+                    }
                     val gdText = bindingRb.smallSquareTextRb.background as GradientDrawable
-                    gdText.setColor(ContextCompat.getColor(requireContext(), R.color.blue))
+                    if (!mExtendedProps!!.getMiniBackgroundColor().isNullOrEmpty()) {
+                        gdText.setColor(Color.parseColor(mExtendedProps!!.getMiniBackgroundColor()))
+                    } else {
+                        gdText.setColor(ContextCompat.getColor(requireContext(), R.color.white))
+                    }
                     val gdImage = bindingRb.smallSquareImageRb.background as GradientDrawable
-                    gdImage.setColor(ContextCompat.getColor(requireContext(), R.color.blue))
+                    if (!mExtendedProps!!.getMiniBackgroundColor().isNullOrEmpty()) {
+                        gdImage.setColor(Color.parseColor(mExtendedProps!!.getMiniBackgroundColor()))
+                    } else {
+                        gdImage.setColor(ContextCompat.getColor(requireContext(), R.color.white))
+                    }
                     bindingRb.smallSquareBackgroundImageRb.visibility = View.GONE
                 }
                 bindingRb.smallCircleContainerRb.visibility = View.GONE
             }
             Shape.CIRCLE -> {
-                if (isBackgroundImage) {
-                    if(!isSmallImage) {
+                if (isMiniBackgroundImage) {
+                    if (!isSmallImage) {
                         Glide.with(requireActivity())
                             .asBitmap()
                             .transform(
@@ -586,27 +845,37 @@ class InAppNotificationFragment : Fragment() {
                                     GranularRoundedCorners(500f, 0f, 0f, 500f)
                                 )
                             )
-                            .load("https://digitalsynopsis.com/wp-content/uploads/2019/11/color-schemes-palettes-feature-image.jpg")
+                            .load(mExtendedProps!!.getMiniBackgroundImage())
                             .into(bindingRb.smallCircleBackgroundImageRb)
                     }
                 } else {
                     bindingRb.smallCircleContainerRb.setBackgroundResource(R.drawable.left_half_circle)
                     bindingRb.smallCircleTextRb.setBackgroundResource(R.drawable.left_half_circle)
                     bindingRb.smallCircleImageRb.setBackgroundResource(R.drawable.left_half_circle)
-                    val gdCircle =
-                        bindingRb.smallCircleContainerRb.background as GradientDrawable
-                    gdCircle.setColor(ContextCompat.getColor(requireContext(), R.color.blue))
-                    val gdCircleText =
-                        bindingRb.smallCircleTextRb.background as GradientDrawable
-                    gdCircleText.setColor(ContextCompat.getColor(requireContext(), R.color.blue))
-                    val gdCircleImage =
-                        bindingRb.smallCircleImageRb.background as GradientDrawable
-                    gdCircleImage.setColor(ContextCompat.getColor(requireContext(), R.color.blue))
+                    val gdCircle = bindingRb.smallCircleContainerRb.background as GradientDrawable
+                    if (!mExtendedProps!!.getMiniBackgroundColor().isNullOrEmpty()) {
+                        gdCircle.setColor(Color.parseColor(mExtendedProps!!.getMiniBackgroundColor()))
+                    } else {
+                        gdCircle.setColor(ContextCompat.getColor(requireContext(), R.color.white))
+                    }
+                    val gdCircleText = bindingRb.smallCircleTextRb.background as GradientDrawable
+                    if (!mExtendedProps!!.getMiniBackgroundColor().isNullOrEmpty()) {
+                        gdCircleText.setColor(Color.parseColor(mExtendedProps!!.getMiniBackgroundColor()))
+                    } else {
+                        gdCircleText.setColor(ContextCompat.getColor(requireContext(), R.color.white))
+                    }
+                    val gdCircleImage = bindingRb.smallCircleImageRb.background as GradientDrawable
+                    if (!mExtendedProps!!.getMiniBackgroundColor().isNullOrEmpty()) {
+                        gdCircleImage.setColor(Color.parseColor(mExtendedProps!!.getMiniBackgroundColor()))
+                    } else {
+                        gdCircleImage.setColor(ContextCompat.getColor(requireContext(), R.color.white))
+                    }
                     bindingRb.smallCircleBackgroundImageRb.visibility = View.GONE
                 }
                 bindingRb.smallSquareContainerRb.visibility = View.GONE
             }
         }
+
         if (shape == Shape.CIRCLE) {
             if (!isArrow) {
                 bindingRb.arrowCircleRb.visibility = View.GONE
@@ -616,7 +885,11 @@ class InAppNotificationFragment : Fragment() {
             } else {
                 bindingRb.arrowCircleRb.text = getString(R.string.notification_right_arrow)
             }
-            bindingRb.arrowCircleRb.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+            if (!mExtendedProps!!.getArrowColor().isNullOrEmpty()) {
+                bindingRb.arrowCircleRb.setTextColor(Color.parseColor(mExtendedProps!!.getArrowColor()))
+            } else {
+                bindingRb.arrowCircleRb.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+            }
             if (isSmallImage) {
                 Glide.with(requireActivity())
                     .asBitmap()
@@ -626,13 +899,22 @@ class InAppNotificationFragment : Fragment() {
                             GranularRoundedCorners(500f, 0f, 0f, 500f)
                         )
                     )
-                    .load("https://www.kimbuldu.com/resimler/Dogus-Grubunu-Kim-Kurdu.jpg")
+                    .load(response!!.getActionData()!!.getContentMinimizedImage())
                     .into(bindingRb.smallCircleImageRb)
                 bindingRb.smallCircleTextRb.visibility = View.GONE
             } else {
-                bindingRb.smallCircleTextRb.text = "Discount"
-                bindingRb.smallCircleTextRb.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
-                bindingRb.smallCircleTextRb.typeface = Typeface.MONOSPACE
+                bindingRb.smallCircleTextRb.text =
+                    response!!.getActionData()!!.getContentMinimizedText()
+                if (!mExtendedProps!!.getMiniTextColor().isNullOrEmpty()) {
+                    bindingRb.smallCircleTextRb.setTextColor(
+                        Color.parseColor(
+                            mExtendedProps!!.getMiniTextColor()
+                        )
+                    )
+                } else {
+                    bindingRb.smallCircleTextRb.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+                }
+                bindingRb.smallCircleTextRb.typeface = mExtendedProps!!.getMiniFontFamily(requireActivity())
                 bindingRb.smallCircleImageRb.visibility = View.GONE
                 bindingRb.smallCircleTextRb.topDown = isTopToBottom
                 bindingRb.smallCircleTextRb.isCircle = true
@@ -658,9 +940,13 @@ class InAppNotificationFragment : Fragment() {
             } else {
                 bindingRb.arrowSquareRb.text = getString(R.string.notification_right_arrow)
             }
-            bindingRb.arrowSquareRb.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+            if (!mExtendedProps!!.getArrowColor().isNullOrEmpty()) {
+                bindingRb.arrowSquareRb.setTextColor(Color.parseColor(mExtendedProps!!.getArrowColor()))
+            } else {
+                bindingRb.arrowSquareRb.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+            }
             if (isSmallImage) {
-                if(shape == Shape.SOFT_EDGE) {
+                if (shape == Shape.SOFT_EDGE) {
                     Glide.with(requireActivity())
                         .asBitmap()
                         .transform(
@@ -669,18 +955,26 @@ class InAppNotificationFragment : Fragment() {
                                 GranularRoundedCorners(40f, 0f, 0f, 40f)
                             )
                         )
-                        .load("https://www.kimbuldu.com/resimler/Dogus-Grubunu-Kim-Kurdu.jpg")
+                        .load(response!!.getActionData()!!.getContentMinimizedImage())
                         .into(bindingRb.smallSquareImageRb)
                 } else {
-                    Picasso.get()
-                        .load("https://www.kimbuldu.com/resimler/Dogus-Grubunu-Kim-Kurdu.jpg")
+                    Picasso.get().load(response!!.getActionData()!!.getContentMinimizedImage())
                         .into(bindingRb.smallSquareImageRb)
                 }
                 bindingRb.smallSquareTextRb.visibility = View.GONE
             } else {
-                bindingRb.smallSquareTextRb.text = "Discount"
-                bindingRb.smallSquareTextRb.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
-                bindingRb.smallSquareTextRb.typeface = Typeface.MONOSPACE
+                bindingRb.smallSquareTextRb.text =
+                    response!!.getActionData()!!.getContentMinimizedText()
+                if (!mExtendedProps!!.getMiniTextColor().isNullOrEmpty()) {
+                    bindingRb.smallSquareTextRb.setTextColor(
+                        Color.parseColor(
+                            mExtendedProps!!.getMiniTextColor()
+                        )
+                    )
+                } else {
+                    bindingRb.smallSquareTextRb.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+                }
+                bindingRb.smallSquareTextRb.typeface = mExtendedProps!!.getMiniFontFamily(requireActivity())
                 bindingRb.smallSquareImageRb.visibility = View.GONE
                 bindingRb.smallSquareTextRb.topDown = isTopToBottom
                 bindingRb.smallCircleTextRb.isCircle = false
@@ -698,28 +992,64 @@ class InAppNotificationFragment : Fragment() {
                 }
             }
         }
-        if (isBackgroundImage) {
-            Picasso.get()
-                .load("https://digitalsynopsis.com/wp-content/uploads/2019/11/color-schemes-palettes-feature-image.jpg")
+
+        if (isMaxiBackgroundImage) {
+            Picasso.get().load(mExtendedProps!!.getMaxiBackgroundImage())
                 .into(bindingRb.bigBackgroundImageRb)
         } else {
-            bindingRb.bigContainerRb.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.blue))
+            if (!mExtendedProps!!.getMaxiBackgroundColor().isNullOrEmpty()) {
+                bindingRb.bigContainerRb.setBackgroundColor(Color.parseColor(mExtendedProps!!.getMaxiBackgroundColor()))
+            } else {
+                bindingRb.bigContainerRb.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.white))
+            }
             bindingRb.bigBackgroundImageRb.visibility = View.GONE
         }
-        Picasso.get().load("https://upload.wikimedia.org//wikipedia/en/a/a9/MarioNSMBUDeluxe.png")
-            .into(bindingRb.bigImageRb)
+
+        if (!response!!.getActionData()!!.getContentMaximizedImage().isNullOrEmpty()) {
+            Picasso.get().load(response!!.getActionData()!!.getContentMaximizedImage())
+                .into(bindingRb.bigImageRb)
+        }
+
         bindingRb.bigContainerRb.setOnClickListener {
-            // TODO : Check buttonInterface first
-            // TODO : send report here
-            val viewIntent =
-                Intent(Intent.ACTION_VIEW, Uri.parse("https://www.relateddigital.com/"))
-            requireActivity().startActivity(viewIntent)
-            endFragment()
+            val uriString = response!!.getActionData()!!.getAndroidLnk()
+            val buttonInterface: InAppButtonInterface? =
+                RelatedDigital.getInAppButtonInterface()
+            var report: MailSubReport?
+            try {
+                report = MailSubReport()
+                report.impression = response!!.getActionData()!!.getReport()!!.getImpression()
+                report.click = response!!.getActionData()!!.getReport()!!.getClick()
+            } catch (e: Exception) {
+                Log.e(LOG_TAG, "There is no report to send!")
+                e.printStackTrace()
+                report = null
+            }
+            if (report != null) {
+                RequestHandler.createInAppActionClickRequest(requireActivity(), report)
+            }
+            if (buttonInterface != null) {
+                RelatedDigital.setInAppButtonInterface(null)
+                buttonInterface.onPress(uriString)
+            } else {
+                if (!uriString.isNullOrEmpty()) {
+                    val uri: Uri
+                    try {
+                        uri = Uri.parse(uriString)
+                        val viewIntent = Intent(Intent.ACTION_VIEW, uri)
+                        requireActivity().startActivity(viewIntent)
+                    } catch (e: Exception) {
+                        Log.i(
+                            LOG_TAG,
+                            "Can't parse notification URI, will not take any action",
+                            e
+                        )
+                    }
+                }
+            }
         }
     }
 
     private fun adjustLt() {
-        //TODO : from real data here
         bindingLt.smallSquareContainerLt.visibility = View.VISIBLE
         bindingLt.smallCircleContainerLt.visibility = View.VISIBLE
         bindingLt.arrowSquareLt.visibility = View.VISIBLE
@@ -731,23 +1061,31 @@ class InAppNotificationFragment : Fragment() {
         bindingLt.smallCircleBackgroundImageLt.visibility = View.VISIBLE
         bindingLt.smallSquareBackgroundImageLt.visibility = View.VISIBLE
         bindingLt.bigContainerLt.visibility = View.GONE
+
         when (shape) {
             Shape.SHARP_EDGE -> {
-                if (isBackgroundImage) {
-                    if(!isSmallImage) {
-                        Picasso.get()
-                            .load("https://digitalsynopsis.com/wp-content/uploads/2019/11/color-schemes-palettes-feature-image.jpg")
+                if (isMiniBackgroundImage) {
+                    if (!isSmallImage) {
+                        Picasso.get().load(mExtendedProps!!.getMiniBackgroundImage())
                             .into(bindingLt.smallSquareBackgroundImageLt)
                     }
                 } else {
-                    bindingLt.smallSquareContainerLt.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.blue))
+                    if (!mExtendedProps!!.getMiniBackgroundColor().isNullOrEmpty()) {
+                        bindingLt.smallSquareContainerLt.setBackgroundColor(
+                            Color.parseColor(
+                                mExtendedProps!!.getMiniBackgroundColor()
+                            )
+                        )
+                    } else {
+                        bindingLt.smallSquareContainerLt.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.white))
+                    }
                     bindingLt.smallSquareBackgroundImageLt.visibility = View.GONE
                 }
                 bindingLt.smallCircleContainerLt.visibility = View.GONE
             }
             Shape.SOFT_EDGE -> {
-                if (isBackgroundImage) {
-                    if(!isSmallImage) {
+                if (isMiniBackgroundImage) {
+                    if (!isSmallImage) {
                         Glide.with(requireActivity())
                             .asBitmap()
                             .transform(
@@ -756,7 +1094,7 @@ class InAppNotificationFragment : Fragment() {
                                     GranularRoundedCorners(0f, 40f, 40f, 0f)
                                 )
                             )
-                            .load("https://digitalsynopsis.com/wp-content/uploads/2019/11/color-schemes-palettes-feature-image.jpg")
+                            .load(mExtendedProps!!.getMiniBackgroundImage())
                             .into(bindingLt.smallSquareBackgroundImageLt)
                     }
                 } else {
@@ -764,18 +1102,30 @@ class InAppNotificationFragment : Fragment() {
                     bindingLt.smallSquareTextLt.setBackgroundResource(R.drawable.rounded_corners_right)
                     bindingLt.smallSquareImageLt.setBackgroundResource(R.drawable.rounded_corners_right)
                     val gd = bindingLt.smallSquareContainerLt.background as GradientDrawable
-                    gd.setColor(ContextCompat.getColor(requireContext(), R.color.blue))
+                    if (!mExtendedProps!!.getMiniBackgroundColor().isNullOrEmpty()) {
+                        gd.setColor(Color.parseColor(mExtendedProps!!.getMiniBackgroundColor()))
+                    } else {
+                        gd.setColor(ContextCompat.getColor(requireContext(), R.color.white))
+                    }
                     val gdText = bindingLt.smallSquareTextLt.background as GradientDrawable
-                    gdText.setColor(ContextCompat.getColor(requireContext(), R.color.blue))
+                    if (!mExtendedProps!!.getMiniBackgroundColor().isNullOrEmpty()) {
+                        gdText.setColor(Color.parseColor(mExtendedProps!!.getMiniBackgroundColor()))
+                    } else {
+                        gdText.setColor(ContextCompat.getColor(requireContext(), R.color.white))
+                    }
                     val gdImage = bindingLt.smallSquareImageLt.background as GradientDrawable
-                    gdImage.setColor(ContextCompat.getColor(requireContext(), R.color.blue))
+                    if (!mExtendedProps!!.getMiniBackgroundColor().isNullOrEmpty()) {
+                        gdImage.setColor(Color.parseColor(mExtendedProps!!.getMiniBackgroundColor()))
+                    } else {
+                        gdImage.setColor(ContextCompat.getColor(requireContext(), R.color.white))
+                    }
                     bindingLt.smallSquareBackgroundImageLt.visibility = View.GONE
                 }
                 bindingLt.smallCircleContainerLt.visibility = View.GONE
             }
             Shape.CIRCLE -> {
-                if (isBackgroundImage) {
-                    if(!isSmallImage) {
+                if (isMiniBackgroundImage) {
+                    if (!isSmallImage) {
                         Glide.with(requireActivity())
                             .asBitmap()
                             .transform(
@@ -784,27 +1134,37 @@ class InAppNotificationFragment : Fragment() {
                                     GranularRoundedCorners(0f, 500f, 500f, 0f)
                                 )
                             )
-                            .load("https://digitalsynopsis.com/wp-content/uploads/2019/11/color-schemes-palettes-feature-image.jpg")
+                            .load(mExtendedProps!!.getMiniBackgroundImage())
                             .into(bindingLt.smallCircleBackgroundImageLt)
                     }
                 } else {
                     bindingLt.smallCircleContainerLt.setBackgroundResource(R.drawable.right_half_circle)
                     bindingLt.smallCircleTextLt.setBackgroundResource(R.drawable.right_half_circle)
                     bindingLt.smallCircleImageLt.setBackgroundResource(R.drawable.right_half_circle)
-                    val gdCircle =
-                        bindingLt.smallCircleContainerLt.background as GradientDrawable
-                    gdCircle.setColor(ContextCompat.getColor(requireContext(), R.color.blue))
-                    val gdCircleText =
-                        bindingLt.smallCircleTextLt.background as GradientDrawable
-                    gdCircleText.setColor(ContextCompat.getColor(requireContext(), R.color.blue))
-                    val gdCircleImage =
-                        bindingLt.smallCircleImageLt.background as GradientDrawable
-                    gdCircleImage.setColor(ContextCompat.getColor(requireContext(), R.color.blue))
+                    val gdCircle = bindingLt.smallCircleContainerLt.background as GradientDrawable
+                    if (!mExtendedProps!!.getMiniBackgroundColor().isNullOrEmpty()) {
+                        gdCircle.setColor(Color.parseColor(mExtendedProps!!.getMiniBackgroundColor()))
+                    } else {
+                        gdCircle.setColor(ContextCompat.getColor(requireContext(), R.color.white))
+                    }
+                    val gdCircleText = bindingLt.smallCircleTextLt.background as GradientDrawable
+                    if (!mExtendedProps!!.getMiniBackgroundColor().isNullOrEmpty()) {
+                        gdCircleText.setColor(Color.parseColor(mExtendedProps!!.getMiniBackgroundColor()))
+                    } else {
+                        gdCircleText.setColor(ContextCompat.getColor(requireContext(), R.color.white))
+                    }
+                    val gdCircleImage = bindingLt.smallCircleImageLt.background as GradientDrawable
+                    if (!mExtendedProps!!.getMiniBackgroundColor().isNullOrEmpty()) {
+                        gdCircleImage.setColor(Color.parseColor(mExtendedProps!!.getMiniBackgroundColor()))
+                    } else {
+                        gdCircleImage.setColor(ContextCompat.getColor(requireContext(), R.color.white))
+                    }
                     bindingLt.smallCircleBackgroundImageLt.visibility = View.GONE
                 }
                 bindingLt.smallSquareContainerLt.visibility = View.GONE
             }
         }
+
         if (shape == Shape.CIRCLE) {
             if (!isArrow) {
                 bindingLt.arrowCircleLt.visibility = View.GONE
@@ -814,7 +1174,11 @@ class InAppNotificationFragment : Fragment() {
             } else {
                 bindingLt.arrowCircleLt.text = getString(R.string.notification_left_arrow)
             }
-            bindingLt.arrowCircleLt.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+            if (!mExtendedProps!!.getArrowColor().isNullOrEmpty()) {
+                bindingLt.arrowCircleLt.setTextColor(Color.parseColor(mExtendedProps!!.getArrowColor()))
+            } else {
+                bindingLt.arrowCircleLt.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+            }
             if (isSmallImage) {
                 Glide.with(requireActivity())
                     .asBitmap()
@@ -824,13 +1188,22 @@ class InAppNotificationFragment : Fragment() {
                             GranularRoundedCorners(0f, 500f, 500f, 0f)
                         )
                     )
-                    .load("https://www.kimbuldu.com/resimler/Dogus-Grubunu-Kim-Kurdu.jpg")
+                    .load(response!!.getActionData()!!.getContentMinimizedImage())
                     .into(bindingLt.smallCircleImageLt)
                 bindingLt.smallCircleTextLt.visibility = View.GONE
             } else {
-                bindingLt.smallCircleTextLt.text = "Discount"
-                bindingLt.smallCircleTextLt.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
-                bindingLt.smallCircleTextLt.typeface = Typeface.MONOSPACE
+                bindingLt.smallCircleTextLt.text =
+                    response!!.getActionData()!!.getContentMinimizedText()
+                if (!mExtendedProps!!.getMiniTextColor().isNullOrEmpty()) {
+                    bindingLt.smallCircleTextLt.setTextColor(
+                        Color.parseColor(
+                            mExtendedProps!!.getMiniTextColor()
+                        )
+                    )
+                } else {
+                    bindingLt.smallCircleTextLt.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+                }
+                bindingLt.smallCircleTextLt.typeface = mExtendedProps!!.getMiniFontFamily(requireActivity())
                 bindingLt.smallCircleImageLt.visibility = View.GONE
                 bindingLt.smallCircleTextLt.topDown = isTopToBottom
                 bindingLt.smallCircleTextLt.isCircle = true
@@ -856,9 +1229,13 @@ class InAppNotificationFragment : Fragment() {
             } else {
                 bindingLt.arrowSquareLt.text = getString(R.string.notification_left_arrow)
             }
-            bindingLt.arrowSquareLt.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+            if (!mExtendedProps!!.getArrowColor().isNullOrEmpty()) {
+                bindingLt.arrowSquareLt.setTextColor(Color.parseColor(mExtendedProps!!.getArrowColor()))
+            } else {
+                bindingLt.arrowSquareLt.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+            }
             if (isSmallImage) {
-                if(shape == Shape.SOFT_EDGE) {
+                if (shape == Shape.SOFT_EDGE) {
                     Glide.with(requireActivity())
                         .asBitmap()
                         .transform(
@@ -867,18 +1244,26 @@ class InAppNotificationFragment : Fragment() {
                                 GranularRoundedCorners(0f, 40f, 40f, 0f)
                             )
                         )
-                        .load("https://www.kimbuldu.com/resimler/Dogus-Grubunu-Kim-Kurdu.jpg")
+                        .load(response!!.getActionData()!!.getContentMinimizedImage())
                         .into(bindingLt.smallSquareImageLt)
                 } else {
-                    Picasso.get()
-                        .load("https://www.kimbuldu.com/resimler/Dogus-Grubunu-Kim-Kurdu.jpg")
+                    Picasso.get().load(response!!.getActionData()!!.getContentMinimizedImage())
                         .into(bindingLt.smallSquareImageLt)
                 }
                 bindingLt.smallSquareTextLt.visibility = View.GONE
             } else {
-                bindingLt.smallSquareTextLt.text = "Discount"
-                bindingLt.smallSquareTextLt.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
-                bindingLt.smallSquareTextLt.typeface = Typeface.MONOSPACE
+                bindingLt.smallSquareTextLt.text =
+                    response!!.getActionData()!!.getContentMinimizedText()
+                if (!mExtendedProps!!.getMiniTextColor().isNullOrEmpty()) {
+                    bindingLt.smallSquareTextLt.setTextColor(
+                        Color.parseColor(
+                            mExtendedProps!!.getMiniTextColor()
+                        )
+                    )
+                } else {
+                    bindingLt.smallSquareTextLt.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+                }
+                bindingLt.smallSquareTextLt.typeface = mExtendedProps!!.getMiniFontFamily(requireActivity())
                 bindingLt.smallSquareImageLt.visibility = View.GONE
                 bindingLt.smallSquareTextLt.topDown = isTopToBottom
                 bindingLt.smallCircleTextLt.isCircle = false
@@ -896,28 +1281,64 @@ class InAppNotificationFragment : Fragment() {
                 }
             }
         }
-        if (isBackgroundImage) {
-            Picasso.get()
-                .load("https://digitalsynopsis.com/wp-content/uploads/2019/11/color-schemes-palettes-feature-image.jpg")
+
+        if (isMaxiBackgroundImage) {
+            Picasso.get().load(mExtendedProps!!.getMaxiBackgroundImage())
                 .into(bindingLt.bigBackgroundImageLt)
         } else {
-            bindingLt.bigContainerLt.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.blue))
+            if (!mExtendedProps!!.getMaxiBackgroundColor().isNullOrEmpty()) {
+                bindingLt.bigContainerLt.setBackgroundColor(Color.parseColor(mExtendedProps!!.getMaxiBackgroundColor()))
+            } else {
+                bindingLt.bigContainerLt.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.white))
+            }
             bindingLt.bigBackgroundImageLt.visibility = View.GONE
         }
-        Picasso.get().load("https://upload.wikimedia.org//wikipedia/en/a/a9/MarioNSMBUDeluxe.png")
-            .into(bindingLt.bigImageLt)
+
+        if (!response!!.getActionData()!!.getContentMaximizedImage().isNullOrEmpty()) {
+            Picasso.get().load(response!!.getActionData()!!.getContentMaximizedImage())
+                .into(bindingLt.bigImageLt)
+        }
+
         bindingLt.bigContainerLt.setOnClickListener {
-            // TODO : Check buttonInterface first
-            // TODO : send report here
-            val viewIntent =
-                Intent(Intent.ACTION_VIEW, Uri.parse("https://www.relateddigital.com/"))
-            requireActivity().startActivity(viewIntent)
-            endFragment()
+            val uriString = response!!.getActionData()!!.getAndroidLnk()
+            val buttonInterface: InAppButtonInterface? =
+                RelatedDigital.getInAppButtonInterface()
+            var report: MailSubReport?
+            try {
+                report = MailSubReport()
+                report.impression = response!!.getActionData()!!.getReport()!!.getImpression()
+                report.click = response!!.getActionData()!!.getReport()!!.getClick()
+            } catch (e: Exception) {
+                Log.e(LOG_TAG, "There is no report to send!")
+                e.printStackTrace()
+                report = null
+            }
+            if (report != null) {
+                RequestHandler.createInAppActionClickRequest(requireActivity(), report)
+            }
+            if (buttonInterface != null) {
+                RelatedDigital.setInAppButtonInterface(null)
+                buttonInterface.onPress(uriString)
+            } else {
+                if (!uriString.isNullOrEmpty()) {
+                    val uri: Uri
+                    try {
+                        uri = Uri.parse(uriString)
+                        val viewIntent = Intent(Intent.ACTION_VIEW, uri)
+                        requireActivity().startActivity(viewIntent)
+                    } catch (e: Exception) {
+                        Log.i(
+                            LOG_TAG,
+                            "Can't parse notification URI, will not take any action",
+                            e
+                        )
+                    }
+                }
+            }
         }
     }
 
     private fun adjustLm() {
-        //TODO : from real data here
         bindingLm.smallSquareContainerLm.visibility = View.VISIBLE
         bindingLm.smallCircleContainerLm.visibility = View.VISIBLE
         bindingLm.arrowSquareLm.visibility = View.VISIBLE
@@ -929,23 +1350,31 @@ class InAppNotificationFragment : Fragment() {
         bindingLm.smallCircleBackgroundImageLm.visibility = View.VISIBLE
         bindingLm.smallSquareBackgroundImageLm.visibility = View.VISIBLE
         bindingLm.bigContainerLm.visibility = View.GONE
+
         when (shape) {
             Shape.SHARP_EDGE -> {
-                if (isBackgroundImage) {
-                    if(!isSmallImage) {
-                        Picasso.get()
-                            .load("https://digitalsynopsis.com/wp-content/uploads/2019/11/color-schemes-palettes-feature-image.jpg")
+                if (isMiniBackgroundImage) {
+                    if (!isSmallImage) {
+                        Picasso.get().load(mExtendedProps!!.getMiniBackgroundImage())
                             .into(bindingLm.smallSquareBackgroundImageLm)
                     }
                 } else {
-                    bindingLm.smallSquareContainerLm.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.blue))
+                    if (!mExtendedProps!!.getMiniBackgroundColor().isNullOrEmpty()) {
+                        bindingLm.smallSquareContainerLm.setBackgroundColor(
+                            Color.parseColor(
+                                mExtendedProps!!.getMiniBackgroundColor()
+                            )
+                        )
+                    } else {
+                        bindingLm.smallSquareContainerLm.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.white))
+                    }
                     bindingLm.smallSquareBackgroundImageLm.visibility = View.GONE
                 }
                 bindingLm.smallCircleContainerLm.visibility = View.GONE
             }
             Shape.SOFT_EDGE -> {
-                if (isBackgroundImage) {
-                    if(!isSmallImage) {
+                if (isMiniBackgroundImage) {
+                    if (!isSmallImage) {
                         Glide.with(requireActivity())
                             .asBitmap()
                             .transform(
@@ -954,7 +1383,7 @@ class InAppNotificationFragment : Fragment() {
                                     GranularRoundedCorners(0f, 40f, 40f, 0f)
                                 )
                             )
-                            .load("https://digitalsynopsis.com/wp-content/uploads/2019/11/color-schemes-palettes-feature-image.jpg")
+                            .load(mExtendedProps!!.getMiniBackgroundImage())
                             .into(bindingLm.smallSquareBackgroundImageLm)
                     }
                 } else {
@@ -962,18 +1391,30 @@ class InAppNotificationFragment : Fragment() {
                     bindingLm.smallSquareTextLm.setBackgroundResource(R.drawable.rounded_corners_right)
                     bindingLm.smallSquareImageLm.setBackgroundResource(R.drawable.rounded_corners_right)
                     val gd = bindingLm.smallSquareContainerLm.background as GradientDrawable
-                    gd.setColor(ContextCompat.getColor(requireContext(), R.color.blue))
+                    if (!mExtendedProps!!.getMiniBackgroundColor().isNullOrEmpty()) {
+                        gd.setColor(Color.parseColor(mExtendedProps!!.getMiniBackgroundColor()))
+                    } else {
+                        gd.setColor(ContextCompat.getColor(requireContext(), R.color.white))
+                    }
                     val gdText = bindingLm.smallSquareTextLm.background as GradientDrawable
-                    gdText.setColor(ContextCompat.getColor(requireContext(), R.color.blue))
+                    if (!mExtendedProps!!.getMiniBackgroundColor().isNullOrEmpty()) {
+                        gdText.setColor(Color.parseColor(mExtendedProps!!.getMiniBackgroundColor()))
+                    } else {
+                        gdText.setColor(ContextCompat.getColor(requireContext(), R.color.white))
+                    }
                     val gdImage = bindingLm.smallSquareImageLm.background as GradientDrawable
-                    gdImage.setColor(ContextCompat.getColor(requireContext(), R.color.blue))
+                    if (!mExtendedProps!!.getMiniBackgroundColor().isNullOrEmpty()) {
+                        gdImage.setColor(Color.parseColor(mExtendedProps!!.getMiniBackgroundColor()))
+                    } else {
+                        gdImage.setColor(ContextCompat.getColor(requireContext(), R.color.white))
+                    }
                     bindingLm.smallSquareBackgroundImageLm.visibility = View.GONE
                 }
                 bindingLm.smallCircleContainerLm.visibility = View.GONE
             }
             Shape.CIRCLE -> {
-                if (isBackgroundImage) {
-                    if(!isSmallImage) {
+                if (isMiniBackgroundImage) {
+                    if (!isSmallImage) {
                         Glide.with(requireActivity())
                             .asBitmap()
                             .transform(
@@ -982,27 +1423,37 @@ class InAppNotificationFragment : Fragment() {
                                     GranularRoundedCorners(0f, 500f, 500f, 0f)
                                 )
                             )
-                            .load("https://digitalsynopsis.com/wp-content/uploads/2019/11/color-schemes-palettes-feature-image.jpg")
+                            .load(mExtendedProps!!.getMiniBackgroundImage())
                             .into(bindingLm.smallCircleBackgroundImageLm)
                     }
                 } else {
                     bindingLm.smallCircleContainerLm.setBackgroundResource(R.drawable.right_half_circle)
                     bindingLm.smallCircleTextLm.setBackgroundResource(R.drawable.right_half_circle)
                     bindingLm.smallCircleImageLm.setBackgroundResource(R.drawable.right_half_circle)
-                    val gdCircle =
-                        bindingLm.smallCircleContainerLm.background as GradientDrawable
-                    gdCircle.setColor(ContextCompat.getColor(requireContext(), R.color.blue))
-                    val gdCircleText =
-                        bindingLm.smallCircleTextLm.background as GradientDrawable
-                    gdCircleText.setColor(ContextCompat.getColor(requireContext(), R.color.blue))
-                    val gdCircleImage =
-                        bindingLm.smallCircleImageLm.background as GradientDrawable
-                    gdCircleImage.setColor(ContextCompat.getColor(requireContext(), R.color.blue))
+                    val gdCircle = bindingLm.smallCircleContainerLm.background as GradientDrawable
+                    if (!mExtendedProps!!.getMiniBackgroundColor().isNullOrEmpty()) {
+                        gdCircle.setColor(Color.parseColor(mExtendedProps!!.getMiniBackgroundColor()))
+                    } else {
+                        gdCircle.setColor(ContextCompat.getColor(requireContext(), R.color.white))
+                    }
+                    val gdCircleText = bindingLm.smallCircleTextLm.background as GradientDrawable
+                    if (!mExtendedProps!!.getMiniBackgroundColor().isNullOrEmpty()) {
+                        gdCircleText.setColor(Color.parseColor(mExtendedProps!!.getMiniBackgroundColor()))
+                    } else {
+                        gdCircleText.setColor(ContextCompat.getColor(requireContext(), R.color.white))
+                    }
+                    val gdCircleImage = bindingLm.smallCircleImageLm.background as GradientDrawable
+                    if (!mExtendedProps!!.getMiniBackgroundColor().isNullOrEmpty()) {
+                        gdCircleImage.setColor(Color.parseColor(mExtendedProps!!.getMiniBackgroundColor()))
+                    } else {
+                        gdCircleImage.setColor(ContextCompat.getColor(requireContext(), R.color.white))
+                    }
                     bindingLm.smallCircleBackgroundImageLm.visibility = View.GONE
                 }
                 bindingLm.smallSquareContainerLm.visibility = View.GONE
             }
         }
+
         if (shape == Shape.CIRCLE) {
             if (!isArrow) {
                 bindingLm.arrowCircleLm.visibility = View.GONE
@@ -1012,7 +1463,11 @@ class InAppNotificationFragment : Fragment() {
             } else {
                 bindingLm.arrowCircleLm.text = getString(R.string.notification_left_arrow)
             }
-            bindingLm.arrowCircleLm.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+            if (!mExtendedProps!!.getArrowColor().isNullOrEmpty()) {
+                bindingLm.arrowCircleLm.setTextColor(Color.parseColor(mExtendedProps!!.getArrowColor()))
+            } else {
+                bindingLm.arrowCircleLm.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+            }
             if (isSmallImage) {
                 Glide.with(requireActivity())
                     .asBitmap()
@@ -1022,13 +1477,22 @@ class InAppNotificationFragment : Fragment() {
                             GranularRoundedCorners(0f, 500f, 500f, 0f)
                         )
                     )
-                    .load("https://www.kimbuldu.com/resimler/Dogus-Grubunu-Kim-Kurdu.jpg")
+                    .load(response!!.getActionData()!!.getContentMinimizedImage())
                     .into(bindingLm.smallCircleImageLm)
                 bindingLm.smallCircleTextLm.visibility = View.GONE
             } else {
-                bindingLm.smallCircleTextLm.text = "Discount"
-                bindingLm.smallCircleTextLm.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
-                bindingLm.smallCircleTextLm.typeface = Typeface.MONOSPACE
+                bindingLm.smallCircleTextLm.text =
+                    response!!.getActionData()!!.getContentMinimizedText()
+                if (!mExtendedProps!!.getMiniTextColor().isNullOrEmpty()) {
+                    bindingLm.smallCircleTextLm.setTextColor(
+                        Color.parseColor(
+                            mExtendedProps!!.getMiniTextColor()
+                        )
+                    )
+                } else {
+                    bindingLm.smallCircleTextLm.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+                }
+                bindingLm.smallCircleTextLm.typeface = mExtendedProps!!.getMiniFontFamily(requireActivity())
                 bindingLm.smallCircleImageLm.visibility = View.GONE
                 bindingLm.smallCircleTextLm.topDown = isTopToBottom
                 bindingLm.smallCircleTextLm.isCircle = true
@@ -1054,9 +1518,13 @@ class InAppNotificationFragment : Fragment() {
             } else {
                 bindingLm.arrowSquareLm.text = getString(R.string.notification_left_arrow)
             }
-            bindingLm.arrowSquareLm.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+            if (!mExtendedProps!!.getArrowColor().isNullOrEmpty()) {
+                bindingLm.arrowSquareLm.setTextColor(Color.parseColor(mExtendedProps!!.getArrowColor()))
+            } else {
+                bindingLm.arrowSquareLm.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+            }
             if (isSmallImage) {
-                if(shape == Shape.SOFT_EDGE) {
+                if (shape == Shape.SOFT_EDGE) {
                     Glide.with(requireActivity())
                         .asBitmap()
                         .transform(
@@ -1065,18 +1533,26 @@ class InAppNotificationFragment : Fragment() {
                                 GranularRoundedCorners(0f, 40f, 40f, 0f)
                             )
                         )
-                        .load("https://www.kimbuldu.com/resimler/Dogus-Grubunu-Kim-Kurdu.jpg")
+                        .load(response!!.getActionData()!!.getContentMinimizedImage())
                         .into(bindingLm.smallSquareImageLm)
                 } else {
-                    Picasso.get()
-                        .load("https://www.kimbuldu.com/resimler/Dogus-Grubunu-Kim-Kurdu.jpg")
+                    Picasso.get().load(response!!.getActionData()!!.getContentMinimizedImage())
                         .into(bindingLm.smallSquareImageLm)
                 }
                 bindingLm.smallSquareTextLm.visibility = View.GONE
             } else {
-                bindingLm.smallSquareTextLm.text = "Discount"
-                bindingLm.smallSquareTextLm.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
-                bindingLm.smallSquareTextLm.typeface = Typeface.MONOSPACE
+                bindingLm.smallSquareTextLm.text =
+                    response!!.getActionData()!!.getContentMinimizedText()
+                if (!mExtendedProps!!.getMiniTextColor().isNullOrEmpty()) {
+                    bindingLm.smallSquareTextLm.setTextColor(
+                        Color.parseColor(
+                            mExtendedProps!!.getMiniTextColor()
+                        )
+                    )
+                } else {
+                    bindingLm.smallSquareTextLm.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+                }
+                bindingLm.smallSquareTextLm.typeface = mExtendedProps!!.getMiniFontFamily(requireActivity())
                 bindingLm.smallSquareImageLm.visibility = View.GONE
                 bindingLm.smallSquareTextLm.topDown = isTopToBottom
                 bindingLm.smallCircleTextLm.isCircle = false
@@ -1094,28 +1570,64 @@ class InAppNotificationFragment : Fragment() {
                 }
             }
         }
-        if (isBackgroundImage) {
-            Picasso.get()
-                .load("https://digitalsynopsis.com/wp-content/uploads/2019/11/color-schemes-palettes-feature-image.jpg")
+
+        if (isMaxiBackgroundImage) {
+            Picasso.get().load(mExtendedProps!!.getMaxiBackgroundImage())
                 .into(bindingLm.bigBackgroundImageLm)
         } else {
-            bindingLm.bigContainerLm.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.blue))
+            if (!mExtendedProps!!.getMaxiBackgroundColor().isNullOrEmpty()) {
+                bindingLm.bigContainerLm.setBackgroundColor(Color.parseColor(mExtendedProps!!.getMaxiBackgroundColor()))
+            } else {
+                bindingLm.bigContainerLm.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.white))
+            }
             bindingLm.bigBackgroundImageLm.visibility = View.GONE
         }
-        Picasso.get().load("https://upload.wikimedia.org//wikipedia/en/a/a9/MarioNSMBUDeluxe.png")
-            .into(bindingLm.bigImageLm)
+
+        if (!response!!.getActionData()!!.getContentMaximizedImage().isNullOrEmpty()) {
+            Picasso.get().load(response!!.getActionData()!!.getContentMaximizedImage())
+                .into(bindingLm.bigImageLm)
+        }
+
         bindingLm.bigContainerLm.setOnClickListener {
-            // TODO : Check buttonInterface first
-            // TODO : send report here
-            val viewIntent =
-                Intent(Intent.ACTION_VIEW, Uri.parse("https://www.relateddigital.com/"))
-            requireActivity().startActivity(viewIntent)
-            endFragment()
+            val uriString = response!!.getActionData()!!.getAndroidLnk()
+            val buttonInterface: InAppButtonInterface? =
+                RelatedDigital.getInAppButtonInterface()
+            var report: MailSubReport?
+            try {
+                report = MailSubReport()
+                report.impression = response!!.getActionData()!!.getReport()!!.getImpression()
+                report.click = response!!.getActionData()!!.getReport()!!.getClick()
+            } catch (e: Exception) {
+                Log.e(LOG_TAG, "There is no report to send!")
+                e.printStackTrace()
+                report = null
+            }
+            if (report != null) {
+                RequestHandler.createInAppActionClickRequest(requireActivity(), report)
+            }
+            if (buttonInterface != null) {
+                RelatedDigital.setInAppButtonInterface(null)
+                buttonInterface.onPress(uriString)
+            } else {
+                if (!uriString.isNullOrEmpty()) {
+                    val uri: Uri
+                    try {
+                        uri = Uri.parse(uriString)
+                        val viewIntent = Intent(Intent.ACTION_VIEW, uri)
+                        requireActivity().startActivity(viewIntent)
+                    } catch (e: Exception) {
+                        Log.i(
+                            LOG_TAG,
+                            "Can't parse notification URI, will not take any action",
+                            e
+                        )
+                    }
+                }
+            }
         }
     }
 
     private fun adjustLb() {
-        //TODO : from real data here
         bindingLb.smallSquareContainerLb.visibility = View.VISIBLE
         bindingLb.smallCircleContainerLb.visibility = View.VISIBLE
         bindingLb.arrowSquareLb.visibility = View.VISIBLE
@@ -1127,23 +1639,31 @@ class InAppNotificationFragment : Fragment() {
         bindingLb.smallCircleBackgroundImageLb.visibility = View.VISIBLE
         bindingLb.smallSquareBackgroundImageLb.visibility = View.VISIBLE
         bindingLb.bigContainerLb.visibility = View.GONE
+
         when (shape) {
             Shape.SHARP_EDGE -> {
-                if (isBackgroundImage) {
-                    if(!isSmallImage) {
-                        Picasso.get()
-                            .load("https://digitalsynopsis.com/wp-content/uploads/2019/11/color-schemes-palettes-feature-image.jpg")
+                if (isMiniBackgroundImage) {
+                    if (!isSmallImage) {
+                        Picasso.get().load(mExtendedProps!!.getMiniBackgroundImage())
                             .into(bindingLb.smallSquareBackgroundImageLb)
                     }
                 } else {
-                    bindingLb.smallSquareContainerLb.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.blue))
+                    if (!mExtendedProps!!.getMiniBackgroundColor().isNullOrEmpty()) {
+                        bindingLb.smallSquareContainerLb.setBackgroundColor(
+                            Color.parseColor(
+                                mExtendedProps!!.getMiniBackgroundColor()
+                            )
+                        )
+                    } else {
+                        bindingLb.smallSquareContainerLb.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.white))
+                    }
                     bindingLb.smallSquareBackgroundImageLb.visibility = View.GONE
                 }
                 bindingLb.smallCircleContainerLb.visibility = View.GONE
             }
             Shape.SOFT_EDGE -> {
-                if (isBackgroundImage) {
-                    if(!isSmallImage) {
+                if (isMiniBackgroundImage) {
+                    if (!isSmallImage) {
                         Glide.with(requireActivity())
                             .asBitmap()
                             .transform(
@@ -1152,7 +1672,7 @@ class InAppNotificationFragment : Fragment() {
                                     GranularRoundedCorners(0f, 40f, 40f, 0f)
                                 )
                             )
-                            .load("https://digitalsynopsis.com/wp-content/uploads/2019/11/color-schemes-palettes-feature-image.jpg")
+                            .load(mExtendedProps!!.getMiniBackgroundImage())
                             .into(bindingLb.smallSquareBackgroundImageLb)
                     }
                 } else {
@@ -1160,18 +1680,30 @@ class InAppNotificationFragment : Fragment() {
                     bindingLb.smallSquareTextLb.setBackgroundResource(R.drawable.rounded_corners_right)
                     bindingLb.smallSquareImageLb.setBackgroundResource(R.drawable.rounded_corners_right)
                     val gd = bindingLb.smallSquareContainerLb.background as GradientDrawable
-                    gd.setColor(ContextCompat.getColor(requireContext(), R.color.blue))
+                    if (!mExtendedProps!!.getMiniBackgroundColor().isNullOrEmpty()) {
+                        gd.setColor(Color.parseColor(mExtendedProps!!.getMiniBackgroundColor()))
+                    } else {
+                        gd.setColor(ContextCompat.getColor(requireContext(), R.color.white))
+                    }
                     val gdText = bindingLb.smallSquareTextLb.background as GradientDrawable
-                    gdText.setColor(ContextCompat.getColor(requireContext(), R.color.blue))
+                    if (!mExtendedProps!!.getMiniBackgroundColor().isNullOrEmpty()) {
+                        gdText.setColor(Color.parseColor(mExtendedProps!!.getMiniBackgroundColor()))
+                    } else {
+                        gdText.setColor(ContextCompat.getColor(requireContext(), R.color.white))
+                    }
                     val gdImage = bindingLb.smallSquareImageLb.background as GradientDrawable
-                    gdImage.setColor(ContextCompat.getColor(requireContext(), R.color.blue))
+                    if (!mExtendedProps!!.getMiniBackgroundColor().isNullOrEmpty()) {
+                        gdImage.setColor(Color.parseColor(mExtendedProps!!.getMiniBackgroundColor()))
+                    } else {
+                        gdImage.setColor(ContextCompat.getColor(requireContext(), R.color.white))
+                    }
                     bindingLb.smallSquareBackgroundImageLb.visibility = View.GONE
                 }
                 bindingLb.smallCircleContainerLb.visibility = View.GONE
             }
             Shape.CIRCLE -> {
-                if (isBackgroundImage) {
-                    if(!isSmallImage) {
+                if (isMiniBackgroundImage) {
+                    if (!isSmallImage) {
                         Glide.with(requireActivity())
                             .asBitmap()
                             .transform(
@@ -1180,27 +1712,37 @@ class InAppNotificationFragment : Fragment() {
                                     GranularRoundedCorners(0f, 500f, 500f, 0f)
                                 )
                             )
-                            .load("https://digitalsynopsis.com/wp-content/uploads/2019/11/color-schemes-palettes-feature-image.jpg")
+                            .load(mExtendedProps!!.getMiniBackgroundImage())
                             .into(bindingLb.smallCircleBackgroundImageLb)
                     }
                 } else {
                     bindingLb.smallCircleContainerLb.setBackgroundResource(R.drawable.right_half_circle)
                     bindingLb.smallCircleTextLb.setBackgroundResource(R.drawable.right_half_circle)
                     bindingLb.smallCircleImageLb.setBackgroundResource(R.drawable.right_half_circle)
-                    val gdCircle =
-                        bindingLb.smallCircleContainerLb.background as GradientDrawable
-                    gdCircle.setColor(ContextCompat.getColor(requireContext(), R.color.blue))
-                    val gdCircleText =
-                        bindingLb.smallCircleTextLb.background as GradientDrawable
-                    gdCircleText.setColor(ContextCompat.getColor(requireContext(), R.color.blue))
-                    val gdCircleImage =
-                        bindingLb.smallCircleImageLb.background as GradientDrawable
-                    gdCircleImage.setColor(ContextCompat.getColor(requireContext(), R.color.blue))
+                    val gdCircle = bindingLb.smallCircleContainerLb.background as GradientDrawable
+                    if (!mExtendedProps!!.getMiniBackgroundColor().isNullOrEmpty()) {
+                        gdCircle.setColor(Color.parseColor(mExtendedProps!!.getMiniBackgroundColor()))
+                    } else {
+                        gdCircle.setColor(ContextCompat.getColor(requireContext(), R.color.white))
+                    }
+                    val gdCircleText = bindingLb.smallCircleTextLb.background as GradientDrawable
+                    if (!mExtendedProps!!.getMiniBackgroundColor().isNullOrEmpty()) {
+                        gdCircleText.setColor(Color.parseColor(mExtendedProps!!.getMiniBackgroundColor()))
+                    } else {
+                        gdCircleText.setColor(ContextCompat.getColor(requireContext(), R.color.white))
+                    }
+                    val gdCircleImage = bindingLb.smallCircleImageLb.background as GradientDrawable
+                    if (!mExtendedProps!!.getMiniBackgroundColor().isNullOrEmpty()) {
+                        gdCircleImage.setColor(Color.parseColor(mExtendedProps!!.getMiniBackgroundColor()))
+                    } else {
+                        gdCircleImage.setColor(ContextCompat.getColor(requireContext(), R.color.white))
+                    }
                     bindingLb.smallCircleBackgroundImageLb.visibility = View.GONE
                 }
                 bindingLb.smallSquareContainerLb.visibility = View.GONE
             }
         }
+
         if (shape == Shape.CIRCLE) {
             if (!isArrow) {
                 bindingLb.arrowCircleLb.visibility = View.GONE
@@ -1210,7 +1752,11 @@ class InAppNotificationFragment : Fragment() {
             } else {
                 bindingLb.arrowCircleLb.text = getString(R.string.notification_left_arrow)
             }
-            bindingLb.arrowCircleLb.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+            if (!mExtendedProps!!.getArrowColor().isNullOrEmpty()) {
+                bindingLb.arrowCircleLb.setTextColor(Color.parseColor(mExtendedProps!!.getArrowColor()))
+            } else {
+                bindingLb.arrowCircleLb.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+            }
             if (isSmallImage) {
                 Glide.with(requireActivity())
                     .asBitmap()
@@ -1220,13 +1766,22 @@ class InAppNotificationFragment : Fragment() {
                             GranularRoundedCorners(0f, 500f, 500f, 0f)
                         )
                     )
-                    .load("https://www.kimbuldu.com/resimler/Dogus-Grubunu-Kim-Kurdu.jpg")
+                    .load(response!!.getActionData()!!.getContentMinimizedImage())
                     .into(bindingLb.smallCircleImageLb)
                 bindingLb.smallCircleTextLb.visibility = View.GONE
             } else {
-                bindingLb.smallCircleTextLb.text = "Discount"
-                bindingLb.smallCircleTextLb.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
-                bindingLb.smallCircleTextLb.typeface = Typeface.MONOSPACE
+                bindingLb.smallCircleTextLb.text =
+                    response!!.getActionData()!!.getContentMinimizedText()
+                if (!mExtendedProps!!.getMiniTextColor().isNullOrEmpty()) {
+                    bindingLb.smallCircleTextLb.setTextColor(
+                        Color.parseColor(
+                            mExtendedProps!!.getMiniTextColor()
+                        )
+                    )
+                } else {
+                    bindingLb.smallCircleTextLb.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+                }
+                bindingLb.smallCircleTextLb.typeface = mExtendedProps!!.getMiniFontFamily(requireActivity())
                 bindingLb.smallCircleImageLb.visibility = View.GONE
                 bindingLb.smallCircleTextLb.topDown = isTopToBottom
                 bindingLb.smallCircleTextLb.isCircle = true
@@ -1252,9 +1807,13 @@ class InAppNotificationFragment : Fragment() {
             } else {
                 bindingLb.arrowSquareLb.text = getString(R.string.notification_left_arrow)
             }
-            bindingLb.arrowSquareLb.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+            if (!mExtendedProps!!.getArrowColor().isNullOrEmpty()) {
+                bindingLb.arrowSquareLb.setTextColor(Color.parseColor(mExtendedProps!!.getArrowColor()))
+            } else {
+                bindingLb.arrowSquareLb.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+            }
             if (isSmallImage) {
-                if(shape == Shape.SOFT_EDGE) {
+                if (shape == Shape.SOFT_EDGE) {
                     Glide.with(requireActivity())
                         .asBitmap()
                         .transform(
@@ -1263,18 +1822,26 @@ class InAppNotificationFragment : Fragment() {
                                 GranularRoundedCorners(0f, 40f, 40f, 0f)
                             )
                         )
-                        .load("https://www.kimbuldu.com/resimler/Dogus-Grubunu-Kim-Kurdu.jpg")
+                        .load(response!!.getActionData()!!.getContentMinimizedImage())
                         .into(bindingLb.smallSquareImageLb)
                 } else {
-                    Picasso.get()
-                        .load("https://www.kimbuldu.com/resimler/Dogus-Grubunu-Kim-Kurdu.jpg")
+                    Picasso.get().load(response!!.getActionData()!!.getContentMinimizedImage())
                         .into(bindingLb.smallSquareImageLb)
                 }
                 bindingLb.smallSquareTextLb.visibility = View.GONE
             } else {
-                bindingLb.smallSquareTextLb.text = "Discount"
-                bindingLb.smallSquareTextLb.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
-                bindingLb.smallSquareTextLb.typeface = Typeface.MONOSPACE
+                bindingLb.smallSquareTextLb.text =
+                    response!!.getActionData()!!.getContentMinimizedText()
+                if (!mExtendedProps!!.getMiniTextColor().isNullOrEmpty()) {
+                    bindingLb.smallSquareTextLb.setTextColor(
+                        Color.parseColor(
+                            mExtendedProps!!.getMiniTextColor()
+                        )
+                    )
+                } else {
+                    bindingLb.smallSquareTextLb.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+                }
+                bindingLb.smallSquareTextLb.typeface = mExtendedProps!!.getMiniFontFamily(requireActivity())
                 bindingLb.smallSquareImageLb.visibility = View.GONE
                 bindingLb.smallSquareTextLb.topDown = isTopToBottom
                 bindingLb.smallCircleTextLb.isCircle = false
@@ -1292,29 +1859,66 @@ class InAppNotificationFragment : Fragment() {
                 }
             }
         }
-        if (isBackgroundImage) {
-            Picasso.get()
-                .load("https://digitalsynopsis.com/wp-content/uploads/2019/11/color-schemes-palettes-feature-image.jpg")
+
+        if (isMaxiBackgroundImage) {
+            Picasso.get().load(mExtendedProps!!.getMaxiBackgroundImage())
                 .into(bindingLb.bigBackgroundImageLb)
         } else {
-            bindingLb.bigContainerLb.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.blue))
+            if (!mExtendedProps!!.getMaxiBackgroundColor().isNullOrEmpty()) {
+                bindingLb.bigContainerLb.setBackgroundColor(Color.parseColor(mExtendedProps!!.getMaxiBackgroundColor()))
+            } else {
+                bindingLb.bigContainerLb.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.white))
+            }
             bindingLb.bigBackgroundImageLb.visibility = View.GONE
         }
-        Picasso.get().load("https://upload.wikimedia.org//wikipedia/en/a/a9/MarioNSMBUDeluxe.png")
-            .into(bindingLb.bigImageLb)
+
+        if (!response!!.getActionData()!!.getContentMaximizedImage().isNullOrEmpty()) {
+            Picasso.get().load(response!!.getActionData()!!.getContentMaximizedImage())
+                .into(bindingLb.bigImageLb)
+        }
+
         bindingLb.bigContainerLb.setOnClickListener {
-            // TODO : Check buttonInterface first
-            // TODO : send report here
-            val viewIntent =
-                Intent(Intent.ACTION_VIEW, Uri.parse("https://www.relateddigital.com/"))
-            requireActivity().startActivity(viewIntent)
-            endFragment()
+            val uriString = response!!.getActionData()!!.getAndroidLnk()
+            val buttonInterface: InAppButtonInterface? =
+                RelatedDigital.getInAppButtonInterface()
+            var report: MailSubReport?
+            try {
+                report = MailSubReport()
+                report.impression = response!!.getActionData()!!.getReport()!!.getImpression()
+                report.click = response!!.getActionData()!!.getReport()!!.getClick()
+            } catch (e: Exception) {
+                Log.e(LOG_TAG, "There is no report to send!")
+                e.printStackTrace()
+                report = null
+            }
+            if (report != null) {
+                RequestHandler.createInAppActionClickRequest(requireActivity(), report)
+            }
+            if (buttonInterface != null) {
+                RelatedDigital.setInAppButtonInterface(null)
+                buttonInterface.onPress(uriString)
+            } else {
+                if (!uriString.isNullOrEmpty()) {
+                    val uri: Uri
+                    try {
+                        uri = Uri.parse(uriString)
+                        val viewIntent = Intent(Intent.ACTION_VIEW, uri)
+                        requireActivity().startActivity(viewIntent)
+                    } catch (e: Exception) {
+                        Log.i(
+                            LOG_TAG,
+                            "Can't parse notification URI, will not take any action",
+                            e
+                        )
+                    }
+                }
+            }
         }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        // TODO : save mModel here
+        outState.putSerializable("drawer", response)
     }
 
     private fun endFragment() {
@@ -1335,7 +1939,7 @@ class InAppNotificationFragment : Fragment() {
          * @param model Parameter 1.
          * @return A new instance of fragment InAppNotificationFragment.
          */
-        fun newInstance(model: InAppNotificationModel): InAppNotificationFragment {
+        fun newInstance(model: Drawer): InAppNotificationFragment {
             val fragment = InAppNotificationFragment()
             val args = Bundle()
             args.putSerializable(ARG_PARAM1, model)

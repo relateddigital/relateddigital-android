@@ -4,6 +4,7 @@ import android.app.Activity
 import android.app.ActivityManager
 import android.app.ActivityManager.RunningAppProcessInfo
 import android.content.Context
+import android.content.Intent
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
@@ -27,7 +28,6 @@ import com.relateddigital.relateddigital_android.recommendation.VisilabsTargetFi
 import com.relateddigital.relateddigital_android.remoteConfig.RemoteConfigHelper
 import com.relateddigital.relateddigital_android.util.*
 import org.json.JSONObject
-import java.util.*
 
 
 object RelatedDigital {
@@ -272,17 +272,20 @@ object RelatedDigital {
     }
 
     @JvmStatic
-    fun setIsGeofenceEnabled(context: Context, isGeofenceEnabled: Boolean) {
+    fun setIsGeofenceEnabled(context: Context, isGeofenceEnabled: Boolean, geofencingIntervalInMinute: Int = 15) {
         if (model != null) {
             model!!.setIsGeofenceEnabled(context, isGeofenceEnabled)
+            model!!.setGeofencingIntervalInMinute(context, geofencingIntervalInMinute)
         } else {
             if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
                 model = Gson().fromJson(SharedPref.readString(context,
                         Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
                 model!!.setIsGeofenceEnabled(context, isGeofenceEnabled)
+                model!!.setGeofencingIntervalInMinute(context, geofencingIntervalInMinute)
             } else {
                 model = createInitialModel(context)
                 model!!.setIsGeofenceEnabled(context, isGeofenceEnabled)
+                model!!.setGeofencingIntervalInMinute(context, geofencingIntervalInMinute)
             }
         }
 
@@ -1278,6 +1281,12 @@ object RelatedDigital {
         } else {
             Log.e(LOG_TAG, "Call RelatedDigital.init() first")
         }
+    }
+
+    @JvmStatic
+    fun requestLocationPermission(activity: Activity) {
+        val intent = Intent(activity, PermissionActivity::class.java)
+        activity.startActivity(intent)
     }
 
     @JvmStatic

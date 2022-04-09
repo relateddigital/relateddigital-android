@@ -1,5 +1,6 @@
 package com.relateddigital.androidexampleapp
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -15,10 +16,8 @@ import com.relateddigital.relateddigital_android.inapp.VisilabsCallback
 import com.relateddigital.relateddigital_android.inapp.VisilabsResponse
 import com.relateddigital.relateddigital_android.inapp.countdowntimer.CountdownTimerFragment
 import com.relateddigital.relateddigital_android.inapp.mailsubsform.MailSubscriptionFormHalfFragment
-import com.relateddigital.relateddigital_android.inapp.notification.InAppNotificationFragment
 import com.relateddigital.relateddigital_android.inapp.shaketowin.ShakeToWinActivity
 import com.relateddigital.relateddigital_android.model.FavsResponse
-import com.relateddigital.relateddigital_android.model.InAppNotificationModel
 import com.relateddigital.relateddigital_android.model.MailSubscriptionFormHalf
 import java.util.*
 
@@ -28,11 +27,14 @@ class InAppNotificationActivity : AppCompatActivity() {
         private const val LOG_TAG = "InAppNotificationActivity"
     }
     private lateinit var binding: ActivityInAppNotificationExampleBinding
+    private lateinit var activiy: Activity
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityInAppNotificationExampleBinding.inflate(layoutInflater)
         val view: View = binding.root
         setContentView(view)
+
+        activiy = this
 
         setupUi()
     }
@@ -207,16 +209,7 @@ class InAppNotificationActivity : AppCompatActivity() {
         }
 
         binding.notification.setOnClickListener {
-            val inAppNotificationFragment = InAppNotificationFragment.newInstance(
-                InAppNotificationModel()
-            )
-
-            val transaction = supportFragmentManager.beginTransaction()
-            transaction.replace(android.R.id.content, inAppNotificationFragment)
-            transaction.commit()
-            //TODO : When BE is ready
-            //sendInAppRequest("notification")
-
+            sendInAppRequest("drawer")
         }
 
         binding.mailSubsFormHalfButton.setOnClickListener {
@@ -230,6 +223,10 @@ class InAppNotificationActivity : AppCompatActivity() {
             //TODO : When BE is ready
             //sendInAppRequest("mail_subs_form_2")
 
+        }
+
+        binding.geofencingButton.setOnClickListener {
+            RelatedDigital.requestLocationPermission(activiy)
         }
     }
 

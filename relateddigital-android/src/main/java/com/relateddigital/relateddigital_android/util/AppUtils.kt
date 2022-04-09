@@ -198,7 +198,8 @@ object AppUtils {
     }
 
     fun getUserAgent(): String {
-        return System.getProperty("http.agent")!!
+        val regex = Regex("[^A-Za-z0-9]")
+        return regex.replace(System.getProperty("http.agent")!!, "")
     }
 
     fun getDeviceType(): String {

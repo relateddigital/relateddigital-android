@@ -11,6 +11,7 @@ import com.relateddigital.relateddigital_android.api.*
 import com.relateddigital.relateddigital_android.constants.Constants
 import com.relateddigital.relateddigital_android.inapp.InAppManager
 import com.relateddigital.relateddigital_android.inapp.VisilabsResponse
+import com.relateddigital.relateddigital_android.inapp.notification.InAppNotificationFragment
 import com.relateddigital.relateddigital_android.inapp.scratchtowin.ScratchToWinActivity
 import com.relateddigital.relateddigital_android.inapp.socialproof.SocialProofFragment
 import com.relateddigital.relateddigital_android.inapp.spintowin.SpinToWinActivity
@@ -251,6 +252,15 @@ object RequestSender {
 
                                             val transaction : FragmentTransaction= (currentRequest.parent!! as FragmentActivity).supportFragmentManager.beginTransaction()
                                             transaction.replace(android.R.id.content, socialProofFragment)
+                                            transaction.commit()
+                                        }
+                                        actionsResponse.mDrawer!!.isNotEmpty() -> {
+                                            val inAppNotificationFragment = InAppNotificationFragment.newInstance(
+                                                actionsResponse.mDrawer!![0]
+                                            )
+
+                                            val transaction : FragmentTransaction= (currentRequest.parent!! as FragmentActivity).supportFragmentManager.beginTransaction()
+                                            transaction.replace(android.R.id.content, inAppNotificationFragment)
                                             transaction.commit()
                                         }
                                         else -> {
