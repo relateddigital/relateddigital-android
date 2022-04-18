@@ -15,10 +15,12 @@ import com.relateddigital.relateddigital_android.constants.Constants
 import com.relateddigital.relateddigital_android.inapp.VisilabsCallback
 import com.relateddigital.relateddigital_android.inapp.VisilabsResponse
 import com.relateddigital.relateddigital_android.inapp.countdowntimer.CountdownTimerFragment
+import com.relateddigital.relateddigital_android.inapp.giftcatch.GiftCatchActivity
 import com.relateddigital.relateddigital_android.inapp.mailsubsform.MailSubscriptionFormHalfFragment
 import com.relateddigital.relateddigital_android.inapp.shaketowin.ShakeToWinActivity
 import com.relateddigital.relateddigital_android.model.FavsResponse
 import com.relateddigital.relateddigital_android.model.MailSubscriptionFormHalf
+import com.relateddigital.relateddigital_android.util.ActivityUtils
 import java.util.*
 
 
@@ -27,14 +29,14 @@ class InAppNotificationActivity : AppCompatActivity() {
         private const val LOG_TAG = "InAppNotificationActivity"
     }
     private lateinit var binding: ActivityInAppNotificationExampleBinding
-    private lateinit var activiy: Activity
+    private lateinit var activity: Activity
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityInAppNotificationExampleBinding.inflate(layoutInflater)
         val view: View = binding.root
         setContentView(view)
 
-        activiy = this
+        activity = this
 
         setupUi()
     }
@@ -226,7 +228,13 @@ class InAppNotificationActivity : AppCompatActivity() {
         }
 
         binding.geofencingButton.setOnClickListener {
-            RelatedDigital.requestLocationPermission(activiy)
+            RelatedDigital.requestLocationPermission(activity)
+        }
+
+        binding.giftCatchButton.setOnClickListener {
+            ActivityUtils.parentActivity = activity
+            val intent = Intent(activity, GiftCatchActivity::class.java)
+            startActivity(intent)
         }
     }
 

@@ -29,6 +29,11 @@
             android:noHistory="true"
             android:screenOrientation="portrait" />
         <activity
+            android:name=".inapp.giftcatch.GiftCatchActivity"
+            android:configChanges="orientation"
+            android:noHistory="true"
+            android:screenOrientation="portrait" />
+        <activity
             android:name=".inapp.inappmessages.InAppFullActivity"
             android:noHistory="true"
             android:theme="@style/Theme.AppCompat.Light.Dialog.Alert" />
