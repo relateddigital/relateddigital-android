@@ -80,6 +80,9 @@ class ActionData : Serializable {
     @SerializedName("number_colors")
     var mNumberColors: Array<String?>? = null
 
+    @SerializedName("number_range")
+    var mNumberRange: String? = null
+
     @SerializedName("qs")
     var mQs: String? = null
 

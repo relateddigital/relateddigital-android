@@ -702,8 +702,10 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
             colors[i] = Color.parseColor(mInAppMessage!!.mActionData!!.mNumberColors!![i])
         }
 
-        //TODO : real control here for isFromZero parameter when BE ready
-        val isFromZero = false
+        var isFromZero = false
+        if(!mInAppMessage!!.mActionData!!.mNumberRange.isNullOrEmpty()){
+            isFromZero = mInAppMessage!!.mActionData!!.mNumberRange == "0-10"
+        }
         binding.npsWithNumbersView.setColors(colors, isFromZero)
     }
 
