@@ -199,5 +199,7 @@ class Constants {
         const val BUTTON_LINK = "link"
         const val BUTTON_REDIRECT = "redirect"
 
+        const val BANNER_CAROUSEL_ACTION_TYPE_VAL = "BannerTest" // TODO fix this after BE gets ready
+
     }
 }

@@ -41,9 +41,12 @@
     <string name="mail_subs_form_half">MAIL SUBS FORM 2</string>
     <string name="geofence">GEOFENCING</string>
     <string name="gift_catch">GIFT CATCH</string>
+    <string name="banner_carousel">BANNER CAROUSEL PAGE</string>
 
     <string name="story_id_optional">Story ID (optional)</string>
+    <string name="banner_id_optional">Banner ID (optional)</string>
     <string name="show_story">Show Story</string>
+    <string name="show_banner">Show Banner</string>
     <string name="clear_story_cache">Clear Story Cache</string>
 
 

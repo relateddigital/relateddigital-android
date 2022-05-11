@@ -42,5 +42,10 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(this@MainActivity, StoryDemoActivity::class.java)
             startActivity(intent)
         }
+
+        binding.bannerCarouselPage.setOnClickListener {
+            val intent = Intent(this@MainActivity, BannerCarouselDemoActivity::class.java)
+            startActivity(intent)
+        }
     }
 }
