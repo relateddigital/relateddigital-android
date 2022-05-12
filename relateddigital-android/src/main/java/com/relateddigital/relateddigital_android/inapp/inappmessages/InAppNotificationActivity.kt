@@ -19,6 +19,8 @@ import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SnapHelper
 import com.bumptech.glide.Glide
+import com.google.android.exoplayer2.ExoPlayer
+import com.google.android.exoplayer2.MediaItem
 import com.relateddigital.relateddigital_android.R
 import com.relateddigital.relateddigital_android.RelatedDigital
 import com.relateddigital.relateddigital_android.constants.Constants
@@ -58,6 +60,7 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
     private var buttonCallback: InAppButtonInterface? = null
     private var isNpsSecondPopupButtonClicked = false
     private var isNpsSecondPopupActivated = false
+    private var player: ExoPlayer? = null
     @SuppressLint("ClickableViewAccessibility")
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -79,7 +82,7 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
                 binding = ActivityInAppNotificationBinding.inflate(layoutInflater)
                 view = binding.root
             }
-            cacheImages()
+            cacheResources()
             setContentView(view)
             if (isShowingInApp) {
                 if (mInAppMessage!!.mActionData!!.mMsgType == InAppNotificationType.CAROUSEL.toString()) {
@@ -115,6 +118,7 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
     private fun setUpView() {
         if (!mInAppMessage!!.mActionData!!.mImg.isNullOrEmpty()) {
             binding.ivTemplate.visibility = View.VISIBLE
+            binding.videoView.visibility = View.GONE
             if(AppUtils.isAnImage(mInAppMessage!!.mActionData!!.mImg)) {
                 Picasso.get().load(mInAppMessage!!.mActionData!!.mImg!!).into(binding.ivTemplate)
             } else {
@@ -124,6 +128,8 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
             }
         } else {
             binding.ivTemplate.visibility = View.GONE
+            binding.videoView.visibility = View.VISIBLE
+            startPlayer()
         }
         binding.smileRating.setOnSmileySelectionListener(this)
         binding.smileRating.setOnRatingSelectedListener(this)
@@ -747,6 +753,7 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
 
     override fun onDestroy() {
         super.onDestroy()
+        releasePlayer()
         if (mInAppMessage != null) {
             if (mIsRotation) {
                 mIsRotation = false
@@ -782,7 +789,7 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
         carouselAdapter.setMessage(mInAppMessage)
     }
 
-    private fun cacheImages() {
+    private fun cacheResources() {
         if (!mInAppMessage!!.mActionData!!.mImg.isNullOrEmpty()) {
             if(AppUtils.isAnImage(mInAppMessage!!.mActionData!!.mImg)) {
                 Picasso.get().load(mInAppMessage!!.mActionData!!.mImg).fetch()
@@ -800,6 +807,30 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
                 }
             }
         }
+
+        if(true) { // TODO : if !video.isNullOrEmpty():
+            initializePlayer()
+        }
+    }
+
+    private fun initializePlayer() {
+        player = ExoPlayer.Builder(this).build()
+        binding.videoView.player = player
+        val mediaItem = MediaItem.fromUri(
+            "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4") //TODO : real url here
+        player!!.setMediaItem(mediaItem)
+        player!!.prepare()
+    }
+
+    private fun startPlayer() {
+        player!!.playWhenReady = true
+    }
+
+    private fun releasePlayer() {
+        if (player != null) {
+            player!!.release()
+            player = null
+        }
     }
 
     companion object {
@@ -810,6 +841,7 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
 
     override fun onFinish() {
         InAppUpdateDisplayState.releaseDisplayState(mIntentId)
+        releasePlayer()
         finish()
     }
 
