@@ -494,6 +494,7 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
             }
         }
         binding.btnTemplate.setOnClickListener {
+            releasePlayer()
             if (binding.ratingBar.rating != 0f) {
                 if (secondPopUpType == NpsSecondPopUpType.FEEDBACK_FORM) {
                     if (isRatingAboveThreshold) {
@@ -532,6 +533,7 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
             NpsSecondPopUpType.IMAGE_TEXT_BUTTON -> {
                 bindingSecondPopUp.commentBox.visibility = View.GONE
                 bindingSecondPopUp.imageView2.visibility = View.GONE
+                bindingSecondPopUp.secondVideoView2.visibility = View.GONE
                 if (!mInAppMessage!!.mActionData!!.mPromotionCode.isNullOrEmpty()) {
                     bindingSecondPopUp.couponContainer.setBackgroundColor(Color.parseColor(
                             mInAppMessage!!.mActionData!!.mPromoCodeBackgroundColor
@@ -554,6 +556,8 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
                 bindingSecondPopUp.commentBox.visibility = View.GONE
                 bindingSecondPopUp.couponContainer.visibility = View.GONE
                 if (!mInAppMessage!!.mActionData!!.mSecondPopupImg2.isNullOrEmpty()) {
+                    bindingSecondPopUp.imageView2.visibility = View.VISIBLE
+                    bindingSecondPopUp.secondVideoView2.visibility = View.GONE
                     if(AppUtils.isAnImage(mInAppMessage!!.mActionData!!.mSecondPopupImg2)) {
                         Picasso.get().load(mInAppMessage!!.mActionData!!.mSecondPopupImg2)
                             .into(bindingSecondPopUp.imageView2)
@@ -562,10 +566,25 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
                             .load(mInAppMessage!!.mActionData!!.mSecondPopupImg2)
                             .into(bindingSecondPopUp.imageView2)
                     }
+                } else {
+                    bindingSecondPopUp.imageView2.visibility = View.GONE
+                    if(true) { // TODO : if !video.isNullOrEmpty():
+                        bindingSecondPopUp.secondVideoView2.visibility = View.VISIBLE
+                        player = ExoPlayer.Builder(this).build()
+                        bindingSecondPopUp.secondVideoView2.player = player
+                        val mediaItem = MediaItem.fromUri("http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4") // TODO : real url here
+                        player!!.setMediaItem(mediaItem)
+                        player!!.prepare()
+                        startPlayer()
+                    } else {
+                        bindingSecondPopUp.secondVideoView2.visibility = View.GONE
+                        releasePlayer()
+                    }
                 }
             }
             NpsSecondPopUpType.FEEDBACK_FORM -> {
                 bindingSecondPopUp.imageView2.visibility = View.GONE
+                bindingSecondPopUp.secondVideoView2.visibility = View.GONE
                 bindingSecondPopUp.couponContainer.visibility = View.GONE
             }
         }
@@ -583,6 +602,8 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
             }
         }
         if (!mInAppMessage!!.mActionData!!.mSecondPopupImg1.isNullOrEmpty()) {
+            bindingSecondPopUp.imageView.visibility = View.VISIBLE
+            bindingSecondPopUp.secondVideoView.visibility = View.GONE
             if(AppUtils.isAnImage(mInAppMessage!!.mActionData!!.mSecondPopupImg1)) {
                 Picasso.get().load(mInAppMessage!!.mActionData!!.mSecondPopupImg1)
                     .into(bindingSecondPopUp.imageView)
@@ -590,6 +611,20 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
                 Glide.with(this)
                     .load(mInAppMessage!!.mActionData!!.mSecondPopupImg1)
                     .into(bindingSecondPopUp.imageView)
+            }
+        } else {
+            bindingSecondPopUp.imageView.visibility = View.GONE
+            if(true) { // TODO : if !video.isNullOrEmpty():
+                bindingSecondPopUp.secondVideoView.visibility = View.VISIBLE
+                player = ExoPlayer.Builder(this).build()
+                bindingSecondPopUp.secondVideoView.player = player
+                val mediaItem = MediaItem.fromUri("http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4") // TODO : real url here
+                player!!.setMediaItem(mediaItem)
+                player!!.prepare()
+                startPlayer()
+            } else {
+                bindingSecondPopUp.secondVideoView.visibility = View.GONE
+                releasePlayer()
             }
         }
         bindingSecondPopUp.titleView.typeface = mInAppMessage!!.mActionData!!.getFontFamily(this)
@@ -821,8 +856,7 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
     private fun initializePlayer() {
         player = ExoPlayer.Builder(this).build()
         binding.videoView.player = player
-        val mediaItem = MediaItem.fromUri(
-            "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4") //TODO : real url here
+        val mediaItem = MediaItem.fromUri("http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4") // TODO : real url here
         player!!.setMediaItem(mediaItem)
         player!!.prepare()
     }
