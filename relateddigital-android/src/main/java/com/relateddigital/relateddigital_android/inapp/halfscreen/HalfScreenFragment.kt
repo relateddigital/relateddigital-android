@@ -12,6 +12,8 @@ import android.view.ViewGroup
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.bumptech.glide.Glide
+import com.google.android.exoplayer2.ExoPlayer
+import com.google.android.exoplayer2.MediaItem
 import com.relateddigital.relateddigital_android.R
 import com.relateddigital.relateddigital_android.RelatedDigital
 import com.relateddigital.relateddigital_android.databinding.FragmentHalfScreenBinding
@@ -58,6 +60,7 @@ class HalfScreenFragment : Fragment() {
     private var mInAppMessage: InAppMessage? = null
     private var mIsTop = false
     private lateinit var binding: FragmentHalfScreenBinding
+    private var player: ExoPlayer? = null
 
     fun HalfScreenFragment() {
         // Required empty public constructor
@@ -104,6 +107,26 @@ class HalfScreenFragment : Fragment() {
     }
 
     private fun adjustTop() {
+        binding.halfScreenContainerTop.setOnClickListener {
+            val uriString: String? = mInAppMessage!!.mActionData!!.mAndroidLnk
+            val buttonInterface: InAppButtonInterface? = RelatedDigital.getInAppButtonInterface()
+            RequestHandler.createInAppNotificationClickRequest(requireActivity(), mInAppMessage, null)
+            if (buttonInterface != null) {
+                RelatedDigital.setInAppButtonInterface(null)
+                buttonInterface.onPress(uriString)
+            } else {
+                if (!uriString.isNullOrEmpty()) {
+                    try {
+                        val uri: Uri = Uri.parse(uriString)
+                        val viewIntent = Intent(Intent.ACTION_VIEW, uri)
+                        requireActivity().startActivity(viewIntent)
+                    } catch (e: Exception) {
+                        Log.i(LOG_TAG, "Can't parse notification URI, will not take any action", e)
+                    }
+                }
+            }
+            endFragment()
+        }
         if (!mInAppMessage!!.mActionData!!.mMsgTitle.isNullOrEmpty()) {
             binding.halfScreenContainerTop.setBackgroundColor(Color.parseColor(mInAppMessage!!.mActionData!!.mBackground))
             binding.topTitleView.text = mInAppMessage!!.mActionData!!.mMsgTitle
@@ -113,15 +136,33 @@ class HalfScreenFragment : Fragment() {
         } else {
             binding.topTitleView.visibility = View.GONE
         }
-        if(AppUtils.isAnImage(mInAppMessage!!.mActionData!!.mImg)) {
-            Picasso.get().load(mInAppMessage!!.mActionData!!.mImg)
-                .into(binding.topImageView)
+        if (!mInAppMessage!!.mActionData!!.mImg.isNullOrEmpty()) {
+            binding.topImageView.visibility = View.VISIBLE
+            binding.topVideoView.visibility = View.GONE
+            if (AppUtils.isAnImage(mInAppMessage!!.mActionData!!.mImg)) {
+                Picasso.get().load(mInAppMessage!!.mActionData!!.mImg)
+                    .into(binding.topImageView)
+            } else {
+                Glide.with(requireActivity())
+                    .load(mInAppMessage!!.mActionData!!.mImg)
+                    .into(binding.topImageView)
+            }
         } else {
-            Glide.with(requireActivity())
-                .load(mInAppMessage!!.mActionData!!.mImg)
-                .into(binding.topImageView)
+            binding.topImageView.visibility = View.GONE
+            if(true) { // TODO : if !video.isNullOrEmpty():
+                binding.topVideoView.visibility = View.VISIBLE
+                initializePlayer()
+                startPlayer()
+            } else {
+                binding.topVideoView.visibility = View.GONE
+                releasePlayer()
+            }
         }
-        binding.topImageView.setOnClickListener {
+        binding.halfScreenContainerBot.visibility = View.GONE
+    }
+
+    private fun adjustBottom() {
+        binding.halfScreenContainerBot.setOnClickListener {
             val uriString: String? = mInAppMessage!!.mActionData!!.mAndroidLnk
             val buttonInterface: InAppButtonInterface? = RelatedDigital.getInAppButtonInterface()
             RequestHandler.createInAppNotificationClickRequest(requireActivity(), mInAppMessage, null)
@@ -141,10 +182,6 @@ class HalfScreenFragment : Fragment() {
             }
             endFragment()
         }
-        binding.halfScreenContainerBot.visibility = View.GONE
-    }
-
-    private fun adjustBottom() {
         if (!mInAppMessage!!.mActionData!!.mMsgTitle.isNullOrEmpty()) {
             binding.halfScreenContainerBot.setBackgroundColor(Color.parseColor(mInAppMessage!!.mActionData!!.mBackground))
             binding.botTitleView.text = mInAppMessage!!.mActionData!!.mMsgTitle
@@ -154,33 +191,27 @@ class HalfScreenFragment : Fragment() {
         } else {
             binding.botTitleView.visibility = View.GONE
         }
-        if(AppUtils.isAnImage(mInAppMessage!!.mActionData!!.mImg)) {
-            Picasso.get().load(mInAppMessage!!.mActionData!!.mImg)
-                .into(binding.botImageView)
-        } else {
-            Glide.with(requireActivity())
-                .load(mInAppMessage!!.mActionData!!.mImg)
-                .into(binding.botImageView)
-        }
-        binding.botImageView.setOnClickListener {
-            val uriString: String? = mInAppMessage!!.mActionData!!.mAndroidLnk
-            val buttonInterface: InAppButtonInterface? = RelatedDigital.getInAppButtonInterface()
-            RequestHandler.createInAppNotificationClickRequest(requireActivity(), mInAppMessage, null)
-            if (buttonInterface != null) {
-                RelatedDigital.setInAppButtonInterface(null)
-                buttonInterface.onPress(uriString)
+        if (!mInAppMessage!!.mActionData!!.mImg.isNullOrEmpty()) {
+            binding.botImageView.visibility = View.VISIBLE
+            binding.botVideoView.visibility = View.GONE
+            if (AppUtils.isAnImage(mInAppMessage!!.mActionData!!.mImg)) {
+                Picasso.get().load(mInAppMessage!!.mActionData!!.mImg)
+                    .into(binding.botImageView)
             } else {
-                if (!uriString.isNullOrEmpty()) {
-                    try {
-                        val uri: Uri = Uri.parse(uriString)
-                        val viewIntent = Intent(Intent.ACTION_VIEW, uri)
-                        requireActivity().startActivity(viewIntent)
-                    } catch (e: Exception) {
-                        Log.i(LOG_TAG, "Can't parse notification URI, will not take any action", e)
-                    }
-                }
+                Glide.with(requireActivity())
+                    .load(mInAppMessage!!.mActionData!!.mImg)
+                    .into(binding.botImageView)
             }
-            endFragment()
+        } else {
+            binding.botImageView.visibility = View.GONE
+            if(true) { // TODO : if !video.isNullOrEmpty():
+                binding.botVideoView.visibility = View.VISIBLE
+                initializePlayer()
+                startPlayer()
+            } else {
+                binding.botVideoView.visibility = View.GONE
+                releasePlayer()
+            }
         }
         binding.halfScreenContainerTop.visibility = View.GONE
     }
@@ -206,6 +237,7 @@ class HalfScreenFragment : Fragment() {
     private fun endFragment() {
         if (activity != null) {
             InAppUpdateDisplayState.releaseDisplayState(mStateId)
+            releasePlayer()
             requireActivity().supportFragmentManager.beginTransaction().remove(this@HalfScreenFragment).commit()
         }
     }
@@ -225,8 +257,33 @@ class HalfScreenFragment : Fragment() {
         }
     }
 
+    private fun initializePlayer() {
+        player = ExoPlayer.Builder(requireContext()).build()
+        if (mIsTop) {
+            binding.topVideoView.player = player
+        } else {
+            binding.botVideoView.player = player
+        }
+        val mediaItem = MediaItem.fromUri(
+            "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4") //TODO : real url here
+        player!!.setMediaItem(mediaItem)
+        player!!.prepare()
+    }
+
+    private fun startPlayer() {
+        player!!.playWhenReady = true
+    }
+
+    private fun releasePlayer() {
+        if (player != null) {
+            player!!.release()
+            player = null
+        }
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         showStatusBar()
+        releasePlayer()
     }
 }

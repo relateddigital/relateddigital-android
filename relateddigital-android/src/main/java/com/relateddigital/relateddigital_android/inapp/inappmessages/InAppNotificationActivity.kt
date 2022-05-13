@@ -128,8 +128,13 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
             }
         } else {
             binding.ivTemplate.visibility = View.GONE
-            binding.videoView.visibility = View.VISIBLE
-            startPlayer()
+            if(true) { // TODO : if !video.isNullOrEmpty():
+                binding.videoView.visibility = View.VISIBLE
+                startPlayer()
+            } else {
+                binding.videoView.visibility = View.GONE
+                releasePlayer()
+            }
         }
         binding.smileRating.setOnSmileySelectionListener(this)
         binding.smileRating.setOnRatingSelectedListener(this)
