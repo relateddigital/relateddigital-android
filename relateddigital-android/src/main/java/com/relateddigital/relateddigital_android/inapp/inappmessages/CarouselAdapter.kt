@@ -12,6 +12,9 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.google.android.exoplayer2.ExoPlayer
+import com.google.android.exoplayer2.MediaItem
+import com.google.android.exoplayer2.ui.PlayerView
 import com.relateddigital.relateddigital_android.R
 import com.relateddigital.relateddigital_android.RelatedDigital
 import com.relateddigital.relateddigital_android.model.InAppCarouselItem
@@ -28,6 +31,11 @@ class CarouselAdapter(
     RecyclerView.Adapter<CarouselAdapter.CarouselViewHolder>() {
     private var message: InAppMessage? = null
     private var mCarouselItems: List<InAppCarouselItem>? = null
+    private var player0: ExoPlayer? = null
+    private var player1: ExoPlayer? = null
+    private var player2: ExoPlayer? = null
+    private var player3: ExoPlayer? = null
+    private var player4: ExoPlayer? = null
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -53,13 +61,13 @@ class CarouselAdapter(
         holder.dotIndicator.visibility = View.VISIBLE
         holder.closeButton.visibility = View.VISIBLE
 
-        if(message!!.mActionData!!.mCloseEventTrigger.isNullOrEmpty()) {
+        if (message!!.mActionData!!.mCloseEventTrigger.isNullOrEmpty()) {
             holder.closeButton.setBackgroundResource(getCloseIcon())
             holder.closeButton.setOnClickListener {
                 finishCallback.onFinish()
             }
         } else {
-            if(message!!.mActionData!!.mCloseEventTrigger.equals("backgroundclick")) {
+            if (message!!.mActionData!!.mCloseEventTrigger.equals("backgroundclick")) {
                 holder.closeButton.visibility = View.GONE
             } else {
                 holder.closeButton.setBackgroundResource(getCloseIcon())
@@ -75,7 +83,8 @@ class CarouselAdapter(
             val view = View(mContext)
             view.setBackgroundResource(R.drawable.dot_indicator_default)
             val layoutParams = LinearLayout.LayoutParams(
-                40, 40)
+                40, 40
+            )
             layoutParams.setMargins(10, 0, 10, 0)
             view.layoutParams = layoutParams
             holder.dotIndicator.addView(view)
@@ -108,6 +117,8 @@ class CarouselAdapter(
         }
 
         if (!mCarouselItems!![position].image.isNullOrEmpty()) {
+            holder.carouselImage.visibility = View.VISIBLE
+            holder.carouselVideo.visibility = View.GONE
             if (AppUtils.isAnImage(mCarouselItems!![position].image)) {
                 Picasso.get().load(mCarouselItems!![position].image)
                     .into(holder.carouselImage)
@@ -118,11 +129,113 @@ class CarouselAdapter(
             }
         } else {
             holder.carouselImage.visibility = View.GONE
+            if (false) { // TODO : if !video.isNullOrEmpty():
+                holder.carouselVideo.visibility = View.VISIBLE
+                when (position) {
+                    0 -> {
+                        holder.carouselVideo.player = player0
+                        val mediaItem =
+                            MediaItem.fromUri("http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4") // TODO : real url here
+                        player0!!.setMediaItem(mediaItem)
+                        player0!!.prepare()
+                        holder.carouselVideo.addOnAttachStateChangeListener(object :
+                            View.OnAttachStateChangeListener {
+                            override fun onViewAttachedToWindow(v: View) {
+                                holder.carouselVideo.player!!.playWhenReady = true
+                            }
+
+                            override fun onViewDetachedFromWindow(v: View) {
+                                if (holder.carouselVideo.player != null) {
+                                    holder.carouselVideo.player!!.pause()
+                                }
+                            }
+                        })
+                    }
+                    1 -> {
+                        holder.carouselVideo.player = player1
+                        val mediaItem =
+                            MediaItem.fromUri("http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4") // TODO : real url here
+                        player1!!.setMediaItem(mediaItem)
+                        player1!!.prepare()
+                        holder.carouselVideo.addOnAttachStateChangeListener(object :
+                            View.OnAttachStateChangeListener {
+                            override fun onViewAttachedToWindow(v: View) {
+                                holder.carouselVideo.player!!.playWhenReady = true
+                            }
+
+                            override fun onViewDetachedFromWindow(v: View) {
+                                if (holder.carouselVideo.player != null) {
+                                    holder.carouselVideo.player!!.pause()
+                                }
+                            }
+                        })
+                    }
+                    2 -> {
+                        holder.carouselVideo.player = player2
+                        val mediaItem =
+                            MediaItem.fromUri("http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4") // TODO : real url here
+                        player2!!.setMediaItem(mediaItem)
+                        player2!!.prepare()
+                        holder.carouselVideo.addOnAttachStateChangeListener(object :
+                            View.OnAttachStateChangeListener {
+                            override fun onViewAttachedToWindow(v: View) {
+                                holder.carouselVideo.player!!.playWhenReady = true
+                            }
+
+                            override fun onViewDetachedFromWindow(v: View) {
+                                if (holder.carouselVideo.player != null) {
+                                    holder.carouselVideo.player!!.pause()
+                                }
+                            }
+                        })
+                    }
+                    3 -> {
+                        holder.carouselVideo.player = player3
+                        val mediaItem =
+                            MediaItem.fromUri("http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4") // TODO : real url here
+                        player3!!.setMediaItem(mediaItem)
+                        player3!!.prepare()
+                        holder.carouselVideo.addOnAttachStateChangeListener(object :
+                            View.OnAttachStateChangeListener {
+                            override fun onViewAttachedToWindow(v: View) {
+                                holder.carouselVideo.player!!.playWhenReady = true
+                            }
+
+                            override fun onViewDetachedFromWindow(v: View) {
+                                if (holder.carouselVideo.player != null) {
+                                    holder.carouselVideo.player!!.pause()
+                                }
+                            }
+                        })
+                    }
+                    4 -> {
+                        holder.carouselVideo.player = player4
+                        val mediaItem =
+                            MediaItem.fromUri("http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4") // TODO : real url here
+                        player4!!.setMediaItem(mediaItem)
+                        player4!!.prepare()
+                        holder.carouselVideo.addOnAttachStateChangeListener(object :
+                            View.OnAttachStateChangeListener {
+                            override fun onViewAttachedToWindow(v: View) {
+                                holder.carouselVideo.player!!.playWhenReady = true
+                            }
+
+                            override fun onViewDetachedFromWindow(v: View) {
+                                if (holder.carouselVideo.player != null) {
+                                    holder.carouselVideo.player!!.pause()
+                                }
+                            }
+                        })
+                    }
+                }
+            } else {
+                holder.carouselVideo.visibility = View.GONE
+            }
         }
 
         if (!mCarouselItems!![position].title.isNullOrEmpty()) {
             holder.carouselTitle.text = mCarouselItems!![position].title
-            if(!mCarouselItems!![position].titleColor.isNullOrEmpty()) {
+            if (!mCarouselItems!![position].titleColor.isNullOrEmpty()) {
                 holder.carouselTitle.setTextColor(Color.parseColor(mCarouselItems!![position].titleColor))
             }
             holder.carouselTitle.textSize =
@@ -136,7 +249,7 @@ class CarouselAdapter(
 
         if (!mCarouselItems!![position].body.isNullOrEmpty()) {
             holder.carouselBodyText.text = mCarouselItems!![position].body
-            if(!mCarouselItems!![position].bodyColor.isNullOrEmpty()) {
+            if (!mCarouselItems!![position].bodyColor.isNullOrEmpty()) {
                 holder.carouselBodyText.setTextColor(
                     Color.parseColor(
                         mCarouselItems!![position].bodyColor
@@ -153,7 +266,7 @@ class CarouselAdapter(
         }
 
         if (!mCarouselItems!![position].promotionCode.isNullOrEmpty()) {
-            if(!mCarouselItems!![position].promocodeBackgroundColor.isNullOrEmpty()) {
+            if (!mCarouselItems!![position].promocodeBackgroundColor.isNullOrEmpty()) {
                 holder.couponContainer.setBackgroundColor(
                     Color.parseColor(
                         mCarouselItems!![position].promocodeBackgroundColor
@@ -161,7 +274,7 @@ class CarouselAdapter(
                 )
             }
             holder.couponCode.text = mCarouselItems!![position].promotionCode
-            if(!mCarouselItems!![position].promocodeTextColor.isNullOrEmpty()) {
+            if (!mCarouselItems!![position].promocodeTextColor.isNullOrEmpty()) {
                 holder.couponCode.setTextColor(Color.parseColor(mCarouselItems!![position].promocodeTextColor))
             }
             holder.couponContainer.setOnClickListener {
@@ -183,7 +296,7 @@ class CarouselAdapter(
         }
 
         if (!mCarouselItems!![position].buttonText.isNullOrEmpty()) {
-            if(!mCarouselItems!![position].buttonColor.isNullOrEmpty()) {
+            if (!mCarouselItems!![position].buttonColor.isNullOrEmpty()) {
                 holder.carouselButton.setBackgroundColor(
                     Color.parseColor(
                         mCarouselItems!![position].buttonColor
@@ -191,7 +304,7 @@ class CarouselAdapter(
                 )
             }
             holder.carouselButton.text = mCarouselItems!![position].buttonText
-            if(!mCarouselItems!![position].buttonTextColor.isNullOrEmpty()) {
+            if (!mCarouselItems!![position].buttonTextColor.isNullOrEmpty()) {
                 holder.carouselButton.setTextColor(Color.parseColor(mCarouselItems!![position].buttonTextColor))
             }
             holder.carouselButton.textSize =
@@ -223,12 +336,17 @@ class CarouselAdapter(
      * To add new data and notify the change
      */
     fun setMessage(message: InAppMessage?) {
-        if(message == null) {
+        if (message == null) {
             Log.e("InAppCarousel", "The data could not be gotten properly!")
             finishCallback.onFinish()
         } else {
             this.message = message
             mCarouselItems = message.mActionData!!.carouselItems
+            player0 = ExoPlayer.Builder(mContext).build()
+            player1 = ExoPlayer.Builder(mContext).build()
+            player2 = ExoPlayer.Builder(mContext).build()
+            player3 = ExoPlayer.Builder(mContext).build()
+            player4 = ExoPlayer.Builder(mContext).build()
             notifyDataSetChanged()
         }
     }
@@ -241,6 +359,29 @@ class CarouselAdapter(
         return R.drawable.ic_close_black_24dp
     }
 
+    fun releasePlayer() {
+        if (player0 != null) {
+            player0!!.release()
+            player0 = null
+        }
+        if (player1 != null) {
+            player1!!.release()
+            player1 = null
+        }
+        if (player2 != null) {
+            player2!!.release()
+            player2 = null
+        }
+        if (player3 != null) {
+            player3!!.release()
+            player3 = null
+        }
+        if (player4 != null) {
+            player4!!.release()
+            player4 = null
+        }
+    }
+
     /**
      * Custom RecyclerView.ViewHolder class
      */
@@ -249,6 +390,7 @@ class CarouselAdapter(
         val carouselContainer: FrameLayout = view.findViewById(R.id.carousel_container)
         val backgroundImage: ImageView = view.findViewById(R.id.background)
         val carouselImage: ImageView = view.findViewById(R.id.carousel_image)
+        val carouselVideo: PlayerView = view.findViewById(R.id.carousel_video)
         val carouselTitle: TextView = view.findViewById(R.id.carousel_title)
         val carouselBodyText: TextView = view.findViewById(R.id.carousel_body_text)
         val couponContainer: FrameLayout = view.findViewById(R.id.coupon_container)

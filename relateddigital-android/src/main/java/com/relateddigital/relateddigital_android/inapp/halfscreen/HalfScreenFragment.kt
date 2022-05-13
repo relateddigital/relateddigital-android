@@ -149,7 +149,7 @@ class HalfScreenFragment : Fragment() {
             }
         } else {
             binding.topImageView.visibility = View.GONE
-            if(true) { // TODO : if !video.isNullOrEmpty():
+            if(false) { // TODO : if !video.isNullOrEmpty():
                 binding.topVideoView.visibility = View.VISIBLE
                 initializePlayer()
                 startPlayer()
@@ -204,7 +204,7 @@ class HalfScreenFragment : Fragment() {
             }
         } else {
             binding.botImageView.visibility = View.GONE
-            if(true) { // TODO : if !video.isNullOrEmpty():
+            if(false) { // TODO : if !video.isNullOrEmpty():
                 binding.botVideoView.visibility = View.VISIBLE
                 initializePlayer()
                 startPlayer()

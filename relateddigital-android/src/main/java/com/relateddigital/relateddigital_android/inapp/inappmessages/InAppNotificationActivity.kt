@@ -61,6 +61,7 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
     private var isNpsSecondPopupButtonClicked = false
     private var isNpsSecondPopupActivated = false
     private var player: ExoPlayer? = null
+    private var carouselAdapter: CarouselAdapter? = null
     @SuppressLint("ClickableViewAccessibility")
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -128,7 +129,7 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
             }
         } else {
             binding.ivTemplate.visibility = View.GONE
-            if(true) { // TODO : if !video.isNullOrEmpty():
+            if(false) { // TODO : if !video.isNullOrEmpty():
                 binding.videoView.visibility = View.VISIBLE
                 startPlayer()
             } else {
@@ -568,7 +569,7 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
                     }
                 } else {
                     bindingSecondPopUp.imageView2.visibility = View.GONE
-                    if(true) { // TODO : if !video.isNullOrEmpty():
+                    if(false) { // TODO : if !video.isNullOrEmpty():
                         bindingSecondPopUp.secondVideoView2.visibility = View.VISIBLE
                         player = ExoPlayer.Builder(this).build()
                         bindingSecondPopUp.secondVideoView2.player = player
@@ -614,7 +615,7 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
             }
         } else {
             bindingSecondPopUp.imageView.visibility = View.GONE
-            if(true) { // TODO : if !video.isNullOrEmpty():
+            if(false) { // TODO : if !video.isNullOrEmpty():
                 bindingSecondPopUp.secondVideoView.visibility = View.VISIBLE
                 player = ExoPlayer.Builder(this).build()
                 bindingSecondPopUp.secondVideoView.player = player
@@ -794,6 +795,9 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
     override fun onDestroy() {
         super.onDestroy()
         releasePlayer()
+        if (mInAppMessage!!.mActionData!!.mMsgType == InAppNotificationType.CAROUSEL.toString()) {
+            carouselAdapter!!.releasePlayer()
+        }
         if (mInAppMessage != null) {
             if (mIsRotation) {
                 mIsRotation = false
@@ -818,7 +822,7 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
 
         bindingCarousel.carouselRecyclerView.layoutManager = layoutManager
 
-        val carouselAdapter = CarouselAdapter(this, this, this)
+        carouselAdapter = CarouselAdapter(this, this, this)
 
         bindingCarousel.carouselRecyclerView.adapter = carouselAdapter
 
@@ -826,7 +830,7 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
 
         snapHelper.attachToRecyclerView(bindingCarousel.carouselRecyclerView)
 
-        carouselAdapter.setMessage(mInAppMessage)
+        carouselAdapter!!.setMessage(mInAppMessage)
     }
 
     private fun cacheResources() {
@@ -848,17 +852,19 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
             }
         }
 
-        if(true) { // TODO : if !video.isNullOrEmpty():
+        if(false) { // TODO : if !video.isNullOrEmpty():
             initializePlayer()
         }
     }
 
     private fun initializePlayer() {
-        player = ExoPlayer.Builder(this).build()
-        binding.videoView.player = player
-        val mediaItem = MediaItem.fromUri("http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4") // TODO : real url here
-        player!!.setMediaItem(mediaItem)
-        player!!.prepare()
+        if (mInAppMessage!!.mActionData!!.mMsgType != InAppNotificationType.CAROUSEL.toString()) {
+            player = ExoPlayer.Builder(this).build()
+            binding.videoView.player = player
+            val mediaItem = MediaItem.fromUri("http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4") // TODO : real url here
+            player!!.setMediaItem(mediaItem)
+            player!!.prepare()
+        }
     }
 
     private fun startPlayer() {
@@ -881,6 +887,9 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
     override fun onFinish() {
         InAppUpdateDisplayState.releaseDisplayState(mIntentId)
         releasePlayer()
+        if (mInAppMessage!!.mActionData!!.mMsgType == InAppNotificationType.CAROUSEL.toString()) {
+            carouselAdapter!!.releasePlayer()
+        }
         finish()
     }
 

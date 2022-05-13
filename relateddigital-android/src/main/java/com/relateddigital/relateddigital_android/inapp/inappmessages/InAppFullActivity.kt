@@ -100,7 +100,7 @@ class InAppFullActivity : Activity(), IVisilabs {
             }
         } else {
             binding.fivInAppImage.visibility = View.GONE
-            if(true) { // TODO : if !video.isNullOrEmpty():
+            if(false) { // TODO : if !video.isNullOrEmpty():
                 binding.fullVideoView.visibility = View.VISIBLE
                 initializePlayer()
                 startPlayer()
