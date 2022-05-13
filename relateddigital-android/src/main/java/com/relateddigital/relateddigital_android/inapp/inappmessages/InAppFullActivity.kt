@@ -13,6 +13,8 @@ import android.view.MotionEvent
 import android.view.View
 import android.widget.Toast
 import com.bumptech.glide.Glide
+import com.google.android.exoplayer2.ExoPlayer
+import com.google.android.exoplayer2.MediaItem
 import com.relateddigital.relateddigital_android.R
 import com.relateddigital.relateddigital_android.RelatedDigital
 import com.relateddigital.relateddigital_android.databinding.ActivityInAppFullBinding
@@ -31,6 +33,7 @@ class InAppFullActivity : Activity(), IVisilabs {
     private var mIntentId = -1
     private lateinit var binding: ActivityInAppFullBinding
     private var mIsRotation = false
+    private var player: ExoPlayer? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityInAppFullBinding.inflate(layoutInflater)
@@ -87,6 +90,7 @@ class InAppFullActivity : Activity(), IVisilabs {
         }
         if (!mInApp!!.mActionData!!.mImg.isNullOrEmpty()) {
             binding.fivInAppImage.visibility = View.VISIBLE
+            binding.fullVideoView.visibility = View.GONE
             if(AppUtils.isAnImage(mInApp!!.mActionData!!.mImg)) {
                 Picasso.get().load(mInApp!!.mActionData!!.mImg).into(binding.fivInAppImage)
             } else {
@@ -96,6 +100,14 @@ class InAppFullActivity : Activity(), IVisilabs {
             }
         } else {
             binding.fivInAppImage.visibility = View.GONE
+            if(true) { // TODO : if !video.isNullOrEmpty():
+                binding.fullVideoView.visibility = View.VISIBLE
+                initializePlayer()
+                startPlayer()
+            } else {
+                binding.fullVideoView.visibility = View.GONE
+                releasePlayer()
+            }
         }
     }
 
@@ -177,6 +189,26 @@ class InAppFullActivity : Activity(), IVisilabs {
             } else InAppNotificationState.TYPE == mUpdateDisplayState!!.getDisplayState()!!.type
         }
 
+    private fun initializePlayer() {
+        player = ExoPlayer.Builder(this).build()
+        binding.fullVideoView.player = player
+        val mediaItem = MediaItem.fromUri(
+            "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4") //TODO : real url here
+        player!!.setMediaItem(mediaItem)
+        player!!.prepare()
+    }
+
+    private fun startPlayer() {
+        player!!.playWhenReady = true
+    }
+
+    private fun releasePlayer() {
+        if (player != null) {
+            player!!.release()
+            player = null
+        }
+    }
+
     override fun onBackPressed() {
         if (isShowingInApp) {
             InAppUpdateDisplayState.releaseDisplayState(mIntentId)
@@ -186,6 +218,7 @@ class InAppFullActivity : Activity(), IVisilabs {
 
     override fun onDestroy() {
         super.onDestroy()
+        releasePlayer()
         if (mIsRotation) {
             mIsRotation = false
         } else {

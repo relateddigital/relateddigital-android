@@ -1,6 +1,7 @@
 <?xml version="1.0" ?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="horizontal"
@@ -37,6 +38,13 @@
                 android:adjustViewBounds="true"
                 android:contentDescription="@string/com_visilabs_android_notification_image"
                 android:scaleType="fitCenter" />
+
+            <com.google.android.exoplayer2.ui.PlayerView
+                android:id="@+id/full_video_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:use_controller="false"
+                app:resize_mode="fixed_width"/>
         </LinearLayout>
 
         <RelativeLayout
