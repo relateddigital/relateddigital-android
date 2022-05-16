@@ -85,7 +85,7 @@ class GiftCatchCodeBannerFragment : Fragment() {
         // TODO : real data here. Get controls from SpinToWinCodeBannerFragment
         binding.container.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.black))
 
-        binding.bannerText.text = "Kodunuzu unutmayın."
+        binding.bannerText.text = "Kodunuzu unutmayın.".replace("\\n", "\n")
         binding.bannerLabel.text = "Kopyala"
         binding.bannerCode.text = "DGFGNK2332MKL"
 

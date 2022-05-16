@@ -112,7 +112,7 @@ class SocialProofFragment : Fragment() {
             }
             binding.textViewTop.text = spannableString
         } else {
-            binding.textViewTop.text = text
+            binding.textViewTop.text = text!!.replace("\\n", "\n")
         }
     }
 
@@ -144,7 +144,7 @@ class SocialProofFragment : Fragment() {
             }
             binding.textViewBot.text = spannableString
         } else {
-            binding.textViewBot.text = text
+            binding.textViewBot.text = text!!.replace("\\n", "\n")
         }
     }
 

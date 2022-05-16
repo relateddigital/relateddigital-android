@@ -93,7 +93,7 @@ class SpinToWinCodeBannerFragment : Fragment() {
             binding.container.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.black))
         }
 
-        binding.bannerText.text = mExtendedProps!!.promocode_banner_text
+        binding.bannerText.text = mExtendedProps!!.promocode_banner_text!!.replace("\\n", "\n")
         binding.bannerLabel.text = mExtendedProps!!.promocode_banner_button_label
         binding.bannerCode.text = bannerCode
 

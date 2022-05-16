@@ -129,7 +129,7 @@ class HalfScreenFragment : Fragment() {
         }
         if (!mInAppMessage!!.mActionData!!.mMsgTitle.isNullOrEmpty()) {
             binding.halfScreenContainerTop.setBackgroundColor(Color.parseColor(mInAppMessage!!.mActionData!!.mBackground))
-            binding.topTitleView.text = mInAppMessage!!.mActionData!!.mMsgTitle
+            binding.topTitleView.text = mInAppMessage!!.mActionData!!.mMsgTitle!!.replace("\\n", "\n")
             binding.topTitleView.setTextColor(Color.parseColor(mInAppMessage!!.mActionData!!.mMsgTitleColor))
             binding.topTitleView.textSize = mInAppMessage!!.mActionData!!.mMsgTitleTextSize!!.toFloat() * 2 + 14
             binding.topTitleView.typeface = mInAppMessage!!.mActionData!!.getFontFamily(requireActivity())
@@ -184,7 +184,7 @@ class HalfScreenFragment : Fragment() {
         }
         if (!mInAppMessage!!.mActionData!!.mMsgTitle.isNullOrEmpty()) {
             binding.halfScreenContainerBot.setBackgroundColor(Color.parseColor(mInAppMessage!!.mActionData!!.mBackground))
-            binding.botTitleView.text = mInAppMessage!!.mActionData!!.mMsgTitle
+            binding.botTitleView.text = mInAppMessage!!.mActionData!!.mMsgTitle!!.replace("\\n", "\n")
             binding.botTitleView.setTextColor(Color.parseColor(mInAppMessage!!.mActionData!!.mMsgTitleColor))
             binding.botTitleView.textSize = mInAppMessage!!.mActionData!!.mMsgTitleTextSize!!.toFloat() * 2 + 14
             binding.botTitleView.typeface = mInAppMessage!!.mActionData!!.getFontFamily(requireActivity())

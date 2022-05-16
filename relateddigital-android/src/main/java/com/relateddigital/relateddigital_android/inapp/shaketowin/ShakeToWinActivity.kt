@@ -71,10 +71,10 @@ class ShakeToWinActivity : Activity(), SensorEventListener {
         bindingStep1.container.setBackgroundColor(Color.parseColor("#ff99de"))
         Picasso.get().load("https://imgvisilabsnet.azureedge.net/in-app-message/uploaded_images/163_1100_490_20210319175823217.jpg")
                 .into(bindingStep1.imageView)
-        bindingStep1.titleView.text = "Title"
+        bindingStep1.titleView.text = "Title".replace("\\n", "\n")
         bindingStep1.titleView.setTextColor(Color.parseColor("#92008c"))
         bindingStep1.titleView.textSize = 32f
-        bindingStep1.bodyTextView.text = "Text"
+        bindingStep1.bodyTextView.text = "Text".replace("\\n", "\n")
         bindingStep1.bodyTextView.setTextColor(Color.parseColor("#4060ff"))
         bindingStep1.bodyTextView.textSize = 24f
         bindingStep1.buttonView.text = "Button"
@@ -179,10 +179,10 @@ class ShakeToWinActivity : Activity(), SensorEventListener {
         bindingStep3.container.setBackgroundColor(Color.parseColor("#ff99de"))
         Picasso.get().load("https://imgvisilabsnet.azureedge.net/in-app-message/uploaded_images/163_1100_490_20210319175823217.jpg")
                 .into(bindingStep3.imageView)
-        bindingStep3.titleView.text = "Title"
+        bindingStep3.titleView.text = "Title".replace("\\n", "\n")
         bindingStep3.titleView.setTextColor(Color.parseColor("#92008c"))
         bindingStep3.titleView.textSize = 32f
-        bindingStep3.bodyTextView.text = "Text"
+        bindingStep3.bodyTextView.text = "Text".replace("\\n", "\n")
         bindingStep3.bodyTextView.setTextColor(Color.parseColor("#4060ff"))
         bindingStep3.bodyTextView.textSize = 24f
         bindingStep3.couponView.setBackgroundColor(Color.parseColor("#00ffab"))

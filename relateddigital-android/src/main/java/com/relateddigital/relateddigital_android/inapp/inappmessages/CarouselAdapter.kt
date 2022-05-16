@@ -234,7 +234,7 @@ class CarouselAdapter(
         }
 
         if (!mCarouselItems!![position].title.isNullOrEmpty()) {
-            holder.carouselTitle.text = mCarouselItems!![position].title
+            holder.carouselTitle.text = mCarouselItems!![position].title!!.replace("\\n", "\n")
             if (!mCarouselItems!![position].titleColor.isNullOrEmpty()) {
                 holder.carouselTitle.setTextColor(Color.parseColor(mCarouselItems!![position].titleColor))
             }
@@ -248,7 +248,7 @@ class CarouselAdapter(
         }
 
         if (!mCarouselItems!![position].body.isNullOrEmpty()) {
-            holder.carouselBodyText.text = mCarouselItems!![position].body
+            holder.carouselBodyText.text = mCarouselItems!![position].body!!.replace("\\n", "\n")
             if (!mCarouselItems!![position].bodyColor.isNullOrEmpty()) {
                 holder.carouselBodyText.setTextColor(
                     Color.parseColor(

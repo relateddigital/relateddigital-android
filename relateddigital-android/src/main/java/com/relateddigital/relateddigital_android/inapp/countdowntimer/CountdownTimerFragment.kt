@@ -87,9 +87,9 @@ class CountdownTimerFragment : Fragment() {
         //TODO remove the code below when the actual data gets ready
         binding.countdownTimerContainerTop.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.blue))
         binding.titleTop.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
-        binding.titleTop.text = "Sana Özel Fırsatı Kaçırma!"
+        binding.titleTop.text = "Sana Özel Fırsatı Kaçırma!".replace("\\n", "\n")
         binding.bodyTextTop.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
-        binding.bodyTextTop.text = "Bugün sana özel indirim kodu için geri sayım başladı."
+        binding.bodyTextTop.text = "Bugün sana özel indirim kodu için geri sayım başladı.".replace("\\n", "\n")
         binding.buttonTop.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.white))
         binding.buttonTop.text = "Alışverişe Başla"
         binding.buttonTop.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
@@ -103,9 +103,9 @@ class CountdownTimerFragment : Fragment() {
         //TODO remove the code below when the actual data gets ready
         binding.countdownTimerContainerBot.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.blue))
         binding.titleBot.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
-        binding.titleBot.text = "Sana Özel Fırsatı Kaçırma!"
+        binding.titleBot.text = "Sana Özel Fırsatı Kaçırma!".replace("\\n", "\n")
         binding.bodyTextBot.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
-        binding.bodyTextBot.text = "Bugün sana özel indirim kodu için geri sayım başladı."
+        binding.bodyTextBot.text = "Bugün sana özel indirim kodu için geri sayım başladı.".replace("\\n", "\n")
         binding.buttonBot.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.white))
         binding.buttonBot.text = "Alışverişe Başla"
         binding.buttonBot.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))

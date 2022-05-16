@@ -118,11 +118,11 @@ class MailSubscriptionFormHalfFragment : Fragment() {
         if(/*!mInApp!!.mActionData!!.mBodyText.isNullOrEmpty()*/true) {
             if(isTextTop) {
                 binding.bodyTextViewBot.visibility = View.GONE
-                binding.bodyTextViewTop.text = "Doğaya karşı sorumluluğumuzu yansıtan ürünlerimizi keşfet"
+                binding.bodyTextViewTop.text = "Doğaya karşı sorumluluğumuzu yansıtan ürünlerimizi keşfet".replace("\\n", "\n")
                 binding.bodyTextViewTop.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
             } else {
                 binding.bodyTextViewTop.visibility = View.GONE
-                binding.bodyTextViewBot.text = "Doğaya karşı sorumluluğumuzu yansıtan ürünlerimizi keşfet"
+                binding.bodyTextViewBot.text = "Doğaya karşı sorumluluğumuzu yansıtan ürünlerimizi keşfet".replace("\\n", "\n")
                 binding.bodyTextViewBot.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
             }
         } else {
@@ -131,7 +131,7 @@ class MailSubscriptionFormHalfFragment : Fragment() {
         }
 
         binding.container.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.blue))
-        binding.titleView.text = "İlk Siparişine Özel İndirim"
+        binding.titleView.text = "İlk Siparişine Özel İndirim".replace("\\n", "\n")
         binding.titleView.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
         binding.titleView.textSize = 20f
         binding.btn.text = "Kaydol"
