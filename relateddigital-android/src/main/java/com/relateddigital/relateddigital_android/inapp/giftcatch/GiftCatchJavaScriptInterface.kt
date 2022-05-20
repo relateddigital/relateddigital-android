@@ -50,6 +50,16 @@ class GiftCatchJavaScriptInterface internal constructor(webViewDialogFragment: G
         //TODO get it from SpinToWin
     }
 
+    /**
+     * This method saves the promotion code shown
+     */
+    @JavascriptInterface
+    fun saveCodeGotten() {
+        //TODO : send it to the interface callback to show it on banner
+    }
+
+
+
     fun setGiftCatchListeners(
         listener: GiftCatchCompleteInterface,
         copyToClipboardInterface: GiftCatchCopyToClipboardInterface,
