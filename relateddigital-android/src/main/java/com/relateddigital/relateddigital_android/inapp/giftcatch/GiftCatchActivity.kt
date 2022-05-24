@@ -25,6 +25,10 @@ class GiftCatchActivity : FragmentActivity(), GiftCatchCompleteInterface,
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         // TODO : Get this from SpinToWin
+        val webViewDialogFragment: GiftCatchWebDialogFragment =
+            GiftCatchWebDialogFragment.newInstance("index.html", "test")
+        webViewDialogFragment.setGiftCatchListeners(this, this, this)
+        webViewDialogFragment.display(supportFragmentManager)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -45,7 +49,7 @@ class GiftCatchActivity : FragmentActivity(), GiftCatchCompleteInterface,
                 if (!extendedProps.promocode_banner_button_label.isNullOrEmpty()) {*/
                     if(ActivityUtils.parentActivity != null) {
                         val giftCatchCodeBannerFragment =
-                            GiftCatchCodeBannerFragment.newInstance(GiftCatchExtendedProps(), "code")
+                            GiftCatchCodeBannerFragment.newInstance(GiftCatchExtendedProps(), giftCatchPromotionCode)
 
                         val transaction: FragmentTransaction =
                             (ActivityUtils.parentActivity as FragmentActivity).supportFragmentManager.beginTransaction()

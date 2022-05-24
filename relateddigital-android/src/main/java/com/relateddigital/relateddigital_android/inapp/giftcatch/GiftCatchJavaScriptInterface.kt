@@ -54,11 +54,9 @@ class GiftCatchJavaScriptInterface internal constructor(webViewDialogFragment: G
      * This method saves the promotion code shown
      */
     @JavascriptInterface
-    fun saveCodeGotten() {
-        //TODO : send it to the interface callback to show it on banner
+    fun saveCodeGotten(code: String) {
+        mShowCodeInterface.onCodeShown(code)
     }
-
-
 
     fun setGiftCatchListeners(
         listener: GiftCatchCompleteInterface,

@@ -87,7 +87,7 @@ class GiftCatchCodeBannerFragment : Fragment() {
 
         binding.bannerText.text = "Kodunuzu unutmayın.".replace("\\n", "\n")
         binding.bannerLabel.text = "Kopyala"
-        binding.bannerCode.text = "DGFGNK2332MKL"
+        binding.bannerCode.text = bannerCode
 
         binding.bannerText.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
         binding.bannerLabel.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
