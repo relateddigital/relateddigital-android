@@ -5,8 +5,10 @@ import android.content.ActivityNotFoundException
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Intent
+import android.content.pm.ActivityInfo
 import android.graphics.Color
 import android.graphics.Typeface
+import android.os.Build
 import android.os.Bundle
 import android.text.Editable
 import android.text.Html
@@ -39,6 +41,11 @@ class ScratchToWinActivity : Activity(), ScratchToWinInterface {
         binding = ActivityScratchToWinBinding.inflate(layoutInflater)
         val view: View = binding.root
         setContentView(view)
+
+        if (Build.VERSION.SDK_INT != Build.VERSION_CODES.O) {
+            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        }
+
         setFinishOnTouchOutside(true)
         scratchToWinMessage
         parseExtendedProps()

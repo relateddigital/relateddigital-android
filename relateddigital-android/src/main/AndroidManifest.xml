@@ -19,9 +19,7 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".inapp.scratchtowin.ScratchToWinActivity"
-            android:configChanges="orientation"
             android:noHistory="true"
-            android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.Light.Dialog.Alert" />
         <activity
             android:name=".inapp.spintowin.SpinToWinActivity"
