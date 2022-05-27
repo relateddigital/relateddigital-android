@@ -27,8 +27,6 @@ import com.relateddigital.relateddigital_android.util.AppUtils
 import com.relateddigital.relateddigital_android.util.ImageUtils
 import com.relateddigital.relateddigital_android.util.LogUtils
 import com.relateddigital.relateddigital_android.util.SharedPref
-import java.lang.Exception
-import java.util.ArrayList
 
 class PushNotificationManager {
     var intent: Intent? = null
@@ -131,6 +129,17 @@ class PushNotificationManager {
                 intent!!, PendingIntent.FLAG_UPDATE_CURRENT
             )
         }
+
+        val priority: String =
+            SharedPref.readString(context, Constants.NOTIFICATION_PRIORITY_KEY)
+        val importance = if (priority == "high") {
+            NotificationCompat.PRIORITY_HIGH
+        } else if (priority == "low") {
+            NotificationCompat.PRIORITY_LOW
+        } else {
+            NotificationCompat.PRIORITY_DEFAULT
+        }
+
         val mBuilder: NotificationCompat.Builder =
             NotificationCompat.Builder(context, AppUtils.getNotificationChannelId(context, false))
         mBuilder.setContentTitle(title)
@@ -138,7 +147,7 @@ class PushNotificationManager {
             .setLargeIcon(largeIconBitmap)
             .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
             .setDefaults(Notification.DEFAULT_VIBRATE or Notification.FLAG_SHOW_LIGHTS)
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setPriority(importance)
             .setAutoCancel(true)
             .setContentIntent(contentIntent)
         setNumber(mBuilder, context)
@@ -183,6 +192,17 @@ class PushNotificationManager {
         } else {
             largeIconBitmap = null
         }
+
+        val priority: String =
+            SharedPref.readString(context, Constants.NOTIFICATION_PRIORITY_KEY)
+        val importance = if (priority == "high") {
+            NotificationCompat.PRIORITY_HIGH
+        } else if (priority == "low") {
+            NotificationCompat.PRIORITY_LOW
+        } else {
+            NotificationCompat.PRIORITY_DEFAULT
+        }
+
         val style = if (pushImage == null) NotificationCompat.BigTextStyle()
             .bigText(pushMessage.message) else NotificationCompat.BigPictureStyle()
             .bigPicture(pushImage).setSummaryText(pushMessage.message)
@@ -195,7 +215,7 @@ class PushNotificationManager {
                 .setColorized(false)
                 .setAutoCancel(true)
                 .setDefaults(Notification.DEFAULT_VIBRATE or Notification.FLAG_SHOW_LIGHTS)
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setPriority(importance)
                 .setContentText(pushMessage.message)
         setNumber(mBuilder, context)
         setNotificationSmallIcon(mBuilder, context)
@@ -265,7 +285,16 @@ class PushNotificationManager {
             sound: String?,
             context: Context
         ) {
-            val importance = NotificationManager.IMPORTANCE_DEFAULT
+            val priority: String =
+                SharedPref.readString(context, Constants.NOTIFICATION_PRIORITY_KEY)
+            val importance = if (priority == "high") {
+                NotificationManager.IMPORTANCE_HIGH
+            } else if (priority == "low") {
+                NotificationManager.IMPORTANCE_LOW
+            } else {
+                NotificationManager.IMPORTANCE_DEFAULT
+            }
+
             val notificationChannel = NotificationChannel(
                 AppUtils.getNotificationChannelId(context, false),
                 getChannelName(context),

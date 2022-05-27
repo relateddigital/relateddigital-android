@@ -9,6 +9,7 @@ import com.huawei.agconnect.AGConnectOptionsBuilder
 import com.huawei.hms.aaid.HmsInstanceId
 import com.huawei.hms.common.ApiException
 import com.relateddigital.relateddigital_android.RelatedDigital
+import com.relateddigital.relateddigital_android.model.RDNotificationPriority
 import com.relateddigital.relateddigital_android.util.GoogleUtils
 
 class MainApplication : Application() {
@@ -65,7 +66,8 @@ class MainApplication : Application() {
                     notificationLargeIconDarkMode = R.mipmap.ic_launcher,
                     notificationPushIntent = "com.relateddigital.androidexampleapp.PushNotificationActivity",
                     notificationChannelName = "relateddigital-android-test",
-                    notificationColor = "#d1dbbd"
+                    notificationColor = "#d1dbbd",
+                    notificationPriority = RDNotificationPriority.NORMAL
                 )
             })
     }
@@ -97,7 +99,8 @@ class MainApplication : Application() {
                         notificationLargeIconDarkMode = R.mipmap.ic_launcher,
                         notificationPushIntent = "com.relateddigital.androidexampleapp.PushNotificationActivity",
                         notificationChannelName = "relateddigital-android-test",
-                        notificationColor = "#d1dbbd"
+                        notificationColor = "#d1dbbd",
+                        notificationPriority = RDNotificationPriority.NORMAL
                     )
                 } catch (e: ApiException) {
                     Log.e("Huawei Token", "Getting the token failed! $e")

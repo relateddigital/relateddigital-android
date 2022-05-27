@@ -189,6 +189,7 @@ class Constants {
         const val NOTIFICATION_CHANNEL_NAME_KEY = "not_channel_name_key"
         const val NOTIFICATION_CHANNEL_DESCRIPTION_KEY = "not_channel_description_key"
         const val NOTIFICATION_CHANNEL_SOUND_KEY = "not_channel_sound_key"
+        const val NOTIFICATION_PRIORITY_KEY = "not_priority_key"
 
         const val UTM_SOURCE = "utm_source"
         const val UTM_MEDIUM = "utm_medium"

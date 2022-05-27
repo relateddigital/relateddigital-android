@@ -3,6 +3,7 @@ package com.relateddigital.relateddigital_android
 import android.app.Activity
 import android.app.ActivityManager
 import android.app.ActivityManager.RunningAppProcessInfo
+import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
 import android.os.Build
@@ -119,7 +120,8 @@ object RelatedDigital {
         notificationLargeIconDarkMode: Int = 0,
         notificationPushIntent: String = "",
         notificationChannelName: String = "",
-        notificationColor: String = ""
+        notificationColor: String = "",
+        notificationPriority: RDNotificationPriority = RDNotificationPriority.NORMAL
     ) {
         if (model != null) {
             model!!.setIsPushNotificationEnabled(context, isPushNotificationEnabled)
@@ -243,6 +245,28 @@ object RelatedDigital {
                 notificationColor
             )
         }
+
+        val notificationManager =
+            context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager?
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && notificationManager != null) {
+            val oldChannelId: String =
+                SharedPref.readString(context, Constants.NOTIFICATION_CHANNEL_ID_KEY)
+            if (oldChannelId.isNotEmpty()) {
+                notificationManager.deleteNotificationChannel(oldChannelId)
+            }
+            AppUtils.getNotificationChannelId(context, true)
+        }
+
+        var importance = ""
+        importance = if (notificationPriority == RDNotificationPriority.HIGH) {
+            "high"
+        } else if (notificationPriority == RDNotificationPriority.LOW) {
+            "low"
+        } else {
+            "normal"
+        }
+
+        SharedPref.writeString(context, Constants.NOTIFICATION_PRIORITY_KEY, importance)
 
         registerToFCM(context)
 
