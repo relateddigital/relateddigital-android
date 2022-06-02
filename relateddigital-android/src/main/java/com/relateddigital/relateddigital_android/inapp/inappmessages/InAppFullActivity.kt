@@ -100,7 +100,7 @@ class InAppFullActivity : Activity(), IVisilabs {
             }
         } else {
             binding.fivInAppImage.visibility = View.GONE
-            if(false) { // TODO : if !video.isNullOrEmpty():
+            if(!mInApp!!.mActionData!!.mVideoUrl.isNullOrEmpty()) {
                 binding.fullVideoView.visibility = View.VISIBLE
                 initializePlayer()
                 startPlayer()
@@ -192,8 +192,7 @@ class InAppFullActivity : Activity(), IVisilabs {
     private fun initializePlayer() {
         player = ExoPlayer.Builder(this).build()
         binding.fullVideoView.player = player
-        val mediaItem = MediaItem.fromUri(
-            "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4") //TODO : real url here
+        val mediaItem = MediaItem.fromUri(mInApp!!.mActionData!!.mVideoUrl!!)
         player!!.setMediaItem(mediaItem)
         player!!.prepare()
     }

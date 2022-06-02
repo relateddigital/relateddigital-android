@@ -129,13 +129,13 @@ class CarouselAdapter(
             }
         } else {
             holder.carouselImage.visibility = View.GONE
-            if (false) { // TODO : if !video.isNullOrEmpty():
+            if (!mCarouselItems!![position].videoUrl.isNullOrEmpty()) {
                 holder.carouselVideo.visibility = View.VISIBLE
                 when (position) {
                     0 -> {
                         holder.carouselVideo.player = player0
                         val mediaItem =
-                            MediaItem.fromUri("http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4") // TODO : real url here
+                            MediaItem.fromUri(mCarouselItems!![position].videoUrl!!)
                         player0!!.setMediaItem(mediaItem)
                         player0!!.prepare()
                         holder.carouselVideo.addOnAttachStateChangeListener(object :
@@ -154,7 +154,7 @@ class CarouselAdapter(
                     1 -> {
                         holder.carouselVideo.player = player1
                         val mediaItem =
-                            MediaItem.fromUri("http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4") // TODO : real url here
+                            MediaItem.fromUri(mCarouselItems!![position].videoUrl!!)
                         player1!!.setMediaItem(mediaItem)
                         player1!!.prepare()
                         holder.carouselVideo.addOnAttachStateChangeListener(object :
@@ -173,7 +173,7 @@ class CarouselAdapter(
                     2 -> {
                         holder.carouselVideo.player = player2
                         val mediaItem =
-                            MediaItem.fromUri("http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4") // TODO : real url here
+                            MediaItem.fromUri(mCarouselItems!![position].videoUrl!!)
                         player2!!.setMediaItem(mediaItem)
                         player2!!.prepare()
                         holder.carouselVideo.addOnAttachStateChangeListener(object :
@@ -192,7 +192,7 @@ class CarouselAdapter(
                     3 -> {
                         holder.carouselVideo.player = player3
                         val mediaItem =
-                            MediaItem.fromUri("http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4") // TODO : real url here
+                            MediaItem.fromUri(mCarouselItems!![position].videoUrl!!)
                         player3!!.setMediaItem(mediaItem)
                         player3!!.prepare()
                         holder.carouselVideo.addOnAttachStateChangeListener(object :
@@ -211,7 +211,7 @@ class CarouselAdapter(
                     4 -> {
                         holder.carouselVideo.player = player4
                         val mediaItem =
-                            MediaItem.fromUri("http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4") // TODO : real url here
+                            MediaItem.fromUri(mCarouselItems!![position].videoUrl!!)
                         player4!!.setMediaItem(mediaItem)
                         player4!!.prepare()
                         holder.carouselVideo.addOnAttachStateChangeListener(object :

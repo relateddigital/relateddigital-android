@@ -149,7 +149,7 @@ class HalfScreenFragment : Fragment() {
             }
         } else {
             binding.topImageView.visibility = View.GONE
-            if(false) { // TODO : if !video.isNullOrEmpty():
+            if(!mInAppMessage!!.mActionData!!.mVideoUrl.isNullOrEmpty()) {
                 binding.topVideoView.visibility = View.VISIBLE
                 initializePlayer()
                 startPlayer()
@@ -204,7 +204,7 @@ class HalfScreenFragment : Fragment() {
             }
         } else {
             binding.botImageView.visibility = View.GONE
-            if(false) { // TODO : if !video.isNullOrEmpty():
+            if(!mInAppMessage!!.mActionData!!.mVideoUrl.isNullOrEmpty()) {
                 binding.botVideoView.visibility = View.VISIBLE
                 initializePlayer()
                 startPlayer()
@@ -264,8 +264,7 @@ class HalfScreenFragment : Fragment() {
         } else {
             binding.botVideoView.player = player
         }
-        val mediaItem = MediaItem.fromUri(
-            "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4") //TODO : real url here
+        val mediaItem = MediaItem.fromUri(mInAppMessage!!.mActionData!!.mVideoUrl!!)
         player!!.setMediaItem(mediaItem)
         player!!.prepare()
     }

@@ -61,6 +61,7 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
     private var isNpsSecondPopupButtonClicked = false
     private var isNpsSecondPopupActivated = false
     private var player: ExoPlayer? = null
+    private var player2: ExoPlayer? = null
     private var carouselAdapter: CarouselAdapter? = null
     @SuppressLint("ClickableViewAccessibility")
     public override fun onCreate(savedInstanceState: Bundle?) {
@@ -129,7 +130,7 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
             }
         } else {
             binding.ivTemplate.visibility = View.GONE
-            if(false) { // TODO : if !video.isNullOrEmpty():
+            if(!mInAppMessage!!.mActionData!!.mVideoUrl.isNullOrEmpty()) {
                 binding.videoView.visibility = View.VISIBLE
                 startPlayer()
             } else {
@@ -569,14 +570,14 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
                     }
                 } else {
                     bindingSecondPopUp.imageView2.visibility = View.GONE
-                    if(false) { // TODO : if !video.isNullOrEmpty():
+                    if(!mInAppMessage!!.mActionData!!.mSecondPopupVideoUrl2.isNullOrEmpty()) {
                         bindingSecondPopUp.secondVideoView2.visibility = View.VISIBLE
-                        player = ExoPlayer.Builder(this).build()
-                        bindingSecondPopUp.secondVideoView2.player = player
-                        val mediaItem = MediaItem.fromUri("http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4") // TODO : real url here
-                        player!!.setMediaItem(mediaItem)
-                        player!!.prepare()
-                        startPlayer()
+                        player2 = ExoPlayer.Builder(this).build()
+                        bindingSecondPopUp.secondVideoView2.player = player2
+                        val mediaItem = MediaItem.fromUri(mInAppMessage!!.mActionData!!.mSecondPopupVideoUrl2!!)
+                        player2!!.setMediaItem(mediaItem)
+                        player2!!.prepare()
+                        player2!!.playWhenReady = true
                     } else {
                         bindingSecondPopUp.secondVideoView2.visibility = View.GONE
                         releasePlayer()
@@ -615,11 +616,11 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
             }
         } else {
             bindingSecondPopUp.imageView.visibility = View.GONE
-            if(false) { // TODO : if !video.isNullOrEmpty():
+            if(!mInAppMessage!!.mActionData!!.mSecondPopupVideoUrl1.isNullOrEmpty()) {
                 bindingSecondPopUp.secondVideoView.visibility = View.VISIBLE
                 player = ExoPlayer.Builder(this).build()
                 bindingSecondPopUp.secondVideoView.player = player
-                val mediaItem = MediaItem.fromUri("http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4") // TODO : real url here
+                val mediaItem = MediaItem.fromUri(mInAppMessage!!.mActionData!!.mSecondPopupVideoUrl1!!)
                 player!!.setMediaItem(mediaItem)
                 player!!.prepare()
                 startPlayer()
@@ -852,7 +853,7 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
             }
         }
 
-        if(false) { // TODO : if !video.isNullOrEmpty():
+        if(!mInAppMessage!!.mActionData!!.mVideoUrl.isNullOrEmpty()) {
             initializePlayer()
         }
     }
@@ -861,7 +862,7 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
         if (mInAppMessage!!.mActionData!!.mMsgType != InAppNotificationType.CAROUSEL.toString()) {
             player = ExoPlayer.Builder(this).build()
             binding.videoView.player = player
-            val mediaItem = MediaItem.fromUri("http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4") // TODO : real url here
+            val mediaItem = MediaItem.fromUri(mInAppMessage!!.mActionData!!.mVideoUrl!!)
             player!!.setMediaItem(mediaItem)
             player!!.prepare()
         }
@@ -875,6 +876,10 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
         if (player != null) {
             player!!.release()
             player = null
+        }
+        if (player2 != null) {
+            player2!!.release()
+            player2 = null
         }
     }
 

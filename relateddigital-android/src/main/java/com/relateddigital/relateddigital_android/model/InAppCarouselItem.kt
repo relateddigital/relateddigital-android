@@ -98,6 +98,9 @@ class InAppCarouselItem constructor(`in`: Parcel) : Parcelable {
     @SerializedName("android_lnk")
     var androidLnk: String?
 
+    @SerializedName("videourl")
+    var videoUrl: String?
+
     fun getTitleFontFamily(context: Context): Typeface? {
         if (titleFontFamily == null || titleFontFamily == "") {
             return Typeface.DEFAULT
@@ -222,6 +225,7 @@ class InAppCarouselItem constructor(`in`: Parcel) : Parcelable {
         dest.writeString(backgroundColor)
         dest.writeString(iosLnk)
         dest.writeString(androidLnk)
+        dest.writeString(videoUrl)
     }
 
     companion object CREATOR : Parcelable.Creator<InAppCarouselItem> {
@@ -264,5 +268,6 @@ class InAppCarouselItem constructor(`in`: Parcel) : Parcelable {
         backgroundColor = `in`.readString()
         iosLnk = `in`.readString()
         androidLnk = `in`.readString()
+        videoUrl = `in`.readString()
     }
 }
