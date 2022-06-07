@@ -53,10 +53,7 @@ class GpsManager(context: Context) {
         mGeofencingClient = LocationServices.getGeofencingClient(mApplication)
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(mApplication)
         mLocationCallback = object : LocationCallback() {
-            override fun onLocationResult(locationResult: LocationResult?) {
-                if (locationResult == null) {
-                    return
-                }
+            override fun onLocationResult(locationResult: LocationResult) {
                 for (location: Location? in locationResult.locations) {
                     if (location != null) {
                         lastKnownLocation = location
