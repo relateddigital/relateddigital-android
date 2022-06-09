@@ -4,7 +4,7 @@
 
 # Latest Version 
 
-***April 1, 2022*** - [v1.0.0](https://github.com/relateddigital/relateddigital-android/releases)
+***June 9, 2022*** - [v1.0.0](https://github.com/relateddigital/relateddigital-android/releases)
 
 # About SDK
 
