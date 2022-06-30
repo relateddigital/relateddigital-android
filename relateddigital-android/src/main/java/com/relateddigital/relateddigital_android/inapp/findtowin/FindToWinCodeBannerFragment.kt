@@ -1,4 +1,4 @@
-package com.relateddigital.relateddigital_android.inapp.giftcatch
+package com.relateddigital.relateddigital_android.inapp.findtowin
 
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -15,17 +15,17 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import com.relateddigital.relateddigital_android.R
-import com.relateddigital.relateddigital_android.databinding.FragmentGiftcatchCodeBannerBinding
-import com.relateddigital.relateddigital_android.model.GiftCatchExtendedProps
+import com.relateddigital.relateddigital_android.databinding.FragmentFindtowinCodeBannerBinding
+import com.relateddigital.relateddigital_android.model.FindToWinExtendedProps
 
 /**
  * A simple [Fragment] subclass.
- * Use the [GiftCatchCodeBannerFragment.newInstance] factory method to
+ * Use the [FindToWinCodeBannerFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
-class GiftCatchCodeBannerFragment : Fragment() {
+class FindToWinCodeBannerFragment : Fragment() {
     companion object{
-        private const val LOG_TAG = "GiftCatchBanner"
+        private const val LOG_TAG = "FindToWinBanner"
         // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
         private const val ARG_PARAM1 = "banner_data"
         private const val ARG_PARAM2 = "banner_code"
@@ -38,8 +38,8 @@ class GiftCatchCodeBannerFragment : Fragment() {
          * @param code Parameter 2.
          * @return A new instance of fragment FindToWinCodeBannerFragment.
          */
-        fun newInstance(extendedProps: GiftCatchExtendedProps, code: String): GiftCatchCodeBannerFragment {
-            val fragment = GiftCatchCodeBannerFragment()
+        fun newInstance(extendedProps: FindToWinExtendedProps, code: String): FindToWinCodeBannerFragment {
+            val fragment = FindToWinCodeBannerFragment()
             val args = Bundle()
             args.putSerializable(ARG_PARAM1, extendedProps)
             args.putString(ARG_PARAM2, code)
@@ -48,13 +48,13 @@ class GiftCatchCodeBannerFragment : Fragment() {
         }
     }
 
-    private var mExtendedProps: GiftCatchExtendedProps? = null
+    private var mExtendedProps: FindToWinExtendedProps? = null
     private var bannerCode: String? = null
-    private lateinit var binding: FragmentGiftcatchCodeBannerBinding
+    private lateinit var binding: FragmentFindtowinCodeBannerBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mExtendedProps = requireArguments().getSerializable(ARG_PARAM1) as GiftCatchExtendedProps
+        mExtendedProps = requireArguments().getSerializable(ARG_PARAM1) as FindToWinExtendedProps
         bannerCode = requireArguments().getString(ARG_PARAM2)
         if(bannerCode.isNullOrEmpty()) {
             endFragment()
@@ -63,7 +63,7 @@ class GiftCatchCodeBannerFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View {
-        binding = FragmentGiftcatchCodeBannerBinding.inflate(inflater, container, false)
+        binding = FragmentFindtowinCodeBannerBinding.inflate(inflater, container, false)
         val view: View = binding.root
 
         hideStatusBar()
@@ -114,7 +114,7 @@ class GiftCatchCodeBannerFragment : Fragment() {
 
     private fun endFragment() {
         if (activity != null) {
-            requireActivity().supportFragmentManager.beginTransaction().remove(this@GiftCatchCodeBannerFragment).commit()
+            requireActivity().supportFragmentManager.beginTransaction().remove(this@FindToWinCodeBannerFragment).commit()
         }
     }
 

@@ -57,10 +57,6 @@ class SpinToWinCodeBannerFragment : Fragment() {
     private var bannerCode: String? = null
     private lateinit var binding: FragmentSpintowinCodeBannerBinding
 
-    fun SpinToWinCodeBannerFragment() {
-        // Required empty public constructor
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mExtendedProps = requireArguments().getSerializable(ARG_PARAM1) as SpinToWinExtendedProps
