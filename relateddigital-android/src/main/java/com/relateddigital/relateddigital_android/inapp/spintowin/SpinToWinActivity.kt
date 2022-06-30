@@ -2,6 +2,8 @@ package com.relateddigital.relateddigital_android.inapp.spintowin
 
 import android.content.ClipData
 import android.content.ClipboardManager
+import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -23,6 +25,7 @@ class SpinToWinActivity : FragmentActivity(), SpinToWinCompleteInterface,
     private var jsonStr: String? = ""
     private var response: SpinToWin? = null
     private var spinToWinPromotionCode = ""
+    private var sliceLink = ""
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -72,11 +75,15 @@ class SpinToWinActivity : FragmentActivity(), SpinToWinCompleteInterface,
         finish()
     }
 
-    override fun copyToClipboard(couponCode: String?) {
+    override fun copyToClipboard(couponCode: String?, link: String?) {
         val clipboard = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
         val clip = ClipData.newPlainText("Coupon Code", couponCode)
         clipboard.setPrimaryClip(clip)
         Toast.makeText(applicationContext, getString(R.string.copied_to_clipboard), Toast.LENGTH_LONG).show()
+
+        if(!link.isNullOrEmpty()) {
+            sliceLink = link
+        }
         finish()
     }
 
@@ -106,6 +113,16 @@ class SpinToWinActivity : FragmentActivity(), SpinToWinCompleteInterface,
                 }
             } catch (e: Exception) {
                 Log.e(LOG_TAG, "SpinToWinCodeBanner : " + e.message)
+            }
+        }
+        if (sliceLink.isNotEmpty()) {
+            val uri: Uri
+            try {
+                uri = Uri.parse(sliceLink)
+                val viewIntent = Intent(Intent.ACTION_VIEW, uri)
+                startActivity(viewIntent)
+            } catch (e: Exception) {
+                Log.w(LOG_TAG, "Can't parse notification URI, will not take any action", e)
             }
         }
     }

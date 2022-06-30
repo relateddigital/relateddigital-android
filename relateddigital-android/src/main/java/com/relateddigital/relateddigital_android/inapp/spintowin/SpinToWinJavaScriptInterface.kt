@@ -27,6 +27,7 @@ class SpinToWinJavaScriptInterface internal constructor(webViewDialogFragment: S
 
     private val spinToWinModel: SpinToWin = Gson().fromJson(this.response, SpinToWin::class.java)
     private var subEmail = ""
+    private var selectedSliceLink = ""
 
     /**
      * This method closes SpinToWinActivity
@@ -46,7 +47,7 @@ class SpinToWinJavaScriptInterface internal constructor(webViewDialogFragment: S
     @JavascriptInterface
     fun copyToClipboard(couponCode: String?) {
         mWebViewDialogFragment.dismiss()
-        mCopyToClipboardInterface.copyToClipboard(couponCode)
+        mCopyToClipboardInterface.copyToClipboard(couponCode, selectedSliceLink)
     }
 
     /**
