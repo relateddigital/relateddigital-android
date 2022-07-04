@@ -57,6 +57,9 @@ class Message : Serializable {
         message = bundle["message"]
         title = bundle["title"]
         sound = bundle["sound"]
+        if(sound == null) {
+            sound = ""
+        }
         emPushSp = bundle["emPushSp"]
         deliver = bundle["deliver"]
         silent = bundle["silent"]
@@ -113,6 +116,9 @@ class Message : Serializable {
         message = bundle.getString("message")
         title = bundle.getString("title")
         sound = bundle.getString("sound")
+        if(sound == null) {
+            sound = ""
+        }
         emPushSp = bundle.getString("emPushSp")
         deliver = bundle.getString("deliver")
         silent = bundle.getString("silent")
