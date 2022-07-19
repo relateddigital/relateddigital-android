@@ -10,13 +10,18 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
+import com.google.gson.Gson
 import com.relateddigital.relateddigital_android.R
 import com.relateddigital.relateddigital_android.databinding.FragmentMailSubscriptionFormHalfBinding
-import com.relateddigital.relateddigital_android.model.MailSubscriptionFormHalf
+import com.relateddigital.relateddigital_android.model.MailSubActionData
+import com.relateddigital.relateddigital_android.model.MailSubscriptionFormHalfExtendedProps
+import com.relateddigital.relateddigital_android.network.RequestHandler
+import com.relateddigital.relateddigital_android.util.AppUtils
 import com.squareup.picasso.Picasso
+import java.net.URI
+import java.net.URISyntaxException
 import java.util.regex.Pattern
 
 /**
@@ -29,6 +34,7 @@ class MailSubscriptionFormHalfFragment : Fragment() {
         private const val LOG_TAG = "MailSubsFragment"
         // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
         private const val ARG_PARAM1 = "mail_subs_half_data"
+        private const val ARG_PARAM2 = "mail_subs_half_actid_data"
 
         /**
          * Use this factory method to create a new instance of
@@ -37,28 +43,45 @@ class MailSubscriptionFormHalfFragment : Fragment() {
          * @param response Parameter 1.
          * @return A new instance of fragment HalfScreenFragment.
          */
-        fun newInstance(response: MailSubscriptionFormHalf?): MailSubscriptionFormHalfFragment {
+        fun newInstance(response: MailSubActionData?, actId: String): MailSubscriptionFormHalfFragment {
             val fragment = MailSubscriptionFormHalfFragment()
             val args = Bundle()
             args.putSerializable(ARG_PARAM1, response)
+            args.putString(ARG_PARAM2, actId)
             fragment.arguments = args
             return fragment
         }
     }
 
-    private var mResponse: MailSubscriptionFormHalf? = null
+    private var mResponse: MailSubActionData? = null
+    private var mExtendedProps: MailSubscriptionFormHalfExtendedProps? = null
     private lateinit var binding: FragmentMailSubscriptionFormHalfBinding
     private var isImageRight: Boolean = true
     private var isTextTop: Boolean = true
-
-    fun MailSubscriptionFormHalfFragment() {
-        // Required empty public constructor
-    }
+    private var actId = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mResponse = requireArguments().getSerializable(ARG_PARAM1) as MailSubscriptionFormHalf
+        actId = requireArguments().getString(ARG_PARAM2)!!
+        mResponse = requireArguments().getSerializable(ARG_PARAM1) as MailSubActionData?
         if (mResponse == null) {
+            endFragment()
+        } else {
+            try {
+                mExtendedProps = Gson().fromJson(
+                    URI(mResponse!!.ExtendedProps).path,
+                    MailSubscriptionFormHalfExtendedProps::class.java
+                )
+            } catch (e: URISyntaxException) {
+                e.printStackTrace()
+                endFragment()
+            } catch (e: Exception) {
+                e.printStackTrace()
+                endFragment()
+            }
+        }
+
+        if(mExtendedProps == null) {
             endFragment()
         }
     }
@@ -75,9 +98,8 @@ class MailSubscriptionFormHalfFragment : Fragment() {
     private fun populateUI() {
         setupCloseButton()
 
-        //TODO : set the values from real data here
-        isImageRight = true
-        isTextTop = true
+        isImageRight = mExtendedProps!!.getImagePosition() == "right"
+        isTextTop = mExtendedProps!!.getTextPosition() == "top"
 
         binding.imageViewLeft.visibility = View.VISIBLE
         binding.container.visibility = View.VISIBLE
@@ -88,25 +110,25 @@ class MailSubscriptionFormHalfFragment : Fragment() {
         binding.emailConsent1Container.visibility = View.VISIBLE
         binding.emailConsent2Container.visibility = View.VISIBLE
 
-        if (/*!mInApp!!.mActionData!!.mImg.isNullOrEmpty()*/true) {
+        if (!mResponse!!.img!!.isNullOrEmpty()) {
             if(isImageRight) {
                 binding.imageViewLeft.visibility = View.GONE
-                if(/*AppUtils.isAnImage(mInApp!!.mActionData!!.mImg)*/true) {
-                    Picasso.get().load("https://media-exp1.licdn.com/dms/image/C4E0BAQGmNKZy5oLtCg/company-logo_200_200/0/1639655091397?e=2147483647&v=beta&t=Bs-WyGPQ6VLsXN9TFKQo6AuZJ8zZxaRmTG6gLuvhAPU")
+                if(AppUtils.isAnImage(mResponse!!.img!!)) {
+                    Picasso.get().load(mResponse!!.img!!)
                         .into(binding.imageViewRight)
                 } else {
                     Glide.with(this)
-                        .load("https://media-exp1.licdn.com/dms/image/C4E0BAQGmNKZy5oLtCg/company-logo_200_200/0/1639655091397?e=2147483647&v=beta&t=Bs-WyGPQ6VLsXN9TFKQo6AuZJ8zZxaRmTG6gLuvhAPU")
+                        .load(mResponse!!.img!!)
                         .into(binding.imageViewRight)
                 }
             } else {
                 binding.imageViewRight.visibility = View.GONE
-                if(/*AppUtils.isAnImage(mInApp!!.mActionData!!.mImg)*/true) {
-                    Picasso.get().load("https://media-exp1.licdn.com/dms/image/C4E0BAQGmNKZy5oLtCg/company-logo_200_200/0/1639655091397?e=2147483647&v=beta&t=Bs-WyGPQ6VLsXN9TFKQo6AuZJ8zZxaRmTG6gLuvhAPU")
+                if(AppUtils.isAnImage(mResponse!!.img!!)) {
+                    Picasso.get().load(mResponse!!.img!!)
                         .into(binding.imageViewLeft)
                 } else {
                     Glide.with(this)
-                        .load("https://media-exp1.licdn.com/dms/image/C4E0BAQGmNKZy5oLtCg/company-logo_200_200/0/1639655091397?e=2147483647&v=beta&t=Bs-WyGPQ6VLsXN9TFKQo6AuZJ8zZxaRmTG6gLuvhAPU")
+                        .load(mResponse!!.img!!)
                         .into(binding.imageViewLeft)
                 }
             }
@@ -115,28 +137,35 @@ class MailSubscriptionFormHalfFragment : Fragment() {
             binding.imageViewRight.visibility = View.GONE
         }
 
-        if(/*!mInApp!!.mActionData!!.mBodyText.isNullOrEmpty()*/true) {
+        if(!mResponse!!.message.isNullOrEmpty()) {
             if(isTextTop) {
                 binding.bodyTextViewBot.visibility = View.GONE
-                binding.bodyTextViewTop.text = "Doğaya karşı sorumluluğumuzu yansıtan ürünlerimizi keşfet".replace("\\n", "\n")
-                binding.bodyTextViewTop.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+                binding.bodyTextViewTop.text = mResponse!!.message!!.replace("\\n", "\n")
+                binding.bodyTextViewTop.setTextColor(Color.parseColor(mExtendedProps!!.getTextColor()))
+                binding.bodyTextViewTop.textSize = mExtendedProps!!.getTextSize()!!.toFloat() + 6
+                binding.bodyTextViewTop.typeface = mExtendedProps!!.getTextFontFamily(requireContext())
             } else {
                 binding.bodyTextViewTop.visibility = View.GONE
-                binding.bodyTextViewBot.text = "Doğaya karşı sorumluluğumuzu yansıtan ürünlerimizi keşfet".replace("\\n", "\n")
-                binding.bodyTextViewBot.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+                binding.bodyTextViewBot.text = mResponse!!.message!!.replace("\\n", "\n")
+                binding.bodyTextViewBot.setTextColor(Color.parseColor(mExtendedProps!!.getTextColor()))
+                binding.bodyTextViewBot.textSize = mExtendedProps!!.getTextSize()!!.toFloat() + 6
+                binding.bodyTextViewBot.typeface = mExtendedProps!!.getTextFontFamily(requireContext())
             }
         } else {
             binding.bodyTextViewBot.visibility = View.GONE
             binding.bodyTextViewTop.visibility = View.GONE
         }
 
-        binding.container.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.blue))
-        binding.titleView.text = "İlk Siparişine Özel İndirim".replace("\\n", "\n")
-        binding.titleView.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
-        binding.titleView.textSize = 20f
-        binding.btn.text = "Kaydol"
-        binding.btn.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
-        binding.btn.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.purple_200))
+        binding.container.setBackgroundColor(Color.parseColor(mExtendedProps!!.getBackgroundColor()))
+        binding.titleView.text = mResponse!!.title!!.replace("\\n", "\n")
+        binding.titleView.setTextColor(Color.parseColor(mExtendedProps!!.getTitleTextColor()))
+        binding.titleView.textSize = mExtendedProps!!.getTitleTextSize()!!.toFloat() + 10
+        binding.titleView.typeface = mExtendedProps!!.getTitleFontFamily(requireContext())
+        binding.btn.text = mResponse!!.button_label
+        binding.btn.setTextColor(Color.parseColor(mExtendedProps!!.getButtonTextColor()))
+        binding.btn.setBackgroundColor(Color.parseColor(mExtendedProps!!.getButtonColor()))
+        binding.btn.textSize = mExtendedProps!!.getButtonTextSize()!!.toFloat() + 10
+        binding.btn.typeface = mExtendedProps!!.getButtonFontFamily(requireContext())
         binding.btn.setOnClickListener {
             val email: String = binding.emailView.text.toString()
             if (checkEmail(email)) {
@@ -144,50 +173,42 @@ class MailSubscriptionFormHalfFragment : Fragment() {
             } else {
                 binding.invalidMessage.visibility = View.VISIBLE
                 binding.invalidMessage.setTextColor(Color.RED)
-                binding.invalidMessage.text = "Lütfen geçerli bir email adresi giriniz"
+                binding.invalidMessage.text = mResponse!!.invalid_email_message
                 return@setOnClickListener
             }
             if (!checkCheckBoxes()) {
                 return@setOnClickListener
             }
 
-            //TODO : open this
-            /*RequestHandler.createInAppActionClickRequest(applicationContext, mMailSubscriptionForm!!.actiondata!!.report)
-            RequestHandler.createSubsJsonRequest(applicationContext, "subscription_email", mMailSubscriptionForm!!.actid!!,
-                mMailSubscriptionForm!!.actiondata!!.auth!!, email)*/
+            RequestHandler.createInAppActionClickRequest(requireContext(), mResponse!!.report)
+            RequestHandler.createSubsJsonRequest(requireContext(), "subscription_email", actId,
+                mResponse!!.auth!!, email)
 
-            Toast.makeText(activity, "E-posta adresiniz başarıyla kaydedildi!", Toast.LENGTH_SHORT).show()
+            Toast.makeText(activity, mResponse!!.success_message, Toast.LENGTH_SHORT).show()
             endFragment()
         }
 
         binding.parentContainer.setOnClickListener{}
 
-        binding.emailView.hint = "email address"
+        binding.emailView.hint = mResponse!!.placeholder
 
-        //TODO : email consent texts here.second one may not be available.
-        if (/*mMailSubscriptionForm!!.actiondata!!
-                .emailpermit_text.isNullOrEmpty()*/ false
-        ) {
+        if (mResponse!!.emailpermit_text.isNullOrEmpty()) {
             binding.emailConsent1Container.visibility = View.GONE
         } else {
             binding.emailConsent1.movementMethod = LinkMovementMethod.getInstance()
-            binding.emailConsent1.text = createHtml("email izin 1",
-                "https://www.relateddigital.com/"
+            binding.emailConsent1.text = createHtml(mResponse!!.emailpermit_text!!,
+                mExtendedProps!!.getEmailPermitTextUrl()
             )
-            binding.emailConsent1.textSize = 12f
-            binding.emailConsent1.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+            binding.emailConsent1.textSize = mExtendedProps!!.getEmailPermitTextSize()!!.toFloat() + 6
         }
-        if (/*mMailSubscriptionForm!!.actiondata!!
-                .emailpermit_text.isNullOrEmpty()*/ false
-        ) {
+        if (mResponse!!.consent_text.isNullOrEmpty()) {
             binding.emailConsent2Container.visibility = View.GONE
         } else {
             binding.emailConsent2.movementMethod = LinkMovementMethod.getInstance()
-            binding.emailConsent2.text = createHtml("email izin 2",
-                "https://www.relateddigital.com/"
+            binding.emailConsent2.text = createHtml(mResponse!!.consent_text!!,
+                mExtendedProps!!.getConsentTextUrl()
             )
-            binding.emailConsent2.textSize = 12f
-            binding.emailConsent2.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+            binding.emailConsent2.textSize = mExtendedProps!!.getConsentTextSize()!!.toFloat() + 6
         }
     }
 
@@ -197,11 +218,10 @@ class MailSubscriptionFormHalfFragment : Fragment() {
     }
 
     private fun getCloseIcon(): Int {
-        // TODO : open this
-        /*when (mInAppMessage!!.mActionData!!.mCloseButtonColor) {
+        when (mExtendedProps!!.getCloseButtonColor()) {
             "white" -> return R.drawable.ic_close_white_24dp
             "black" -> return R.drawable.ic_close_black_24dp
-        }*/
+        }
         return R.drawable.ic_close_black_24dp
     }
 
@@ -242,7 +262,7 @@ class MailSubscriptionFormHalfFragment : Fragment() {
                 isCheckboxesOk = false
                 binding.invalidMessage.visibility = View.VISIBLE
                 binding.invalidMessage.setTextColor(Color.RED)
-                binding.invalidMessage.text = "Lütfen kullanım koşullarını kabul ediyorumu onaylayınız."
+                binding.invalidMessage.text = mResponse!!.check_consent_message
                 return isCheckboxesOk
             } else {
                 isCheckboxesOk = true
@@ -254,7 +274,7 @@ class MailSubscriptionFormHalfFragment : Fragment() {
                 isCheckboxesOk = false
                 binding.invalidMessage.visibility = View.VISIBLE
                 binding.invalidMessage.setTextColor(Color.RED)
-                binding.invalidMessage.text = "Lütfen kullanım koşullarını kabul ediyorumu onaylayınız."
+                binding.invalidMessage.text = mResponse!!.check_consent_message
                 return isCheckboxesOk
             } else {
                 isCheckboxesOk = true

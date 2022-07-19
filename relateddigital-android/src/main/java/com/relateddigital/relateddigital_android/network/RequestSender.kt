@@ -11,6 +11,7 @@ import com.relateddigital.relateddigital_android.api.*
 import com.relateddigital.relateddigital_android.constants.Constants
 import com.relateddigital.relateddigital_android.inapp.InAppManager
 import com.relateddigital.relateddigital_android.inapp.VisilabsResponse
+import com.relateddigital.relateddigital_android.inapp.mailsubsform.MailSubscriptionFormHalfFragment
 import com.relateddigital.relateddigital_android.inapp.notification.InAppNotificationFragment
 import com.relateddigital.relateddigital_android.inapp.scratchtowin.ScratchToWinActivity
 import com.relateddigital.relateddigital_android.inapp.socialproof.SocialProofFragment
@@ -239,13 +240,25 @@ object RequestSender {
                                             currentRequest.parent!!.startActivity(intent)
                                         }
                                         actionsResponse.mMailSubscriptionForm!!.isNotEmpty() -> {
-                                            InAppManager(
+
+                                            if(!actionsResponse.mMailSubscriptionForm!![0].actiondata!!.taTemplate.isNullOrEmpty()
+                                                && actionsResponse.mMailSubscriptionForm!![0].actiondata!!.taTemplate == "customizable") {
+                                                val mailSubscriptionFormHalfFragment = MailSubscriptionFormHalfFragment.newInstance(
+                                                    actionsResponse.mMailSubscriptionForm!![0].actiondata, actionsResponse.mMailSubscriptionForm!![0].actid!!
+                                                )
+
+                                                val transaction : FragmentTransaction = (currentRequest.parent!! as FragmentActivity).supportFragmentManager.beginTransaction()
+                                                transaction.replace(android.R.id.content, mailSubscriptionFormHalfFragment)
+                                                transaction.commit()
+                                            } else {
+                                                InAppManager(
                                                     model.getCookieId()!!,
                                                     model.getDataSource()
-                                            ).showMailSubscriptionForm(
+                                                ).showMailSubscriptionForm(
                                                     actionsResponse.mMailSubscriptionForm!![0],
                                                     currentRequest.parent!!
-                                            )
+                                                )
+                                            }
                                         }
                                         actionsResponse.mProductStatNotifierList!!.isNotEmpty() -> {
                                             val socialProofFragment: SocialProofFragment = SocialProofFragment.newInstance(actionsResponse.mProductStatNotifierList!![0])

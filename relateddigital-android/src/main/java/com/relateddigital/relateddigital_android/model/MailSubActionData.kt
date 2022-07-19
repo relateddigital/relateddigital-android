@@ -54,4 +54,10 @@ class MailSubActionData : Serializable {
 
     @SerializedName("report")
     var report: MailSubReport? = null
+
+    @SerializedName("img")
+    var img: String? = null
+
+    @SerializedName("taTemplate")
+    var taTemplate: String? = null
 }

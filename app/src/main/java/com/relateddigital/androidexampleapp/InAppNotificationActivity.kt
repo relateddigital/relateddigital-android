@@ -7,7 +7,6 @@ import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.FragmentTransaction
 import com.google.gson.Gson
 import com.relateddigital.androidexampleapp.databinding.ActivityInAppNotificationExampleBinding
 import com.relateddigital.relateddigital_android.RelatedDigital
@@ -16,10 +15,8 @@ import com.relateddigital.relateddigital_android.inapp.VisilabsCallback
 import com.relateddigital.relateddigital_android.inapp.VisilabsResponse
 import com.relateddigital.relateddigital_android.inapp.countdowntimer.CountdownTimerFragment
 import com.relateddigital.relateddigital_android.inapp.giftcatch.GiftCatchActivity
-import com.relateddigital.relateddigital_android.inapp.mailsubsform.MailSubscriptionFormHalfFragment
 import com.relateddigital.relateddigital_android.inapp.shaketowin.ShakeToWinActivity
 import com.relateddigital.relateddigital_android.model.FavsResponse
-import com.relateddigital.relateddigital_android.model.MailSubscriptionFormHalf
 import com.relateddigital.relateddigital_android.util.ActivityUtils
 import java.util.*
 
@@ -215,16 +212,7 @@ class InAppNotificationActivity : AppCompatActivity() {
         }
 
         binding.mailSubsFormHalfButton.setOnClickListener {
-            val mailSubscriptionFormHalfFragment = MailSubscriptionFormHalfFragment.newInstance(
-                MailSubscriptionFormHalf()
-            )
-
-            val transaction : FragmentTransaction = supportFragmentManager.beginTransaction()
-            transaction.replace(android.R.id.content, mailSubscriptionFormHalfFragment)
-            transaction.commit()
-            //TODO : When BE is ready
-            //sendInAppRequest("mail_subs_form_2")
-
+            sendInAppRequest("mail_subs_form_2")
         }
 
         binding.geofencingButton.setOnClickListener {

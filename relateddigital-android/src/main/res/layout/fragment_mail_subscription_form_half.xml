@@ -5,7 +5,7 @@
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="300dp"
+        android:layout_height="340dp"
         android:layout_alignParentBottom="true"
         android:orientation="horizontal">
 
@@ -39,6 +39,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
                     android:layout_marginBottom="4dp"
+                    android:maxLines="2"
                     android:gravity="center" />
 
                 <TextView
@@ -46,6 +47,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="4dp"
+                    android:maxLines="3"
                     android:gravity="center"
                     android:layout_marginTop="4dp" />
 
@@ -84,6 +86,7 @@
                         android:clickable="true"
                         android:ellipsize="end"
                         android:focusable="true"
+                        android:maxLines="2"
                         android:gravity="start"
                         android:paddingLeft="10dp"
                         android:paddingTop="5dp"
@@ -112,6 +115,7 @@
                         android:ellipsize="end"
                         android:focusable="true"
                         android:gravity="start"
+                        android:maxLines="2"
                         android:paddingLeft="10dp"
                         android:paddingTop="5dp"
                         android:paddingRight="10dp"
@@ -143,6 +147,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="4dp"
                     android:gravity="center"
+                    android:maxLines="3"
                     android:layout_marginTop="4dp" />
 
             </LinearLayout>
