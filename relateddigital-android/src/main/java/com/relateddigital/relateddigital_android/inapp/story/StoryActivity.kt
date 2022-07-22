@@ -17,6 +17,7 @@ import android.view.View.OnTouchListener
 import android.widget.*
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.google.gson.Gson
 import com.relateddigital.relateddigital_android.R
 import com.relateddigital.relateddigital_android.constants.Constants
@@ -50,6 +51,7 @@ class StoryActivity : Activity(), StoriesProgressView.StoriesListener {
     private lateinit var mIvClose: ImageView
     private lateinit var mIvCover: ImageView
     private lateinit var mTvCover: TextView
+    private lateinit var mCountdownEndGifView: ImageView
     private var mGestureDetector: GestureDetector? = null
     private var mStoryPosition = 0
     private var mOnTouchListener: OnTouchListener? = null
@@ -172,6 +174,9 @@ class StoryActivity : Activity(), StoriesProgressView.StoriesListener {
         mHourStr = findViewById(R.id.hour_str)
         mMinuteStr = findViewById(R.id.minute_str)
         mSecStr = findViewById(R.id.sec_str)
+        mCountdownEndGifView = findViewById(R.id.countdown_end_gif)
+
+        mCountdownEndGifView.visibility = View.GONE
 
         val title: String = mStories!!.title!!
         Log.i("StoryActivityShows ", mActionId + " : " + mStories!!.title)
@@ -227,6 +232,7 @@ class StoryActivity : Activity(), StoriesProgressView.StoriesListener {
     }
 
     override fun onNext() {
+        mCountdownEndGifView.visibility = View.GONE
         RequestHandler.createStoryImpressionClickRequest(applicationContext, mBannerActionData!!.report!!.impression)
         if (mStories!!.getItems()!!.size > mStoryItemPosition + 1) {
             setStoryItem(mStories!!.getItems()!![++mStoryItemPosition])
@@ -234,6 +240,7 @@ class StoryActivity : Activity(), StoriesProgressView.StoriesListener {
     }
 
     override fun onPrev() {
+        mCountdownEndGifView.visibility = View.GONE
         RequestHandler.createStoryImpressionClickRequest(applicationContext, mBannerActionData!!.report!!.impression)
         if (mStoryItemPosition - 1 < 0) {
             if (mStoryPosition - 1 < mBannerActionData!!.stories!!.size && mStoryPosition - 1 > -1) {
@@ -251,6 +258,7 @@ class StoryActivity : Activity(), StoriesProgressView.StoriesListener {
     }
 
     override fun onComplete() {
+        mCountdownEndGifView.visibility = View.GONE
         mStoryPosition++
         if (mStoryPosition < mBannerActionData!!.stories!!.size) {
             val nextStoryGroupFirstPosition = 0
@@ -261,6 +269,7 @@ class StoryActivity : Activity(), StoriesProgressView.StoriesListener {
     }
 
     private fun startStoryGroup(itemPosition: Int) {
+        mCountdownEndGifView.visibility = View.GONE
         val intent = Intent(applicationContext, StoryActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
         intent.flags =
@@ -438,6 +447,17 @@ class StoryActivity : Activity(), StoriesProgressView.StoriesListener {
         if (timeDifInSec == 0) {
             mCountDownContainer!!.visibility = View.GONE
             Log.e(LOG_TAG, "Something went wrong when calculating the time difference!!")
+            return
+        } else if (timeDifInSec < 0) {
+            mWeekNumber = 0
+            mDayNumber = 0
+            mHourNumber = 0
+            mMinuteNumber = 0
+            mSecondNumber = 0
+
+            if(true) { // TODO : real control here
+                startCountdownEndAnimation()
+            }
         }
 
         when (mStories!!.getItems()!![mStoryItemPosition].countdown!!.displayType) {
@@ -457,13 +477,8 @@ class StoryActivity : Activity(), StoriesProgressView.StoriesListener {
                 mDivider2!!.visibility = View.VISIBLE
                 mDivider3!!.visibility = View.VISIBLE
                 mDivider4!!.visibility = View.VISIBLE
-                if (timeDifInSec <= 0) {
-                    mDayNumber = 0
-                    mHourNumber = 0
-                    mMinuteNumber = 0
-                    mSecondNumber = 0
-                    startCountdownEndAnimation()
-                } else {
+
+                if (timeDifInSec > 0) {
                     mDayNumber = (timeDifInSec / (60 * 60 * 24)).toShort()
                     timeDifInSec -= mDayNumber * 60 * 60 * 24
                     mHourNumber = (timeDifInSec / (60 * 60)).toShort()
@@ -489,12 +504,8 @@ class StoryActivity : Activity(), StoriesProgressView.StoriesListener {
                 mDivider2!!.visibility = View.VISIBLE
                 mDivider3!!.visibility = View.VISIBLE
                 mDivider4!!.visibility = View.GONE
-                if (timeDifInSec <= 0) {
-                    mDayNumber = 0
-                    mHourNumber = 0
-                    mMinuteNumber = 0
-                    startCountdownEndAnimation()
-                } else {
+
+                if (timeDifInSec > 0) {
                     mDayNumber = (timeDifInSec / (60 * 60 * 24)).toShort()
                     timeDifInSec -= mDayNumber * 60 * 60 * 24
                     mHourNumber = (timeDifInSec / (60 * 60)).toShort()
@@ -517,10 +528,8 @@ class StoryActivity : Activity(), StoriesProgressView.StoriesListener {
                 mDivider2!!.visibility = View.GONE
                 mDivider3!!.visibility = View.GONE
                 mDivider4!!.visibility = View.GONE
-                if (timeDifInSec <= 0) {
-                    mDayNumber = 0
-                    startCountdownEndAnimation()
-                } else {
+
+                if (timeDifInSec > 0) {
                     mDayNumber = (timeDifInSec / (60 * 60 * 24)).toShort()
                 }
             }
@@ -539,14 +548,8 @@ class StoryActivity : Activity(), StoriesProgressView.StoriesListener {
                 mDivider2!!.visibility = View.VISIBLE
                 mDivider3!!.visibility = View.VISIBLE
                 mDivider4!!.visibility = View.VISIBLE
-                if (timeDifInSec <= 0) {
-                    mWeekNumber = 0
-                    mDayNumber = 0
-                    mHourNumber = 0
-                    mMinuteNumber = 0
-                    mSecondNumber = 0
-                    startCountdownEndAnimation()
-                } else {
+
+                if (timeDifInSec > 0) {
                     mWeekNumber = (timeDifInSec / (60 * 60 * 24 * 7)).toShort()
                     timeDifInSec -= mWeekNumber * 60 * 60 * 24 * 7
                     mDayNumber = (timeDifInSec / (60 * 60 * 24)).toShort()
@@ -664,11 +667,19 @@ class StoryActivity : Activity(), StoriesProgressView.StoriesListener {
             mTimerCountDown!!.cancel()
         }
 
-        startCountdownEndAnimation()
+        if(true) { // TODO : real control here
+            startCountdownEndAnimation()
+        }
     }
 
     private fun startCountdownEndAnimation() {
-        // TODO : animation here
+        runOnUiThread {
+            mCountdownEndGifView.visibility = View.VISIBLE
+            mCountdownEndGifView.alpha = 0.5f
+            Glide.with(this)
+                .load("https://c.tenor.com/Rdz9M0h2BoQAAAAC/confetti.gif") // TODO : real url here
+                .into(mCountdownEndGifView)
+        }
     }
 
 

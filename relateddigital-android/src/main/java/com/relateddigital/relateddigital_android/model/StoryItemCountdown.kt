@@ -9,5 +9,5 @@ class StoryItemCountdown : Serializable {
     var messageTextColor: String? = null
     var displayType: String? = null
     var endDateTime: String? = null
-    var endAction: String? = null
+    var endAction: String? = null  //TODO : endAction gidecek yerine bitince cıkacak gif url si gelecek
 }
