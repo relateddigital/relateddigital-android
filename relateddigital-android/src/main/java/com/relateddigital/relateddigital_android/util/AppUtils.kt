@@ -16,6 +16,7 @@ import android.os.Build
 import android.os.Environment
 import android.os.StrictMode
 import android.os.StrictMode.ThreadPolicy
+import android.provider.Settings
 import android.telephony.TelephonyManager
 import android.util.Log
 import android.util.TypedValue
@@ -39,7 +40,6 @@ import java.nio.charset.StandardCharsets
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.regex.Pattern
-import android.provider.Settings
 
 
 object AppUtils {
@@ -612,6 +612,16 @@ object AppUtils {
         return result
     }
 
+    fun calculateTimeDifferenceInSec(endDate: String?): Int {
+        return try {
+            val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")
+            val dt = sdf.parse(endDate)
+            val epoch = dt.time
+            ((epoch - System.currentTimeMillis()) / 1000).toInt()
+        } catch (e: java.lang.Exception) {
+            0
+        }
+    }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     fun createSpinToWinCustomFontFiles(context: Context, jsonStr: String?): ArrayList<String?>? {

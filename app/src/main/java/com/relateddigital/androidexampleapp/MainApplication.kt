@@ -18,10 +18,10 @@ class MainApplication : Application() {
 
         // Initialize RelatedDigital with mandatory information
         RelatedDigital.init(
-                context = applicationContext,
-                organizationId = "676D325830564761676D453D",
-                profileId = "356467332F6533766975593D",
-                dataSource = "visistore")
+            context = applicationContext,
+            organizationId = "676D325830564761676D453D",
+            profileId = "356467332F6533766975593D",
+            dataSource = "visistore")
 
         // Enable In-App Notifications
         RelatedDigital.setIsInAppNotificationEnabled(

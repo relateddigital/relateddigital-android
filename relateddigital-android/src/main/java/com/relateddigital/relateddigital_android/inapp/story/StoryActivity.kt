@@ -25,6 +25,7 @@ import com.relateddigital.relateddigital_android.model.StoryItems
 import com.relateddigital.relateddigital_android.model.StorySkinBasedActionData
 import com.relateddigital.relateddigital_android.model.StorySkinBasedExtendedProps
 import com.relateddigital.relateddigital_android.network.RequestHandler
+import com.relateddigital.relateddigital_android.util.AppUtils
 import com.relateddigital.relateddigital_android.util.AppUtils.getFontFamily
 import com.relateddigital.relateddigital_android.util.PersistentTargetManager
 import com.squareup.picasso.Picasso
@@ -301,65 +302,80 @@ class StoryActivity : Activity(), StoriesProgressView.StoriesListener {
                 Picasso.get().load(item.fileSrc).into(mIvStory)
             }
 
-            // TODO : real control here:
-            isCountDownTimer = false
+            isCountDownTimer = mStories!!.getItems()!![mStoryItemPosition].countdown != null
+
             if (isCountDownTimer) {
                 mCountDownContainer!!.visibility = View.VISIBLE
                 mCountDownTimer!!.setBackgroundResource(R.drawable.rounded_corners_full)
                 val gd = mCountDownTimer!!.background as GradientDrawable
                 gd.setColor(ContextCompat.getColor(this, R.color.white))
-                // TODO : real control here
-                if (true) { // TODO : text top
+
+                if(mStories!!.getItems()!![mStoryItemPosition].countdown!!.pagePosition == "top") {
                     mCountDownTopText!!.visibility = View.VISIBLE
                     mCountDownBotText!!.visibility = View.GONE
 
-                    // TODO : real data here
-                    mCountDownTopText!!.text =
-                        ("SAAT 16:00'DA PAYLAŞILACAK HİKAYEDEKİ İNDİRİM KODUNU BUL" +
-                                ", ONU KULLANABİLECEK 25 ŞANSLI KİŞİDEN BİRİ OL!").replace("\\n", "\n")
-                    mCountDownTopText!!.setTextColor(Color.parseColor("#FFFFFF"))
-                    mCountDownTopText!!.textSize = "9".toFloat() + 16
-                    mCountDownTopText!!.setTypeface(Typeface.DEFAULT)
+                    mCountDownTopText!!.text = mStories!!.getItems()!![mStoryItemPosition]
+                        .countdown!!.messageText!!.replace("\\n", "\n")
+                    mCountDownTopText!!.setTextColor(Color.parseColor(mStories!!.getItems()!![mStoryItemPosition]
+                        .countdown!!.messageTextColor))
+                    mCountDownTopText!!.textSize = mStories!!.getItems()!![mStoryItemPosition]
+                        .countdown!!.messageTextSize!!.toFloat() + 16
+                    mCountDownTopText!!.typeface = Typeface.DEFAULT
                 } else {
                     mCountDownBotText!!.visibility = View.VISIBLE
                     mCountDownTopText!!.visibility = View.GONE
 
-                    // TODO : real data here
-                    mCountDownBotText!!.text =
-                        ("SAAT 16:00'DA PAYLAŞILACAK HİKAYEDEKİ İNDİRİM KODUNU BUL" +
-                                ", ONU KULLANABİLECEK 25 ŞANSLI KİŞİDEN BİRİ OL!").replace("\\n", "\n")
-                    mCountDownBotText!!.setTextColor(Color.parseColor("#FFFFFF"))
-                    mCountDownBotText!!.textSize = "9".toFloat() + 16
-                    mCountDownBotText!!.setTypeface(Typeface.DEFAULT)
+                    mCountDownBotText!!.text = mStories!!.getItems()!![mStoryItemPosition]
+                        .countdown!!.messageText!!.replace("\\n", "\n")
+                    mCountDownBotText!!.setTextColor(Color.parseColor(mStories!!.getItems()!![mStoryItemPosition]
+                        .countdown!!.messageTextColor))
+                    mCountDownBotText!!.textSize = mStories!!.getItems()!![mStoryItemPosition]
+                        .countdown!!.messageTextSize!!.toFloat() + 16
+                    mCountDownBotText!!.typeface = Typeface.DEFAULT
                 }
+
                 setTimerValues()
-                //TODO check the format here and set the visibilities of the views accordingly
-                //TODO: convert bigger part like week to smaller parts like day if necessary according to the format
-                mWeekNum!!.setBackgroundResource(R.drawable.rounded_corners_full_small_edge)
-                val gdWeek = mWeekNum!!.background as GradientDrawable
-                gdWeek.setColor(Color.parseColor("#E5E4E2"))
-                mWeekNum!!.text = mWeekNumber.toString()
-                mWeekNum!!.setTextColor(ContextCompat.getColor(this, R.color.black))
-                mDayNum!!.setBackgroundResource(R.drawable.rounded_corners_full_small_edge)
-                val gdDay = mDayNum!!.background as GradientDrawable
-                gdDay.setColor(Color.parseColor("#E5E4E2"))
-                mDayNum!!.text = mDayNumber.toString()
-                mDayNum!!.setTextColor(ContextCompat.getColor(this, R.color.black))
-                mHourNum!!.setBackgroundResource(R.drawable.rounded_corners_full_small_edge)
-                val gdHour = mHourNum!!.background as GradientDrawable
-                gdHour.setColor(Color.parseColor("#E5E4E2"))
-                mHourNum!!.text = mHourNumber.toString()
-                mHourNum!!.setTextColor(ContextCompat.getColor(this, R.color.black))
-                mMinuteNum!!.setBackgroundResource(R.drawable.rounded_corners_full_small_edge)
-                val gdMinute = mMinuteNum!!.background as GradientDrawable
-                gdMinute.setColor(Color.parseColor("#E5E4E2"))
-                mMinuteNum!!.text = mMinuteNumber.toString()
-                mMinuteNum!!.setTextColor(ContextCompat.getColor(this, R.color.black))
-                mSecNum!!.setBackgroundResource(R.drawable.rounded_corners_full_small_edge)
-                val gdSec = mSecNum!!.background as GradientDrawable
-                gdSec.setColor(Color.parseColor("#E5E4E2"))
-                mSecNum!!.text = mSecondNumber.toString()
-                mSecNum!!.setTextColor(ContextCompat.getColor(this, R.color.black))
+
+                if(mWeekNum!!.visibility != View.GONE) {
+                    mWeekNum!!.setBackgroundResource(R.drawable.rounded_corners_full_small_edge)
+                    val gdWeek = mWeekNum!!.background as GradientDrawable
+                    gdWeek.setColor(Color.parseColor("#E5E4E2"))
+                    mWeekNum!!.text = mWeekNumber.toString()
+                    mWeekNum!!.setTextColor(ContextCompat.getColor(this, R.color.black))
+                }
+
+                if(mDayNum!!.visibility != View.GONE) {
+                    mDayNum!!.setBackgroundResource(R.drawable.rounded_corners_full_small_edge)
+                    val gdDay = mDayNum!!.background as GradientDrawable
+                    gdDay.setColor(Color.parseColor("#E5E4E2"))
+                    mDayNum!!.text = mDayNumber.toString()
+                    mDayNum!!.setTextColor(ContextCompat.getColor(this, R.color.black))
+                }
+
+                if(mHourNum!!.visibility != View.GONE) {
+                    mHourNum!!.setBackgroundResource(R.drawable.rounded_corners_full_small_edge)
+                    val gdHour = mHourNum!!.background as GradientDrawable
+                    gdHour.setColor(Color.parseColor("#E5E4E2"))
+                    mHourNum!!.text = mHourNumber.toString()
+                    mHourNum!!.setTextColor(ContextCompat.getColor(this, R.color.black))
+                }
+
+                if(mMinuteNum!!.visibility != View.GONE) {
+                    mMinuteNum!!.setBackgroundResource(R.drawable.rounded_corners_full_small_edge)
+                    val gdMinute = mMinuteNum!!.background as GradientDrawable
+                    gdMinute.setColor(Color.parseColor("#E5E4E2"))
+                    mMinuteNum!!.text = mMinuteNumber.toString()
+                    mMinuteNum!!.setTextColor(ContextCompat.getColor(this, R.color.black))
+                }
+
+                if(mSecNum!!.visibility != View.GONE) {
+                    mSecNum!!.setBackgroundResource(R.drawable.rounded_corners_full_small_edge)
+                    val gdSec = mSecNum!!.background as GradientDrawable
+                    gdSec.setColor(Color.parseColor("#E5E4E2"))
+                    mSecNum!!.text = mSecondNumber.toString()
+                    mSecNum!!.setTextColor(ContextCompat.getColor(this, R.color.black))
+                }
+
                 startTimer()
             } else {
                 mCountDownContainer!!.visibility = View.GONE
@@ -414,12 +430,135 @@ class StoryActivity : Activity(), StoriesProgressView.StoriesListener {
     }
 
     private fun setTimerValues() {
-        //TODO: When real data came, adjust here accordingly
-        mWeekNumber = 3
-        mDayNumber = 5
-        mHourNumber = 17
-        mMinuteNumber = 0
-        mSecondNumber = 6
+        var timeDifInSec: Int = AppUtils.calculateTimeDifferenceInSec(
+            mStories!!.getItems()!![mStoryItemPosition]
+                .countdown!!.endDateTime
+        )
+
+        if (timeDifInSec == 0) {
+            mCountDownContainer!!.visibility = View.GONE
+            Log.e(LOG_TAG, "Something went wrong when calculating the time difference!!")
+        }
+
+        when (mStories!!.getItems()!![mStoryItemPosition].countdown!!.displayType) {
+
+            "dhms" -> {
+                mWeekNum!!.visibility = View.GONE
+                mDayNum!!.visibility = View.VISIBLE
+                mHourNum!!.visibility = View.VISIBLE
+                mMinuteNum!!.visibility = View.VISIBLE
+                mSecNum!!.visibility = View.VISIBLE
+                mWeekStr!!.visibility = View.GONE
+                mDayStr!!.visibility = View.VISIBLE
+                mHourStr!!.visibility = View.VISIBLE
+                mMinuteStr!!.visibility = View.VISIBLE
+                mSecStr!!.visibility = View.VISIBLE
+                mDivider1!!.visibility = View.GONE
+                mDivider2!!.visibility = View.VISIBLE
+                mDivider3!!.visibility = View.VISIBLE
+                mDivider4!!.visibility = View.VISIBLE
+                if (timeDifInSec <= 0) {
+                    mDayNumber = 0
+                    mHourNumber = 0
+                    mMinuteNumber = 0
+                    mSecondNumber = 0
+                    startCountdownEndAnimation()
+                } else {
+                    mDayNumber = (timeDifInSec / (60 * 60 * 24)).toShort()
+                    timeDifInSec -= mDayNumber * 60 * 60 * 24
+                    mHourNumber = (timeDifInSec / (60 * 60)).toShort()
+                    timeDifInSec -= mHourNumber * 60 * 60
+                    mMinuteNumber = (timeDifInSec / 60).toShort()
+                    timeDifInSec -= mMinuteNumber * 60
+                    mSecondNumber = timeDifInSec.toShort()
+                }
+            }
+
+            "dhm" -> {
+                mWeekNum!!.visibility = View.GONE
+                mDayNum!!.visibility = View.VISIBLE
+                mHourNum!!.visibility = View.VISIBLE
+                mMinuteNum!!.visibility = View.VISIBLE
+                mSecNum!!.visibility = View.GONE
+                mWeekStr!!.visibility = View.GONE
+                mDayStr!!.visibility = View.VISIBLE
+                mHourStr!!.visibility = View.VISIBLE
+                mMinuteStr!!.visibility = View.VISIBLE
+                mSecStr!!.visibility = View.GONE
+                mDivider1!!.visibility = View.GONE
+                mDivider2!!.visibility = View.VISIBLE
+                mDivider3!!.visibility = View.VISIBLE
+                mDivider4!!.visibility = View.GONE
+                if (timeDifInSec <= 0) {
+                    mDayNumber = 0
+                    mHourNumber = 0
+                    mMinuteNumber = 0
+                    startCountdownEndAnimation()
+                } else {
+                    mDayNumber = (timeDifInSec / (60 * 60 * 24)).toShort()
+                    timeDifInSec -= mDayNumber * 60 * 60 * 24
+                    mHourNumber = (timeDifInSec / (60 * 60)).toShort()
+                    timeDifInSec -= mHourNumber * 60 * 60
+                    mMinuteNumber = (timeDifInSec / 60).toShort()
+                }
+            }
+            "d" -> {
+                mWeekNum!!.visibility = View.GONE
+                mDayNum!!.visibility = View.VISIBLE
+                mHourNum!!.visibility = View.GONE
+                mMinuteNum!!.visibility = View.GONE
+                mSecNum!!.visibility = View.GONE
+                mWeekStr!!.visibility = View.GONE
+                mDayStr!!.visibility = View.VISIBLE
+                mHourStr!!.visibility = View.GONE
+                mMinuteStr!!.visibility = View.GONE
+                mSecStr!!.visibility = View.GONE
+                mDivider1!!.visibility = View.GONE
+                mDivider2!!.visibility = View.GONE
+                mDivider3!!.visibility = View.GONE
+                mDivider4!!.visibility = View.GONE
+                if (timeDifInSec <= 0) {
+                    mDayNumber = 0
+                    startCountdownEndAnimation()
+                } else {
+                    mDayNumber = (timeDifInSec / (60 * 60 * 24)).toShort()
+                }
+            }
+            else -> {
+                mWeekNum!!.visibility = View.VISIBLE
+                mDayNum!!.visibility = View.VISIBLE
+                mHourNum!!.visibility = View.VISIBLE
+                mMinuteNum!!.visibility = View.VISIBLE
+                mSecNum!!.visibility = View.VISIBLE
+                mWeekStr!!.visibility = View.VISIBLE
+                mDayStr!!.visibility = View.VISIBLE
+                mHourStr!!.visibility = View.VISIBLE
+                mMinuteStr!!.visibility = View.VISIBLE
+                mSecStr!!.visibility = View.VISIBLE
+                mDivider1!!.visibility = View.VISIBLE
+                mDivider2!!.visibility = View.VISIBLE
+                mDivider3!!.visibility = View.VISIBLE
+                mDivider4!!.visibility = View.VISIBLE
+                if (timeDifInSec <= 0) {
+                    mWeekNumber = 0
+                    mDayNumber = 0
+                    mHourNumber = 0
+                    mMinuteNumber = 0
+                    mSecondNumber = 0
+                    startCountdownEndAnimation()
+                } else {
+                    mWeekNumber = (timeDifInSec / (60 * 60 * 24 * 7)).toShort()
+                    timeDifInSec -= mWeekNumber * 60 * 60 * 24 * 7
+                    mDayNumber = (timeDifInSec / (60 * 60 * 24)).toShort()
+                    timeDifInSec -= mDayNumber * 60 * 60 * 24
+                    mHourNumber = (timeDifInSec / (60 * 60)).toShort()
+                    timeDifInSec -= mHourNumber * 60 * 60
+                    mMinuteNumber = (timeDifInSec / 60).toShort()
+                    timeDifInSec -= mMinuteNumber * 60
+                    mSecondNumber = timeDifInSec.toShort()
+                }
+            }
+        }
     }
 
     private fun startTimer() {
@@ -462,28 +601,52 @@ class StoryActivity : Activity(), StoriesProgressView.StoriesListener {
     }
 
     private fun calculateTimeFields() {
-        //TODO: Adjust the logic here for each format. For example, if there is no week field
-        //in the format do not set day to max 6 below.
-        if (mSecondNumber > 0) {
-            mSecondNumber--
-        } else {
-            mSecondNumber = 59
-            if (mMinuteNumber > 0) {
-                mMinuteNumber--
-            } else {
-                mMinuteNumber = 59
-                if (mHourNumber > 0) {
-                    mHourNumber--
+        when (mStories!!.getItems()!![mStoryItemPosition].countdown!!.displayType) {
+            "dhms", "dhm", "d" -> {
+                if (mSecondNumber > 0) {
+                    mSecondNumber--
                 } else {
-                    mHourNumber = 23
-                    if (mDayNumber > 0) {
-                        mDayNumber--
+                    mSecondNumber = 59
+                    if (mMinuteNumber > 0) {
+                        mMinuteNumber--
                     } else {
-                        mDayNumber = 6
-                        if (mWeekNumber > 0) {
-                            mWeekNumber--
+                        mMinuteNumber = 59
+                        if (mHourNumber > 0) {
+                            mHourNumber--
                         } else {
-                            expireTime()
+                            mHourNumber = 23
+                            if (mDayNumber > 0) {
+                                mDayNumber--
+                            } else {
+                                expireTime()
+                            }
+                        }
+                    }
+                }
+            }
+            else -> {
+                if (mSecondNumber > 0) {
+                    mSecondNumber--
+                } else {
+                    mSecondNumber = 59
+                    if (mMinuteNumber > 0) {
+                        mMinuteNumber--
+                    } else {
+                        mMinuteNumber = 59
+                        if (mHourNumber > 0) {
+                            mHourNumber--
+                        } else {
+                            mHourNumber = 23
+                            if (mDayNumber > 0) {
+                                mDayNumber--
+                            } else {
+                                mDayNumber = 6
+                                if (mWeekNumber > 0) {
+                                    mWeekNumber--
+                                } else {
+                                    expireTime()
+                                }
+                            }
                         }
                     }
                 }
@@ -500,19 +663,14 @@ class StoryActivity : Activity(), StoriesProgressView.StoriesListener {
         if (mTimerCountDown != null) {
             mTimerCountDown!!.cancel()
         }
-        runOnUiThread {
-            Toast.makeText(
-                applicationContext,
-                getString(R.string.time_is_over),
-                Toast.LENGTH_LONG
-            ).show()
-        }
 
-        // TODO : real control here
-        if (true) { // if it should be removed when it expires
-            mCountDownContainer!!.visibility = View.GONE
-        }
+        startCountdownEndAnimation()
     }
+
+    private fun startCountdownEndAnimation() {
+        // TODO : animation here
+    }
+
 
     companion object {
         private const val LOG_TAG = "Story Activity"

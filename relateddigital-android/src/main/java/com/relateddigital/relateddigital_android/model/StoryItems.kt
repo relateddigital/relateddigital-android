@@ -11,6 +11,7 @@ class StoryItems : Serializable {
     var buttonTextColor: String? = null
     var targetUrl: String? = null
     var fileType: String? = null
+    var countdown: StoryItemCountdown? = null
 
     override fun toString(): String {
         return "Items [ fileSrc = " + fileSrc + ", buttonText = " + buttonText +
