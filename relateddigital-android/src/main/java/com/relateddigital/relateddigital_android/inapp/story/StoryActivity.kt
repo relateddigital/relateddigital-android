@@ -455,7 +455,7 @@ class StoryActivity : Activity(), StoriesProgressView.StoriesListener {
             mMinuteNumber = 0
             mSecondNumber = 0
 
-            if(true) { // TODO : real control here
+            if(!mStories!!.getItems()!![mStoryItemPosition].countdown!!.endAnimationImageUrl.isNullOrEmpty()) {
                 startCountdownEndAnimation()
             }
         }
@@ -667,7 +667,7 @@ class StoryActivity : Activity(), StoriesProgressView.StoriesListener {
             mTimerCountDown!!.cancel()
         }
 
-        if(true) { // TODO : real control here
+        if(!mStories!!.getItems()!![mStoryItemPosition].countdown!!.endAnimationImageUrl.isNullOrEmpty()) {
             startCountdownEndAnimation()
         }
     }
@@ -677,7 +677,7 @@ class StoryActivity : Activity(), StoriesProgressView.StoriesListener {
             mCountdownEndGifView.visibility = View.VISIBLE
             mCountdownEndGifView.alpha = 0.5f
             Glide.with(this)
-                .load("https://c.tenor.com/Rdz9M0h2BoQAAAAC/confetti.gif") // TODO : real url here
+                .load(mStories!!.getItems()!![mStoryItemPosition].countdown!!.endAnimationImageUrl)
                 .into(mCountdownEndGifView)
         }
     }
