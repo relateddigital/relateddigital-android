@@ -675,7 +675,6 @@ class StoryActivity : Activity(), StoriesProgressView.StoriesListener {
     private fun startCountdownEndAnimation() {
         runOnUiThread {
             mCountdownEndGifView.visibility = View.VISIBLE
-            mCountdownEndGifView.alpha = 0.5f
             Glide.with(this)
                 .load(mStories!!.getItems()!![mStoryItemPosition].countdown!!.endAnimationImageUrl)
                 .into(mCountdownEndGifView)
