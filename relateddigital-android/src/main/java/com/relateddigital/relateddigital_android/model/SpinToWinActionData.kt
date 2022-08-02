@@ -64,4 +64,7 @@ class SpinToWinActionData : Serializable {
     @SerializedName("promocodes_soldout_message")
     var promoCodesSoldOutMessage: String? = null
 
+    @SerializedName("copybutton_function")
+    var copyButtonFunction: String? = null
+
 }

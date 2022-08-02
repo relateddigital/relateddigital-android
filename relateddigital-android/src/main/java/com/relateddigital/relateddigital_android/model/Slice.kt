@@ -18,4 +18,10 @@ class Slice : Serializable {
 
     @SerializedName("is_available")
     var isAvailable: Boolean? = null
+
+    @SerializedName("ios_lnk")
+    var iosLink: String? = null
+
+    @SerializedName("android_lnk")
+    var androidLink: String? = null
 }

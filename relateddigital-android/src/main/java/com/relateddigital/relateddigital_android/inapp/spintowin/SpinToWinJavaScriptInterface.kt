@@ -27,7 +27,7 @@ class SpinToWinJavaScriptInterface internal constructor(webViewDialogFragment: S
 
     private val spinToWinModel: SpinToWin = Gson().fromJson(this.response, SpinToWin::class.java)
     private var subEmail = ""
-    private var selectedSliceLink = ""
+    private var selectedIndex = -1
 
     /**
      * This method closes SpinToWinActivity
@@ -47,7 +47,14 @@ class SpinToWinJavaScriptInterface internal constructor(webViewDialogFragment: S
     @JavascriptInterface
     fun copyToClipboard(couponCode: String?) {
         mWebViewDialogFragment.dismiss()
-        mCopyToClipboardInterface.copyToClipboard(couponCode, selectedSliceLink)
+
+        if (spinToWinModel.actiondata!!.copyButtonFunction == "copy_redirect" &&
+            !spinToWinModel.actiondata!!.slices!![selectedIndex].androidLink.isNullOrEmpty()) {
+            mCopyToClipboardInterface.copyToClipboard(couponCode, spinToWinModel.actiondata!!.slices!![selectedIndex].androidLink)
+        } else {
+            mCopyToClipboardInterface.copyToClipboard(couponCode, null)
+        }
+
     }
 
     /**
@@ -98,7 +105,6 @@ class SpinToWinJavaScriptInterface internal constructor(webViewDialogFragment: S
         val promotionCodes: MutableList<String> = ArrayList()
         val sliceTexts: MutableList<String> = ArrayList()
         val promotionIndexes: MutableList<Int> = ArrayList()
-        var selectedIndex = -1
 
         val promoAuth: String = spinToWinModel.actiondata!!.promoAuth!!
         val actId: Int = spinToWinModel.actid!!
