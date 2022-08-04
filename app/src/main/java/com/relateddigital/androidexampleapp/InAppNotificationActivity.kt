@@ -14,6 +14,7 @@ import com.relateddigital.relateddigital_android.constants.Constants
 import com.relateddigital.relateddigital_android.inapp.VisilabsCallback
 import com.relateddigital.relateddigital_android.inapp.VisilabsResponse
 import com.relateddigital.relateddigital_android.inapp.countdowntimer.CountdownTimerFragment
+import com.relateddigital.relateddigital_android.inapp.findtowin.FindToWinActivity
 import com.relateddigital.relateddigital_android.inapp.giftcatch.GiftCatchActivity
 import com.relateddigital.relateddigital_android.inapp.shaketowin.ShakeToWinActivity
 import com.relateddigital.relateddigital_android.model.FavsResponse
@@ -222,6 +223,12 @@ class InAppNotificationActivity : AppCompatActivity() {
         binding.giftCatchButton.setOnClickListener {
             ActivityUtils.parentActivity = activity
             val intent = Intent(activity, GiftCatchActivity::class.java)
+            startActivity(intent)
+        }
+
+        binding.findToWinButton.setOnClickListener {
+            ActivityUtils.parentActivity = activity
+            val intent = Intent(activity, FindToWinActivity::class.java)
             startActivity(intent)
         }
     }

@@ -64,10 +64,6 @@ class FindToWinWebDialogFragment : DialogFragment() {
         }
     }
 
-    fun getWebView(): WebView? {
-        return webView
-    }
-
     @SuppressLint("SetJavaScriptEnabled", "JavascriptInterface")
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         super.onCreateView(inflater, container, savedInstanceState)

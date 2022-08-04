@@ -26,7 +26,7 @@ class GiftCatchActivity : FragmentActivity(), GiftCatchCompleteInterface,
         super.onCreate(savedInstanceState)
         // TODO : Get this from SpinToWin
         val webViewDialogFragment: GiftCatchWebDialogFragment =
-            GiftCatchWebDialogFragment.newInstance("index.html", "test")
+            GiftCatchWebDialogFragment.newInstance("gift_catch_index.html", "test")
         webViewDialogFragment.setGiftCatchListeners(this, this, this)
         webViewDialogFragment.display(supportFragmentManager)
     }

@@ -26,7 +26,7 @@ class FindToWinActivity : FragmentActivity(), FindToWinCompleteInterface,
         super.onCreate(savedInstanceState)
         // TODO : Get this from SpinToWin
         val webViewDialogFragment: FindToWinWebDialogFragment =
-            FindToWinWebDialogFragment.newInstance("index.html", "test")
+            FindToWinWebDialogFragment.newInstance("find_to_win_index.html", "test")
         webViewDialogFragment.setFindToWinListeners(this, this, this)
         webViewDialogFragment.display(supportFragmentManager)
     }
