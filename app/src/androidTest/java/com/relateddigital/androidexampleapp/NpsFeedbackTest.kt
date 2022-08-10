@@ -6,6 +6,7 @@ import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.assertion.ViewAssertions
 import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.relateddigital.androidexampleapp.utils.RatingViewAction
 import org.junit.After
 import org.junit.Before
 import org.junit.Test

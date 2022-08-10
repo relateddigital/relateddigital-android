@@ -1,4 +1,4 @@
-package com.relateddigital.androidexampleapp
+package com.relateddigital.androidexampleapp.utils
 
 import android.view.View
 import android.widget.RatingBar
