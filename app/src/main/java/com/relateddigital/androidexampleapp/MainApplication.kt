@@ -16,6 +16,8 @@ class MainApplication : Application() {
     override fun onCreate() {
         super.onCreate()
 
+        RelatedDigital.clearBadgeCount(context = applicationContext)
+
         // Initialize RelatedDigital with mandatory information
         RelatedDigital.init(
             context = applicationContext,
