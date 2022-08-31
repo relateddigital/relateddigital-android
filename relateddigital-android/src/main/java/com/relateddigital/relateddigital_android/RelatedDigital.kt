@@ -28,7 +28,6 @@ import com.relateddigital.relateddigital_android.push.RetentionType
 import com.relateddigital.relateddigital_android.recommendation.VisilabsTargetFilter
 import com.relateddigital.relateddigital_android.remoteConfig.RemoteConfigHelper
 import com.relateddigital.relateddigital_android.util.*
-import me.leolin.shortcutbadger.ShortcutBadger
 import org.json.JSONObject
 
 
@@ -970,12 +969,6 @@ object RelatedDigital {
         } else {
             customEvent(context, Constants.PAGE_NAME_REQUEST_VAL, properties)
         }
-    }
-
-    @JvmStatic
-    fun clearBadgeCount(context: Context) {
-        ShortcutBadger.removeCount(context)
-        SharedPref.writeInt(context, Constants.BADGE_COUNT_KEY, 0)
     }
 
     @JvmStatic

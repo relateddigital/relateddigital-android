@@ -18,7 +18,6 @@ import com.relateddigital.relateddigital_android.util.AppUtils
 import com.relateddigital.relateddigital_android.util.LogUtils
 import com.relateddigital.relateddigital_android.util.PayloadUtils
 import com.relateddigital.relateddigital_android.util.SharedPref
-import me.leolin.shortcutbadger.ShortcutBadger
 import java.util.*
 
 class RelatedDigitalHuaweiMessagingService : HmsMessageService() {
@@ -123,10 +122,6 @@ class RelatedDigitalHuaweiMessagingService : HmsMessageService() {
                         )
                     }
                 }
-
-                val badgeCount = SharedPref.readInt(this, Constants.BADGE_COUNT_KEY, 0)
-                ShortcutBadger.applyCount(this, badgeCount+1)
-                SharedPref.writeInt(this, Constants.BADGE_COUNT_KEY, badgeCount+1)
 
                 when (pushMessage.getPushType()) {
                     PushType.Image -> if (pushMessage.getElements() != null) {

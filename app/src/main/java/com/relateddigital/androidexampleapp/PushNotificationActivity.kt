@@ -217,7 +217,6 @@ class PushNotificationActivity : AppCompatActivity() {
 
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
-        RelatedDigital.clearBadgeCount(context = applicationContext)
         if (intent != null) {
             val bundle = intent.extras
             if (bundle != null) {
@@ -244,7 +243,6 @@ class PushNotificationActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        RelatedDigital.clearBadgeCount(context = applicationContext)
         if(isFirstResume) {
             isFirstResume = false
             if (intent != null) {
