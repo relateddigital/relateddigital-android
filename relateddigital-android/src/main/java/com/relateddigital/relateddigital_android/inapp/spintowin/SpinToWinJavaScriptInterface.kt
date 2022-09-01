@@ -64,7 +64,7 @@ class SpinToWinJavaScriptInterface internal constructor(webViewDialogFragment: S
      */
     @JavascriptInterface
     fun subscribeEmail(email: String?) {
-        if (email != "" && email != null) {
+        if (!email.isNullOrEmpty()) {
             subEmail = email
             RequestHandler.createSubsJsonRequest(mWebViewDialogFragment.requireContext(), spinToWinModel.actiondata!!.type!!,
                     spinToWinModel.actid.toString(), spinToWinModel.actiondata!!.auth!!,

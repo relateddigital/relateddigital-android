@@ -1,6 +1,11 @@
 package com.relateddigital.relateddigital_android.inapp.giftcatch
 
+import android.util.Log
 import android.webkit.JavascriptInterface
+import com.google.gson.Gson
+import com.relateddigital.relateddigital_android.model.GiftRain
+import com.relateddigital.relateddigital_android.model.MailSubReport
+import com.relateddigital.relateddigital_android.network.RequestHandler
 
 class GiftCatchJavaScriptInterface internal constructor(webViewDialogFragment: GiftCatchWebDialogFragment,
                                                         @get:JavascriptInterface val response: String) {
@@ -8,6 +13,7 @@ class GiftCatchJavaScriptInterface internal constructor(webViewDialogFragment: G
     private lateinit var mListener: GiftCatchCompleteInterface
     private lateinit var mCopyToClipboardInterface: GiftCatchCopyToClipboardInterface
     private lateinit var mShowCodeInterface: GiftCatchShowCodeInterface
+    private val giftRainModel: GiftRain = Gson().fromJson(this.response, GiftRain::class.java)
 
     private var subEmail = ""
 
@@ -39,7 +45,14 @@ class GiftCatchJavaScriptInterface internal constructor(webViewDialogFragment: G
      */
     @JavascriptInterface
     fun subscribeEmail(email: String?) {
-        //TODO get it from SpinToWin
+        if (!email.isNullOrEmpty()) {
+            subEmail = email
+            RequestHandler.createSubsJsonRequest(mWebViewDialogFragment.requireContext(), giftRainModel.actiondata!!.type!!,
+                giftRainModel.actid.toString(), giftRainModel.actiondata!!.auth!!,
+                email)
+        } else {
+            Log.e("Gift Rain : ", "Email entered is not valid!")
+        }
     }
 
     /**
@@ -47,7 +60,19 @@ class GiftCatchJavaScriptInterface internal constructor(webViewDialogFragment: G
      */
     @JavascriptInterface
     fun sendReport() {
-        //TODO get it from SpinToWin
+        var report: MailSubReport?
+        try {
+            report = MailSubReport()
+            report.impression = giftRainModel.actiondata!!.report!!.impression
+            report.click = giftRainModel.actiondata!!.report!!.click
+        } catch (e: Exception) {
+            Log.e("Gift Rain : ", "There is no report to send!")
+            e.printStackTrace()
+            report = null
+        }
+        if (report != null) {
+            RequestHandler.createInAppActionClickRequest(mWebViewDialogFragment.requireContext(), report)
+        }
     }
 
     /**
@@ -66,9 +91,5 @@ class GiftCatchJavaScriptInterface internal constructor(webViewDialogFragment: G
         mListener = listener
         mCopyToClipboardInterface = copyToClipboardInterface
         mShowCodeInterface = showCodeInterface
-    }
-
-    private fun sendPromotionCodeInfo(promotionCode: String, sliceText: String) {
-        // TODO : check if this is necessary
     }
 }
