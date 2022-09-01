@@ -11,6 +11,7 @@ import com.relateddigital.relateddigital_android.api.*
 import com.relateddigital.relateddigital_android.constants.Constants
 import com.relateddigital.relateddigital_android.inapp.InAppManager
 import com.relateddigital.relateddigital_android.inapp.VisilabsResponse
+import com.relateddigital.relateddigital_android.inapp.giftcatch.GiftCatchActivity
 import com.relateddigital.relateddigital_android.inapp.mailsubsform.MailSubscriptionFormHalfFragment
 import com.relateddigital.relateddigital_android.inapp.notification.InAppNotificationFragment
 import com.relateddigital.relateddigital_android.inapp.scratchtowin.ScratchToWinActivity
@@ -275,6 +276,18 @@ object RequestSender {
                                             val transaction : FragmentTransaction= (currentRequest.parent!! as FragmentActivity).supportFragmentManager.beginTransaction()
                                             transaction.replace(android.R.id.content, inAppNotificationFragment)
                                             transaction.commit()
+                                        }
+                                        actionsResponse.mGiftRain!!.isNotEmpty() -> {
+                                            ActivityUtils.parentActivity = currentRequest.parent
+                                            val intent =
+                                                Intent(
+                                                    currentRequest.parent,
+                                                    GiftCatchActivity::class.java
+                                                )
+                                            val giftRainModel: GiftRain =
+                                                actionsResponse.mGiftRain!![0]
+                                            intent.putExtra("gift-rain-data", giftRainModel)
+                                            currentRequest.parent!!.startActivity(intent)
                                         }
                                         else -> {
                                             Log.e(

@@ -2,6 +2,7 @@ package com.relateddigital.relateddigital_android.inapp.giftcatch
 
 import android.content.ClipData
 import android.content.ClipboardManager
+import android.graphics.Color
 import android.graphics.Typeface
 import android.os.Bundle
 import android.util.Log
@@ -10,13 +11,17 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import com.relateddigital.relateddigital_android.R
 import com.relateddigital.relateddigital_android.databinding.FragmentGiftcatchCodeBannerBinding
+import com.relateddigital.relateddigital_android.inapp.FontFamily
 import com.relateddigital.relateddigital_android.model.GiftCatchExtendedProps
+import com.relateddigital.relateddigital_android.util.AppUtils
+import java.util.*
 
 /**
  * A simple [Fragment] subclass.
@@ -78,23 +83,64 @@ class GiftCatchCodeBannerFragment : Fragment() {
     }
 
     private fun setupUi() {
-        // TODO : real data here. Get controls from SpinToWinCodeBannerFragment
-        binding.container.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.black))
+        if (!mExtendedProps!!.promocodeBannerBackgroundColor.isNullOrEmpty()) {
+            binding.container.setBackgroundColor(Color.parseColor(mExtendedProps!!.promocodeBannerBackgroundColor))
+        } else {
+            binding.container.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.black))
+        }
 
-        binding.bannerText.text = "Kodunuzu unutmayın.".replace("\\n", "\n")
-        binding.bannerLabel.text = "Kopyala"
+        binding.bannerText.text = mExtendedProps!!.promocodeBannerText!!.replace("\\n", "\n")
+        binding.bannerLabel.text = mExtendedProps!!.promocodeBannerButtonLabel
         binding.bannerCode.text = bannerCode
 
-        binding.bannerText.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
-        binding.bannerLabel.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
-        binding.bannerCode.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+        if (!mExtendedProps!!.promocodeBannerTextColor.isNullOrEmpty()) {
+            binding.bannerText.setTextColor(Color.parseColor(mExtendedProps!!.promocodeBannerTextColor))
+            binding.bannerLabel.setTextColor(Color.parseColor(mExtendedProps!!.promocodeBannerTextColor))
+            binding.bannerCode.setTextColor(Color.parseColor(mExtendedProps!!.promocodeBannerTextColor))
+        } else {
+            binding.bannerText.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+            binding.bannerLabel.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+            binding.bannerCode.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+        }
 
-        binding.bannerText.textSize = 14f
-        binding.bannerLabel.textSize = 16f
-        binding.bannerCode.textSize = 14f
+        if (!mExtendedProps!!.gameResultElements!!.textSize.isNullOrEmpty()) {
+            binding.bannerText.textSize = mExtendedProps!!.gameResultElements!!.textSize!!.toFloat() + 10
+            binding.bannerLabel.textSize = mExtendedProps!!.gameResultElements!!.textSize!!.toFloat() + 12
+            binding.bannerCode.textSize = mExtendedProps!!.gameResultElements!!.textSize!!.toFloat() + 10
+        } else {
+            binding.bannerText.textSize = 14f
+            binding.bannerLabel.textSize = 16f
+            binding.bannerCode.textSize = 14f
+        }
 
-        binding.bannerText.typeface = Typeface.DEFAULT
-        binding.bannerLabel.typeface = Typeface.DEFAULT
+        if (mExtendedProps!!.fontFamily.isNullOrEmpty()) {
+            binding.bannerText.typeface = Typeface.DEFAULT
+            binding.bannerLabel.typeface = Typeface.DEFAULT
+        } else if (FontFamily.Monospace.toString() == mExtendedProps!!.fontFamily!!.lowercase(
+                Locale.getDefault())) {
+            binding.bannerText.typeface = Typeface.MONOSPACE
+            binding.bannerLabel.typeface = Typeface.MONOSPACE
+        } else if (FontFamily.SansSerif.toString() == mExtendedProps!!.fontFamily!!.lowercase(
+                Locale.getDefault())) {
+            binding.bannerText.typeface = Typeface.SANS_SERIF
+            binding.bannerLabel.typeface = Typeface.SANS_SERIF
+        } else if (FontFamily.Serif.toString() == mExtendedProps!!.fontFamily!!.lowercase(Locale.getDefault())) {
+            binding.bannerText.typeface = Typeface.SERIF
+            binding.bannerLabel.typeface = Typeface.SERIF
+        } else if (!mExtendedProps!!.customFontFamilyAndroid.isNullOrEmpty()) {
+            if (AppUtils.isFontResourceAvailable(requireContext(), mExtendedProps!!.customFontFamilyAndroid)) {
+                val id = requireActivity().resources.getIdentifier(
+                    mExtendedProps!!.customFontFamilyAndroid,
+                    "font",
+                    requireActivity().packageName
+                )
+                binding.bannerText.typeface = ResourcesCompat.getFont(requireActivity(), id)
+                binding.bannerLabel.typeface = ResourcesCompat.getFont(requireActivity(), id)
+            }
+        } else {
+            binding.bannerText.typeface = Typeface.DEFAULT
+            binding.bannerLabel.typeface = Typeface.DEFAULT
+        }
 
         binding.closeButton.setBackgroundResource(getCloseIcon())
         binding.closeButton.setOnClickListener { endFragment() }
@@ -108,8 +154,11 @@ class GiftCatchCodeBannerFragment : Fragment() {
     }
 
     private fun getCloseIcon(): Int {
-        //TODO real data here
-        return R.drawable.ic_close_white_24dp
+        when (mExtendedProps!!.closeButtonColor) {
+            "white" -> return R.drawable.ic_close_white_24dp
+            "black" -> return R.drawable.ic_close_black_24dp
+        }
+        return R.drawable.ic_close_black_24dp
     }
 
     private fun endFragment() {

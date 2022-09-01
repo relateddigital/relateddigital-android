@@ -25,6 +25,9 @@ class ActionResponse : Serializable {
     @SerializedName("Drawer")
     var mDrawer: List<Drawer>? = null
 
+    @SerializedName("GiftRain")
+    var mGiftRain: List<GiftRain>? = null
+
     @SerializedName("VERSION")
     var version: Int? = null
 

@@ -221,9 +221,7 @@ class InAppNotificationActivity : AppCompatActivity() {
         }
 
         binding.giftCatchButton.setOnClickListener {
-            ActivityUtils.parentActivity = activity
-            val intent = Intent(activity, GiftCatchActivity::class.java)
-            startActivity(intent)
+            sendInAppRequest("giftrain")
         }
 
         binding.findToWinButton.setOnClickListener {

@@ -4,17 +4,22 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentTransaction
+import com.google.gson.Gson
 import com.relateddigital.relateddigital_android.R
 import com.relateddigital.relateddigital_android.model.GiftCatchExtendedProps
+import com.relateddigital.relateddigital_android.model.GiftRain
 import com.relateddigital.relateddigital_android.util.ActivityUtils
+import java.net.URI
 
 class GiftCatchActivity : FragmentActivity(), GiftCatchCompleteInterface,
     GiftCatchCopyToClipboardInterface, GiftCatchShowCodeInterface {
     private var jsonStr: String? = ""
+    private var response: GiftRain? = null
     private var giftCatchPromotionCode = ""
 
     companion object {
@@ -24,44 +29,65 @@ class GiftCatchActivity : FragmentActivity(), GiftCatchCompleteInterface,
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // TODO : Get this from SpinToWin
-        val webViewDialogFragment: GiftCatchWebDialogFragment =
-            GiftCatchWebDialogFragment.newInstance("gift_catch_index.html", "test")
-        webViewDialogFragment.setGiftCatchListeners(this, this, this)
-        webViewDialogFragment.display(supportFragmentManager)
+        if (savedInstanceState != null) {
+            jsonStr = savedInstanceState.getString("gift-rain-json-str", "")
+        } else {
+            val intent = intent
+            if (intent != null && intent.hasExtra("gift-rain-data")) {
+                response = intent.getSerializableExtra("gift-rain-data") as GiftRain?
+                if (response != null) {
+                    jsonStr = Gson().toJson(response)
+                } else {
+                    Log.e(LOG_TAG, "Could not get the gift-rain data properly!")
+                    finish()
+                }
+            } else {
+                Log.e(LOG_TAG, "Could not get the gift-rain data properly!")
+                finish()
+            }
+        }
+
+        if (jsonStr != null && jsonStr != "") {
+            val webViewDialogFragment: GiftCatchWebDialogFragment =
+                GiftCatchWebDialogFragment.newInstance("gift_catch_index.html", jsonStr)
+            webViewDialogFragment.setGiftCatchListeners(this, this, this)
+            webViewDialogFragment.display(supportFragmentManager)
+        } else {
+            Log.e(LOG_TAG, "Could not get the gift-rain data properly!")
+            finish()
+        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
-        outState.putString("gift-catch-json-str", jsonStr)
+        outState.putString("gift-rain-json-str", jsonStr)
         super.onSaveInstanceState(outState)
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        // TODO: open the lines when real data comes
-        /*if (giftCatchPromotionCode.isNotEmpty()) {
+        if (giftCatchPromotionCode.isNotEmpty()) {
             try {
                 val extendedProps = Gson().fromJson(
                     URI(response!!.actiondata!!.extendedProps).path,
                     GiftCatchExtendedProps::class.java
                 )
 
-                if (!extendedProps.promocode_banner_button_label.isNullOrEmpty()) {*/
+                if (!extendedProps.promocodeBannerButtonLabel.isNullOrEmpty()) {
                     if(ActivityUtils.parentActivity != null) {
                         val giftCatchCodeBannerFragment =
-                            GiftCatchCodeBannerFragment.newInstance(GiftCatchExtendedProps(), giftCatchPromotionCode)
+                            GiftCatchCodeBannerFragment.newInstance(extendedProps, giftCatchPromotionCode)
 
                         val transaction: FragmentTransaction =
                             (ActivityUtils.parentActivity as FragmentActivity).supportFragmentManager.beginTransaction()
                         transaction.replace(android.R.id.content, giftCatchCodeBannerFragment)
                         transaction.commit()
                         ActivityUtils.parentActivity = null
-                    }/*
+                    }
                 }
             } catch (e: Exception) {
                 Log.e(LOG_TAG, "GiftCatchCodeBanner : " + e.message)
             }
-        }*/
+        }
     }
 
     override fun onCompleted() {
