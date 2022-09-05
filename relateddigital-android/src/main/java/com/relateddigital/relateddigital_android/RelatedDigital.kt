@@ -1127,6 +1127,20 @@ object RelatedDigital {
         }
     }
 
+    /**
+     * This method sets an ID to store the last 30-days notifications for a user.
+     * To get historical notifications with respect to a specific user
+     */
+    @JvmStatic
+    fun setNotificationLoginID(notificationLoginId: String, context: Context) {
+        SharedPref.writeString(
+            context,
+            Constants.NOTIFICATION_LOGIN_ID_KEY,
+            notificationLoginId
+        )
+    }
+
+
     @JvmStatic
     fun setPhoneNumber(context: Context, msisdn: String) {
         if(model != null) {
@@ -1243,6 +1257,75 @@ object RelatedDigital {
                     SharedPref.writeString(
                         activity.applicationContext,
                         Constants.PAYLOAD_SP_KEY,
+                        ""
+                    )
+                    val element = Throwable().stackTrace[0]
+                    LogUtils.formGraylogModel(
+                        activity.applicationContext,
+                        "e",
+                        "De-serializing JSON string of push message : " + e.message,
+                        element.className + "/" + element.methodName + "/" + element.lineNumber
+                    )
+                    activity.runOnUiThread { callback.fail(e.message!!) }
+                }
+            } else {
+                activity.runOnUiThread {
+                    callback.fail(
+                        "There is not any push notification sent " +
+                                "(or saved) in the last 30 days"
+                    )
+                }
+            }
+        }) {}.start()
+    }
+
+    /**
+     * This method returns the list of push messages sent to the user logged-in in the last 30 days.
+     * The messages are ordered in terms of their timestamps e.g. most recent one is at index 0.
+     * activity : Activity
+     * callback : PushMessageInterface
+     */
+    @JvmStatic
+    fun getPushMessagesWithID(activity: Activity, callback: PushMessageInterface) {
+        val loginID: String =
+            SharedPref.readString(activity, Constants.NOTIFICATION_LOGIN_ID_KEY)
+
+        if(loginID.isEmpty()) {
+            Log.e("getPushMessagesID() : ", "login ID is empty!");
+            return;
+        }
+
+        object : Thread(Runnable {
+            val payloads: String = SharedPref.readString(
+                activity.applicationContext,
+                Constants.PAYLOAD_SP_ID_KEY
+            )
+            if (payloads.isNotEmpty()) {
+                try {
+                    val pushMessages: MutableList<Message> = ArrayList<Message>()
+                    val jsonObject = JSONObject(payloads)
+                    val jsonArray = jsonObject.getJSONArray(Constants.PAYLOAD_SP_ARRAY_ID_KEY)
+                    for (i in 0 until jsonArray.length()) {
+                        val currentObject = jsonArray.getJSONObject(i)
+                        val currentMessage: Message = Gson().fromJson(
+                            currentObject.toString(),
+                            Message::class.java
+                        )
+                        if(!currentMessage.loginID.isNullOrEmpty()) {
+                            if(loginID == currentMessage.loginID) {
+                                pushMessages.add(currentMessage);
+                            }
+                        }
+                    }
+                    val orderedPushMessages: List<Message> = PayloadUtils.orderPushMessages(
+                        activity.applicationContext,
+                        pushMessages
+                    )
+                    activity.runOnUiThread { callback.success(orderedPushMessages) }
+                } catch (e: Exception) {
+                    SharedPref.writeString(
+                        activity.applicationContext,
+                        Constants.PAYLOAD_SP_ID_KEY,
                         ""
                     )
                     val element = Throwable().stackTrace[0]

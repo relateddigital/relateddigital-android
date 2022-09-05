@@ -40,6 +40,7 @@ class Message : Serializable {
         private set
     private val params: MutableMap<String, String> = HashMap()
     private var elements: ArrayList<Element>? = null
+    var loginID: String? = null
 
     constructor(context: Context, bundle: Map<String, String?>) {
         for (key in bundle.keys) {

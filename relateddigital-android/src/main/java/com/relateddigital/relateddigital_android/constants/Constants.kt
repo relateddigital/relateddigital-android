@@ -200,6 +200,10 @@ class Constants {
         const val BUTTON_LINK = "link"
         const val BUTTON_REDIRECT = "redirect"
 
+        const val PAYLOAD_SP_ID_KEY = "payload_sp_with_id"
+        const val PAYLOAD_SP_ARRAY_ID_KEY = "messages_with_id"
+        const val NOTIFICATION_LOGIN_ID_KEY = "notification_login_id_key"
+
         const val BANNER_CAROUSEL_ACTION_TYPE_VAL = "BannerTest" // TODO fix this after BE gets ready
 
     }

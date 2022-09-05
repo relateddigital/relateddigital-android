@@ -164,7 +164,14 @@ class RelatedDigitalHuaweiMessagingService : HmsMessageService() {
 
                 PayloadUtils.sendUtmParametersEvent(this, pushMessage)
 
-                PayloadUtils.addPushMessage(this, pushMessage)
+                val notificationLoginId: String =
+                    SharedPref.readString(this, Constants.NOTIFICATION_LOGIN_ID_KEY)
+
+                if (notificationLoginId.isEmpty()) {
+                    PayloadUtils.addPushMessage(this, pushMessage)
+                } else {
+                    PayloadUtils.addPushMessageWithId(this, pushMessage, notificationLoginId)
+                }
             } else {
                 Log.d(LOG_TAG, "remoteMessageData transform problem")
             }

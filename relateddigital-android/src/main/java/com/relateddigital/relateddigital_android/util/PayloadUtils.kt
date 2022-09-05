@@ -10,10 +10,8 @@ import com.relateddigital.relateddigital_android.constants.Constants
 import com.relateddigital.relateddigital_android.model.Message
 import org.json.JSONArray
 import org.json.JSONObject
-import java.lang.Exception
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.collections.HashMap
 
 object PayloadUtils {
     private const val LOG_TAG = "PayloadUtils"
@@ -56,6 +54,47 @@ object PayloadUtils {
             }
         } else {
             createAndSaveNewOne(context, message)
+        }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    fun addPushMessageWithId(context: Context, message: Message, loginID: String) {
+        val payloads: String = SharedPref.readString(context, Constants.PAYLOAD_SP_ID_KEY)
+        if (payloads.isNotEmpty()) {
+            try {
+                val jsonObject = JSONObject(payloads)
+                var jsonArray = jsonObject.optJSONArray(Constants.PAYLOAD_SP_ARRAY_ID_KEY)
+                if (isPushIdAvailable(context, jsonArray, message)) {
+                    return
+                }
+                jsonArray = addNewOneWithID(context, jsonArray, message, loginID)
+                if (jsonArray == null) {
+                    return
+                }
+                jsonArray = removeOldOnes(context, jsonArray)
+                val finalObject = JSONObject()
+                finalObject.put(Constants.PAYLOAD_SP_ARRAY_ID_KEY, jsonArray)
+                SharedPref.writeString(
+                    context,
+                    Constants.PAYLOAD_SP_ID_KEY,
+                    finalObject.toString()
+                )
+            } catch (e: Exception) {
+                val element = Throwable().stackTrace[0]
+                LogUtils.formGraylogModel(
+                    context,
+                    "e",
+                    "Serializing push message : " + e.message,
+                    element.className + "/" + element.methodName + "/" + element.lineNumber
+                )
+                Log.e(
+                    LOG_TAG,
+                    "Something went wrong when adding the push message to shared preferences!"
+                )
+                Log.e(LOG_TAG, e.message!!)
+            }
+        } else {
+            createAndSaveNewOneWithID(context, message, loginID)
         }
     }
 
@@ -141,6 +180,31 @@ object PayloadUtils {
         }
     }
 
+    private fun addNewOneWithID(context: Context, jsonArray: JSONArray?, message: Message,
+    loginID: String): JSONArray? {
+        return try {
+            message.loginID = loginID
+            message.date =
+                SimpleDateFormat(
+                    "yyyy-MM-dd HH:mm:ss",
+                    Locale.getDefault()
+                ).format(Date())
+            jsonArray!!.put(JSONObject(Gson().toJson(message)))
+            jsonArray
+        } catch (e: Exception) {
+            val element = Throwable().stackTrace[0]
+            LogUtils.formGraylogModel(
+                context,
+                "e",
+                "Serializing push message : " + e.message,
+                element.className + "/" + element.methodName + "/" + element.lineNumber
+            )
+            Log.e(LOG_TAG, "Could not save the push message!")
+            Log.e(LOG_TAG, e.message!!)
+            null
+        }
+    }
+
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     private fun removeOldOnes(context: Context, jsonArray: JSONArray): JSONArray {
         var i = 0
@@ -201,6 +265,32 @@ object PayloadUtils {
             jsonArray.put(JSONObject(Gson().toJson(message)))
             jsonObject.put(Constants.PAYLOAD_SP_ARRAY_KEY, jsonArray)
             SharedPref.writeString(context, Constants.PAYLOAD_SP_KEY, jsonObject.toString())
+        } catch (e: Exception) {
+            val element = Throwable().stackTrace[0]
+            LogUtils.formGraylogModel(
+                context,
+                "e",
+                "Forming and serializing push message string : " + e.message,
+                element.className + "/" + element.methodName + "/" + element.lineNumber
+            )
+            Log.e(LOG_TAG, "Could not save the push message!")
+            Log.e(LOG_TAG, e.message!!)
+        }
+    }
+
+    private fun createAndSaveNewOneWithID(context: Context, message: Message, loginID: String) {
+        try {
+            val jsonObject = JSONObject()
+            val jsonArray = JSONArray()
+            message.loginID = loginID
+            message.date =
+                SimpleDateFormat(
+                    "yyyy-MM-dd HH:mm:ss",
+                    Locale.getDefault()
+                ).format(Date())
+            jsonArray.put(JSONObject(Gson().toJson(message)))
+            jsonObject.put(Constants.PAYLOAD_SP_ARRAY_ID_KEY, jsonArray)
+            SharedPref.writeString(context, Constants.PAYLOAD_SP_ID_KEY, jsonObject.toString())
         } catch (e: Exception) {
             val element = Throwable().stackTrace[0]
             LogUtils.formGraylogModel(

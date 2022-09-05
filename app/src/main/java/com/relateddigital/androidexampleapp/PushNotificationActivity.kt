@@ -102,7 +102,13 @@ class PushNotificationActivity : AppCompatActivity() {
                     // Something went wrong. You may consider warning the user:
                 }
             }
-            RelatedDigital.getPushMessages(activity, pushMessageInterface)
+
+            val loginID = SharedPref.readString(applicationContext, com.relateddigital.relateddigital_android.constants.Constants.NOTIFICATION_LOGIN_ID_KEY)
+            if(loginID.isEmpty()) {
+                RelatedDigital.getPushMessages(activity, pushMessageInterface)
+            } else {
+                RelatedDigital.getPushMessagesWithID(activity, pushMessageInterface)
+            }
         }
     }
 
