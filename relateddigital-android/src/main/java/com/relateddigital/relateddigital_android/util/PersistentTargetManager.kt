@@ -53,13 +53,19 @@ object PersistentTargetManager {
                     if (previousParameterValue.isNotEmpty()) {
                         val previousParameterValueParts = previousParameterValue
                                 .split("~").toTypedArray()
+                        var paramCounter = 1
                         for (i in previousParameterValueParts.indices) {
-                            if (i == 9) {
+                            if (paramCounter == 10) {
                                 break
                             }
                             val decodedPreviousParameterValuePart = previousParameterValueParts[i]
                             if (decodedPreviousParameterValuePart.split("\\|").toTypedArray().size == 2) {
+                                if (decodedPreviousParameterValuePart.split("\\|")
+                                        .toTypedArray()[0] == parameterValue) {
+                                    continue
+                                }
                                 parameterValueToStore.append("~").append(decodedPreviousParameterValuePart)
+                                paramCounter++
                             }
                         }
                     }
