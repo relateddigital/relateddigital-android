@@ -1,4 +1,4 @@
-let UPDATE_PRODUCT_INTERVAL, SCORE = 0, DURATION, HEIGHT = window.innerHeight;
+let UPDATE_PRODUCT_INTERVAL, SCORE = 0, DURATION, HEIGHT = window.innerHeight, AUDIO;
 
 let MAIN_COMPONENT = document.createElement("DIV");
 
@@ -12,162 +12,28 @@ let screens = {
 
 
 let activePageData = {
-    mailSubsScreen: true,
-    rulesScreen: true,
+    mailSubsScreen: false,
+    rulesScreen: false,
 };
 
 /**
  * Defaults 
- * */ 
+ * */
 let generalData = {
     id: 'rmc-gift-catch',
-    bgColor: 'aqua',
+    bgColor: 'white',
     bgImg: 'https://picsum.photos/seed/picsum/400/800',
     basketImg: 'https://app.visilabs.net/download/loreal/Game/MobilSenaryolari/materials/bag-min.png',
+    sound: '',
     fontColor: 'gray',
     fontName: 'Helvetica',
     closeButtonId: 'rmc-close-button',
-    closeButton: 'true',
     closeButtonColor: 'black',
     borderRadius: '10px',
-    scoreBoardRadius: '5px',
     difficulty: 4
 };
 
-/**
- * Components defaults
- */
-let componentsData = {
-    mailSubsScreen: {
-        id: "rmc-mail-subs-screen",
-        title: { // OPTIONAL
-            use: true, 
-            text: 'İndirim Kazan',
-            textColor: 'lightblue',
-            fontSize: '19px'
-        },
-        message: { // OPTIONAL
-            use: true,
-            text: 'İndirim Kazanmak için formu doldur ve oyunu oyna.',
-            textColor: 'darkblue',
-            fontSize: '15px'
-        },
-        emailPermission: { // OPTIONAL
-            use: true,
-            id: 'rmc-email-permission-checkbox',
-            text: 'Burası eposta izin metnidir. İncelemek için tıklayın.',
-            fontSize: '15px',
-            url: 'www.google.com',
-        },
-        secondPermission: { // OPTIONAL
-            use: true,
-            id: 'rmc-second-permission-checkbox',
-            text: 'Kullanım Koşulları\'nı okudum ve kabul ediyorum.',
-            fontSize: '15px',
-            url: 'www.google.com',
-        },
-        button: { // REQUIRED
-            use: true, 
-            id: 'rmc-mail-subs-button',
-            text: 'Kaydet ve Devam Et',
-            textColor: 'darkblue',
-            buttonColor: 'lightblue',
-            fontSize: '15px',
-            goScreen: screens.rules,
-        },
-        emailInput: {
-            id: 'rmc-email-input',
-            placeHolder: 'Email',
-            value: '',
-        }
-    },
-    rulesScreen: {
-        bgImage: "2-min.png",
-        id: "rmc-rules-screen",
-        title: { // OPTIONAL
-            use: true, 
-            text: 'Kurallar',
-            textColor: 'black',
-            fontSize: '19px'
-        },
-        message: { // OPTIONAL
-            use: true,
-            text: 'Yukarıdan düşen ürünleri Topla',
-            textColor: 'black',
-            fontSize: '15px'
-        },
-        button: { // REQUIRED
-            use: true,
-            id: 'rmc-rules-button',
-            text: 'Oyuna Başla',
-            textColor: 'darkblue',
-            buttonColor: 'lightblue',
-            fontSize: '15px',
-            goScreen: screens.game,
-        },
-    },
-    gameScreen: {
-        id: "rmc-game-screen",
-        scoreboard: {
-            id: 'rmc-scoreboard',
-            fontSize: '20px',
-            background: 'white',
-            fontColor: 'gray',
-            type: 'round', // square | circle | round
-            countDown: {
-                id: 'rmc-count-down',
-            },
-            score: {
-                id: 'rmc-score'
-            }
-        }
-    },
-    finishScreen: {
-        id: 'rmc-finish-screen',
-        title: { // OPTIONAL
-            use: true, 
-            text: 'Tebrikler',
-            loseText: 'Malesef',
-            textColor: 'lightblue',
-            fontSize: '19px'
-        },
-        message: { // OPTIONAL
-            use: true,
-            text: 'İndirim Kazandınız',
-            loseText: 'Kazanamadınız',
-            textColor: 'darkblue',
-            fontSize: '15px'
-        },
-        score: { // OPTIONAL
-            use: true,
-            id: 'rmc-finish-score',
-            text: '',
-        },
-        couponCode: { // OPTIONAL
-            use: true,
-            id: 'rmc-coupon-code',
-            fontSize: '15px',
-        },
-        button: { // REQUIRED
-            use: true,
-            id: 'rmc-finish-button',
-            text: 'Kodu Kopyala',
-            textColor: 'darkblue',
-            buttonColor: 'lightblue',
-            fontSize: '15px',
-        },
-        goButton: { // OPTIONAL
-            use: true,
-            id: 'rmc-finish-go-button',
-            text: 'Linke Git',
-            textColor: 'darkblue',
-            buttonColor: 'lightblue',
-            fontSize: '15px',
-            androidLink: 'https://www.google.com',
-            iOSLink: 'https://www.facebook.com'
-        },
-    }
-};
+
 
 /**
  * Product settings
@@ -182,18 +48,8 @@ let productSettings = {
 
 /**
  * Product img
- */ 
+ */
 let productImgs = [
-    'https://app.visilabs.net/download/loreal/Game/MobilSenaryolari/products/1.png',
-    'https://app.visilabs.net/download/loreal/Game/MobilSenaryolari/products/2.png',
-    'https://app.visilabs.net/download/loreal/Game/MobilSenaryolari/products/3.png',
-    'https://app.visilabs.net/download/loreal/Game/MobilSenaryolari/products/4.png',
-    'https://app.visilabs.net/download/loreal/Game/MobilSenaryolari/products/5.png',
-    'https://app.visilabs.net/download/loreal/Game/MobilSenaryolari/products/6.png',
-    'https://app.visilabs.net/download/loreal/Game/MobilSenaryolari/products/7.png',
-    'https://app.visilabs.net/download/loreal/Game/MobilSenaryolari/products/8.png',
-    'https://app.visilabs.net/download/loreal/Game/MobilSenaryolari/products/9.png',
-    'https://app.visilabs.net/download/loreal/Game/MobilSenaryolari/products/10.png',
 ]
 
 /**
@@ -247,55 +103,377 @@ let gameSettings = {
  * Coupons
 */
 let couponCodes = {
-    0: "KAZANAMADINIZ",
-    1: "BGJ7S1",
-    2: "BDGJ72",
-    3: "BAGJ73",
-    4: "BGJ7V4",
-    5: "BGJ7S5",
-    6: "BGJ76Q",
-    7: "BGJ77F",
-    8: "BGJ78F",
-    9: "BGJ79Q",
-    10: "BG1J0D",
-    11: "N72X1P",
-    12: "N72X2H",
-    13: "N72X3J",
-    14: "N72X4K",
-    15: "N72X5Y",
-    16: "N72X6E",
-    17: "N72X7FD",
-    18: "N72DX8",
-    19: "N72GX9",
-    20: "BJWMD0",
-    21: "BJSWM1",
-    22: "BJWM2D",
-    23: "BJWEM3",
-    24: "BJWM4J",
-    25: "BJWWM5",
-    26: "BJWM6F",
-    27: "BJWM7Q",
-    28: "BJDWM8",
-    29: "BJWQM9",
-    30: "BCWM0G",
-    31: "BCWM1K",
-    32: "BCWM2W",
-    33: "BCWM3L",
-    34: "BCWM4Q",
-    35: "BCWM5C",
-    36: "BCWM6S",
-    37: "BCWOM7",
-    38: "BCWM8M",
-    39: "BCWM8P",
-    40: "BCWKN0",
 };
-
+/**
+ * Components defaults
+ */
+let componentsData = {
+    mailSubsScreen: {
+        id: "rmc-mail-subs-screen",
+        title: { // OPTIONAL
+            use: false,
+            text: 'İndirim Kazan',
+            textColor: 'lightblue',
+            fontSize: '19px'
+        },
+        message: { // OPTIONAL
+            use: false,
+            text: 'İndirim Kazanmak için formu doldur ve oyunu oyna.',
+            textColor: 'darkblue',
+            fontSize: '15px'
+        },
+        emailPermission: { // OPTIONAL
+            use: false,
+            id: 'rmc-email-permission-checkbox',
+            text: 'Burası eposta izin metnidir. İncelemek için tıklayın.',
+            fontSize: '15px',
+            url: 'www.google.com',
+        },
+        secondPermission: { // OPTIONAL
+            use: false,
+            id: 'rmc-second-permission-checkbox',
+            text: 'Kullanım Koşulları\'nı okudum ve kabul ediyorum.',
+            fontSize: '15px',
+            url: 'www.google.com',
+        },
+        button: { // REQUIRED
+            use: true,
+            id: 'rmc-mail-subs-button',
+            text: 'Kaydet ve Devam Et',
+            textColor: 'darkblue',
+            buttonColor: 'lightblue',
+            fontSize: '15px',
+            goScreen: screens.rules,
+        },
+        emailInput: {
+            id: 'rmc-email-input',
+            placeHolder: 'Email',
+            value: '',
+        },
+        alerts: {
+            invalid_email_message: "Please enter a valid E-Mail Address.",
+            check_consent_message: "Please confirm you accept the terms of use."
+        }
+    },
+    rulesScreen: {
+        bgImage: "2-min.png",
+        id: "rmc-rules-screen",
+        title: { // OPTIONAL
+            use: false,
+            text: 'Kurallar',
+            textColor: 'black',
+            fontSize: '19px'
+        },
+        message: { // OPTIONAL
+            use: false,
+            text: 'Yukarıdan düşen ürünleri Topla',
+            textColor: 'black',
+            fontSize: '15px'
+        },
+        button: { // REQUIRED
+            use: true,
+            id: 'rmc-rules-button',
+            text: 'Oyuna Başla',
+            textColor: 'darkblue',
+            buttonColor: 'lightblue',
+            fontSize: '15px',
+            goScreen: screens.game,
+        },
+    },
+    gameScreen: {
+        id: "rmc-game-screen",
+        scoreboard: {
+            id: 'rmc-scoreboard',
+            fontSize: '20px',
+            background: 'white',
+            fontColor: 'gray',
+            type: 'roundedcorners', // square | circle | roundedcorners
+            countDown: {
+                id: 'rmc-count-down',
+            },
+            score: {
+                id: 'rmc-score'
+            }
+        }
+    },
+    finishScreen: {
+        id: 'rmc-finish-screen',
+        title: { // OPTIONAL
+            use: false,
+            text: 'Tebrikler',
+            loseText: '',
+            textColor: 'lightblue',
+            fontSize: '19px'
+        },
+        message: { // OPTIONAL
+            use: false,
+            text: 'İndirim Kazandınız',
+            loseText: '',
+            textColor: 'darkblue',
+            fontSize: '15px'
+        },
+        couponCode: { // OPTIONAL
+            use: true,
+            id: 'rmc-coupon-code',
+            fontSize: '15px',
+        },
+        button: { // REQUIRED
+            use: true,
+            id: 'rmc-finish-button',
+            text: 'Kodu Kopyala',
+            textColor: 'darkblue',
+            buttonColor: 'lightblue',
+            fontSize: '15px',
+            androidLink: '',
+            iOSLink: ''
+        }
+    }
+};
 /**
  * Init
  */
 function initGame(responseConfig) {
-    console.log("responseConfig",responseConfig);
+    if (utils.getMobileOperatingSystem() == 'iOS') {
+        console.log("RUN IOS");
+        iOSConfigRegulator(responseConfig)
+    }
+    else {        
+        console.log("RUN ANDROID");
+        androidConfigRegulator(responseConfig);
+    }
+
     config();
+}
+
+function androidConfigRegulator(responseConfig){
+    responseConfig = JSON.parse(responseConfig)
+    responseConfig.actiondata.ExtendedProps = JSON.parse(unescape(responseConfig.actiondata.ExtendedProps))
+
+    const res = responseConfig.actiondata;
+    const ext = res.ExtendedProps;
+
+    promoCodeCalculator(res.promo_codes)
+
+    // General data
+    generalData.difficulty = parseInt(res.game_elements.downward_speed);
+    generalData.basketImg = res.game_elements.gift_catcher_image;
+    generalData.bgColor = ext.background_color;
+    generalData.bgImg = ext.background_image;
+    generalData.closeButtonColor = ext.close_button_color;
+    generalData.fontName = ext.font_family;
+    generalData.sound = res.game_elements.sound_url;
+    utils.loadSound();
+
+    if (ext.custom_font_family_android && utils.getMobileOperatingSystem() == 'Android') {
+        generalData.fontName = ext.custom_font_family_android;
+    }
+
+    if (ext.custom_font_family_ios && utils.getMobileOperatingSystem() == 'iOS') {
+        generalData.fontName = ext.custom_font_family_ios;
+    }
+
+    productImgs = res.game_elements.gift_images;
+    productSettings.totalProductCount = res.game_elements.number_of_products;
+
+    // Mail Form Optionals
+    if (res.mail_subscription) {
+        activePageData.mailSubsScreen = true;
+
+        if (res.mail_subscription_form.title) {
+            componentsData.mailSubsScreen.title.use = true;
+            componentsData.mailSubsScreen.title.text = res.mail_subscription_form.title;
+            componentsData.mailSubsScreen.title.textColor = ext.mail_subscription_form.title_text_color;
+            componentsData.mailSubsScreen.title.fontSize = ext.mail_subscription_form.title_text_size + 'px';
+        }
+
+        if (res.mail_subscription_form.message) {
+            componentsData.mailSubsScreen.message.use = true;
+            componentsData.mailSubsScreen.message.text = res.mail_subscription_form.message;
+            componentsData.mailSubsScreen.message.textColor = ext.mail_subscription_form.text_color;
+            componentsData.mailSubsScreen.message.fontSize = ext.mail_subscription_form.text_size + 'px';
+        }
+
+        if (res.mail_subscription_form.emailpermit_text) {
+            componentsData.mailSubsScreen.emailPermission.use = true;
+            componentsData.mailSubsScreen.emailPermission.text = res.mail_subscription_form.emailpermit_text;
+            componentsData.mailSubsScreen.emailPermission.fontSize = ext.mail_subscription_form.emailpermit_text_size + 'px';
+            componentsData.mailSubsScreen.emailPermission.url = ext.mail_subscription_form.emailpermit_text_url;
+        }
+
+        if (res.mail_subscription_form.consent_text) {
+            componentsData.mailSubsScreen.secondPermission.use = true;
+            componentsData.mailSubsScreen.secondPermission.text = res.mail_subscription_form.consent_text;
+            componentsData.mailSubsScreen.secondPermission.fontSize = ext.mail_subscription_form.consent_text_size + 'px';
+            componentsData.mailSubsScreen.secondPermission.url = ext.mail_subscription_form.consent_text_url;
+        }
+    }
+
+    // Mail Form Required
+    componentsData.mailSubsScreen.button.text = res.mail_subscription_form.button_label;
+    componentsData.mailSubsScreen.button.textColor = ext.mail_subscription_form.button_text_color;
+    componentsData.mailSubsScreen.button.buttonColor = ext.mail_subscription_form.button_color;
+    componentsData.mailSubsScreen.button.fontSize = ext.mail_subscription_form.button_text_size + 'px';
+    componentsData.mailSubsScreen.emailInput.placeHolder = res.mail_subscription_form.placeholder;
+    componentsData.mailSubsScreen.alerts.check_consent_message = res.mail_subscription_form.check_consent_message;
+    componentsData.mailSubsScreen.alerts.invalid_email_message = res.mail_subscription_form.invalid_email_message;
+
+    // Rules Screen Optionals
+    if (res.gamification_rules) {
+        activePageData.rulesScreen = true;
+
+        componentsData.rulesScreen.bgImage = res.gamification_rules.background_image
+        componentsData.rulesScreen.button.text = res.gamification_rules.button_label
+        componentsData.rulesScreen.button.textColor = ext.gamification_rules.button_text_color;
+        componentsData.rulesScreen.button.buttonColor = ext.gamification_rules.button_color;
+        componentsData.rulesScreen.button.fontSize = ext.gamification_rules.button_text_size + 'px';
+    }
+
+    // Game Screen
+    // componentsData.scoreboard.fontSize
+    // componentsData.scoreboard.fontColor
+    componentsData.gameScreen.scoreboard.background = ext.game_elements.scoreboard_background_color;
+    componentsData.gameScreen.scoreboard.type = ext.game_elements.scoreboard_shape;
+
+    if(componentsData.gameScreen.scoreboard.type == "") componentsData.gameScreen.scoreboard.type = "roundedcorners"
+
+    if (res.game_result_elements.title) {
+        componentsData.finishScreen.title.use = true
+        componentsData.finishScreen.title.text = res.game_result_elements.title
+        componentsData.finishScreen.title.fontSize = ext.game_result_elements.title_text_size + 'px'
+        componentsData.finishScreen.title.textColor = ext.game_result_elements.title_text_color
+
+    }
+    if (res.game_result_elements.message) {
+        componentsData.finishScreen.message.use = true
+        componentsData.finishScreen.message.text = res.game_result_elements.message
+        componentsData.finishScreen.message.fontSize = ext.game_result_elements.text_size + 'px'
+        componentsData.finishScreen.message.textColor = ext.game_result_elements.text_color
+    }
+
+    componentsData.finishScreen.button.text = res.copybutton_label;
+    componentsData.finishScreen.button.textColor = ext.copybutton_text_color;
+    componentsData.finishScreen.button.fontSize = ext.copybutton_text_size + 'px';
+    componentsData.finishScreen.button.buttonColor = ext.copybutton_color;
+    componentsData.finishScreen.button.androidLink = res.android_lnk;
+    componentsData.finishScreen.button.iOSLink = res.ios_lnk;
+}
+
+function iOSConfigRegulator(responseConfig){
+    console.log(responseConfig)
+
+
+    const res = responseConfig;
+
+    promoCodeCalculator(res.promoCodes)
+
+    // // General data
+    generalData.difficulty = parseInt(res.gameElements.downwardSpeed);
+    generalData.basketImg = res.gameElements.giftCatcherImage;
+    generalData.bgColor = res.background_color;
+    generalData.bgImg = res.backgroundImage;
+    generalData.closeButtonColor = res.close_button_color;
+    generalData.fontName = res.font_family;
+    generalData.sound = res.gameElements.soundUrl;
+    utils.loadSound();
+
+    if (res.custom_font_family_ios && utils.getMobileOperatingSystem() == 'iOS') {
+        generalData.fontName = res.custom_font_family_ios;
+    }
+
+    // productImgs = res.game_elements.gift_images; ///
+    productSettings.totalProductCount = res.gameElements.numberOfProducts;
+
+    // // Mail Form Optionals
+    if (res.mailSubscription) {
+        activePageData.mailSubsScreen = true;
+
+        if (res.mailSubscriptionForm.title) {
+            componentsData.mailSubsScreen.title.use = true;
+            componentsData.mailSubsScreen.title.text = res.mailSubscriptionForm.title; /// yok
+            componentsData.mailSubsScreen.title.textColor = res.mailExtendedProps.titleTextColor;
+            componentsData.mailSubsScreen.title.fontSize = res.mailExtendedProps.textSize + 'px'; /// yok
+        }
+
+        if (res.mailSubscriptionForm.message) {
+            componentsData.mailSubsScreen.message.use = true;
+            componentsData.mailSubsScreen.message.text = res.mailSubscriptionForm.message; /// yok
+            componentsData.mailSubsScreen.message.textColor = res.mailExtendedProps.textColor;
+            componentsData.mailSubsScreen.message.fontSize = res.mailExtendedProps.textSize + 'px';
+        }
+
+        if (res.mailSubscriptionForm.emailPermitText) {
+            componentsData.mailSubsScreen.emailPermission.use = true;
+            componentsData.mailSubsScreen.emailPermission.text = res.mailSubscriptionForm.emailPermitText;
+            componentsData.mailSubsScreen.emailPermission.fontSize = res.mailExtendedProps.emailPermitTextSize + 'px';
+            componentsData.mailSubsScreen.emailPermission.url = res.mailExtendedProps.emailPermitTextUrl;
+        }
+
+        if (res.mailSubscriptionForm.consentText) {
+            componentsData.mailSubsScreen.secondPermission.use = true;
+            componentsData.mailSubsScreen.secondPermission.text = res.mailSubscriptionForm.consentText;
+            componentsData.mailSubsScreen.secondPermission.fontSize = res.mailExtendedProps.consentTextSize + 'px';
+            componentsData.mailSubsScreen.secondPermission.url = res.mailExtendedProps.consentTextUrl;
+        }
+    }
+
+    // // Mail Form Required
+    componentsData.mailSubsScreen.button.text = res.mailSubscriptionForm.buttonTitle;
+    componentsData.mailSubsScreen.button.textColor = res.mailExtendedProps.buttonTextColor;
+    componentsData.mailSubsScreen.button.buttonColor = res.mailExtendedProps.buttonColor;
+    componentsData.mailSubsScreen.button.fontSize = res.mailExtendedProps.buttonTextSize + 'px';
+    componentsData.mailSubsScreen.emailInput.placeHolder = res.mailSubscriptionForm.placeholder;
+    componentsData.mailSubsScreen.alerts.check_consent_message = res.mailSubscriptionForm.checkConsentMessage;
+    componentsData.mailSubsScreen.alerts.invalid_email_message = res.mailSubscriptionForm.invalidEmailMessage;
+
+    // // Rules Screen Optionals
+    if (res.gamificationRules) {
+        activePageData.rulesScreen = true;
+
+        componentsData.rulesScreen.bgImage = res.gamificationRules.backgroundImage
+        componentsData.rulesScreen.button.text = res.gamificationRules.buttonLabel
+        componentsData.rulesScreen.button.textColor = res.gamificationRulesExtended.buttonTextColor;
+        componentsData.rulesScreen.button.buttonColor = res.gamificationRulesExtended.buttonColor;
+        componentsData.rulesScreen.button.fontSize = res.gamificationRulesExtended.buttonTextSize + 'px';
+    }
+
+    // Game Screen
+    // componentsData.scoreboard.fontSize
+    // componentsData.scoreboard.fontColor
+    componentsData.gameScreen.scoreboard.background = res.gameElementsExtended.scoreboardBackgroundColor;
+    componentsData.gameScreen.scoreboard.type = res.gameElementsExtended.scoreboardShape;
+
+    if(componentsData.gameScreen.scoreboard.type == "") componentsData.gameScreen.scoreboard.type = "roundedcorners"
+
+    if (res.gameResultElements.title) {
+        componentsData.finishScreen.title.use = true
+        componentsData.finishScreen.title.text = res.gameResultElements.title
+        componentsData.finishScreen.title.fontSize = res.gameResultElementsExtended.titleTextSize + 'px'
+        componentsData.finishScreen.title.textColor = res.gameResultElementsExtended.titleTextColor
+
+    }
+    if (res.gameResultElements.message) {
+        componentsData.finishScreen.message.use = true
+        componentsData.finishScreen.message.text = res.gameResultElements.message
+        componentsData.finishScreen.message.fontSize = res.gameResultElementsExtended.textSize + 'px'
+        componentsData.finishScreen.message.textColor = res.gameResultElementsExtended.textColor
+    }
+
+    componentsData.finishScreen.button.text = res.copybutton_label;
+    componentsData.finishScreen.button.textColor = res.copybutton_text_color;
+    componentsData.finishScreen.button.fontSize = res.copybutton_text_size + 'px';
+    componentsData.finishScreen.button.buttonColor = res.copybutton_color;
+    componentsData.finishScreen.button.iOSLink = res.ios_lnk;
+}
+
+/**
+ * Start configs
+ */
+function config() {
+    document.body.setAttribute('style', '-webkit-user-select:none');
+    setDifficulty();
+    utils.calculateTotalDuration();
+    pageChecker();
+    createCloseButton();
 }
 
 /**
@@ -411,7 +589,7 @@ function createMailSubsScreen() {
         emailPermission.style.margin = "15px 0";
         emailPermission.style.width = "80%";
         emailPermission.style.display = "inline-block";
-        emailPermission.innerHTML = "<input style='width:20px;height:20px;display:block;margin-right:7px;float:left' id='" + componentsData.mailSubsScreen.emailPermission.id + "' type='checkbox' checked>\
+        emailPermission.innerHTML = "<input style='width:20px;height:20px;display:block;margin-right:7px;float:left' id='" + componentsData.mailSubsScreen.emailPermission.id + "' checked type='checkbox'>\
         <div style='" + ("padding: 0px;") + "'>\
         <a style='font-size:"+ componentsData.mailSubsScreen.emailPermission.fontSize + ";text-decoration: underline;color: black; font-family:" + generalData.fontName + "'\
         href='"+ componentsData.mailSubsScreen.emailPermission.url + "'>" + componentsData.mailSubsScreen.emailPermission.text + "</a>\
@@ -426,7 +604,7 @@ function createMailSubsScreen() {
         secondPermission.style.margin = "15px 0";
         secondPermission.style.width = "80%";
         secondPermission.style.display = "inline-block";
-        secondPermission.innerHTML = "<input style='width:20px;height:20px;display:block;margin-right:7px;float:left' id='" + componentsData.mailSubsScreen.secondPermission.id + "' type='checkbox' checked>" +
+        secondPermission.innerHTML = "<input style='width:20px;height:20px;display:block;margin-right:7px;float:left' id='" + componentsData.mailSubsScreen.secondPermission.id + "' checked type='checkbox' >" +
             "<div style='padding: 0px;'>\
                 <a style='font-size:"+ componentsData.mailSubsScreen.emailPermission.fontSize + ";text-decoration: underline;color: black; font-family:" + generalData.fontName + "'\
                 href='"+ componentsData.mailSubsScreen.secondPermission.url + "'>\
@@ -435,13 +613,14 @@ function createMailSubsScreen() {
         container.appendChild(secondPermission);
     }
 
-    var submit = document.createElement("div");
+    var submit = document.createElement("button");
     submit.id = componentsData.mailSubsScreen.button.id;
     submit.style.backgroundColor = componentsData.mailSubsScreen.button.buttonColor;
     submit.style.color = componentsData.mailSubsScreen.button.textColor;
     submit.style.padding = "15px 30px";
     submit.style.fontSize = componentsData.mailSubsScreen.button.fontSize;
     submit.style.borderRadius = generalData.borderRadius;
+    submit.style.border = 0;
     submit.style.position = "absolute";
     submit.style.bottom = "70px";
     submit.style.left = "50%";
@@ -471,11 +650,11 @@ function createMailSubsScreen() {
                             }
                         }
                     } else {
-                        alert("Please tick the checkboxes!");
+                        alert(componentsData.mailSubsScreen.alerts.check_consent_message);
                     }
                 }
             } else {
-                alert("Check your email address!");
+                alert(componentsData.mailSubsScreen.alerts.invalid_email_message);
             }
         }
 
@@ -502,6 +681,7 @@ function createCloseButton() {
     closeButton.style.cursor = "pointer";
     closeButton.style.fontSize = "29px";
     closeButton.style.borderRadius = generalData.borderRadius;
+    closeButton.style.backgroundColor = 'rgba(0,0,0,0)';
     closeButton.style.zIndex = "999";
     closeButton.style.transform = "translate3d(0,0,3px)";
 
@@ -512,6 +692,7 @@ function createCloseButton() {
         document.querySelector("#" + componentsData.rulesScreen.id) ? document.querySelector("#" + componentsData.rulesScreen.id).remove() : null;
         document.querySelector("#" + generalData.closeButtonId) ? document.querySelector("#" + generalData.closeButtonId).remove() : null;
         document.documentElement.style.overflow = 'auto';
+        utils.pauseSound();
         console.log('Oyun Kapatıldı');
     });
 
@@ -563,13 +744,14 @@ function createRulesScreen() {
     }
 
 
-    var submit = document.createElement("div");
+    var submit = document.createElement("button");
     submit.id = componentsData.rulesScreen.button.id;
     submit.style.backgroundColor = componentsData.rulesScreen.button.buttonColor;
     submit.style.color = componentsData.rulesScreen.button.textColor;
     submit.style.padding = "15px 30px";
     submit.style.fontSize = componentsData.rulesScreen.button.fontSize;
     submit.style.borderRadius = generalData.borderRadius;
+    submit.style.border = 0;
     submit.style.position = "absolute";
     submit.style.bottom = "70px";
     submit.style.left = "50%";
@@ -744,9 +926,9 @@ function updateProduct(id) {
             }
 
             if (
-                (productLeftCorner + (productSettings.productSize / 2)) >= basketLeftCorner && 
-                productLeftCorner <= (basketLeftCorner + gameSettings.basketSize) && 
-                (productLeftCorner + (productSettings.productSize / 2)) <= (basketLeftCorner + gameSettings.basketSize) && 
+                (productLeftCorner + (productSettings.productSize / 2)) >= basketLeftCorner &&
+                productLeftCorner <= (basketLeftCorner + gameSettings.basketSize) &&
+                (productLeftCorner + (productSettings.productSize / 2)) <= (basketLeftCorner + gameSettings.basketSize) &&
                 catchable == 'true'
             ) {
                 SCORE++;
@@ -905,14 +1087,15 @@ function createFinishScreen() {
     componentsData.gameScreen.scoreboard.type !== 'square' && (_score.style.borderRadius = componentsData.gameScreen.scoreboard.type == 'circle' ? '50%' : '15px');
     container.appendChild(_score);
 
-    if (SCORE>0) {
-        var copyButton = document.createElement("div");
+    if (SCORE > 0) {
+        var copyButton = document.createElement("button");
         copyButton.id = componentsData.finishScreen.button.id;
         copyButton.style.backgroundColor = componentsData.finishScreen.button.buttonColor;
         copyButton.style.color = componentsData.finishScreen.button.textColor;
         copyButton.style.padding = "15px 30px";
         copyButton.style.fontSize = componentsData.finishScreen.button.fontSize;
         copyButton.style.borderRadius = generalData.borderRadius;
+        copyButton.style.border = 0;
         copyButton.style.width = "fit-content";
         copyButton.style.margin = "10px auto";
         copyButton.style.cursor = "pointer";
@@ -920,42 +1103,25 @@ function createFinishScreen() {
         copyButton.style.fontWeight = "bolder";
         copyButton.style.fontFamily = generalData.fontName;
         copyButton.innerText = componentsData.finishScreen.button.text;
-    
+
         container.appendChild(copyButton);
-    
-        _score.addEventListener('click',function () {
+
+        _score.addEventListener('click', function () {
             utils.copyToClipboard();
+            utils.pauseSound();
         });
-    
-        copyButton.addEventListener('click',function () {
+
+        copyButton.addEventListener('click', function () {
             utils.copyToClipboard();
+            utils.pauseSound();
         });
-    }
 
-    if (componentsData.finishScreen.goButton.use) {
-        var goButton = document.createElement("div");
-        goButton.id = componentsData.finishScreen.goButton.id;
-        goButton.style.backgroundColor = componentsData.finishScreen.goButton.buttonColor;
-        goButton.style.color = componentsData.finishScreen.goButton.textColor;
-        goButton.style.padding = "15px 30px";
-        goButton.style.fontSize = componentsData.finishScreen.goButton.fontSize;
-        goButton.style.borderRadius = generalData.borderRadius;
-        goButton.style.width = "fit-content";
-        goButton.style.cursor = "pointer";
-        goButton.style.zIndex = "3";
-        goButton.style.fontWeight = "bolder";
-        goButton.style.position = "absolute";
-        goButton.style.bottom = "70px";
-        goButton.style.left = "50%";
-        goButton.style.transform = "translate(-50%, 0%)";
-        goButton.style.fontFamily = generalData.fontName;
-        goButton.innerText = componentsData.finishScreen.goButton.text;
+        copyButton.addEventListener("click", function () {
+            if (utils.getMobileOperatingSystem() == 'iOS' && componentsData.finishScreen.button.iOSLink)
+                location.href = componentsData.finishScreen.button.iOSLink
 
-        finishScreen.appendChild(goButton);
-        console.log(utils.getMobileOperatingSystem());
-
-        goButton.addEventListener("click", function () {
-            location.href = utils.getMobileOperatingSystem() == 'iOS' ? componentsData.finishScreen.goButton.iOSLink : componentsData.finishScreen.goButton.androidLink
+            if (utils.getMobileOperatingSystem() == 'Android' && componentsData.finishScreen.button.androidLink)
+                location.href = componentsData.finishScreen.button.androidLink
         });
     }
 
@@ -967,7 +1133,7 @@ function createFinishScreen() {
 function finish() {
     createFinishScreen();
     utils.saveCodeGotten()
-    
+
     document.querySelector('#' + componentsData.gameScreen.id).remove();
 }
 
@@ -1045,25 +1211,68 @@ let utils = {
             return "Android";
         }
 
-        if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
+        if (/iPad|iPhone|iPod|Mac/.test(userAgent) && !window.MSStream) {
             return "iOS";
         }
 
         return "unknown";
+    },
+    getBrowser: () => {
+        try {
+
+
+            // Opera 8.0+
+            var isOpera = (!!window.opr && !!opr.addons) || !!window.opera || navigator.userAgent.indexOf(' OPR/') >= 0;
+            if (isOpera) return "Opera"
+
+            // Firefox 1.0+
+            var isFirefox = typeof InstallTrigger !== 'undefined';
+            if (isFirefox) return "Firefox"
+
+            // Safari 3.0+ "[object HTMLElementConstructor]" 
+            var isSafari = /constructor/i.test(window.HTMLElement) || (function (p) { return p.toString() === "[object SafariRemoteNotification]"; })(!window['safari'] || (typeof safari !== 'undefined' && window['safari'].pushNotification));
+            if (!isSafari) isSafari = /iP(ad|hone|od).+Version\/[\d\.]+.*Safari/i.test(navigator.userAgent);
+
+            if (isSafari) return "Safari"
+
+            // Internet Explorer 6-11
+            var isIE = /*@cc_on!@*/false || !!document.documentMode;
+            if (isIE) return "IE"
+
+            // Edge 20+
+            var isEdge = !isIE && !!window.StyleMedia;
+            if (isEdge) return "Edge"
+
+            // Chrome 1 - 79
+            var isChrome = !!window.chrome && (!!window.chrome.webstore || !!window.chrome.runtime);
+            if (isChrome) return "Chrome"
+
+            // Edge (based on chromium) detection
+            var isEdgeChromium = isChrome && (navigator.userAgent.indexOf("Edg") != -1);
+            if (isEdgeChromium) return "EdgeChromium"
+
+            // Blink engine detection
+            // var isBlink = (isChrome || isOpera) && !!window.CSS;
+
+            return "unknown"
+        } catch (error) {
+            console.log("getBrowser error",error);
+            return "unknown"
+        }
     },
     winCheck: () => {
         return SCORE > 0 ? true : false
     },
     copyToClipboard: () => {
         console.log("NATIVE COPYCLIPBORD");
-            if (window.Android) {
-                Android.copyToClipboard(couponCodes[SCORE])
-            } else if (window.webkit.messageHandlers.eventHandler) {
-                window.webkit.messageHandlers.eventHandler.postMessage({
-                    method: "copyToClipboard",
-                    couponCode: couponCodes[SCORE]
-                })
-            }
+        if (window.Android) {
+            Android.copyToClipboard(couponCodes[SCORE])
+        } else if (window.webkit.messageHandlers.eventHandler) {
+            window.webkit.messageHandlers.eventHandler.postMessage({
+                method: "copyToClipboard",
+                couponCode: couponCodes[SCORE]
+            })
+        }
     },
     sendReport: () => {
         console.log("NATIVE SENDREPORT");
@@ -1073,7 +1282,7 @@ let utils = {
             window.webkit.messageHandlers.eventHandler.postMessage({
                 method: "sendReport"
             })
-        }       
+        }
     },
     close: () => {
         console.log("NATIVE CLOSE");
@@ -1087,8 +1296,9 @@ let utils = {
     },
     subscribe: (email) => {
         console.log("NATIVE SUBSCRIBE");
-        if(!email) return
-        
+
+        if (!email) return
+
         if (window.Android) {
             Android.subscribeEmail(email.trim())
         } else if (window.webkit && window.webkit.messageHandlers) {
@@ -1108,8 +1318,62 @@ let utils = {
                 email: couponCodes[SCORE]
             })
         }
-    }
+    },
+    loadSound: () => {
+        AUDIO = document.createElement("audio")
+        AUDIO.src = generalData.sound;
+        AUDIO.currentTime = 0;
+        AUDIO.setAttribute("playsinline", true);
+        AUDIO.setAttribute("preload", "auto");
+        AUDIO.setAttribute("loop", true);
+        AUDIO.setAttribute("autoplay", true);
+        document.querySelector('head').appendChild(AUDIO);
+        try {
+            if (utils.getBrowser() == 'Safari') {
+                let html = document.querySelector('html');
+                html.addEventListener('touchstart', () => { AUDIO.play(); html.removeEventListener('touchstart', () => { }) })
+                html.addEventListener('click', () => { AUDIO.play(); html.removeEventListener('click', () => { }) })
+            }
+            else {
+                AUDIO.play();
+            }
+        } catch (error) {
+            console.log("loadSound error",error);
+        }
+    },
+    pauseSound: () => {
+        try {
+            const audio = document.querySelector("audio")
+            if (audio) {
+                !audio.paused && audio.pause();
+                audio.remove()
+            } else {
+                console.log("not closed sounnd");
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    },
 };
+
+function promoCodeCalculator(data) {
+    console.log(data);
+    let codes = { 0: "" }, counter = 1;
+    data.forEach(range => {
+        if (range.rangebottom == range.rangetop) {
+            codes[counter] = range.staticcode;
+            counter++;
+        }
+        else {
+            for (let index = range.rangebottom; index <= range.rangetop; index++) {
+                codes[counter] = range.staticcode;
+                counter++;
+            }
+        }
+    });
+
+    couponCodes = codes;
+}
 
 /**
  * Difficulty level check
@@ -1152,13 +1416,3 @@ function timeOuts(minDiff, maxDiff) {
     }
 }
 
-/**
- * Start configs
- */
-function config() {
-    document.body.setAttribute('style', '-webkit-user-select:none');
-    setDifficulty();
-    utils.calculateTotalDuration();
-    pageChecker();
-    createCloseButton();
-}
