@@ -33,9 +33,9 @@ class GiftCatchJavaScriptInterface internal constructor(webViewDialogFragment: G
      * @param couponCode - String: coupon code
      */
     @JavascriptInterface
-    fun copyToClipboard(couponCode: String?) {
+    fun copyToClipboard(couponCode: String?, link: String?) {
         mWebViewDialogFragment.dismiss()
-        mCopyToClipboardInterface.copyToClipboard(couponCode)
+        mCopyToClipboardInterface.copyToClipboard(couponCode, link)
     }
 
     /**

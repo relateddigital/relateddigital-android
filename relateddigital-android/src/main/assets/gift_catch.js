@@ -380,7 +380,7 @@ function iOSConfigRegulator(responseConfig){
         generalData.fontName = res.custom_font_family_ios;
     }
 
-    // productImgs = res.game_elements.gift_images; ///
+    productImgs = res.gameElements.giftImages; 
     productSettings.totalProductCount = res.gameElements.numberOfProducts;
 
     // // Mail Form Optionals
@@ -389,14 +389,14 @@ function iOSConfigRegulator(responseConfig){
 
         if (res.mailSubscriptionForm.title) {
             componentsData.mailSubsScreen.title.use = true;
-            componentsData.mailSubsScreen.title.text = res.mailSubscriptionForm.title; /// yok
+            componentsData.mailSubsScreen.title.text = res.mailSubscriptionForm.title; 
             componentsData.mailSubsScreen.title.textColor = res.mailExtendedProps.titleTextColor;
-            componentsData.mailSubsScreen.title.fontSize = res.mailExtendedProps.textSize + 'px'; /// yok
+            componentsData.mailSubsScreen.title.fontSize = res.mailExtendedProps.titleTextSize + 'px'; 
         }
 
         if (res.mailSubscriptionForm.message) {
             componentsData.mailSubsScreen.message.use = true;
-            componentsData.mailSubsScreen.message.text = res.mailSubscriptionForm.message; /// yok
+            componentsData.mailSubsScreen.message.text = res.mailSubscriptionForm.message;
             componentsData.mailSubsScreen.message.textColor = res.mailExtendedProps.textColor;
             componentsData.mailSubsScreen.message.fontSize = res.mailExtendedProps.textSize + 'px';
         }
@@ -564,7 +564,6 @@ function createMailSubsScreen() {
     var input = document.createElement("INPUT");
     input.setAttribute("type", "text");
     input.setAttribute("placeholder", componentsData.mailSubsScreen.emailInput.placeHolder);
-    input.setAttribute("value", "baris.arslan@euromsg.com");
     input.id = componentsData.mailSubsScreen.emailInput.id;
     input.style.backgroundColor = "white";
     input.style.width = "80%";
@@ -589,7 +588,7 @@ function createMailSubsScreen() {
         emailPermission.style.margin = "15px 0";
         emailPermission.style.width = "80%";
         emailPermission.style.display = "inline-block";
-        emailPermission.innerHTML = "<input style='width:20px;height:20px;display:block;margin-right:7px;float:left' id='" + componentsData.mailSubsScreen.emailPermission.id + "' checked type='checkbox'>\
+        emailPermission.innerHTML = "<input style='width:20px;height:20px;display:block;margin-right:7px;float:left' id='" + componentsData.mailSubsScreen.emailPermission.id + "' type='checkbox'>\
         <div style='" + ("padding: 0px;") + "'>\
         <a style='font-size:"+ componentsData.mailSubsScreen.emailPermission.fontSize + ";text-decoration: underline;color: black; font-family:" + generalData.fontName + "'\
         href='"+ componentsData.mailSubsScreen.emailPermission.url + "'>" + componentsData.mailSubsScreen.emailPermission.text + "</a>\
@@ -604,7 +603,7 @@ function createMailSubsScreen() {
         secondPermission.style.margin = "15px 0";
         secondPermission.style.width = "80%";
         secondPermission.style.display = "inline-block";
-        secondPermission.innerHTML = "<input style='width:20px;height:20px;display:block;margin-right:7px;float:left' id='" + componentsData.mailSubsScreen.secondPermission.id + "' checked type='checkbox' >" +
+        secondPermission.innerHTML = "<input style='width:20px;height:20px;display:block;margin-right:7px;float:left' id='" + componentsData.mailSubsScreen.secondPermission.id + "' type='checkbox' >" +
             "<div style='padding: 0px;'>\
                 <a style='font-size:"+ componentsData.mailSubsScreen.emailPermission.fontSize + ";text-decoration: underline;color: black; font-family:" + generalData.fontName + "'\
                 href='"+ componentsData.mailSubsScreen.secondPermission.url + "'>\

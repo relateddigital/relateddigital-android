@@ -4,6 +4,8 @@ import com.google.gson.annotations.SerializedName
 import java.io.Serializable
 
 class GiftRain : Serializable {
+    var fontFiles = ArrayList<String>()
+
     @SerializedName("actid")
     var actid: String? = null
 

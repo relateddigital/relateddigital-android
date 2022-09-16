@@ -18,6 +18,7 @@ import com.relateddigital.relateddigital_android.constants.Constants
 class GiftCatchWebDialogFragment : DialogFragment() {
     private var webView: WebView? = null
     private var mResponse: String? = null
+    private var baseUrl: String? = ""
     private var htmlString: String? = ""
     private var mIsRotation = false
     private lateinit var mListener: GiftCatchCompleteInterface
@@ -43,6 +44,7 @@ class GiftCatchWebDialogFragment : DialogFragment() {
         super.onCreate(savedInstanceState)
         setStyle(STYLE_NORMAL, R.style.AppTheme_FullScreenDialog)
         if (arguments != null) {
+            baseUrl = requireArguments().getString("baseUrl")
             htmlString = requireArguments().getString("htmlString")
             mResponse = requireArguments().getString("response")
             mJavaScriptInterface = GiftCatchJavaScriptInterface(this, mResponse!!)
@@ -78,10 +80,7 @@ class GiftCatchWebDialogFragment : DialogFragment() {
             webView!!.settings.mediaPlaybackRequiresUserGesture = false
         }
         mJavaScriptInterface?.let { webView!!.addJavascriptInterface(it, "Android") }
-        val folderPath = "file:android_asset/"
-        val fileName = htmlString
-        val file = folderPath + fileName
-        webView!!.loadUrl(file)
+        webView!!.loadDataWithBaseURL(baseUrl, htmlString!!, "text/html", "utf-8", "about:blank")
         webView!!.reload()
         return view
     }
@@ -112,14 +111,16 @@ class GiftCatchWebDialogFragment : DialogFragment() {
         const val TAG = "WebViewDialogFragment"
 
         // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-        private const val ARG_PARAM1 = "htmlString"
-        private const val ARG_PARAM2 = "response"
+        private const val ARG_PARAM1 = "response"
+        private const val ARG_PARAM2 = "baseUrl"
+        private const val ARG_PARAM3 = "htmlString"
         private var mJavaScriptInterface: GiftCatchJavaScriptInterface? = null
-        fun newInstance(htmlString: String?, response: String?): GiftCatchWebDialogFragment {
+        fun newInstance(baseUrl: String?, htmlString: String?, response: String?): GiftCatchWebDialogFragment {
             val fragment = GiftCatchWebDialogFragment()
             val args = Bundle()
-            args.putString(ARG_PARAM1, htmlString)
-            args.putString(ARG_PARAM2, response)
+            args.putString(ARG_PARAM1, response)
+            args.putString(ARG_PARAM2, baseUrl)
+            args.putString(ARG_PARAM3, htmlString)
             mJavaScriptInterface = GiftCatchJavaScriptInterface(fragment, response!!)
             fragment.arguments = args
             return fragment

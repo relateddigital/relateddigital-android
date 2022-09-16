@@ -29,10 +29,7 @@ import com.relateddigital.relateddigital_android.BuildConfig
 import com.relateddigital.relateddigital_android.constants.Constants
 import com.relateddigital.relateddigital_android.inapp.FontFamily
 import com.relateddigital.relateddigital_android.locationPermission.LocationPermission
-import com.relateddigital.relateddigital_android.model.Message
-import com.relateddigital.relateddigital_android.model.SpinToWin
-import com.relateddigital.relateddigital_android.model.SpinToWinExtendedProps
-import com.relateddigital.relateddigital_android.model.UtilResultModel
+import com.relateddigital.relateddigital_android.model.*
 import java.io.*
 import java.net.URI
 import java.net.URL
@@ -651,7 +648,7 @@ object AppUtils {
         val promoCodesSoldOutMessageFontFamily: String =
             extendedProps.promocodesSoldOutMessageFontFamily!!
 
-        val htmlStr: String = writeHtmlToFile(context)
+        val htmlStr: String = writeHtmlToFile(context, "spintowin")
 
         if (displayNameFontFamily == "custom") {
             val fontExtension = getFontNameWithExtension(
@@ -754,6 +751,53 @@ object AppUtils {
         return result
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    fun createGiftRainCustomFontFiles(context: Context, jsonStr: String?): ArrayList<String?>? {
+        var result: ArrayList<String?>? = null
+        val giftRainModel: GiftRain?
+        val extendedProps: GiftCatchExtendedProps?
+        val baseUrlPath = "file://" + context.filesDir.absolutePath + "/"
+        try {
+            giftRainModel = Gson().fromJson(jsonStr, GiftRain::class.java)
+            extendedProps = Gson().fromJson(
+                URI(giftRainModel.actiondata!!.extendedProps).path,
+                GiftCatchExtendedProps::class.java
+            )
+        } catch (e: java.lang.Exception) {
+            Log.e("GiftRain", "Extended properties could not be parsed properly!")
+            return null
+        }
+        if (giftRainModel == null || extendedProps == null) {
+            return null
+        }
+        val fontFamily: String = extendedProps.fontFamily!!
+
+        val htmlStr: String = writeHtmlToFile(context, "gift_catch")
+
+        if (fontFamily == "custom") {
+            val fontExtension = getFontNameWithExtension(
+                context,
+                extendedProps.customFontFamilyAndroid!!
+            )
+            if (fontExtension.isNotEmpty()) {
+                writeFontToFile(
+                    context,
+                    extendedProps.customFontFamilyAndroid!!,
+                    fontExtension
+                )
+                giftRainModel.fontFiles.add(fontExtension)
+            }
+        }
+
+        if (htmlStr.isNotEmpty()) {
+            result = ArrayList()
+            result.add(baseUrlPath)
+            result.add(htmlStr)
+            result.add(Gson().toJson(giftRainModel, GiftRain::class.java))
+        }
+        return result
+    }
+
     fun goToNotificationSettings(context: Context) {
         try {
             val intent = Intent()
@@ -784,32 +828,31 @@ object AppUtils {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-    private fun writeHtmlToFile(context: Context): String {
-        val spinToWinFileName = "spintowin"
+    private fun writeHtmlToFile(context: Context, fileName: String): String {
         val htmlString: String
-        val spintowinRelatedDigitalCacheDir = context.filesDir
+        val relatedDigitalCacheDir = context.filesDir
         var `is`: InputStream? = null
         var fos: FileOutputStream? = null
         try {
-            val htmlFile = File("$spintowinRelatedDigitalCacheDir/$spinToWinFileName.html")
-            val jsFile = File("$spintowinRelatedDigitalCacheDir/$spinToWinFileName.js")
+            val htmlFile = File("$relatedDigitalCacheDir/$fileName.html")
+            val jsFile = File("$relatedDigitalCacheDir/$fileName.js")
             htmlFile.createNewFile()
             jsFile.createNewFile()
-            `is` = context.assets.open("$spinToWinFileName.html")
+            `is` = context.assets.open("$fileName.html")
             var bytes = getBytesFromInputStream(`is`)
             `is`.close()
             htmlString = String(bytes!!, StandardCharsets.UTF_8)
             fos = FileOutputStream(htmlFile, false)
             fos.write(bytes)
             fos.close()
-            `is` = context.assets.open("$spinToWinFileName.js")
+            `is` = context.assets.open("$fileName.js")
             bytes = getBytesFromInputStream(`is`)
             `is`.close()
             fos = FileOutputStream(jsFile)
             fos.write(bytes)
             fos.close()
         } catch (e: java.lang.Exception) {
-            Log.e("SpinToWin", "Could not create spintowin cache files properly!")
+            Log.e(fileName, "Could not create $fileName cache files properly!")
             e.printStackTrace()
             return ""
         } finally {
@@ -817,7 +860,7 @@ object AppUtils {
                 try {
                     `is`.close()
                 } catch (e: java.lang.Exception) {
-                    Log.e("SpinToWin", "Could not close spintowin is stream properly!")
+                    Log.e(fileName, "Could not close $fileName is stream properly!")
                     e.printStackTrace()
                 }
             }
@@ -825,7 +868,7 @@ object AppUtils {
                 try {
                     fos.close()
                 } catch (e: java.lang.Exception) {
-                    Log.e("SpinToWin", "Could not close spintowin fos stream properly!")
+                    Log.e(fileName, "Could not close $fileName fos stream properly!")
                     e.printStackTrace()
                 }
             }
@@ -839,11 +882,11 @@ object AppUtils {
         fontName: String,
         fontNameWithExtension: String
     ){
-        val spintowinRelatedDigitalCacheDir = context.filesDir
+        val relatedDigitalCacheDir = context.filesDir
         var `is`: InputStream? = null
         var fos: FileOutputStream? = null
         try {
-            val fontFile = File("$spintowinRelatedDigitalCacheDir/$fontNameWithExtension")
+            val fontFile = File("$relatedDigitalCacheDir/$fontNameWithExtension")
             fontFile.createNewFile()
             val fontId = context.resources.getIdentifier(fontName, "font", context.packageName)
             `is` = context.resources.openRawResource(fontId)
@@ -853,14 +896,14 @@ object AppUtils {
             fos.write(bytes)
             fos.close()
         } catch (e: java.lang.Exception) {
-            Log.e("SpinToWin", "Could not create spintowin cache files properly!")
+            Log.e("WriteFont", "Could not create font cache files properly!")
             e.printStackTrace()
         } finally {
             if (`is` != null) {
                 try {
                     `is`.close()
                 } catch (e: java.lang.Exception) {
-                    Log.e("SpinToWin", "Could not close spintowin is stream properly!")
+                    Log.e("WriteFont", "Could not close font fis stream properly!")
                     e.printStackTrace()
                 }
             }
@@ -868,7 +911,7 @@ object AppUtils {
                 try {
                     fos.close()
                 } catch (e: java.lang.Exception) {
-                    Log.e("SpinToWin", "Could not close spintowin fos stream properly!")
+                    Log.e("WriteFont", "Could not close font fos stream properly!")
                     e.printStackTrace()
                 }
             }

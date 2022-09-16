@@ -2,6 +2,8 @@ package com.relateddigital.relateddigital_android.inapp.giftcatch
 
 import android.content.ClipData
 import android.content.ClipboardManager
+import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -14,6 +16,7 @@ import com.relateddigital.relateddigital_android.R
 import com.relateddigital.relateddigital_android.model.GiftCatchExtendedProps
 import com.relateddigital.relateddigital_android.model.GiftRain
 import com.relateddigital.relateddigital_android.util.ActivityUtils
+import com.relateddigital.relateddigital_android.util.AppUtils
 import java.net.URI
 
 class GiftCatchActivity : FragmentActivity(), GiftCatchCompleteInterface,
@@ -21,6 +24,7 @@ class GiftCatchActivity : FragmentActivity(), GiftCatchCompleteInterface,
     private var jsonStr: String? = ""
     private var response: GiftRain? = null
     private var giftCatchPromotionCode = ""
+    private var link = ""
 
     companion object {
         private const val LOG_TAG = "GiftCatch"
@@ -48,10 +52,18 @@ class GiftCatchActivity : FragmentActivity(), GiftCatchCompleteInterface,
         }
 
         if (jsonStr != null && jsonStr != "") {
-            val webViewDialogFragment: GiftCatchWebDialogFragment =
-                GiftCatchWebDialogFragment.newInstance("gift_catch_index.html", jsonStr)
-            webViewDialogFragment.setGiftCatchListeners(this, this, this)
-            webViewDialogFragment.display(supportFragmentManager)
+            val res = AppUtils.createGiftRainCustomFontFiles(
+                this, jsonStr
+            )
+            if(res == null) {
+                Log.e(LOG_TAG, "Could not get the gift-rain data properly!")
+                finish()
+            } else {
+                val webViewDialogFragment: GiftCatchWebDialogFragment =
+                    GiftCatchWebDialogFragment.newInstance(res[0], res[1], res[2])
+                webViewDialogFragment.setGiftCatchListeners(this, this, this)
+                webViewDialogFragment.display(supportFragmentManager)
+            }
         } else {
             Log.e(LOG_TAG, "Could not get the gift-rain data properly!")
             finish()
@@ -88,17 +100,31 @@ class GiftCatchActivity : FragmentActivity(), GiftCatchCompleteInterface,
                 Log.e(LOG_TAG, "GiftCatchCodeBanner : " + e.message)
             }
         }
+
+        if (link.isNotEmpty()) {
+            val uri: Uri
+            try {
+                uri = Uri.parse(link)
+                val viewIntent = Intent(Intent.ACTION_VIEW, uri)
+                startActivity(viewIntent)
+            } catch (e: Exception) {
+                Log.w(LOG_TAG, "Can't parse notification URI, will not take any action", e)
+            }
+        }
     }
 
     override fun onCompleted() {
         finish()
     }
 
-    override fun copyToClipboard(couponCode: String?) {
+    override fun copyToClipboard(couponCode: String?, link: String?) {
         val clipboard = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
         val clip = ClipData.newPlainText("Coupon Code", couponCode)
         clipboard.setPrimaryClip(clip)
         Toast.makeText(applicationContext, getString(R.string.copied_to_clipboard), Toast.LENGTH_LONG).show()
+        if(!link.isNullOrEmpty()) {
+            this.link = link
+        }
         finish()
     }
 
