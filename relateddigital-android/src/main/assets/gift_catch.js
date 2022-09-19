@@ -27,6 +27,7 @@ let generalData = {
     sound: '',
     fontColor: 'gray',
     fontName: 'Helvetica',
+    fontFiles: [],
     closeButtonId: 'rmc-close-button',
     closeButtonColor: 'black',
     borderRadius: '10px',
@@ -237,7 +238,7 @@ function initGame(responseConfig) {
         console.log("RUN IOS");
         iOSConfigRegulator(responseConfig)
     }
-    else {        
+    else {
         console.log("RUN ANDROID");
         androidConfigRegulator(responseConfig);
     }
@@ -245,9 +246,11 @@ function initGame(responseConfig) {
     config();
 }
 
-function androidConfigRegulator(responseConfig){
+function androidConfigRegulator(responseConfig) {
     responseConfig = JSON.parse(responseConfig)
     responseConfig.actiondata.ExtendedProps = JSON.parse(unescape(responseConfig.actiondata.ExtendedProps))
+
+    console.log(responseConfig);
 
     const res = responseConfig.actiondata;
     const ext = res.ExtendedProps;
@@ -264,12 +267,11 @@ function androidConfigRegulator(responseConfig){
     generalData.sound = res.game_elements.sound_url;
     utils.loadSound();
 
-    if (ext.custom_font_family_android && utils.getMobileOperatingSystem() == 'Android') {
+    if (ext.font_family == 'custom' && utils.getMobileOperatingSystem() == 'Android') {
         generalData.fontName = ext.custom_font_family_android;
-    }
-
-    if (ext.custom_font_family_ios && utils.getMobileOperatingSystem() == 'iOS') {
-        generalData.fontName = ext.custom_font_family_ios;
+        generalData.fontFiles = responseConfig.fontFiles;
+        console.log('font files ',generalData.fontFiles);
+        addFonts();
     }
 
     productImgs = res.game_elements.gift_images;
@@ -281,51 +283,51 @@ function androidConfigRegulator(responseConfig){
 
         if (res.mail_subscription_form.title) {
             componentsData.mailSubsScreen.title.use = true;
-            componentsData.mailSubsScreen.title.text = res.mail_subscription_form.title;
+            componentsData.mailSubsScreen.title.text = slashController(res.mail_subscription_form.title);
             componentsData.mailSubsScreen.title.textColor = ext.mail_subscription_form.title_text_color;
-            componentsData.mailSubsScreen.title.fontSize = ext.mail_subscription_form.title_text_size + 'px';
+            componentsData.mailSubsScreen.title.fontSize = fontSizeCalculator(ext.mail_subscription_form.title_text_size) + 'px';
         }
 
         if (res.mail_subscription_form.message) {
             componentsData.mailSubsScreen.message.use = true;
-            componentsData.mailSubsScreen.message.text = res.mail_subscription_form.message;
+            componentsData.mailSubsScreen.message.text = slashController(res.mail_subscription_form.message);
             componentsData.mailSubsScreen.message.textColor = ext.mail_subscription_form.text_color;
-            componentsData.mailSubsScreen.message.fontSize = ext.mail_subscription_form.text_size + 'px';
+            componentsData.mailSubsScreen.message.fontSize = fontSizeCalculator(ext.mail_subscription_form.text_size) + 'px';
         }
 
         if (res.mail_subscription_form.emailpermit_text) {
             componentsData.mailSubsScreen.emailPermission.use = true;
-            componentsData.mailSubsScreen.emailPermission.text = res.mail_subscription_form.emailpermit_text;
-            componentsData.mailSubsScreen.emailPermission.fontSize = ext.mail_subscription_form.emailpermit_text_size + 'px';
+            componentsData.mailSubsScreen.emailPermission.text = slashController(res.mail_subscription_form.emailpermit_text);
+            componentsData.mailSubsScreen.emailPermission.fontSize = fontSizeCalculator(ext.mail_subscription_form.emailpermit_text_size) + 'px';
             componentsData.mailSubsScreen.emailPermission.url = ext.mail_subscription_form.emailpermit_text_url;
         }
 
         if (res.mail_subscription_form.consent_text) {
             componentsData.mailSubsScreen.secondPermission.use = true;
-            componentsData.mailSubsScreen.secondPermission.text = res.mail_subscription_form.consent_text;
-            componentsData.mailSubsScreen.secondPermission.fontSize = ext.mail_subscription_form.consent_text_size + 'px';
+            componentsData.mailSubsScreen.secondPermission.text = slashController(res.mail_subscription_form.consent_text);
+            componentsData.mailSubsScreen.secondPermission.fontSize = fontSizeCalculator(ext.mail_subscription_form.consent_text_size) + 'px';
             componentsData.mailSubsScreen.secondPermission.url = ext.mail_subscription_form.consent_text_url;
         }
     }
 
     // Mail Form Required
-    componentsData.mailSubsScreen.button.text = res.mail_subscription_form.button_label;
+    componentsData.mailSubsScreen.button.text = slashController(res.mail_subscription_form.button_label);
     componentsData.mailSubsScreen.button.textColor = ext.mail_subscription_form.button_text_color;
     componentsData.mailSubsScreen.button.buttonColor = ext.mail_subscription_form.button_color;
-    componentsData.mailSubsScreen.button.fontSize = ext.mail_subscription_form.button_text_size + 'px';
+    componentsData.mailSubsScreen.button.fontSize = fontSizeCalculator(ext.mail_subscription_form.button_text_size) + 'px';
     componentsData.mailSubsScreen.emailInput.placeHolder = res.mail_subscription_form.placeholder;
-    componentsData.mailSubsScreen.alerts.check_consent_message = res.mail_subscription_form.check_consent_message;
-    componentsData.mailSubsScreen.alerts.invalid_email_message = res.mail_subscription_form.invalid_email_message;
+    componentsData.mailSubsScreen.alerts.check_consent_message = slashController(res.mail_subscription_form.check_consent_message);
+    componentsData.mailSubsScreen.alerts.invalid_email_message = slashController(res.mail_subscription_form.invalid_email_message);
 
     // Rules Screen Optionals
-    if (res.gamification_rules) {
+    if (res.gamification_ruless) { ///
         activePageData.rulesScreen = true;
 
         componentsData.rulesScreen.bgImage = res.gamification_rules.background_image
-        componentsData.rulesScreen.button.text = res.gamification_rules.button_label
+        componentsData.rulesScreen.button.text = slashController(res.gamification_rules.button_label)
         componentsData.rulesScreen.button.textColor = ext.gamification_rules.button_text_color;
         componentsData.rulesScreen.button.buttonColor = ext.gamification_rules.button_color;
-        componentsData.rulesScreen.button.fontSize = ext.gamification_rules.button_text_size + 'px';
+        componentsData.rulesScreen.button.fontSize = fontSizeCalculator(ext.gamification_rules.button_text_size) + 'px';
     }
 
     // Game Screen
@@ -334,31 +336,31 @@ function androidConfigRegulator(responseConfig){
     componentsData.gameScreen.scoreboard.background = ext.game_elements.scoreboard_background_color;
     componentsData.gameScreen.scoreboard.type = ext.game_elements.scoreboard_shape;
 
-    if(componentsData.gameScreen.scoreboard.type == "") componentsData.gameScreen.scoreboard.type = "roundedcorners"
+    if (componentsData.gameScreen.scoreboard.type == "") componentsData.gameScreen.scoreboard.type = "roundedcorners"
 
     if (res.game_result_elements.title) {
         componentsData.finishScreen.title.use = true
-        componentsData.finishScreen.title.text = res.game_result_elements.title
-        componentsData.finishScreen.title.fontSize = ext.game_result_elements.title_text_size + 'px'
+        componentsData.finishScreen.title.text = slashController(res.game_result_elements.title)
+        componentsData.finishScreen.title.fontSize = fontSizeCalculator(ext.game_result_elements.title_text_size) + 'px'
         componentsData.finishScreen.title.textColor = ext.game_result_elements.title_text_color
 
     }
     if (res.game_result_elements.message) {
         componentsData.finishScreen.message.use = true
-        componentsData.finishScreen.message.text = res.game_result_elements.message
-        componentsData.finishScreen.message.fontSize = ext.game_result_elements.text_size + 'px'
+        componentsData.finishScreen.message.text = slashController(res.game_result_elements.message)
+        componentsData.finishScreen.message.fontSize = fontSizeCalculator(ext.game_result_elements.text_size) + 'px'
         componentsData.finishScreen.message.textColor = ext.game_result_elements.text_color
     }
 
-    componentsData.finishScreen.button.text = res.copybutton_label;
+    componentsData.finishScreen.button.text = slashController(res.copybutton_label);
     componentsData.finishScreen.button.textColor = ext.copybutton_text_color;
-    componentsData.finishScreen.button.fontSize = ext.copybutton_text_size + 'px';
+    componentsData.finishScreen.button.fontSize = fontSizeCalculator(ext.copybutton_text_size) + 'px';
     componentsData.finishScreen.button.buttonColor = ext.copybutton_color;
     componentsData.finishScreen.button.androidLink = res.android_lnk;
     componentsData.finishScreen.button.iOSLink = res.ios_lnk;
 }
 
-function iOSConfigRegulator(responseConfig){
+function iOSConfigRegulator(responseConfig) {
     console.log(responseConfig)
 
 
@@ -376,11 +378,11 @@ function iOSConfigRegulator(responseConfig){
     generalData.sound = res.gameElements.soundUrl;
     utils.loadSound();
 
-    if (res.custom_font_family_ios && utils.getMobileOperatingSystem() == 'iOS') {
+    if (res.custom_font_family_ios == 'custom' && utils.getMobileOperatingSystem() == 'iOS') {
         generalData.fontName = res.custom_font_family_ios;
     }
 
-    productImgs = res.gameElements.giftImages; 
+    productImgs = res.gameElements.giftImages;
     productSettings.totalProductCount = res.gameElements.numberOfProducts;
 
     // // Mail Form Optionals
@@ -389,51 +391,51 @@ function iOSConfigRegulator(responseConfig){
 
         if (res.mailSubscriptionForm.title) {
             componentsData.mailSubsScreen.title.use = true;
-            componentsData.mailSubsScreen.title.text = res.mailSubscriptionForm.title; 
+            componentsData.mailSubsScreen.title.text = slashController(res.mailSubscriptionForm.title);
             componentsData.mailSubsScreen.title.textColor = res.mailExtendedProps.titleTextColor;
-            componentsData.mailSubsScreen.title.fontSize = res.mailExtendedProps.titleTextSize + 'px'; 
+            componentsData.mailSubsScreen.title.fontSize = fontSizeCalculator(res.mailExtendedProps.titleTextSize) + 'px';
         }
 
         if (res.mailSubscriptionForm.message) {
             componentsData.mailSubsScreen.message.use = true;
-            componentsData.mailSubsScreen.message.text = res.mailSubscriptionForm.message;
+            componentsData.mailSubsScreen.message.text = slashController(res.mailSubscriptionForm.message);
             componentsData.mailSubsScreen.message.textColor = res.mailExtendedProps.textColor;
-            componentsData.mailSubsScreen.message.fontSize = res.mailExtendedProps.textSize + 'px';
+            componentsData.mailSubsScreen.message.fontSize = fontSizeCalculator(res.mailExtendedProps.textSize) + 'px';
         }
 
         if (res.mailSubscriptionForm.emailPermitText) {
             componentsData.mailSubsScreen.emailPermission.use = true;
-            componentsData.mailSubsScreen.emailPermission.text = res.mailSubscriptionForm.emailPermitText;
-            componentsData.mailSubsScreen.emailPermission.fontSize = res.mailExtendedProps.emailPermitTextSize + 'px';
+            componentsData.mailSubsScreen.emailPermission.text = slashController(res.mailSubscriptionForm.emailPermitText);
+            componentsData.mailSubsScreen.emailPermission.fontSize = fontSizeCalculator(res.mailExtendedProps.emailPermitTextSize) + 'px';
             componentsData.mailSubsScreen.emailPermission.url = res.mailExtendedProps.emailPermitTextUrl;
         }
 
         if (res.mailSubscriptionForm.consentText) {
             componentsData.mailSubsScreen.secondPermission.use = true;
-            componentsData.mailSubsScreen.secondPermission.text = res.mailSubscriptionForm.consentText;
-            componentsData.mailSubsScreen.secondPermission.fontSize = res.mailExtendedProps.consentTextSize + 'px';
+            componentsData.mailSubsScreen.secondPermission.text = slashController(res.mailSubscriptionForm.consentText);
+            componentsData.mailSubsScreen.secondPermission.fontSize = fontSizeCalculator(res.mailExtendedProps.consentTextSize) + 'px';
             componentsData.mailSubsScreen.secondPermission.url = res.mailExtendedProps.consentTextUrl;
         }
     }
 
     // // Mail Form Required
-    componentsData.mailSubsScreen.button.text = res.mailSubscriptionForm.buttonTitle;
+    componentsData.mailSubsScreen.button.text = slashController(res.mailSubscriptionForm.buttonTitle);
     componentsData.mailSubsScreen.button.textColor = res.mailExtendedProps.buttonTextColor;
     componentsData.mailSubsScreen.button.buttonColor = res.mailExtendedProps.buttonColor;
-    componentsData.mailSubsScreen.button.fontSize = res.mailExtendedProps.buttonTextSize + 'px';
+    componentsData.mailSubsScreen.button.fontSize = fontSizeCalculator(res.mailExtendedProps.buttonTextSize) + 'px';
     componentsData.mailSubsScreen.emailInput.placeHolder = res.mailSubscriptionForm.placeholder;
-    componentsData.mailSubsScreen.alerts.check_consent_message = res.mailSubscriptionForm.checkConsentMessage;
-    componentsData.mailSubsScreen.alerts.invalid_email_message = res.mailSubscriptionForm.invalidEmailMessage;
+    componentsData.mailSubsScreen.alerts.check_consent_message = slashController(res.mailSubscriptionForm.checkConsentMessage);
+    componentsData.mailSubsScreen.alerts.invalid_email_message = slashController(res.mailSubscriptionForm.invalidEmailMessage);
 
     // // Rules Screen Optionals
     if (res.gamificationRules) {
         activePageData.rulesScreen = true;
 
         componentsData.rulesScreen.bgImage = res.gamificationRules.backgroundImage
-        componentsData.rulesScreen.button.text = res.gamificationRules.buttonLabel
+        componentsData.rulesScreen.button.text = slashController(res.gamificationRules.buttonLabel)
         componentsData.rulesScreen.button.textColor = res.gamificationRulesExtended.buttonTextColor;
         componentsData.rulesScreen.button.buttonColor = res.gamificationRulesExtended.buttonColor;
-        componentsData.rulesScreen.button.fontSize = res.gamificationRulesExtended.buttonTextSize + 'px';
+        componentsData.rulesScreen.button.fontSize = fontSizeCalculator(res.gamificationRulesExtended.buttonTextSize) + 'px';
     }
 
     // Game Screen
@@ -442,25 +444,25 @@ function iOSConfigRegulator(responseConfig){
     componentsData.gameScreen.scoreboard.background = res.gameElementsExtended.scoreboardBackgroundColor;
     componentsData.gameScreen.scoreboard.type = res.gameElementsExtended.scoreboardShape;
 
-    if(componentsData.gameScreen.scoreboard.type == "") componentsData.gameScreen.scoreboard.type = "roundedcorners"
+    if (componentsData.gameScreen.scoreboard.type == "") componentsData.gameScreen.scoreboard.type = "roundedcorners"
 
     if (res.gameResultElements.title) {
         componentsData.finishScreen.title.use = true
-        componentsData.finishScreen.title.text = res.gameResultElements.title
-        componentsData.finishScreen.title.fontSize = res.gameResultElementsExtended.titleTextSize + 'px'
+        componentsData.finishScreen.title.text = slashController(res.gameResultElements.title)
+        componentsData.finishScreen.title.fontSize = fontSizeCalculator(res.gameResultElementsExtended.titleTextSize) + 'px'
         componentsData.finishScreen.title.textColor = res.gameResultElementsExtended.titleTextColor
 
     }
     if (res.gameResultElements.message) {
         componentsData.finishScreen.message.use = true
-        componentsData.finishScreen.message.text = res.gameResultElements.message
-        componentsData.finishScreen.message.fontSize = res.gameResultElementsExtended.textSize + 'px'
+        componentsData.finishScreen.message.text = slashController(res.gameResultElements.message)
+        componentsData.finishScreen.message.fontSize = fontSizeCalculator(res.gameResultElementsExtended.textSize) + 'px'
         componentsData.finishScreen.message.textColor = res.gameResultElementsExtended.textColor
     }
 
-    componentsData.finishScreen.button.text = res.copybutton_label;
+    componentsData.finishScreen.button.text = slashController(res.copybutton_label);
     componentsData.finishScreen.button.textColor = res.copybutton_text_color;
-    componentsData.finishScreen.button.fontSize = res.copybutton_text_size + 'px';
+    componentsData.finishScreen.button.fontSize = fontSizeCalculator(res.copybutton_text_size) + 'px';
     componentsData.finishScreen.button.buttonColor = res.copybutton_color;
     componentsData.finishScreen.button.iOSLink = res.ios_lnk;
 }
@@ -528,7 +530,7 @@ function createMailSubsScreen() {
 
     var container = document.createElement("DIV");
     container.id = "rmc-container";
-    container.style.width = "100%";
+    container.style.width = "80%";
     container.style.height = "auto";
     container.style.position = "absolute";
     container.style.transform = "translate(-50%, -50%)";
@@ -542,6 +544,7 @@ function createMailSubsScreen() {
         title.style.color = componentsData.mailSubsScreen.title.textColor;
         title.style.fontSize = componentsData.mailSubsScreen.title.fontSize;
         title.style.display = "inline-block";
+        title.style.width = "100%";
         title.style.margin = "15px 0";
         title.style.fontFamily = generalData.fontName;
         title.innerText = componentsData.mailSubsScreen.title.text;
@@ -554,6 +557,7 @@ function createMailSubsScreen() {
         message.style.color = componentsData.mailSubsScreen.message.textColor;
         message.style.fontSize = componentsData.mailSubsScreen.message.fontSize;
         message.style.display = "inline-block";
+        message.style.width = "100%";
         message.style.margin = "15px 0";
         message.style.fontFamily = generalData.fontName;
         message.innerText = componentsData.mailSubsScreen.message.text;
@@ -562,11 +566,11 @@ function createMailSubsScreen() {
 
 
     var input = document.createElement("INPUT");
-    input.setAttribute("type", "text");
+    input.setAttribute("type", "email");
     input.setAttribute("placeholder", componentsData.mailSubsScreen.emailInput.placeHolder);
     input.id = componentsData.mailSubsScreen.emailInput.id;
     input.style.backgroundColor = "white";
-    input.style.width = "80%";
+    input.style.width = "100%";
     input.style.padding = "9px";
     input.style.border = "1px solid " + generalData.fontColor;
     input.style.borderRadius = generalData.borderRadius;
@@ -580,20 +584,29 @@ function createMailSubsScreen() {
     input.style.fontFamily = generalData.fontName;
     container.appendChild(input);
 
+    var emailAlert = document.createElement("div");
+    emailAlert.id = 'emailAlert';
+    container.appendChild(emailAlert);
+
+
 
     if (componentsData.mailSubsScreen.emailPermission.use) {
         var emailPermission = document.createElement("DIV");
         emailPermission.style.color = "black";
         emailPermission.style.fontSize = "13px";
         emailPermission.style.margin = "15px 0";
-        emailPermission.style.width = "80%";
-        emailPermission.style.display = "inline-block";
+        emailPermission.style.width = "100%";
+        emailPermission.style.display = "flex";
+        emailPermission.style.alignItems = "center";
+
         emailPermission.innerHTML = "<input style='width:20px;height:20px;display:block;margin-right:7px;float:left' id='" + componentsData.mailSubsScreen.emailPermission.id + "' type='checkbox'>\
-        <div style='" + ("padding: 0px;") + "'>\
         <a style='font-size:"+ componentsData.mailSubsScreen.emailPermission.fontSize + ";text-decoration: underline;color: black; font-family:" + generalData.fontName + "'\
-        href='"+ componentsData.mailSubsScreen.emailPermission.url + "'>" + componentsData.mailSubsScreen.emailPermission.text + "</a>\
-        </div>";
+        href='"+ componentsData.mailSubsScreen.emailPermission.url + "'>" + componentsData.mailSubsScreen.emailPermission.text;
         container.appendChild(emailPermission);
+
+        var checkboxAlert1 = document.createElement("div");
+        checkboxAlert1.id = 'checkboxAlert1';
+        container.appendChild(checkboxAlert1);
     }
 
     if (componentsData.mailSubsScreen.emailPermission.use) {
@@ -601,15 +614,19 @@ function createMailSubsScreen() {
         secondPermission.style.color = "black";
         secondPermission.style.fontSize = "13px";
         secondPermission.style.margin = "15px 0";
-        secondPermission.style.width = "80%";
-        secondPermission.style.display = "inline-block";
+        secondPermission.style.width = "100%";
+        secondPermission.style.display = "flex";
+        secondPermission.style.alignItems = "center";
+
         secondPermission.innerHTML = "<input style='width:20px;height:20px;display:block;margin-right:7px;float:left' id='" + componentsData.mailSubsScreen.secondPermission.id + "' type='checkbox' >" +
-            "<div style='padding: 0px;'>\
-                <a style='font-size:"+ componentsData.mailSubsScreen.emailPermission.fontSize + ";text-decoration: underline;color: black; font-family:" + generalData.fontName + "'\
+            "<a style='font-size:" + componentsData.mailSubsScreen.emailPermission.fontSize + ";text-decoration: underline;color: black; font-family:" + generalData.fontName + "'\
                 href='"+ componentsData.mailSubsScreen.secondPermission.url + "'>\
-                "+ componentsData.mailSubsScreen.secondPermission.text + "\
-                </div>";
+                "+ componentsData.mailSubsScreen.secondPermission.text;
         container.appendChild(secondPermission);
+
+        var checkboxAlert2 = document.createElement("div");
+        checkboxAlert2.id = 'checkboxAlert2';
+        container.appendChild(checkboxAlert2);
     }
 
     var submit = document.createElement("button");
@@ -633,36 +650,146 @@ function createMailSubsScreen() {
     activePageData.rulesScreen && createRulesScreen();
 
     submit.addEventListener("click", function () {
-        if (document.querySelector("#" + componentsData.mailSubsScreen.emailInput.id)) {
-            var email = document.querySelector("#" + componentsData.mailSubsScreen.emailInput.id).value.toLowerCase();
-            var pattern = new RegExp("[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+.[A-Za-z]{2,}");
-            var emailStatus = pattern.test(email);
-            if (emailStatus == true) {
-                if (document.querySelector("#" + componentsData.mailSubsScreen.emailPermission.id) && document.querySelector("#" + componentsData.mailSubsScreen.secondPermission.id)) {
-                    if (document.querySelector("#" + componentsData.mailSubsScreen.emailPermission.id).checked && document.querySelector("#" + componentsData.mailSubsScreen.secondPermission.id).checked) {
-                        utils.subscribe(email);
-                        if (document.querySelector("#" + componentsData.mailSubsScreen.id)) {
-                            document.querySelector("#" + componentsData.mailSubsScreen.id).remove();
-                            if (!activePageData.rulesScreen) {
-                                createGameScreen();
-                                createScoreBoard();
-                            }
-                        }
-                    } else {
-                        alert(componentsData.mailSubsScreen.alerts.check_consent_message);
+        if (emailChecker()) {
+            removeAlert("emailAlert")
+            if (emailPermitChecker() && secondPermitChecker()) {
+                utils.subscribe(document.querySelector("#" + componentsData.mailSubsScreen.emailInput.id).value.toLowerCase());
+                if (document.querySelector("#" + componentsData.mailSubsScreen.id)) {
+                    document.querySelector("#" + componentsData.mailSubsScreen.id).remove();
+                    if (!activePageData.rulesScreen) {
+                        createGameScreen();
+                        createScoreBoard();
                     }
                 }
             } else {
-                alert(componentsData.mailSubsScreen.alerts.invalid_email_message);
+                if (!emailPermitChecker()) {
+                    alertChecker(componentsData.mailSubsScreen.alerts.check_consent_message, 'checkboxAlert1')
+                }
+                else {
+                    removeAlert("checkboxAlert1")
+                }
+                if (!secondPermitChecker()) {
+                    alertChecker(componentsData.mailSubsScreen.alerts.check_consent_message, 'checkboxAlert2')
+                }
+                else {
+                    removeAlert("checkboxAlert2")
+                }
             }
+        } else {
+            alertChecker(componentsData.mailSubsScreen.alerts.invalid_email_message, 'emailAlert')
         }
-
     });
 
     mailSubsScreen.appendChild(submit);
     mailSubsScreen.appendChild(container);
     MAIN_COMPONENT.appendChild(mailSubsScreen);
 }
+
+function createAlert(text, id) {
+    if (!document.querySelector('#' + id).innerText) {
+        var alert = document.createElement("div");
+        alert.innerText = text;
+        alert.style.width = "100%";
+        alert.style.padding = "5px 10px";
+        alert.style.zIndex = "999";
+        alert.style.textAlign = "left";
+        alert.style.color = "#000";
+        alert.style.fontSize= "14px";
+        alert.style.fontFamily = generalData.fontName;
+        alert.style.transform = "translate3d(0,0,3px)";
+
+        document.querySelector('#' + id).appendChild(alert)
+    }
+    else {
+
+    }
+}
+
+function removeAlert(id) {
+    if (document.querySelector('#' + id)) {
+        document.querySelector('#' + id).innerText = ""
+    }
+}
+
+function alertChecker(text, id) {
+    switch (id) {
+        case "checkboxAlert1":
+            if (emailPermitChecker()) {
+                document.querySelector('#' + id).innerText = ""
+            } else {
+                createAlert(text, id)
+            }
+            break;
+        case "checkboxAlert2":
+            if (secondPermitChecker()) {
+                document.querySelector('#' + id).innerText = ""
+            } else {
+                createAlert(text, id)
+            }
+            break;
+        case "emailAlert":
+            if (emailChecker()) {
+                document.querySelector('#' + id).innerText = ""
+            } else {
+                createAlert(text, id)
+            }
+            break;
+        default:
+            break;
+    }
+}
+
+function emailChecker() {
+    if (document.querySelector("#" + componentsData.mailSubsScreen.emailInput.id)) {
+        var email = document.querySelector("#" + componentsData.mailSubsScreen.emailInput.id).value.toLowerCase();
+        var pattern = new RegExp("[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+.[A-Za-z]{2,}");
+        var emailStatus = pattern.test(email);
+        if (emailStatus == true) {
+            console.log("email checker", true)
+            return true
+        }
+        else {
+            console.log("email checker", false)
+            return false
+        }
+    }
+    else {
+        console.log("email checker", false)
+        return false
+    }
+}
+
+function emailPermitChecker() {
+    if (document.querySelector("#" + componentsData.mailSubsScreen.emailPermission.id)) {
+        if (document.querySelector("#" + componentsData.mailSubsScreen.emailPermission.id).checked) {
+            return true
+        }
+        else {
+            return false
+        }
+    }
+    else {
+        return false
+    }
+}
+
+function secondPermitChecker() {
+    if (document.querySelector("#" + componentsData.mailSubsScreen.secondPermission.id)) {
+        if (document.querySelector("#" + componentsData.mailSubsScreen.secondPermission.id).checked) {
+            return true
+        }
+        else {
+            return false
+        }
+    }
+    else {
+        return false
+    }
+}
+
+
+
+
 
 /**
  * Close button
@@ -1119,14 +1246,23 @@ function createFinishScreen() {
             if (utils.getMobileOperatingSystem() == 'iOS' && componentsData.finishScreen.button.iOSLink)
                 location.href = componentsData.finishScreen.button.iOSLink
 
-            if (utils.getMobileOperatingSystem() == 'Android' && componentsData.finishScreen.button.androidLink)
-                location.href = componentsData.finishScreen.button.androidLink
+            // Android link yönlendirme native taraftan yapılıyor
+            // if (utils.getMobileOperatingSystem() == 'Android' && componentsData.finishScreen.button.androidLink)
+            //     location.href = componentsData.finishScreen.button.androidLink
         });
     }
 
 
     finishScreen.appendChild(container);
     MAIN_COMPONENT.appendChild(finishScreen);
+}
+
+function getAndroidLink() {
+    if (componentsData.finishScreen.button.androidLink) {
+        return componentsData.finishScreen.button.androidLink
+    } else {
+        return ""
+    }
 }
 
 function finish() {
@@ -1255,7 +1391,7 @@ let utils = {
 
             return "unknown"
         } catch (error) {
-            console.log("getBrowser error",error);
+            console.log("getBrowser error", error);
             return "unknown"
         }
     },
@@ -1265,7 +1401,7 @@ let utils = {
     copyToClipboard: () => {
         console.log("NATIVE COPYCLIPBORD");
         if (window.Android) {
-            Android.copyToClipboard(couponCodes[SCORE])
+            Android.copyToClipboard(couponCodes[SCORE], getAndroidLink())
         } else if (window.webkit.messageHandlers.eventHandler) {
             window.webkit.messageHandlers.eventHandler.postMessage({
                 method: "copyToClipboard",
@@ -1337,7 +1473,7 @@ let utils = {
                 AUDIO.play();
             }
         } catch (error) {
-            console.log("loadSound error",error);
+            console.log("loadSound error", error);
         }
     },
     pauseSound: () => {
@@ -1372,6 +1508,73 @@ function promoCodeCalculator(data) {
     });
 
     couponCodes = codes;
+}
+
+function addFonts() {
+	if (generalData.fontFiles === undefined) {
+		return
+	}
+	var addedFontFiles = [];
+	for (var fontFileIndex in generalData.fontFiles) {
+		var fontFile = generalData.fontFiles[fontFileIndex];
+		if (addedFontFiles.includes(fontFile)) {
+			continue;
+		}
+		var fontFamily = fontFile.split(".")[0];
+		var newStyle = document.createElement('style');
+		var cssContent = "@font-face{font-family:" + fontFamily + ";src:url('" + fontFile + "');}";
+		newStyle.appendChild(document.createTextNode(cssContent));
+		document.head.appendChild(newStyle);
+		addedFontFiles.push(fontFile);
+	}
+};
+
+function fontSizeCalculator(BEFS) {
+    BEFS = parseInt(BEFS)
+    switch (BEFS) {
+        case 10:
+            return 28
+            break;
+        case 9:
+            return 26
+            break;
+        case 8:
+            return 24
+            break;
+        case 7:
+            return 22
+            break;
+        case 6:
+            return 20
+            break;
+        case 5:
+            return 18
+            break;
+        case 4:
+            return 16
+            break;
+        case 3:
+            return 14
+            break;
+        case 2:
+            return 12
+            break;
+        case 1:
+            return 10
+            break;
+        default:
+            return 18
+            break;
+    }
+}
+
+function slashController(text){
+    let pos = text.indexOf('\\n');
+    while (pos > -1) {
+        text = text.replace("\\n", "\n");
+        pos = text.indexOf('\\n');
+    }
+    return text
 }
 
 /**
