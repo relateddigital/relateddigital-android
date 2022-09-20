@@ -217,6 +217,8 @@ let componentsData = {
             use: true,
             id: 'rmc-coupon-code',
             fontSize: '15px',
+            background: '#fff',
+            textColor: '#000'
         },
         button: { // REQUIRED
             use: true,
@@ -358,6 +360,11 @@ function androidConfigRegulator(responseConfig) {
     componentsData.finishScreen.button.buttonColor = ext.copybutton_color;
     componentsData.finishScreen.button.androidLink = res.android_lnk;
     componentsData.finishScreen.button.iOSLink = res.ios_lnk;
+
+    componentsData.finishScreen.couponCode.background = ext.promocode_background_color;
+    componentsData.finishScreen.couponCode.textColor = ext.promocode_text_color;
+    componentsData.finishScreen.couponCode.fontSize = fontSizeCalculator(ext.game_result_elements.text_size) + 'px';
+
 }
 
 function iOSConfigRegulator(responseConfig) {
@@ -1206,10 +1213,10 @@ function createFinishScreen() {
     _score.style.padding = componentsData.gameScreen.scoreboard.type === 'circle' ? (utils.winCheck() ? '40px 30px' : '70px 20px') : '15px 10px';
     _score.style.width = 'fit-content';
     _score.style.margin = '0 auto';
-    _score.style.color = componentsData.gameScreen.scoreboard.fontColor;
+    _score.style.color = componentsData.finishScreen.couponCode.textColor;
     _score.style.fontFamily = generalData.fontName;
-    _score.style.fontSize = componentsData.gameScreen.scoreboard.fontSize;
-    _score.style.background = componentsData.gameScreen.scoreboard.background;
+    _score.style.fontSize = componentsData.finishScreen.couponCode.fontSize;
+    _score.style.background = componentsData.finishScreen.couponCode.background;
     componentsData.gameScreen.scoreboard.type !== 'square' && (_score.style.borderRadius = componentsData.gameScreen.scoreboard.type == 'circle' ? '50%' : '15px');
     container.appendChild(_score);
 
