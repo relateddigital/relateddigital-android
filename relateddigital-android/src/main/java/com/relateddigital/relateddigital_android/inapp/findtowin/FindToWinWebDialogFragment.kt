@@ -18,6 +18,7 @@ import com.relateddigital.relateddigital_android.constants.Constants
 class FindToWinWebDialogFragment : DialogFragment() {
     private var webView: WebView? = null
     private var mResponse: String? = null
+    private var baseUrl: String? = ""
     private var htmlString: String? = ""
     private var mIsRotation = false
     private lateinit var mListener: FindToWinCompleteInterface
@@ -43,6 +44,7 @@ class FindToWinWebDialogFragment : DialogFragment() {
         super.onCreate(savedInstanceState)
         setStyle(STYLE_NORMAL, R.style.AppTheme_FullScreenDialog)
         if (arguments != null) {
+            baseUrl = requireArguments().getString("baseUrl")
             htmlString = requireArguments().getString("htmlString")
             mResponse = requireArguments().getString("response")
             mJavaScriptInterface = FindToWinJavaScriptInterface(this, mResponse!!)
@@ -78,10 +80,7 @@ class FindToWinWebDialogFragment : DialogFragment() {
             webView!!.settings.mediaPlaybackRequiresUserGesture = false
         }
         mJavaScriptInterface?.let { webView!!.addJavascriptInterface(it, "Android") }
-        val folderPath = "file:android_asset/"
-        val fileName = htmlString
-        val file = folderPath + fileName
-        webView!!.loadUrl(file)
+        webView!!.loadDataWithBaseURL(baseUrl, htmlString!!, "text/html", "utf-8", "about:blank")
         webView!!.reload()
         return view
     }
@@ -112,14 +111,16 @@ class FindToWinWebDialogFragment : DialogFragment() {
         const val TAG = "WebViewDialogFragment"
 
         // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-        private const val ARG_PARAM1 = "htmlString"
-        private const val ARG_PARAM2 = "response"
+        private const val ARG_PARAM1 = "response"
+        private const val ARG_PARAM2 = "baseUrl"
+        private const val ARG_PARAM3 = "htmlString"
         private var mJavaScriptInterface: FindToWinJavaScriptInterface? = null
-        fun newInstance(htmlString: String?, response: String?): FindToWinWebDialogFragment {
+        fun newInstance(baseUrl: String?, htmlString: String?, response: String?): FindToWinWebDialogFragment {
             val fragment = FindToWinWebDialogFragment()
             val args = Bundle()
-            args.putString(ARG_PARAM1, htmlString)
-            args.putString(ARG_PARAM2, response)
+            args.putString(ARG_PARAM1, response)
+            args.putString(ARG_PARAM2, baseUrl)
+            args.putString(ARG_PARAM3, htmlString)
             mJavaScriptInterface = FindToWinJavaScriptInterface(fragment, response!!)
             fragment.arguments = args
             return fragment

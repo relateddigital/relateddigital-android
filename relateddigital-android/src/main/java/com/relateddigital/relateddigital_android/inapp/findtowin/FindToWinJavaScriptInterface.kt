@@ -1,6 +1,11 @@
 package com.relateddigital.relateddigital_android.inapp.findtowin
 
+import android.util.Log
 import android.webkit.JavascriptInterface
+import com.google.gson.Gson
+import com.relateddigital.relateddigital_android.model.FindToWin
+import com.relateddigital.relateddigital_android.model.MailSubReport
+import com.relateddigital.relateddigital_android.network.RequestHandler
 
 class FindToWinJavaScriptInterface internal constructor(webViewDialogFragment: FindToWinWebDialogFragment,
                                                         @get:JavascriptInterface val response: String) {
@@ -8,6 +13,7 @@ class FindToWinJavaScriptInterface internal constructor(webViewDialogFragment: F
     private lateinit var mListener: FindToWinCompleteInterface
     private lateinit var mCopyToClipboardInterface: FindToWinCopyToClipboardInterface
     private lateinit var mShowCodeInterface: FindToWinShowCodeInterface
+    private val findToWinModel: FindToWin = Gson().fromJson(this.response, FindToWin::class.java)
 
     private var subEmail = ""
 
@@ -27,9 +33,9 @@ class FindToWinJavaScriptInterface internal constructor(webViewDialogFragment: F
      * @param couponCode - String: coupon code
      */
     @JavascriptInterface
-    fun copyToClipboard(couponCode: String?) {
+    fun copyToClipboard(couponCode: String?, link: String?) {
         mWebViewDialogFragment.dismiss()
-        mCopyToClipboardInterface.copyToClipboard(couponCode)
+        mCopyToClipboardInterface.copyToClipboard(couponCode, link)
     }
 
     /**
@@ -39,7 +45,14 @@ class FindToWinJavaScriptInterface internal constructor(webViewDialogFragment: F
      */
     @JavascriptInterface
     fun subscribeEmail(email: String?) {
-        //TODO get it from SpinToWin
+        if (!email.isNullOrEmpty()) {
+            subEmail = email
+            RequestHandler.createSubsJsonRequest(mWebViewDialogFragment.requireContext(), findToWinModel.actiondata!!.type!!,
+                findToWinModel.actid.toString(), findToWinModel.actiondata!!.auth!!,
+                email)
+        } else {
+            Log.e("FindToWin : ", "Email entered is not valid!")
+        }
     }
 
     /**
@@ -47,7 +60,19 @@ class FindToWinJavaScriptInterface internal constructor(webViewDialogFragment: F
      */
     @JavascriptInterface
     fun sendReport() {
-        //TODO get it from SpinToWin
+        var report: MailSubReport?
+        try {
+            report = MailSubReport()
+            report.impression = findToWinModel.actiondata!!.report!!.impression
+            report.click = findToWinModel.actiondata!!.report!!.click
+        } catch (e: Exception) {
+            Log.e("FindToWin : ", "There is no report to send!")
+            e.printStackTrace()
+            report = null
+        }
+        if (report != null) {
+            RequestHandler.createInAppActionClickRequest(mWebViewDialogFragment.requireContext(), report)
+        }
     }
 
     /**
@@ -66,9 +91,5 @@ class FindToWinJavaScriptInterface internal constructor(webViewDialogFragment: F
         mListener = listener
         mCopyToClipboardInterface = copyToClipboardInterface
         mShowCodeInterface = showCodeInterface
-    }
-
-    private fun sendPromotionCodeInfo(promotionCode: String, sliceText: String) {
-        // TODO : check if this is necessary
     }
 }

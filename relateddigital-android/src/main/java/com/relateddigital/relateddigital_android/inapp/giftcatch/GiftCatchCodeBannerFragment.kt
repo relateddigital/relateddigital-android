@@ -41,7 +41,7 @@ class GiftCatchCodeBannerFragment : Fragment() {
          *
          * @param extendedProps Parameter 1.
          * @param code Parameter 2.
-         * @return A new instance of fragment FindToWinCodeBannerFragment.
+         * @return A new instance of fragment GiftCatchCodeBannerFragment.
          */
         fun newInstance(extendedProps: GiftCatchExtendedProps, code: String): GiftCatchCodeBannerFragment {
             val fragment = GiftCatchCodeBannerFragment()

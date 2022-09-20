@@ -225,9 +225,7 @@ class InAppNotificationActivity : AppCompatActivity() {
         }
 
         binding.findToWinButton.setOnClickListener {
-            ActivityUtils.parentActivity = activity
-            val intent = Intent(activity, FindToWinActivity::class.java)
-            startActivity(intent)
+            sendInAppRequest("findtowin")
         }
     }
 

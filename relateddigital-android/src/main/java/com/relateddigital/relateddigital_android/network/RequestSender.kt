@@ -11,6 +11,7 @@ import com.relateddigital.relateddigital_android.api.*
 import com.relateddigital.relateddigital_android.constants.Constants
 import com.relateddigital.relateddigital_android.inapp.InAppManager
 import com.relateddigital.relateddigital_android.inapp.VisilabsResponse
+import com.relateddigital.relateddigital_android.inapp.findtowin.FindToWinActivity
 import com.relateddigital.relateddigital_android.inapp.giftcatch.GiftCatchActivity
 import com.relateddigital.relateddigital_android.inapp.mailsubsform.MailSubscriptionFormHalfFragment
 import com.relateddigital.relateddigital_android.inapp.notification.InAppNotificationFragment
@@ -287,6 +288,18 @@ object RequestSender {
                                             val giftRainModel: GiftRain =
                                                 actionsResponse.mGiftRain!![0]
                                             intent.putExtra("gift-rain-data", giftRainModel)
+                                            currentRequest.parent!!.startActivity(intent)
+                                        }
+                                        actionsResponse.mFindToWin!!.isNotEmpty() -> {
+                                            ActivityUtils.parentActivity = currentRequest.parent
+                                            val intent =
+                                                Intent(
+                                                    currentRequest.parent,
+                                                    FindToWinActivity::class.java
+                                                )
+                                            val findToWinModel: FindToWin =
+                                                actionsResponse.mFindToWin!![0]
+                                            intent.putExtra("find-to-win-data", findToWinModel)
                                             currentRequest.parent!!.startActivity(intent)
                                         }
                                         else -> {

@@ -798,6 +798,53 @@ object AppUtils {
         return result
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    fun createFindToWinCustomFontFiles(context: Context, jsonStr: String?): ArrayList<String?>? {
+        var result: ArrayList<String?>? = null
+        val findToWinModel: FindToWin?
+        val extendedProps: FindToWinExtendedProps?
+        val baseUrlPath = "file://" + context.filesDir.absolutePath + "/"
+        try {
+            findToWinModel = Gson().fromJson(jsonStr, FindToWin::class.java)
+            extendedProps = Gson().fromJson(
+                URI(findToWinModel.actiondata!!.extendedProps).path,
+                FindToWinExtendedProps::class.java
+            )
+        } catch (e: java.lang.Exception) {
+            Log.e("FindToWin", "Extended properties could not be parsed properly!")
+            return null
+        }
+        if (findToWinModel == null || extendedProps == null) {
+            return null
+        }
+        val fontFamily: String = extendedProps.fontFamily!!
+
+        val htmlStr: String = writeHtmlToFile(context, "findtowin")
+
+        if (fontFamily == "custom") {
+            val fontExtension = getFontNameWithExtension(
+                context,
+                extendedProps.customFontFamilyAndroid!!
+            )
+            if (fontExtension.isNotEmpty()) {
+                writeFontToFile(
+                    context,
+                    extendedProps.customFontFamilyAndroid!!,
+                    fontExtension
+                )
+                findToWinModel.fontFiles.add(fontExtension)
+            }
+        }
+
+        if (htmlStr.isNotEmpty()) {
+            result = ArrayList()
+            result.add(baseUrlPath)
+            result.add(htmlStr)
+            result.add(Gson().toJson(findToWinModel, FindToWin::class.java))
+        }
+        return result
+    }
+
     fun goToNotificationSettings(context: Context) {
         try {
             val intent = Intent()

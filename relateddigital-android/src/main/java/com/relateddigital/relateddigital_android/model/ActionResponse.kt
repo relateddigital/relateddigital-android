@@ -28,6 +28,9 @@ class ActionResponse : Serializable {
     @SerializedName("GiftRain")
     var mGiftRain: List<GiftRain>? = null
 
+    @SerializedName("FindToWin")
+    var mFindToWin: List<FindToWin>? = null
+
     @SerializedName("VERSION")
     var version: Int? = null
 
