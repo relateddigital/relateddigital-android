@@ -262,9 +262,9 @@ function androidConfigRegulator(responseConfig) {
     // General data
     generalData.difficulty = parseInt(res.game_elements.downward_speed);
     generalData.basketImg = res.game_elements.gift_catcher_image;
-    generalData.bgColor = ext.background_color;
+    generalData.bgColor = ARGBtoRGBA(ext.background_color);
     generalData.bgImg = ext.background_image;
-    generalData.closeButtonColor = ext.close_button_color;
+    generalData.closeButtonColor = ARGBtoRGBA(ext.close_button_color);
     generalData.fontName = ext.font_family;
     generalData.sound = res.game_elements.sound_url;
     utils.loadSound();
@@ -286,14 +286,14 @@ function androidConfigRegulator(responseConfig) {
         if (res.mail_subscription_form.title) {
             componentsData.mailSubsScreen.title.use = true;
             componentsData.mailSubsScreen.title.text = slashController(res.mail_subscription_form.title);
-            componentsData.mailSubsScreen.title.textColor = ext.mail_subscription_form.title_text_color;
+            componentsData.mailSubsScreen.title.textColor = ARGBtoRGBA(ext.mail_subscription_form.title_text_color);
             componentsData.mailSubsScreen.title.fontSize = fontSizeCalculator(ext.mail_subscription_form.title_text_size) + 'px';
         }
 
         if (res.mail_subscription_form.message) {
             componentsData.mailSubsScreen.message.use = true;
             componentsData.mailSubsScreen.message.text = slashController(res.mail_subscription_form.message);
-            componentsData.mailSubsScreen.message.textColor = ext.mail_subscription_form.text_color;
+            componentsData.mailSubsScreen.message.textColor = ARGBtoRGBA(ext.mail_subscription_form.text_color);
             componentsData.mailSubsScreen.message.fontSize = fontSizeCalculator(ext.mail_subscription_form.text_size) + 'px';
         }
 
@@ -314,8 +314,8 @@ function androidConfigRegulator(responseConfig) {
 
     // Mail Form Required
     componentsData.mailSubsScreen.button.text = slashController(res.mail_subscription_form.button_label);
-    componentsData.mailSubsScreen.button.textColor = ext.mail_subscription_form.button_text_color;
-    componentsData.mailSubsScreen.button.buttonColor = ext.mail_subscription_form.button_color;
+    componentsData.mailSubsScreen.button.textColor = ARGBtoRGBA(ext.mail_subscription_form.button_text_color);
+    componentsData.mailSubsScreen.button.buttonColor = ARGBtoRGBA(ext.mail_subscription_form.button_color);
     componentsData.mailSubsScreen.button.fontSize = fontSizeCalculator(ext.mail_subscription_form.button_text_size) + 'px';
     componentsData.mailSubsScreen.emailInput.placeHolder = res.mail_subscription_form.placeholder;
     componentsData.mailSubsScreen.alerts.check_consent_message = slashController(res.mail_subscription_form.check_consent_message);
@@ -327,15 +327,15 @@ function androidConfigRegulator(responseConfig) {
 
         componentsData.rulesScreen.bgImage = res.gamification_rules.background_image
         componentsData.rulesScreen.button.text = slashController(res.gamification_rules.button_label)
-        componentsData.rulesScreen.button.textColor = ext.gamification_rules.button_text_color;
-        componentsData.rulesScreen.button.buttonColor = ext.gamification_rules.button_color;
+        componentsData.rulesScreen.button.textColor = ARGBtoRGBA(ext.gamification_rules.button_text_color);
+        componentsData.rulesScreen.button.buttonColor = ARGBtoRGBA(ext.gamification_rules.button_color);
         componentsData.rulesScreen.button.fontSize = fontSizeCalculator(ext.gamification_rules.button_text_size) + 'px';
     }
 
     // Game Screen
     // componentsData.scoreboard.fontSize
     // componentsData.scoreboard.fontColor
-    componentsData.gameScreen.scoreboard.background = ext.game_elements.scoreboard_background_color;
+    componentsData.gameScreen.scoreboard.background = ARGBtoRGBA(ext.game_elements.scoreboard_background_color);
     componentsData.gameScreen.scoreboard.type = ext.game_elements.scoreboard_shape;
 
     if (componentsData.gameScreen.scoreboard.type == "") componentsData.gameScreen.scoreboard.type = "roundedcorners"
@@ -344,25 +344,25 @@ function androidConfigRegulator(responseConfig) {
         componentsData.finishScreen.title.use = true
         componentsData.finishScreen.title.text = slashController(res.game_result_elements.title)
         componentsData.finishScreen.title.fontSize = fontSizeCalculator(ext.game_result_elements.title_text_size) + 'px'
-        componentsData.finishScreen.title.textColor = ext.game_result_elements.title_text_color
+        componentsData.finishScreen.title.textColor = ARGBtoRGBA(ext.game_result_elements.title_text_color)
 
     }
     if (res.game_result_elements.message) {
         componentsData.finishScreen.message.use = true
         componentsData.finishScreen.message.text = slashController(res.game_result_elements.message)
         componentsData.finishScreen.message.fontSize = fontSizeCalculator(ext.game_result_elements.text_size) + 'px'
-        componentsData.finishScreen.message.textColor = ext.game_result_elements.text_color
+        componentsData.finishScreen.message.textColor = ARGBtoRGBA(ext.game_result_elements.text_color)
     }
 
     componentsData.finishScreen.button.text = slashController(res.copybutton_label);
-    componentsData.finishScreen.button.textColor = ext.copybutton_text_color;
+    componentsData.finishScreen.button.textColor = ARGBtoRGBA(ext.copybutton_text_color);
     componentsData.finishScreen.button.fontSize = fontSizeCalculator(ext.copybutton_text_size) + 'px';
-    componentsData.finishScreen.button.buttonColor = ext.copybutton_color;
+    componentsData.finishScreen.button.buttonColor = ARGBtoRGBA(ext.copybutton_color);
     componentsData.finishScreen.button.androidLink = res.android_lnk;
     componentsData.finishScreen.button.iOSLink = res.ios_lnk;
 
-    componentsData.finishScreen.couponCode.background = ext.promocode_background_color;
-    componentsData.finishScreen.couponCode.textColor = ext.promocode_text_color;
+    componentsData.finishScreen.couponCode.background = ARGBtoRGBA(ext.promocode_background_color);
+    componentsData.finishScreen.couponCode.textColor = ARGBtoRGBA(ext.promocode_text_color);
     componentsData.finishScreen.couponCode.fontSize = fontSizeCalculator(ext.game_result_elements.text_size) + 'px';
 
 }
@@ -378,17 +378,20 @@ function iOSConfigRegulator(responseConfig) {
     // // General data
     generalData.difficulty = parseInt(res.gameElements.downwardSpeed);
     generalData.basketImg = res.gameElements.giftCatcherImage;
-    generalData.bgColor = res.background_color;
+    generalData.bgColor = ARGBtoRGBA(res.background_color);
     generalData.bgImg = res.backgroundImage;
-    generalData.closeButtonColor = res.close_button_color;
+    generalData.closeButtonColor = ARGBtoRGBA(res.close_button_color);
     generalData.fontName = res.font_family;
     generalData.sound = res.gameElements.soundUrl;
     utils.loadSound();
 
-    if (res.custom_font_family_ios == 'custom' && utils.getMobileOperatingSystem() == 'iOS') {
+    if (res.font_family == 'custom' && utils.getMobileOperatingSystem() == 'iOS') {
         generalData.fontName = res.custom_font_family_ios;
+        generalData.fontFiles = responseConfig.fontFiles;
+        console.log('font files ',generalData.fontFiles);
+        addFonts();
     }
-
+    
     productImgs = res.gameElements.giftImages;
     productSettings.totalProductCount = res.gameElements.numberOfProducts;
 
@@ -399,14 +402,14 @@ function iOSConfigRegulator(responseConfig) {
         if (res.mailSubscriptionForm.title) {
             componentsData.mailSubsScreen.title.use = true;
             componentsData.mailSubsScreen.title.text = slashController(res.mailSubscriptionForm.title);
-            componentsData.mailSubsScreen.title.textColor = res.mailExtendedProps.titleTextColor;
+            componentsData.mailSubsScreen.title.textColor = ARGBtoRGBA(res.mailExtendedProps.titleTextColor);
             componentsData.mailSubsScreen.title.fontSize = fontSizeCalculator(res.mailExtendedProps.titleTextSize) + 'px';
         }
 
         if (res.mailSubscriptionForm.message) {
             componentsData.mailSubsScreen.message.use = true;
             componentsData.mailSubsScreen.message.text = slashController(res.mailSubscriptionForm.message);
-            componentsData.mailSubsScreen.message.textColor = res.mailExtendedProps.textColor;
+            componentsData.mailSubsScreen.message.textColor = ARGBtoRGBA(res.mailExtendedProps.textColor);
             componentsData.mailSubsScreen.message.fontSize = fontSizeCalculator(res.mailExtendedProps.textSize) + 'px';
         }
 
@@ -427,8 +430,8 @@ function iOSConfigRegulator(responseConfig) {
 
     // // Mail Form Required
     componentsData.mailSubsScreen.button.text = slashController(res.mailSubscriptionForm.buttonTitle);
-    componentsData.mailSubsScreen.button.textColor = res.mailExtendedProps.buttonTextColor;
-    componentsData.mailSubsScreen.button.buttonColor = res.mailExtendedProps.buttonColor;
+    componentsData.mailSubsScreen.button.textColor = ARGBtoRGBA(res.mailExtendedProps.buttonTextColor);
+    componentsData.mailSubsScreen.button.buttonColor = ARGBtoRGBA(res.mailExtendedProps.buttonColor);
     componentsData.mailSubsScreen.button.fontSize = fontSizeCalculator(res.mailExtendedProps.buttonTextSize) + 'px';
     componentsData.mailSubsScreen.emailInput.placeHolder = res.mailSubscriptionForm.placeholder;
     componentsData.mailSubsScreen.alerts.check_consent_message = slashController(res.mailSubscriptionForm.checkConsentMessage);
@@ -440,15 +443,15 @@ function iOSConfigRegulator(responseConfig) {
 
         componentsData.rulesScreen.bgImage = res.gamificationRules.backgroundImage
         componentsData.rulesScreen.button.text = slashController(res.gamificationRules.buttonLabel)
-        componentsData.rulesScreen.button.textColor = res.gamificationRulesExtended.buttonTextColor;
-        componentsData.rulesScreen.button.buttonColor = res.gamificationRulesExtended.buttonColor;
+        componentsData.rulesScreen.button.textColor = ARGBtoRGBA(res.gamificationRulesExtended.buttonTextColor);
+        componentsData.rulesScreen.button.buttonColor = ARGBtoRGBA(res.gamificationRulesExtended.buttonColor);
         componentsData.rulesScreen.button.fontSize = fontSizeCalculator(res.gamificationRulesExtended.buttonTextSize) + 'px';
     }
 
     // Game Screen
     // componentsData.scoreboard.fontSize
     // componentsData.scoreboard.fontColor
-    componentsData.gameScreen.scoreboard.background = res.gameElementsExtended.scoreboardBackgroundColor;
+    componentsData.gameScreen.scoreboard.background = ARGBtoRGBA(res.gameElementsExtended.scoreboardBackgroundColor);
     componentsData.gameScreen.scoreboard.type = res.gameElementsExtended.scoreboardShape;
 
     if (componentsData.gameScreen.scoreboard.type == "") componentsData.gameScreen.scoreboard.type = "roundedcorners"
@@ -457,20 +460,20 @@ function iOSConfigRegulator(responseConfig) {
         componentsData.finishScreen.title.use = true
         componentsData.finishScreen.title.text = slashController(res.gameResultElements.title)
         componentsData.finishScreen.title.fontSize = fontSizeCalculator(res.gameResultElementsExtended.titleTextSize) + 'px'
-        componentsData.finishScreen.title.textColor = res.gameResultElementsExtended.titleTextColor
+        componentsData.finishScreen.title.textColor = ARGBtoRGBA(res.gameResultElementsExtended.titleTextColor)
 
     }
     if (res.gameResultElements.message) {
         componentsData.finishScreen.message.use = true
         componentsData.finishScreen.message.text = slashController(res.gameResultElements.message)
         componentsData.finishScreen.message.fontSize = fontSizeCalculator(res.gameResultElementsExtended.textSize) + 'px'
-        componentsData.finishScreen.message.textColor = res.gameResultElementsExtended.textColor
+        componentsData.finishScreen.message.textColor = ARGBtoRGBA(res.gameResultElementsExtended.textColor)
     }
 
     componentsData.finishScreen.button.text = slashController(res.copybutton_label);
-    componentsData.finishScreen.button.textColor = res.copybutton_text_color;
+    componentsData.finishScreen.button.textColor = ARGBtoRGBA(res.copybutton_text_color);
     componentsData.finishScreen.button.fontSize = fontSizeCalculator(res.copybutton_text_size) + 'px';
-    componentsData.finishScreen.button.buttonColor = res.copybutton_color;
+    componentsData.finishScreen.button.buttonColor = ARGBtoRGBA(res.copybutton_color);
     componentsData.finishScreen.button.iOSLink = res.ios_lnk;
 }
 
@@ -1535,6 +1538,14 @@ function addFonts() {
 		addedFontFiles.push(fontFile);
 	}
 };
+
+function ARGBtoRGBA(argb) {
+    if (argb && argb.length < 8) return argb
+    
+    if(argb.substr(0,1) !=='#') return argb.replace(/(..)(......)/, '$2$1')
+    
+    return argb.replace(/#(..)(......)/, '#$2$1')
+}
 
 function fontSizeCalculator(BEFS) {
     BEFS = parseInt(BEFS)
