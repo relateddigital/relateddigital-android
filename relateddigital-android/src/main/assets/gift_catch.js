@@ -272,7 +272,7 @@ function androidConfigRegulator(responseConfig) {
     if (ext.font_family == 'custom' && utils.getMobileOperatingSystem() == 'Android') {
         generalData.fontName = ext.custom_font_family_android;
         generalData.fontFiles = responseConfig.fontFiles;
-        console.log('font files ',generalData.fontFiles);
+        console.log('font files ', generalData.fontFiles);
         addFonts();
     }
 
@@ -310,19 +310,19 @@ function androidConfigRegulator(responseConfig) {
             componentsData.mailSubsScreen.secondPermission.fontSize = fontSizeCalculator(ext.mail_subscription_form.consent_text_size) + 'px';
             componentsData.mailSubsScreen.secondPermission.url = ext.mail_subscription_form.consent_text_url;
         }
+        // Mail Form Required
+        componentsData.mailSubsScreen.button.text = slashController(res.mail_subscription_form.button_label);
+        componentsData.mailSubsScreen.button.textColor = ARGBtoRGBA(ext.mail_subscription_form.button_text_color);
+        componentsData.mailSubsScreen.button.buttonColor = ARGBtoRGBA(ext.mail_subscription_form.button_color);
+        componentsData.mailSubsScreen.button.fontSize = fontSizeCalculator(ext.mail_subscription_form.button_text_size) + 'px';
+        componentsData.mailSubsScreen.emailInput.placeHolder = res.mail_subscription_form.placeholder;
+        componentsData.mailSubsScreen.alerts.check_consent_message = slashController(res.mail_subscription_form.check_consent_message);
+        componentsData.mailSubsScreen.alerts.invalid_email_message = slashController(res.mail_subscription_form.invalid_email_message);
     }
 
-    // Mail Form Required
-    componentsData.mailSubsScreen.button.text = slashController(res.mail_subscription_form.button_label);
-    componentsData.mailSubsScreen.button.textColor = ARGBtoRGBA(ext.mail_subscription_form.button_text_color);
-    componentsData.mailSubsScreen.button.buttonColor = ARGBtoRGBA(ext.mail_subscription_form.button_color);
-    componentsData.mailSubsScreen.button.fontSize = fontSizeCalculator(ext.mail_subscription_form.button_text_size) + 'px';
-    componentsData.mailSubsScreen.emailInput.placeHolder = res.mail_subscription_form.placeholder;
-    componentsData.mailSubsScreen.alerts.check_consent_message = slashController(res.mail_subscription_form.check_consent_message);
-    componentsData.mailSubsScreen.alerts.invalid_email_message = slashController(res.mail_subscription_form.invalid_email_message);
 
     // Rules Screen Optionals
-    if (res.gamification_ruless) { ///
+    if (res.gamification_rules) { ///
         activePageData.rulesScreen = true;
 
         componentsData.rulesScreen.bgImage = res.gamification_rules.background_image
@@ -388,10 +388,10 @@ function iOSConfigRegulator(responseConfig) {
     if (res.font_family == 'custom' && utils.getMobileOperatingSystem() == 'iOS') {
         generalData.fontName = res.custom_font_family_ios;
         generalData.fontFiles = responseConfig.fontFiles;
-        console.log('font files ',generalData.fontFiles);
+        console.log('font files ', generalData.fontFiles);
         addFonts();
     }
-    
+
     productImgs = res.gameElements.giftImages;
     productSettings.totalProductCount = res.gameElements.numberOfProducts;
 
@@ -426,16 +426,16 @@ function iOSConfigRegulator(responseConfig) {
             componentsData.mailSubsScreen.secondPermission.fontSize = fontSizeCalculator(res.mailExtendedProps.consentTextSize) + 'px';
             componentsData.mailSubsScreen.secondPermission.url = res.mailExtendedProps.consentTextUrl;
         }
-    }
 
-    // // Mail Form Required
-    componentsData.mailSubsScreen.button.text = slashController(res.mailSubscriptionForm.buttonTitle);
-    componentsData.mailSubsScreen.button.textColor = ARGBtoRGBA(res.mailExtendedProps.buttonTextColor);
-    componentsData.mailSubsScreen.button.buttonColor = ARGBtoRGBA(res.mailExtendedProps.buttonColor);
-    componentsData.mailSubsScreen.button.fontSize = fontSizeCalculator(res.mailExtendedProps.buttonTextSize) + 'px';
-    componentsData.mailSubsScreen.emailInput.placeHolder = res.mailSubscriptionForm.placeholder;
-    componentsData.mailSubsScreen.alerts.check_consent_message = slashController(res.mailSubscriptionForm.checkConsentMessage);
-    componentsData.mailSubsScreen.alerts.invalid_email_message = slashController(res.mailSubscriptionForm.invalidEmailMessage);
+        // // Mail Form Required
+        componentsData.mailSubsScreen.button.text = slashController(res.mailSubscriptionForm.buttonTitle);
+        componentsData.mailSubsScreen.button.textColor = ARGBtoRGBA(res.mailExtendedProps.buttonTextColor);
+        componentsData.mailSubsScreen.button.buttonColor = ARGBtoRGBA(res.mailExtendedProps.buttonColor);
+        componentsData.mailSubsScreen.button.fontSize = fontSizeCalculator(res.mailExtendedProps.buttonTextSize) + 'px';
+        componentsData.mailSubsScreen.emailInput.placeHolder = res.mailSubscriptionForm.placeholder;
+        componentsData.mailSubsScreen.alerts.check_consent_message = slashController(res.mailSubscriptionForm.checkConsentMessage);
+        componentsData.mailSubsScreen.alerts.invalid_email_message = slashController(res.mailSubscriptionForm.invalidEmailMessage);
+    }
 
     // // Rules Screen Optionals
     if (res.gamificationRules) {
@@ -601,17 +601,14 @@ function createMailSubsScreen() {
 
 
     if (componentsData.mailSubsScreen.emailPermission.use) {
-        var emailPermission = document.createElement("DIV");
-        emailPermission.style.color = "black";
-        emailPermission.style.fontSize = "13px";
-        emailPermission.style.margin = "15px 0";
-        emailPermission.style.width = "100%";
-        emailPermission.style.display = "flex";
-        emailPermission.style.alignItems = "center";
+        var emailPermission = createPermitRow(
+            componentsData.mailSubsScreen.emailPermission.id,
+            componentsData.mailSubsScreen.emailPermission.text,
+            componentsData.mailSubsScreen.emailPermission.fontSize,
+            generalData.fontName,
+            componentsData.mailSubsScreen.emailPermission.url
+        )
 
-        emailPermission.innerHTML = "<input style='width:20px;height:20px;display:block;margin-right:7px;float:left' id='" + componentsData.mailSubsScreen.emailPermission.id + "' type='checkbox'>\
-        <a style='font-size:"+ componentsData.mailSubsScreen.emailPermission.fontSize + ";text-decoration: underline;color: black; font-family:" + generalData.fontName + "'\
-        href='"+ componentsData.mailSubsScreen.emailPermission.url + "'>" + componentsData.mailSubsScreen.emailPermission.text;
         container.appendChild(emailPermission);
 
         var checkboxAlert1 = document.createElement("div");
@@ -620,18 +617,14 @@ function createMailSubsScreen() {
     }
 
     if (componentsData.mailSubsScreen.emailPermission.use) {
-        var secondPermission = document.createElement("DIV");
-        secondPermission.style.color = "black";
-        secondPermission.style.fontSize = "13px";
-        secondPermission.style.margin = "15px 0";
-        secondPermission.style.width = "100%";
-        secondPermission.style.display = "flex";
-        secondPermission.style.alignItems = "center";
+        var secondPermission = createPermitRow(
+            componentsData.mailSubsScreen.secondPermission.id,
+            componentsData.mailSubsScreen.secondPermission.text,
+            componentsData.mailSubsScreen.emailPermission.fontSize,
+            generalData.fontName,
+            componentsData.mailSubsScreen.secondPermission.url
+        )
 
-        secondPermission.innerHTML = "<input style='width:20px;height:20px;display:block;margin-right:7px;float:left' id='" + componentsData.mailSubsScreen.secondPermission.id + "' type='checkbox' >" +
-            "<a style='font-size:" + componentsData.mailSubsScreen.emailPermission.fontSize + ";text-decoration: underline;color: black; font-family:" + generalData.fontName + "'\
-                href='"+ componentsData.mailSubsScreen.secondPermission.url + "'>\
-                "+ componentsData.mailSubsScreen.secondPermission.text;
         container.appendChild(secondPermission);
 
         var checkboxAlert2 = document.createElement("div");
@@ -695,6 +688,42 @@ function createMailSubsScreen() {
     MAIN_COMPONENT.appendChild(mailSubsScreen);
 }
 
+function createPermitRow(inputId,desc,fontSize,fontName,url){
+    var container = document.createElement("DIV");
+    container.style.color = "black";
+    container.style.fontSize = "13px";
+    container.style.margin = "15px 0";
+    container.style.width = "100%";
+    container.style.display = "flex";
+    container.style.alignItems = "center";
+
+    var input = document.createElement("input");
+    input.id = inputId;
+    input.type="checkbox";
+    input.style.width="20px";
+    input.style.height="20px";
+    input.style.display="block";
+    input.style.marginRight="7px";
+    input.style.float="left";
+
+    var text = document.createElement("div");
+    text.innerText=desc;
+    text.style.fontSize=fontSize;
+    text.style.fontFamily=fontName;
+    text.style.textDecoration="underline";
+    text.style.color="black";
+
+    text.addEventListener('click',()=>{
+        utils.linkClicked(url)
+        console.log(url,desc);
+    })
+
+    container.appendChild(input);
+    container.appendChild(text);
+
+    return container;
+}
+
 function createAlert(text, id) {
     if (!document.querySelector('#' + id).innerText) {
         var alert = document.createElement("div");
@@ -704,7 +733,7 @@ function createAlert(text, id) {
         alert.style.zIndex = "999";
         alert.style.textAlign = "left";
         alert.style.color = "#000";
-        alert.style.fontSize= "14px";
+        alert.style.fontSize = "14px";
         alert.style.fontFamily = generalData.fontName;
         alert.style.transform = "translate3d(0,0,3px)";
 
@@ -1248,18 +1277,11 @@ function createFinishScreen() {
         });
 
         copyButton.addEventListener('click', function () {
-            utils.copyToClipboard();
+            utils.copyToClipboard(); // redirect
             utils.pauseSound();
         });
-
-        copyButton.addEventListener("click", function () {
-            if (utils.getMobileOperatingSystem() == 'iOS' && componentsData.finishScreen.button.iOSLink)
-                location.href = componentsData.finishScreen.button.iOSLink
-
-            // Android link yönlendirme native taraftan yapılıyor
-            // if (utils.getMobileOperatingSystem() == 'Android' && componentsData.finishScreen.button.androidLink)
-            //     location.href = componentsData.finishScreen.button.androidLink
-        });
+        
+        
     }
 
 
@@ -1270,6 +1292,14 @@ function createFinishScreen() {
 function getAndroidLink() {
     if (componentsData.finishScreen.button.androidLink) {
         return componentsData.finishScreen.button.androidLink
+    } else {
+        return ""
+    }
+}
+
+function getIOSLink() {
+    if (componentsData.finishScreen.button.iOSLink) {
+        return componentsData.finishScreen.button.iOSLink
     } else {
         return ""
     }
@@ -1415,7 +1445,8 @@ let utils = {
         } else if (window.webkit.messageHandlers.eventHandler) {
             window.webkit.messageHandlers.eventHandler.postMessage({
                 method: "copyToClipboard",
-                couponCode: couponCodes[SCORE]
+                couponCode: couponCodes[SCORE],
+                url:getIOSLink()
             })
         }
     },
@@ -1461,6 +1492,16 @@ let utils = {
             window.webkit.messageHandlers.eventHandler.postMessage({
                 method: "saveCodeGotten",
                 email: couponCodes[SCORE]
+            })
+        }
+    },
+    linkClicked: (url) => {
+        if (window.Android) {
+            location.href=url ? url : ""
+        } else if (window.webkit && window.webkit.messageHandlers) {
+            window.webkit.messageHandlers.eventHandler.postMessage({
+                method: "linkClicked",
+                url: url ? url : ""
             })
         }
     },
@@ -1521,29 +1562,29 @@ function promoCodeCalculator(data) {
 }
 
 function addFonts() {
-	if (generalData.fontFiles === undefined) {
-		return
-	}
-	var addedFontFiles = [];
-	for (var fontFileIndex in generalData.fontFiles) {
-		var fontFile = generalData.fontFiles[fontFileIndex];
-		if (addedFontFiles.includes(fontFile)) {
-			continue;
-		}
-		var fontFamily = fontFile.split(".")[0];
-		var newStyle = document.createElement('style');
-		var cssContent = "@font-face{font-family:" + fontFamily + ";src:url('" + fontFile + "');}";
-		newStyle.appendChild(document.createTextNode(cssContent));
-		document.head.appendChild(newStyle);
-		addedFontFiles.push(fontFile);
-	}
+    if (generalData.fontFiles === undefined) {
+        return
+    }
+    var addedFontFiles = [];
+    for (var fontFileIndex in generalData.fontFiles) {
+        var fontFile = generalData.fontFiles[fontFileIndex];
+        if (addedFontFiles.includes(fontFile)) {
+            continue;
+        }
+        var fontFamily = fontFile.split(".")[0];
+        var newStyle = document.createElement('style');
+        var cssContent = "@font-face{font-family:" + fontFamily + ";src:url('" + fontFile + "');}";
+        newStyle.appendChild(document.createTextNode(cssContent));
+        document.head.appendChild(newStyle);
+        addedFontFiles.push(fontFile);
+    }
 };
 
 function ARGBtoRGBA(argb) {
-    if (argb && argb.length < 8) return argb
-    
-    if(argb.substr(0,1) !=='#') return argb.replace(/(..)(......)/, '$2$1')
-    
+    if (!argb || argb.length < 8) return argb
+
+    if (argb.substr(0, 1) !== '#') return argb.replace(/(..)(......)/, '$2$1')
+
     return argb.replace(/#(..)(......)/, '#$2$1')
 }
 
@@ -1586,7 +1627,7 @@ function fontSizeCalculator(BEFS) {
     }
 }
 
-function slashController(text){
+function slashController(text) {
     let pos = text.indexOf('\\n');
     while (pos > -1) {
         text = text.replace("\\n", "\n");
