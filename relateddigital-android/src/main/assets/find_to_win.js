@@ -209,47 +209,6 @@ let gameSettings = {
  * Coupons
 */
 let couponCodes = {
-    0: "KAZANAMADINIZ",
-    1: "BGJ7S1",
-    2: "BDGJ72",
-    3: "BAGJ73",
-    4: "BGJ7V4",
-    5: "BGJ7S5",
-    6: "BGJ76Q",
-    7: "BGJ77F",
-    8: "BGJ78F",
-    9: "BGJ79Q",
-    10: "BG1J0D",
-    11: "N72X1P",
-    12: "N72X2H",
-    13: "N72X3J",
-    14: "N72X4K",
-    15: "N72X5Y",
-    16: "N72X6E",
-    17: "N72X7FD",
-    18: "N72DX8",
-    19: "N72GX9",
-    20: "BJWMD0",
-    21: "BJSWM1",
-    22: "BJWM2D",
-    23: "BJWEM3",
-    24: "BJWM4J",
-    25: "BJWWM5",
-    26: "BJWM6F",
-    27: "BJWM7Q",
-    28: "BJDWM8",
-    29: "BJWQM9",
-    30: "BCWM0G",
-    31: "BCWM1K",
-    32: "BCWM2W",
-    33: "BCWM3L",
-    34: "BCWM4Q",
-    35: "BCWM5C",
-    36: "BCWM6S",
-    37: "BCWOM7",
-    38: "BCWM8M",
-    39: "BCWM8P",
-    40: "BCWKN0",
 };
 
 let pair = [];
@@ -272,14 +231,12 @@ function initFindToWinGame(responseConfig) {
 
 function androidConfigRegulator(responseConfig) {
 
-    // console.log("responseConfig", responseConfig);
-
     responseConfig = JSON.parse(responseConfig)
-    responseConfig.ExtendedProps = JSON.parse(unescape(responseConfig.ExtendedProps))
+    responseConfig.actiondata.ExtendedProps = JSON.parse(unescape(responseConfig.actiondata.ExtendedProps))
 
-    console.log(responseConfig);
+    // console.log(responseConfig);
 
-    const res = responseConfig;
+    const res = responseConfig.actiondata;
     const ext = res.ExtendedProps;
 
     const row = res.game_elements.playground_rowcount;
@@ -408,7 +365,7 @@ function androidConfigRegulator(responseConfig) {
 }
 
 function iOSConfigRegulator(responseConfig) {
-    console.log(responseConfig);
+    // console.log(responseConfig);
 
     const res = responseConfig;
 
