@@ -12,9 +12,17 @@
 <body>
     <script src="find_to_win.js"></script>
     <script>
+        window.initFindGame = function (responseConfig) {
+            initFindToWinGame(responseConfig);
+        }
+
         if (window.Android) {
             let responseConfig = Android.getResponse();
             initFindToWinGame(responseConfig);
+        } else if (window.webkit.messageHandlers.eventHandler) {
+            window.webkit.messageHandlers.eventHandler.postMessage({
+                method: "initFindGame"
+            })
         }
     </script>
 </body>

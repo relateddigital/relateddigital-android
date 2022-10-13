@@ -1,4 +1,4 @@
-let UPDATE_PRODUCT_INTERVAL, SCORE = 0, DURATION, HEIGHT = window.innerHeight, WIDTH = window.innerWidth, PAIR_COUNTER = 0, LAST_CLICKED_CARD_ID = null, PAIR_COUNT = 0, MAX_PAIR_COUNT=0, CLICKABLE=true, CLICKABLE_DURATION = 1000;
+let UPDATE_PRODUCT_INTERVAL, SCORE = 0, DURATION, HEIGHT = window.innerHeight, WIDTH = window.innerWidth, PAIR_COUNTER = 0, LAST_CLICKED_CARD_ID = null, PAIR_COUNT = 0, MAX_PAIR_COUNT = 0, CLICKABLE = true, CLICKABLE_DURATION = 1000, PAIRS = [], AUDIO, TIME_INTERVAL;
 
 let MAIN_COMPONENT = document.createElement("DIV");
 
@@ -12,8 +12,8 @@ let screens = {
 
 
 let activePageData = {
-    mailSubsScreen: true,
-    rulesScreen: true,
+    mailSubsScreen: false,
+    rulesScreen: false,
 };
 
 /**
@@ -21,16 +21,17 @@ let activePageData = {
  * */
 let generalData = {
     id: 'rmc-find-to-win',
-    bgColor: 'aqua',
+    bgColor: '',
     bgImg: 'https://picsum.photos/seed/picsum/400/800',
-    basketImg: 'https://app.visilabs.net/download/loreal/Game/MobilSenaryolari/materials/bag-min.png',
-    fontColor: 'gray',
+    fontColor: '',
     fontName: 'Helvetica',
+    fontFiles: [],
     closeButtonId: 'rmc-close-button',
     closeButton: 'true',
     closeButtonColor: 'black',
     borderRadius: '10px',
     scoreBoardRadius: '5px',
+    sound: 'https://bariisarslans.github.io/giftcatchgame/sound.mp3'
 };
 
 /**
@@ -41,109 +42,85 @@ let componentsData = {
         id: "rmc-mail-subs-screen",
         title: { // OPTIONAL
             use: true,
-            text: 'İndirim Kazan',
-            textColor: 'lightblue',
-            fontSize: '19px'
+            text: '',
+            textColor: '',
+            fontSize: ''
         },
         message: { // OPTIONAL
             use: true,
-            text: 'İndirim Kazanmak için formu doldur ve oyunu oyna.',
-            textColor: 'darkblue',
-            fontSize: '15px'
+            text: '',
+            textColor: '',
+            fontSize: ''
         },
         emailPermission: { // OPTIONAL
             use: true,
             id: 'rmc-email-permission-checkbox',
-            text: 'Burası eposta izin metnidir. İncelemek için tıklayın.',
-            fontSize: '15px',
-            url: 'www.google.com',
+            text: '',
+            fontSize: '',
+            url: '',
         },
         secondPermission: { // OPTIONAL
             use: true,
             id: 'rmc-second-permission-checkbox',
-            text: 'Kullanım Koşulları\'nı okudum ve kabul ediyorum.',
-            fontSize: '15px',
-            url: 'www.google.com',
+            text: '',
+            fontSize: '',
+            url: '',
         },
         button: { // REQUIRED
             use: true,
             id: 'rmc-mail-subs-button',
-            text: 'Kaydet ve Devam Et',
-            textColor: 'darkblue',
-            buttonColor: 'lightblue',
-            fontSize: '15px',
+            text: '',
+            textColor: '',
+            buttonColor: '',
+            fontSize: '',
             goScreen: screens.rules,
         },
         emailInput: {
             id: 'rmc-email-input',
             placeHolder: 'Email',
             value: '',
+        },
+        alerts: {
+            invalid_email_message: '',
+            check_consent_message: ''
         }
     },
     rulesScreen: {
-        bgImage: "2-min.png",
-        id: "rmc-rules-screen",
+        bgImage: '',
+        id: 'rmc-rules-screen',
         title: { // OPTIONAL
             use: true,
-            text: 'Kurallar',
-            textColor: 'black',
-            fontSize: '19px'
+            text: '',
+            textColor: '',
+            fontSize: ''
         },
         message: { // OPTIONAL
             use: true,
-            text: 'Yukarıdan düşen ürünleri Topla',
-            textColor: 'black',
-            fontSize: '15px'
+            text: '',
+            textColor: '',
+            fontSize: ''
         },
         button: { // REQUIRED
             use: true,
             id: 'rmc-rules-button',
-            text: 'Oyuna Başla',
-            textColor: 'darkblue',
-            buttonColor: 'lightblue',
-            fontSize: '15px',
+            text: '',
+            textColor: '',
+            buttonColor: '',
+            fontSize: '',
             goScreen: screens.game,
         },
     },
     gameScreen: {
         id: "rmc-game-screen",
         gameArea: "rmc-game-screen-game-area",
-        cards: [
-            [
-                {
-                    name: "dog",
-                    imgUrl: "https://picsum.photos/id/237/300/600",
-                },
-                {
-                    name: "city",
-                    imgUrl: "https://picsum.photos/id/238/300/600",
-                },
-                {
-                    name: "flower",
-                    imgUrl: "https://picsum.photos/id/239/300/600",
-                },
-            ],
-            [
-                {
-                    name: "city",
-                    imgUrl: "https://picsum.photos/id/238/300/600",
-                },
-                {
-                    name: "flower",
-                    imgUrl: "https://picsum.photos/id/239/300/600",
-                },
-                {
-                    name: "dog",
-                    imgUrl: "https://picsum.photos/id/237/300/600",
-                },
-            ],
-        ],
+        cards: [],
         scoreboard: {
             id: 'rmc-scoreboard',
-            fontSize: '20px',
-            background: 'white',
-            fontColor: 'gray',
+            fontSize: '',
+            background: '',
+            fontColor: '',
             type: 'round', // square | circle | round
+            position: 'topLeft', // topLeft | topRight | bottomLeft | bottomRight
             countDown: {
                 id: 'rmc-count-down',
             },
@@ -156,46 +133,48 @@ let componentsData = {
         id: 'rmc-finish-screen',
         title: { // OPTIONAL
             use: true,
-            text: 'Tebrikler',
-            loseText: 'Malesef',
-            textColor: 'lightblue',
-            fontSize: '19px'
+            text: '',
+            loseText: '',
+            textColor: '',
+            fontSize: ''
         },
         message: { // OPTIONAL
             use: true,
-            text: 'İndirim Kazandınız',
-            loseText: 'Kazanamadınız',
-            textColor: 'darkblue',
-            fontSize: '15px'
+            text: '',
+            loseText: '',
+            textColor: '',
+            fontSize: ''
         },
         score: { // OPTIONAL
             use: true,
             id: 'rmc-finish-score',
             text: '',
         },
+        lose: {
+            id: 'rmc-finish-lose-img',
+            src: '',
+            buttonLabel: '',
+            loseAndroidLink: '',
+            loseIOSLink: '',
+            loseButtonColor: '',
+            loseButtonTextSize: '',
+            loseButtonTextColor: ''
+        },
         couponCode: { // OPTIONAL
             use: true,
             id: 'rmc-coupon-code',
-            fontSize: '15px',
+            fontSize: '',
         },
         button: { // REQUIRED
             use: true,
             id: 'rmc-finish-button',
-            text: 'Kodu Kopyala',
-            textColor: 'darkblue',
-            buttonColor: 'lightblue',
-            fontSize: '15px',
-        },
-        goButton: { // OPTIONAL
-            use: true,
-            id: 'rmc-finish-go-button',
-            text: 'Linke Git',
-            textColor: 'darkblue',
-            buttonColor: 'lightblue',
-            fontSize: '15px',
-            androidLink: 'https://www.google.com',
-            iOSLink: 'https://www.facebook.com'
-        },
+            text: '',
+            textColor: '',
+            buttonColor: '',
+            fontSize: '',
+            androidLink: '',
+            iOSLink: ''
+        }
     }
 };
 
@@ -207,17 +186,23 @@ let cardSettings = {
     cardHeight: 300,
     cardMargin: 10,
     cardIdPrefix: 'item',
-    totalCardCount: 6,
     duration: 500,
+    backfaceImg: 'https://picsum.photos/id/29/300/600',
+    backfaceColor: 'green',
+    emptyBackfaceImg: '',
+    emptyBackfaceColor: 'gray',
+    emptyFrontImg: '',
+    emptyFrontColor: 'red',
 }
 
 /**
  * Game page settins
 */
 let gameSettings = {
-    duration: 230,
-    gameAreaHeight: HEIGHT * 0.6,
-    matchedIconEnable: true
+    duration: 6,
+    gameAreaHeight: HEIGHT * 0.7,
+    matchedIconEnable: false,
+    gameScreenSecondScoreEnable: false
 }
 
 /**
@@ -273,8 +258,273 @@ let pair = [];
  * Init
  */
 function initFindToWinGame(responseConfig) {
-    console.log("responseConfig", responseConfig);
+    if (utils.getMobileOperatingSystem() == 'iOS') {
+        console.log("RUN IOS");
+        iOSConfigRegulator(responseConfig)
+    }
+    else {
+        console.log("RUN ANDROID");
+        androidConfigRegulator(responseConfig);
+    }
+
     config();
+}
+
+function androidConfigRegulator(responseConfig) {
+
+    // console.log("responseConfig", responseConfig);
+
+    responseConfig = JSON.parse(responseConfig)
+    responseConfig.ExtendedProps = JSON.parse(unescape(responseConfig.ExtendedProps))
+
+    console.log(responseConfig);
+
+    const res = responseConfig;
+    const ext = res.ExtendedProps;
+
+    const row = res.game_elements.playground_rowcount;
+    const col = res.game_elements.playground_columncount;
+
+    maxPairCalculator(row, col);
+    cardSlotAdjuster(row, col, res.game_elements.card_images); // buraya boş kart aktif mi bilgisini yolla
+    promoCodeCalculator(res.promo_codes);
+
+
+    // General data
+    gameSettings.duration = res.game_elements.duration_of_game;
+    generalData.sound = res.game_elements.sound_url;
+    generalData.bgColor = ARGBtoRGBA(ext.background_color);
+    generalData.bgImg = ext.background_image;
+    generalData.closeButtonColor = ARGBtoRGBA(ext.close_button_color);
+    generalData.fontName = ext.font_family;
+    cardSettings.backfaceImg = ext.game_elements.backofcards_image;
+    cardSettings.backfaceColor = ext.game_elements.backofcards_color;
+
+    utils.loadSound();
+
+    if (ext.font_family == 'custom' && utils.getMobileOperatingSystem() == 'Android') {
+        generalData.fontName = ext.custom_font_family_android;
+        generalData.fontFiles = responseConfig.fontFiles;
+        console.log('font files ', generalData.fontFiles);
+        addFonts();
+    }
+
+    // Mail Form Optionals
+    if (res.mail_subscription) {
+        activePageData.mailSubsScreen = true;
+
+        if (res.mail_subscription_form.title) {
+            componentsData.mailSubsScreen.title.use = true;
+            componentsData.mailSubsScreen.title.text = slashController(res.mail_subscription_form.title);
+            componentsData.mailSubsScreen.title.textColor = ARGBtoRGBA(ext.mail_subscription_form.title_text_color);
+            componentsData.mailSubsScreen.title.fontSize = fontSizeCalculator(ext.mail_subscription_form.title_text_size) + 'px';
+        }
+
+        if (res.mail_subscription_form.message) {
+            componentsData.mailSubsScreen.message.use = true;
+            componentsData.mailSubsScreen.message.text = slashController(res.mail_subscription_form.message);
+            componentsData.mailSubsScreen.message.textColor = ARGBtoRGBA(ext.mail_subscription_form.text_color);
+            componentsData.mailSubsScreen.message.fontSize = fontSizeCalculator(ext.mail_subscription_form.text_size) + 'px';
+        }
+
+        if (res.mail_subscription_form.emailpermit_text) {
+            componentsData.mailSubsScreen.emailPermission.use = true;
+            componentsData.mailSubsScreen.emailPermission.text = slashController(res.mail_subscription_form.emailpermit_text);
+            componentsData.mailSubsScreen.emailPermission.fontSize = fontSizeCalculator(ext.mail_subscription_form.emailpermit_text_size) + 'px';
+            componentsData.mailSubsScreen.emailPermission.url = ext.mail_subscription_form.emailpermit_text_url;
+        }
+
+        if (res.mail_subscription_form.consent_text) {
+            componentsData.mailSubsScreen.secondPermission.use = true;
+            componentsData.mailSubsScreen.secondPermission.text = slashController(res.mail_subscription_form.consent_text);
+            componentsData.mailSubsScreen.secondPermission.fontSize = fontSizeCalculator(ext.mail_subscription_form.consent_text_size) + 'px';
+            componentsData.mailSubsScreen.secondPermission.url = ext.mail_subscription_form.consent_text_url;
+        }
+        // Mail Form Required
+        componentsData.mailSubsScreen.button.text = slashController(res.mail_subscription_form.button_label);
+        componentsData.mailSubsScreen.button.textColor = ARGBtoRGBA(ext.mail_subscription_form.button_text_color);
+        componentsData.mailSubsScreen.button.buttonColor = ARGBtoRGBA(ext.mail_subscription_form.button_color);
+        componentsData.mailSubsScreen.button.fontSize = fontSizeCalculator(ext.mail_subscription_form.button_text_size) + 'px';
+        componentsData.mailSubsScreen.emailInput.placeHolder = res.mail_subscription_form.placeholder;
+        componentsData.mailSubsScreen.alerts.check_consent_message = slashController(res.mail_subscription_form.check_consent_message);
+        componentsData.mailSubsScreen.alerts.invalid_email_message = slashController(res.mail_subscription_form.invalid_email_message);
+    }
+
+    // Rules Screen Optionals
+    if (res.gamification_rules) {
+        activePageData.rulesScreen = true;
+
+        componentsData.rulesScreen.bgImage = res.gamification_rules.background_image
+        componentsData.rulesScreen.button.text = slashController(res.gamification_rules.button_label)
+        componentsData.rulesScreen.button.textColor = ARGBtoRGBA(ext.gamification_rules.button_text_color);
+        componentsData.rulesScreen.button.buttonColor = ARGBtoRGBA(ext.gamification_rules.button_color);
+        componentsData.rulesScreen.button.fontSize = fontSizeCalculator(ext.gamification_rules.button_text_size) + 'px';
+    }
+
+
+    // Game Screen
+    componentsData.gameScreen.scoreboard.background = ARGBtoRGBA(ext.game_elements.scoreboard_background_color);
+    componentsData.gameScreen.scoreboard.type = ext.game_elements.scoreboard_shape;
+    componentsData.gameScreen.scoreboard.position = ext.game_elements.scoreboard_pageposition;
+    if (componentsData.gameScreen.scoreboard.type == "") componentsData.gameScreen.scoreboard.type = "roundedcorners"
+
+
+    // Finish Screen
+    if (res.game_result_elements.title) {
+        componentsData.finishScreen.title.use = true
+        componentsData.finishScreen.title.text = slashController(res.game_result_elements.title)
+        componentsData.finishScreen.title.fontSize = fontSizeCalculator(ext.game_result_elements.title_text_size) + 'px'
+        componentsData.finishScreen.title.textColor = ARGBtoRGBA(ext.game_result_elements.title_text_color)
+
+    }
+    if (res.game_result_elements.message) {
+        componentsData.finishScreen.message.use = true
+        componentsData.finishScreen.message.text = slashController(res.game_result_elements.message)
+        componentsData.finishScreen.message.fontSize = fontSizeCalculator(ext.game_result_elements.text_size) + 'px'
+        componentsData.finishScreen.message.textColor = ARGBtoRGBA(ext.game_result_elements.text_color)
+    }
+
+    componentsData.finishScreen.button.text = slashController(res.copybutton_label);
+    componentsData.finishScreen.button.textColor = ARGBtoRGBA(ext.copybutton_text_color);
+    componentsData.finishScreen.button.fontSize = fontSizeCalculator(ext.copybutton_text_size) + 'px';
+    componentsData.finishScreen.button.buttonColor = ARGBtoRGBA(ext.copybutton_color);
+    componentsData.finishScreen.button.androidLink = res.android_lnk;
+
+    componentsData.finishScreen.lose.buttonLabel = slashController(res.game_result_elements.lose_button_label);
+    componentsData.finishScreen.lose.loseAndroidLink = res.game_result_elements.lose_android_lnk;
+    componentsData.finishScreen.lose.src = res.game_result_elements.lose_image;
+    componentsData.finishScreen.lose.loseButtonTextColor = ARGBtoRGBA(ext.game_result_elements.losebutton_text_color);
+    componentsData.finishScreen.lose.loseButtonColor = ARGBtoRGBA(ext.game_result_elements.losebutton_color);
+    componentsData.finishScreen.lose.loseButtonTextSize = fontSizeCalculator(ext.game_result_elements.losebutton_text_size) + 'px';
+
+
+
+    componentsData.finishScreen.couponCode.background = ARGBtoRGBA(ext.promocode_background_color);
+    componentsData.finishScreen.couponCode.textColor = ARGBtoRGBA(ext.promocode_text_color);
+    componentsData.finishScreen.couponCode.fontSize = fontSizeCalculator(ext.game_result_elements.text_size) + 'px';
+
+
+
+}
+
+function iOSConfigRegulator(responseConfig) {
+    console.log(responseConfig);
+
+    const res = responseConfig;
+
+    const row = res.gameElements.playgroundRowcount;
+    const col = res.gameElements.playgroundColumncount;
+
+    maxPairCalculator(row, col);
+    cardSlotAdjuster(row, col, res.gameElements.cardImages);
+    promoCodeCalculator(res.promoCodes);
+
+    // General data
+    gameSettings.duration = res.gameElements.durationOfGame;
+    generalData.sound = res.gameElements.soundUrl;
+    generalData.bgColor = ARGBtoRGBA(res.background_color);
+    generalData.bgImg = res.backgroundImage;
+    generalData.closeButtonColor = ARGBtoRGBA(res.close_button_color);
+    generalData.fontName = res.font_family;
+    cardSettings.backfaceImg = res.gameElementsExtended.backofcardsImage;
+    cardSettings.backfaceColor = res.gameElementsExtended.backofcardsColor;
+
+    if (res.font_family == 'custom' && utils.getMobileOperatingSystem() == 'iOS') {
+        generalData.fontName = res.custom_font_family_ios;
+        generalData.fontFiles = responseConfig.fontFiles;
+        console.log('font files ', generalData.fontFiles);
+        addFonts();
+    }
+
+    // // Mail Form Optionals
+    if (res.mailSubscription) {
+        activePageData.mailSubsScreen = true;
+
+        if (res.mailSubscriptionForm.title) {
+            componentsData.mailSubsScreen.title.use = true;
+            componentsData.mailSubsScreen.title.text = slashController(res.mailSubscriptionForm.title);
+            componentsData.mailSubsScreen.title.textColor = ARGBtoRGBA(res.mailExtendedProps.titleTextColor);
+            componentsData.mailSubsScreen.title.fontSize = fontSizeCalculator(res.mailExtendedProps.titleTextSize) + 'px';
+        }
+
+        if (res.mailSubscriptionForm.message) {
+            componentsData.mailSubsScreen.message.use = true;
+            componentsData.mailSubsScreen.message.text = slashController(res.mailSubscriptionForm.message);
+            componentsData.mailSubsScreen.message.textColor = ARGBtoRGBA(res.mailExtendedProps.textColor);
+            componentsData.mailSubsScreen.message.fontSize = fontSizeCalculator(res.mailExtendedProps.textSize) + 'px';
+        }
+
+        if (res.mailSubscriptionForm.emailPermitText) {
+            componentsData.mailSubsScreen.emailPermission.use = true;
+            componentsData.mailSubsScreen.emailPermission.text = slashController(res.mailSubscriptionForm.emailPermitText);
+            componentsData.mailSubsScreen.emailPermission.fontSize = fontSizeCalculator(res.mailExtendedProps.emailPermitTextSize) + 'px';
+            componentsData.mailSubsScreen.emailPermission.url = res.mailExtendedProps.emailPermitTextUrl;
+        }
+
+        if (res.mailSubscriptionForm.consentText) {
+            componentsData.mailSubsScreen.secondPermission.use = true;
+            componentsData.mailSubsScreen.secondPermission.text = slashController(res.mailSubscriptionForm.consentText);
+            componentsData.mailSubsScreen.secondPermission.fontSize = fontSizeCalculator(res.mailExtendedProps.consentTextSize) + 'px';
+            componentsData.mailSubsScreen.secondPermission.url = res.mailExtendedProps.consentTextUrl;
+        }
+
+        // // Mail Form Required
+        componentsData.mailSubsScreen.button.text = slashController(res.mailSubscriptionForm.buttonTitle);
+        componentsData.mailSubsScreen.button.textColor = ARGBtoRGBA(res.mailExtendedProps.buttonTextColor);
+        componentsData.mailSubsScreen.button.buttonColor = ARGBtoRGBA(res.mailExtendedProps.buttonColor);
+        componentsData.mailSubsScreen.button.fontSize = fontSizeCalculator(res.mailExtendedProps.buttonTextSize) + 'px';
+        componentsData.mailSubsScreen.emailInput.placeHolder = res.mailSubscriptionForm.placeholder;
+        componentsData.mailSubsScreen.alerts.check_consent_message = slashController(res.mailSubscriptionForm.checkConsentMessage);
+        componentsData.mailSubsScreen.alerts.invalid_email_message = slashController(res.mailSubscriptionForm.invalidEmailMessage);
+    }
+
+    // // Rules Screen Optionals
+    if (res.gamificationRules) {
+        activePageData.rulesScreen = true;
+
+        componentsData.rulesScreen.bgImage = res.gamificationRules.backgroundImage
+        componentsData.rulesScreen.button.text = slashController(res.gamificationRules.buttonLabel)
+        componentsData.rulesScreen.button.textColor = ARGBtoRGBA(res.gamificationRulesExtended.buttonTextColor);
+        componentsData.rulesScreen.button.buttonColor = ARGBtoRGBA(res.gamificationRulesExtended.buttonColor);
+        componentsData.rulesScreen.button.fontSize = fontSizeCalculator(res.gamificationRulesExtended.buttonTextSize) + 'px';
+    }
+
+    // Game Screen
+    componentsData.gameScreen.scoreboard.background = ARGBtoRGBA(res.gameElementsExtended.scoreboardBackgroundColor);
+    componentsData.gameScreen.scoreboard.type = res.gameElementsExtended.scoreboardShape;
+    componentsData.gameScreen.scoreboard.position = res.gameElementsExtended.scoreboardPageposition;
+    if (componentsData.gameScreen.scoreboard.type == "") componentsData.gameScreen.scoreboard.type = "roundedcorners"
+
+    // Finish Screen
+    if (res.gameResultElements.title) {
+        componentsData.finishScreen.title.use = true
+        componentsData.finishScreen.title.text = slashController(res.gameResultElements.title)
+        componentsData.finishScreen.title.fontSize = fontSizeCalculator(res.gameResultElementsExtended.titleTextSize) + 'px'
+        componentsData.finishScreen.title.textColor = ARGBtoRGBA(res.gameResultElementsExtended.titleTextColor)
+    }
+    if (res.gameResultElements.message) {
+        componentsData.finishScreen.message.use = true
+        componentsData.finishScreen.message.text = slashController(res.gameResultElements.message)
+        componentsData.finishScreen.message.fontSize = fontSizeCalculator(res.gameResultElementsExtended.textSize) + 'px'
+        componentsData.finishScreen.message.textColor = ARGBtoRGBA(res.gameResultElementsExtended.textColor)
+    }
+
+    componentsData.finishScreen.button.text = slashController(res.copybutton_label);
+    componentsData.finishScreen.button.textColor = ARGBtoRGBA(res.copybutton_text_color);
+    componentsData.finishScreen.button.fontSize = fontSizeCalculator(res.copybutton_text_size) + 'px';
+    componentsData.finishScreen.button.buttonColor = ARGBtoRGBA(res.copybutton_color);
+    componentsData.finishScreen.button.iOSLink = res.ios_lnk;
+
+    componentsData.finishScreen.lose.buttonLabel = slashController(res.gameResultElements.loseButtonLabel);
+    componentsData.finishScreen.lose.loseIOSLink = res.gameResultElements.loseIosLnk;
+    componentsData.finishScreen.lose.src = res.gameResultElements.loseImage;
+    componentsData.finishScreen.lose.loseButtonTextColor = ARGBtoRGBA(res.gameResultElementsExtended.losebuttonTextColor);
+    componentsData.finishScreen.lose.loseButtonColor = ARGBtoRGBA(res.gameResultElementsExtended.losebuttonColor);
+    componentsData.finishScreen.lose.loseButtonTextSize = fontSizeCalculator(res.gameResultElementsExtended.losebuttonTextSize) + 'px';
+
+    componentsData.finishScreen.couponCode.background = ARGBtoRGBA(res.promocode_background_color);
+    componentsData.finishScreen.couponCode.textColor = ARGBtoRGBA(res.promocode_text_color);
+    componentsData.finishScreen.couponCode.fontSize = fontSizeCalculator(res.gameResultElementsExtended.textSize) + 'px';
 }
 
 /**
@@ -311,6 +561,7 @@ function createMainComponents() {
 /**
  * Mail subscribe form screen
  */
+
 function createMailSubsScreen() {
     var mailSubsScreen = document.createElement("DIV");
     mailSubsScreen.id = componentsData.mailSubsScreen.id;
@@ -329,7 +580,7 @@ function createMailSubsScreen() {
 
     var container = document.createElement("DIV");
     container.id = "rmc-container";
-    container.style.width = "100%";
+    container.style.width = "80%";
     container.style.height = "auto";
     container.style.position = "absolute";
     container.style.transform = "translate(-50%, -50%)";
@@ -343,6 +594,7 @@ function createMailSubsScreen() {
         title.style.color = componentsData.mailSubsScreen.title.textColor;
         title.style.fontSize = componentsData.mailSubsScreen.title.fontSize;
         title.style.display = "inline-block";
+        title.style.width = "100%";
         title.style.margin = "15px 0";
         title.style.fontFamily = generalData.fontName;
         title.innerText = componentsData.mailSubsScreen.title.text;
@@ -355,6 +607,7 @@ function createMailSubsScreen() {
         message.style.color = componentsData.mailSubsScreen.message.textColor;
         message.style.fontSize = componentsData.mailSubsScreen.message.fontSize;
         message.style.display = "inline-block";
+        message.style.width = "100%";
         message.style.margin = "15px 0";
         message.style.fontFamily = generalData.fontName;
         message.innerText = componentsData.mailSubsScreen.message.text;
@@ -363,12 +616,11 @@ function createMailSubsScreen() {
 
 
     var input = document.createElement("INPUT");
-    input.setAttribute("type", "text");
+    input.setAttribute("type", "email");
     input.setAttribute("placeholder", componentsData.mailSubsScreen.emailInput.placeHolder);
-    input.setAttribute("value", "baris.arslan@euromsg.com");
     input.id = componentsData.mailSubsScreen.emailInput.id;
     input.style.backgroundColor = "white";
-    input.style.width = "80%";
+    input.style.width = "100%";
     input.style.padding = "9px";
     input.style.border = "1px solid " + generalData.fontColor;
     input.style.borderRadius = generalData.borderRadius;
@@ -382,20 +634,29 @@ function createMailSubsScreen() {
     input.style.fontFamily = generalData.fontName;
     container.appendChild(input);
 
+    var emailAlert = document.createElement("div");
+    emailAlert.id = 'emailAlert';
+    container.appendChild(emailAlert);
+
+
 
     if (componentsData.mailSubsScreen.emailPermission.use) {
         var emailPermission = document.createElement("DIV");
         emailPermission.style.color = "black";
         emailPermission.style.fontSize = "13px";
         emailPermission.style.margin = "15px 0";
-        emailPermission.style.width = "80%";
-        emailPermission.style.display = "inline-block";
-        emailPermission.innerHTML = "<input style='width:20px;height:20px;display:block;margin-right:7px;float:left' id='" + componentsData.mailSubsScreen.emailPermission.id + "' type='checkbox' checked>\
-        <div style='" + ("padding: 0px;") + "'>\
-        <a style='font-size:"+ componentsData.mailSubsScreen.emailPermission.fontSize + ";text-decoration: underline;color: black; font-family:" + generalData.fontName + "'\
-        href='"+ componentsData.mailSubsScreen.emailPermission.url + "'>" + componentsData.mailSubsScreen.emailPermission.text + "</a>\
-        </div>";
+        emailPermission.style.width = "100%";
+        emailPermission.style.display = "flex";
+        emailPermission.style.alignItems = "center";
+
+        emailPermission.innerHTML = "<input style='width:20px;height:20px;display:block;margin-right:7px;float:left' id='" + componentsData.mailSubsScreen.emailPermission.id + "' type='checkbox'>\
+        <a style='font-size:"+ componentsData.mailSubsScreen.emailPermission.fontSize + ";text-decoration: underline;color: black;text-align:left; font-family:" + generalData.fontName + "'\
+        href='"+ componentsData.mailSubsScreen.emailPermission.url + "'>" + componentsData.mailSubsScreen.emailPermission.text;
         container.appendChild(emailPermission);
+
+        var checkboxAlert1 = document.createElement("div");
+        checkboxAlert1.id = 'checkboxAlert1';
+        container.appendChild(checkboxAlert1);
     }
 
     if (componentsData.mailSubsScreen.emailPermission.use) {
@@ -403,24 +664,29 @@ function createMailSubsScreen() {
         secondPermission.style.color = "black";
         secondPermission.style.fontSize = "13px";
         secondPermission.style.margin = "15px 0";
-        secondPermission.style.width = "80%";
-        secondPermission.style.display = "inline-block";
-        secondPermission.innerHTML = "<input style='width:20px;height:20px;display:block;margin-right:7px;float:left' id='" + componentsData.mailSubsScreen.secondPermission.id + "' type='checkbox' checked>" +
-            "<div style='padding: 0px;'>\
-                <a style='font-size:"+ componentsData.mailSubsScreen.emailPermission.fontSize + ";text-decoration: underline;color: black; font-family:" + generalData.fontName + "'\
+        secondPermission.style.width = "100%";
+        secondPermission.style.display = "flex";
+        secondPermission.style.alignItems = "center";
+
+        secondPermission.innerHTML = "<input style='width:20px;height:20px;display:block;margin-right:7px;float:left' id='" + componentsData.mailSubsScreen.secondPermission.id + "' type='checkbox' >" +
+            "<a style='font-size:" + componentsData.mailSubsScreen.emailPermission.fontSize + ";text-decoration: underline;color: black;text-align:left; font-family:" + generalData.fontName + "'\
                 href='"+ componentsData.mailSubsScreen.secondPermission.url + "'>\
-                "+ componentsData.mailSubsScreen.secondPermission.text + "\
-                </div>";
+                "+ componentsData.mailSubsScreen.secondPermission.text;
         container.appendChild(secondPermission);
+
+        var checkboxAlert2 = document.createElement("div");
+        checkboxAlert2.id = 'checkboxAlert2';
+        container.appendChild(checkboxAlert2);
     }
 
-    var submit = document.createElement("div");
+    var submit = document.createElement("button");
     submit.id = componentsData.mailSubsScreen.button.id;
     submit.style.backgroundColor = componentsData.mailSubsScreen.button.buttonColor;
     submit.style.color = componentsData.mailSubsScreen.button.textColor;
     submit.style.padding = "15px 30px";
     submit.style.fontSize = componentsData.mailSubsScreen.button.fontSize;
     submit.style.borderRadius = generalData.borderRadius;
+    submit.style.border = 0;
     submit.style.position = "absolute";
     submit.style.bottom = "70px";
     submit.style.left = "50%";
@@ -434,35 +700,141 @@ function createMailSubsScreen() {
     activePageData.rulesScreen && createRulesScreen();
 
     submit.addEventListener("click", function () {
-        if (document.querySelector("#" + componentsData.mailSubsScreen.emailInput.id)) {
-            var email = document.querySelector("#" + componentsData.mailSubsScreen.emailInput.id).value.toLowerCase();
-            var pattern = new RegExp("[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+.[A-Za-z]{2,}");
-            var emailStatus = pattern.test(email);
-            if (emailStatus == true) {
-                if (document.querySelector("#" + componentsData.mailSubsScreen.emailPermission.id) && document.querySelector("#" + componentsData.mailSubsScreen.secondPermission.id)) {
-                    if (document.querySelector("#" + componentsData.mailSubsScreen.emailPermission.id).checked && document.querySelector("#" + componentsData.mailSubsScreen.secondPermission.id).checked) {
-                        utils.subscribe(email);
-                        if (document.querySelector("#" + componentsData.mailSubsScreen.id)) {
-                            document.querySelector("#" + componentsData.mailSubsScreen.id).remove();
-                            if (!activePageData.rulesScreen) {
-                                createGameScreen();
-                                createScoreBoard();
-                            }
-                        }
-                    } else {
-                        alert("Please tick the checkboxes!");
+        if (emailChecker()) {
+            removeAlert("emailAlert")
+            if (emailPermitChecker() && secondPermitChecker()) {
+                utils.subscribe(document.querySelector("#" + componentsData.mailSubsScreen.emailInput.id).value.toLowerCase());
+                if (document.querySelector("#" + componentsData.mailSubsScreen.id)) {
+                    document.querySelector("#" + componentsData.mailSubsScreen.id).remove();
+                    if (!activePageData.rulesScreen) {
+                        createGameScreen();
+                        createScoreBoard();
                     }
                 }
             } else {
-                alert("Check your email address!");
+                if (!emailPermitChecker()) {
+                    alertChecker(componentsData.mailSubsScreen.alerts.check_consent_message, 'checkboxAlert1')
+                }
+                else {
+                    removeAlert("checkboxAlert1")
+                }
+                if (!secondPermitChecker()) {
+                    alertChecker(componentsData.mailSubsScreen.alerts.check_consent_message, 'checkboxAlert2')
+                }
+                else {
+                    removeAlert("checkboxAlert2")
+                }
             }
+        } else {
+            alertChecker(componentsData.mailSubsScreen.alerts.invalid_email_message, 'emailAlert')
         }
-
     });
 
     mailSubsScreen.appendChild(submit);
     mailSubsScreen.appendChild(container);
     MAIN_COMPONENT.appendChild(mailSubsScreen);
+}
+
+function createAlert(text, id) {
+    if (!document.querySelector('#' + id).innerText) {
+        var alert = document.createElement("div");
+        alert.innerText = text;
+        alert.style.width = "100%";
+        alert.style.padding = "5px 10px";
+        alert.style.zIndex = "999";
+        alert.style.textAlign = "left";
+        alert.style.color = "#000";
+        alert.style.fontSize = "14px";
+        alert.style.fontFamily = generalData.fontName;
+        alert.style.transform = "translate3d(0,0,3px)";
+
+        document.querySelector('#' + id).appendChild(alert)
+    }
+    else {
+
+    }
+}
+
+function removeAlert(id) {
+    if (document.querySelector('#' + id)) {
+        document.querySelector('#' + id).innerText = ""
+    }
+}
+
+function alertChecker(text, id) {
+    switch (id) {
+        case "checkboxAlert1":
+            if (emailPermitChecker()) {
+                document.querySelector('#' + id).innerText = ""
+            } else {
+                createAlert(text, id)
+            }
+            break;
+        case "checkboxAlert2":
+            if (secondPermitChecker()) {
+                document.querySelector('#' + id).innerText = ""
+            } else {
+                createAlert(text, id)
+            }
+            break;
+        case "emailAlert":
+            if (emailChecker()) {
+                document.querySelector('#' + id).innerText = ""
+            } else {
+                createAlert(text, id)
+            }
+            break;
+        default:
+            break;
+    }
+}
+
+function emailChecker() {
+    if (document.querySelector("#" + componentsData.mailSubsScreen.emailInput.id)) {
+        var email = document.querySelector("#" + componentsData.mailSubsScreen.emailInput.id).value.toLowerCase();
+        var pattern = new RegExp("[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+.[A-Za-z]{2,}");
+        var emailStatus = pattern.test(email);
+        if (emailStatus == true) {
+            console.log("email checker", true)
+            return true
+        }
+        else {
+            console.log("email checker", false)
+            return false
+        }
+    }
+    else {
+        console.log("email checker", false)
+        return false
+    }
+}
+
+function emailPermitChecker() {
+    if (document.querySelector("#" + componentsData.mailSubsScreen.emailPermission.id)) {
+        if (document.querySelector("#" + componentsData.mailSubsScreen.emailPermission.id).checked) {
+            return true
+        }
+        else {
+            return false
+        }
+    }
+    else {
+        return false
+    }
+}
+
+function secondPermitChecker() {
+    if (document.querySelector("#" + componentsData.mailSubsScreen.secondPermission.id)) {
+        if (document.querySelector("#" + componentsData.mailSubsScreen.secondPermission.id).checked) {
+            return true
+        }
+        else {
+            return false
+        }
+    }
+    else {
+        return false
+    }
 }
 
 /**
@@ -481,8 +853,13 @@ function createCloseButton() {
     closeButton.style.cursor = "pointer";
     closeButton.style.fontSize = "29px";
     closeButton.style.borderRadius = generalData.borderRadius;
+    closeButton.style.backgroundColor = 'rgba(0,0,0,0)';
     closeButton.style.zIndex = "999";
     closeButton.style.transform = "translate3d(0,0,3px)";
+    if (componentsData.gameScreen.scoreboard.position == 'topRight') {
+        closeButton.style.left = "0px";
+        closeButton.style.right = "auto";
+    }
 
     closeButton.addEventListener("click", function () {
         utils.close();
@@ -491,6 +868,7 @@ function createCloseButton() {
         document.querySelector("#" + componentsData.rulesScreen.id) ? document.querySelector("#" + componentsData.rulesScreen.id).remove() : null;
         document.querySelector("#" + generalData.closeButtonId) ? document.querySelector("#" + generalData.closeButtonId).remove() : null;
         document.documentElement.style.overflow = 'auto';
+        utils.pauseSound();
         console.log('Oyun Kapatıldı');
     });
 
@@ -617,7 +995,9 @@ function createGameScreen() {
 }
 
 function createCard(data, i) {
-    let id = data.name + i, turn = false;
+    if (!data || !data.name) return
+
+    let id = data.name + '-' + i, turn = false;
     var card = document.createElement('div');
     card.id = id;
     card.style.width = cardSettings.cardWidth + 'px';
@@ -636,7 +1016,7 @@ function createCard(data, i) {
     front.style.backgroundSize = 'cover';
     front.style.backgroundImage = "url('" + data.imgUrl + "')";
     front.style.transformStyle = 'preserve-3d';
-    front.style.transition = 'all '+cardSettings.duration+'ms cubic-bezier(1, 0.99, 0, -0.02) 0s';
+    front.style.transition = 'all ' + cardSettings.duration + 'ms cubic-bezier(1, 0.99, 0, -0.02) 0s';
     front.style.position = 'absolute';
     front.style.backfaceVisibility = 'hidden';
     front.style.borderRadius = '10px';
@@ -648,17 +1028,26 @@ function createCard(data, i) {
     back.style.height = card.style.height;
     back.style.backgroundRepeat = 'no-repeat';
     back.style.backgroundSize = 'cover';
-    back.style.backgroundImage = "url('https://picsum.photos/id/29/300/600')";
+    back.style.backgroundImage = "url('" + cardSettings.backfaceImg + "')";
+    back.style.backgroundColor = cardSettings.backfaceColor;
     back.style.transformStyle = 'preserve-3d';
-    back.style.transition = 'all '+cardSettings.duration+'ms cubic-bezier(1, 0.99, 0, -0.02) 0s';
+    back.style.transition = 'all ' + cardSettings.duration + 'ms cubic-bezier(1, 0.99, 0, -0.02) 0s';
     back.style.position = 'absolute';
     back.style.backfaceVisibility = 'hidden';
     back.style.borderRadius = '10px';
 
+
+    if (data.empty) {
+        front.style.backgroundImage = "url('" + cardSettings.emptyFrontImg + "')";
+        front.style.backgroundColor = cardSettings.emptyFrontColor;
+        back.style.backgroundImage = "url('" + cardSettings.emptyBackfaceImg + "')";
+        back.style.backgroundColor = cardSettings.emptyBackfaceColor;
+    }
+
     card.appendChild(front);
     card.appendChild(back);
 
-    card.addEventListener("click", ()=>{
+    card.addEventListener("click", () => {
         if (CLICKABLE) {
             open(card.id, data)
         }
@@ -667,8 +1056,74 @@ function createCard(data, i) {
     return card;
 }
 
+function cardSlotAdjuster(row, column, images) {
+    let result = [];
+    // console.log("rowColTotalCountWithMod(row , column)",rowColTotalCountWithMod(row , column));
+    images.forEach((url, i) => {
+        if (result.length < rowColTotalCountWithMod(row , column)) {
+            const cardData = {name: 'card' + (i+1), imgUrl: url}
+            result.push(cardData)
+            result.push(cardData)
+        }
+    });
+
+    // 3. parametre responseConfigden çekilecek 
+    if (emptyCardDataAddControl(row, column,true)) {
+        result.push({empty:true, name: 'EMPTY_CARD', imgUrl:"https://picsum.photos/id/5/300/600" })
+    }
+
+    result.sort(() => (Math.random() > .5) ? 1 : -1);
+
+
+    result = slotCreator(row, column, result)
+    console.log(result);
+
+    componentsData.gameScreen.cards = result;
+    utils.cardSizeCalculate();
+}
+
+function emptyCardDataAddControl(row,column,emptyCardActive){
+    if(!row || !column) return false
+
+    let result = false;
+    if (emptyCardActive) {
+        result = (row * column) % 2 > 0
+    }
+
+    return result
+}
+
+function rowColTotalCountWithMod(row,column){
+    if(!row || !column) return 0
+
+    const x = row * column
+    const result = x % 2
+
+    return result > 0 ? x-1 : x
+}
+
+function slotCreator(r, c, imgs) {
+    let arr = []
+    for (let i = 0; i < r; i++) {
+        arr.push([])
+        for (let j = 0; j < c; j++) {
+            arr[i].push(imgs[0])
+            imgs.shift();
+        }
+    }
+    return arr
+}
+
+function cardSizeCalculator(col) {
+    let cardWidth = (window.innerWidth / col) - (cardSettings.cardMargin * 2);
+    let cardHeight = cardWidth * 2
+
+    cardSettings.cardWidth = cardWidth
+    cardSettings.cardHeight = cardHeight
+}
+
 function removeEventListener(id) {
-    let card = document.querySelector('#'+id)
+    let card = document.querySelector('#' + id)
     card.outerHTML = card.outerHTML
 }
 
@@ -683,31 +1138,31 @@ function pairController(id, data) {
     })
     PAIR_COUNTER++;
     if (PAIR_COUNTER == 2) {
-        console.log("pair",pair);
+        console.log("pair", pair);
         if (pair[0].name == pair[1].name) {
             setTimeout(() => {
-                updateScore();
+                PAIRS.push(pair);
                 removeEventListener(pair[0].id);
                 removeEventListener(pair[1].id);
                 gameSettings.matchedIconEnable && addPairIcon(pair[0].id)
                 gameSettings.matchedIconEnable && addPairIcon(pair[1].id)
                 resetPairCheckParams();
-                console.log(pair);
+                console.log("PPPPPAAAIR", PAIRS);
                 PAIR_COUNT++;
                 finishChecker();
-            }, cardSettings.duration+100);
+            }, cardSettings.duration);
         }
-        else{
+        else {
             setTimeout(() => {
                 close(pair[0].id);
                 close(pair[1].id);
                 resetPairCheckParams();
-            }, cardSettings.duration+100);
+            }, cardSettings.duration);
         }
     }
 }
 
-function resetPairCheckParams(){
+function resetPairCheckParams() {
     LAST_CLICKED_CARD_ID = null;
     PAIR_COUNTER = 0;
     pair = [];
@@ -722,13 +1177,13 @@ function clickableController() {
 
 function addPairIcon(id) {
     var icon = document.createElement("div");
-    icon.innerText = "MATCHED "+SCORE;
+    icon.innerText = "MATCHED " + SCORE;
     icon.style.backgroundColor = 'green';
     icon.style.position = 'relative';
     icon.style.color = '#fff';
     icon.style.borderTopLeftRadius = '10px';
     icon.style.borderTopRightRadius = '10px';
-    document.querySelector("#"+id).appendChild(icon)
+    document.querySelector("#" + id).appendChild(icon)
 }
 
 function open(cardId, data) {
@@ -750,18 +1205,17 @@ function close(cardId) {
     back.style.transform = "rotate3d(0, 1, 0, 0deg)"
 }
 
-function updateScore(){
-    SCORE++;
-    document.querySelector('#' + componentsData.gameScreen.scoreboard.score.id).innerHTML = SCORE + ' PUAN';
+function updateScore(score) {
+    document.querySelector('#' + componentsData.gameScreen.scoreboard.score.id).innerHTML = score + ' SANİYE';
 
 }
 
 function startGame() {
     componentsData.gameScreen.cards.forEach((row, i) => {
-        row.forEach((card) => {
-            console.log("card", card);
+        row.forEach((card, j) => {
             if (document.querySelector('#' + componentsData.gameScreen.id) && document.querySelector('#' + componentsData.gameScreen.gameArea)) {
-                document.querySelector('#' + componentsData.gameScreen.gameArea).appendChild(createCard(card, i));
+                let tmpCard = createCard(card, i + '-' + j)
+                tmpCard && document.querySelector('#' + componentsData.gameScreen.gameArea).appendChild(tmpCard);
             }
         });
     });
@@ -782,16 +1236,16 @@ function createScoreBoard() {
     dashboard.style.maxWidth = "150px";
     dashboard.style.margin = "5px";
     dashboard.style.backgroundSize = "contain";
-    dashboard.style.left = "0";
     dashboard.style.fontSize = "24px";
     dashboard.style.transition = "1s all";
+    dashboard = scoreboardPositionChanger(dashboard, componentsData.gameScreen.scoreboard.position);
     componentsData.gameScreen.scoreboard.type !== 'square' && (dashboard.style.borderRadius = componentsData.gameScreen.scoreboard.type == 'circle' ? '50%' : '15px')
 
     var _duration = document.createElement("div");
     _duration.innerHTML = gameSettings.duration;
     _duration.id = componentsData.gameScreen.scoreboard.countDown.id;
     _duration.style.fontWeight = "bold";
-    _duration.style.marginBottom = "10px";
+    _duration.style.marginBottom = gameSettings.gameScreenSecondScoreEnable ? "10px" : "0px";
     _duration.style.transition = "1s all";
     _duration.style.width = "150px";
     _duration.style.maxWidth = "150px";
@@ -800,20 +1254,48 @@ function createScoreBoard() {
     _duration.style.fontSize = componentsData.gameScreen.scoreboard.fontSize;
     dashboard.appendChild(_duration);
 
-    var _score = document.createElement("DIV");
-    _score.id = componentsData.gameScreen.scoreboard.score.id;
-    _score.innerHTML = SCORE + ' PUAN';
-    _score.style.transition = "1s all";
-    _score.style.color = componentsData.gameScreen.scoreboard.fontColor;
-    _score.style.fontFamily = generalData.fontName;
-    _score.style.fontSize = componentsData.gameScreen.scoreboard.fontSize;
+    if (gameSettings.gameScreenSecondScoreEnable) {
+        var _score = document.createElement("DIV");
+        _score.id = componentsData.gameScreen.scoreboard.score.id;
+        _score.innerHTML = SCORE + ' SANİYE';
+        _score.style.transition = "1s all";
+        _score.style.color = componentsData.gameScreen.scoreboard.fontColor;
+        _score.style.fontFamily = generalData.fontName;
+        _score.style.fontSize = componentsData.gameScreen.scoreboard.fontSize;
 
-    dashboard.appendChild(_score);
+        dashboard.appendChild(_score);
+    }
     document.querySelector('#' + componentsData.gameScreen.id).appendChild(dashboard);
-    utils.startCountDown(document.querySelector('#' + _duration.id), gameSettings.duration);
+    TIME_INTERVAL = utils.startCountDown(document.querySelector('#' + _duration.id), gameSettings.duration);
 }
 
-function createFinishScreen() {
+function scoreboardPositionChanger(el, value) {
+    switch (value) {
+        case 'topLeft':
+            el.style.top = '0';
+            el.style.left = '0';
+            break;
+        case 'topRight':
+            el.style.top = '0';
+            el.style.right = '0';
+            break;
+        case 'bottomLeft':
+            el.style.bottom = '0';
+            el.style.left = '0';
+            break;
+        case 'bottomRight':
+            el.style.bottom = '0';
+            el.style.right = '0';
+            break;
+        default:
+            el.style.top = '0';
+            el.style.left = '0';
+            break;
+    }
+    return el
+}
+
+function createFinishScreen(lose) {
     var finishScreen = document.createElement("DIV");
     finishScreen.id = componentsData.finishScreen.id;
     finishScreen.style.width = "100%";
@@ -839,125 +1321,247 @@ function createFinishScreen() {
     container.style.left = "50%";
     container.style.textAlign = "center";
 
-    if (componentsData.finishScreen.title.use) {
-        var title = document.createElement("DIV");
-        title.id = "rmc-finish-title";
-        title.style.color = componentsData.finishScreen.title.textColor;
-        title.style.fontSize = componentsData.finishScreen.title.fontSize;
-        title.style.display = "inline-block";
-        title.style.margin = "15px 0";
-        title.style.width = 'inherit';
-        title.style.fontFamily = generalData.fontName;
-        title.innerText = utils.winCheck() ? componentsData.finishScreen.title.text : componentsData.finishScreen.title.loseText;
-        container.appendChild(title);
-    }
-
-    if (componentsData.finishScreen.message.use) {
-        var message = document.createElement("DIV");
-        message.id = "rmc-finish-message";
-        message.style.color = componentsData.finishScreen.message.textColor;
-        message.style.fontSize = componentsData.finishScreen.message.fontSize;
-        message.style.display = "inline-block";
-        message.style.margin = "15px 0";
-        message.style.width = 'inherit';
-        message.style.fontFamily = generalData.fontName;
-        message.innerText = utils.winCheck() ? componentsData.finishScreen.message.text : componentsData.finishScreen.message.loseText;
-        container.appendChild(message);
-    }
-
-    var _score = document.createElement("DIV");
-    _score.id = 'rmc-finish-finish';
-    _score.innerHTML = SCORE + ' PUAN';
-    _score.innerHTML += '<br> ' + couponCodes[SCORE];
-    _score.style.transition = "1s all";
-    _score.style.padding = componentsData.gameScreen.scoreboard.type === 'circle' ? (utils.winCheck() ? '40px 30px' : '70px 20px') : '15px 10px';
-    _score.style.width = 'fit-content';
-    _score.style.margin = '0 auto';
-    _score.style.color = componentsData.gameScreen.scoreboard.fontColor;
-    _score.style.fontFamily = generalData.fontName;
-    _score.style.fontSize = componentsData.gameScreen.scoreboard.fontSize;
-    _score.style.background = componentsData.gameScreen.scoreboard.background;
-    componentsData.gameScreen.scoreboard.type !== 'square' && (_score.style.borderRadius = componentsData.gameScreen.scoreboard.type == 'circle' ? '50%' : '15px');
-    container.appendChild(_score);
-
-    if (SCORE > 0) {
-        var copyButton = document.createElement("div");
-        copyButton.id = componentsData.finishScreen.button.id;
-        copyButton.style.backgroundColor = componentsData.finishScreen.button.buttonColor;
-        copyButton.style.color = componentsData.finishScreen.button.textColor;
-        copyButton.style.padding = "15px 30px";
-        copyButton.style.fontSize = componentsData.finishScreen.button.fontSize;
-        copyButton.style.borderRadius = generalData.borderRadius;
-        copyButton.style.width = "fit-content";
-        copyButton.style.margin = "10px auto";
-        copyButton.style.cursor = "pointer";
-        copyButton.style.zIndex = "3";
-        copyButton.style.fontWeight = "bolder";
-        copyButton.style.fontFamily = generalData.fontName;
-        copyButton.innerText = componentsData.finishScreen.button.text;
-
-        container.appendChild(copyButton);
+    if (!lose) {
+        if (componentsData.finishScreen.title.use) {
+            var title = document.createElement("DIV");
+            title.id = "rmc-finish-title";
+            title.style.color = componentsData.finishScreen.title.textColor;
+            title.style.fontSize = componentsData.finishScreen.title.fontSize;
+            title.style.display = "inline-block";
+            title.style.margin = "15px 0";
+            title.style.width = 'inherit';
+            title.style.fontFamily = generalData.fontName;
+            title.innerText = utils.winCheck() ? componentsData.finishScreen.title.text : componentsData.finishScreen.title.loseText;
+            container.appendChild(title);
+        }
+        if (componentsData.finishScreen.message.use) {
+            var message = document.createElement("DIV");
+            message.id = "rmc-finish-message";
+            message.style.color = componentsData.finishScreen.message.textColor;
+            message.style.fontSize = componentsData.finishScreen.message.fontSize;
+            message.style.display = "inline-block";
+            message.style.margin = "15px 0";
+            message.style.width = 'inherit';
+            message.style.fontFamily = generalData.fontName;
+            message.innerText = utils.winCheck() ? componentsData.finishScreen.message.text : componentsData.finishScreen.message.loseText;
+            container.appendChild(message);
+        }
+        var _score = document.createElement("DIV");
+        _score.id = 'rmc-finish-finish';
+        _score.innerHTML = SCORE + ' SANİYEDE ÇÖZDÜNÜZ';
+        _score.innerHTML += '<br> ' + couponCodes[SCORE];
+        _score.style.transition = "1s all";
+        _score.style.padding = componentsData.gameScreen.scoreboard.type === 'circle' ? (utils.winCheck() ? '40px 30px' : '70px 20px') : '15px 10px';
+        _score.style.width = 'fit-content';
+        _score.style.margin = '0 auto';
+        _score.style.color = componentsData.gameScreen.scoreboard.fontColor;
+        _score.style.fontFamily = generalData.fontName;
+        _score.style.fontSize = componentsData.gameScreen.scoreboard.fontSize;
+        _score.style.background = componentsData.gameScreen.scoreboard.background;
+        componentsData.gameScreen.scoreboard.type !== 'square' && (_score.style.borderRadius = componentsData.gameScreen.scoreboard.type == 'circle' ? '50%' : '15px');
+        container.appendChild(_score);
 
         _score.addEventListener('click', function () {
-            utils.copyToClipboard();
+            utils.copyToClipboard(lose);
+            utils.pauseSound();
         });
+    }
+    else {
+        var img = document.createElement("img");
+        img.id = componentsData.finishScreen.lose.id;
+        img.src = componentsData.finishScreen.lose.src
+        img.style.display = "inline-block";
+        img.style.margin = "15px 0";
+        img.style.width = 'inherit';
+        container.appendChild(img);
+    }
 
+    var copyButton = document.createElement("div");
+    copyButton.id = componentsData.finishScreen.button.id;
+    copyButton.style.backgroundColor = lose ? componentsData.finishScreen.lose.loseButtonColor : componentsData.finishScreen.button.buttonColor;
+    copyButton.style.color = lose ? componentsData.finishScreen.lose.loseButtonTextColor : componentsData.finishScreen.button.textColor;
+    copyButton.style.padding = "15px 30px";
+    copyButton.style.fontSize = lose ? componentsData.finishScreen.lose.loseButtonTextSize : componentsData.finishScreen.button.fontSize;
+    copyButton.style.borderRadius = generalData.borderRadius;
+    copyButton.style.width = "fit-content";
+    copyButton.style.margin = "10px auto";
+    copyButton.style.cursor = "pointer";
+    copyButton.style.zIndex = "3";
+    copyButton.style.fontWeight = "bolder";
+    copyButton.style.fontFamily = generalData.fontName;
+    copyButton.innerText = lose ? componentsData.finishScreen.lose.buttonLabel : componentsData.finishScreen.button.text;
+
+
+    container.appendChild(copyButton);
+
+    if (!lose) {
         copyButton.addEventListener('click', function () {
-            utils.copyToClipboard();
+            utils.copyToClipboard(lose);
+            utils.pauseSound();
         });
     }
 
-    if (componentsData.finishScreen.goButton.use) {
-        var goButton = document.createElement("div");
-        goButton.id = componentsData.finishScreen.goButton.id;
-        goButton.style.backgroundColor = componentsData.finishScreen.goButton.buttonColor;
-        goButton.style.color = componentsData.finishScreen.goButton.textColor;
-        goButton.style.padding = "15px 30px";
-        goButton.style.fontSize = componentsData.finishScreen.goButton.fontSize;
-        goButton.style.borderRadius = generalData.borderRadius;
-        goButton.style.width = "fit-content";
-        goButton.style.cursor = "pointer";
-        goButton.style.zIndex = "3";
-        goButton.style.fontWeight = "bolder";
-        goButton.style.position = "absolute";
-        goButton.style.bottom = "70px";
-        goButton.style.left = "50%";
-        goButton.style.transform = "translate(-50%, 0%)";
-        goButton.style.fontFamily = generalData.fontName;
-        goButton.innerText = componentsData.finishScreen.goButton.text;
-
-        finishScreen.appendChild(goButton);
-        console.log(utils.getMobileOperatingSystem());
-
-        goButton.addEventListener("click", function () {
-            location.href = utils.getMobileOperatingSystem() == 'iOS' ? componentsData.finishScreen.goButton.iOSLink : componentsData.finishScreen.goButton.androidLink
-        });
-    }
-
+    copyButton.addEventListener("click", function () {
+        if (utils.getMobileOperatingSystem() == 'iOS' && componentsData.finishScreen.button.iOSLink) {
+            if (lose) {
+                redirection(componentsData.finishScreen.lose.loseIOSLink)
+            }
+            else {
+                redirection(componentsData.finishScreen.button.iOSLink)
+            }
+        }
+    });
 
     finishScreen.appendChild(container);
     MAIN_COMPONENT.appendChild(finishScreen);
 }
 
-function finish() {
-    createFinishScreen();
+function finish(lose) {
+    clearInterval(TIME_INTERVAL.timer)
+    createFinishScreen(lose);
     utils.saveCodeGotten()
-
     document.querySelector('#' + componentsData.gameScreen.id).remove();
+
 }
 
-function maxPairCalculator() {
-    componentsData.gameScreen.cards.forEach(card => {
-        MAX_PAIR_COUNT += card.length/2
-    });
+function maxPairCalculator(row, col) {
+    MAX_PAIR_COUNT = Math.floor((row * col) / 2)
+    console.log("MAX_PAIR_COUNT", MAX_PAIR_COUNT);
 }
 
 function finishChecker() {
+    // console.log(PAIR_COUNT,'----',MAX_PAIR_COUNT);
     if (PAIR_COUNT >= MAX_PAIR_COUNT) {
-        finish();
+        finish(false);
     }
 }
 
+function loseCheck() {
+    if (PAIR_COUNT < MAX_PAIR_COUNT) {
+        finish(true);
+    }
+}
+
+function promoCodeCalculator(data) {
+    let codes = { 0: "" }, counter = 1;
+    data.forEach(range => {
+        if (range.rangebottom == range.rangetop) {
+            codes[counter] = range.staticcode;
+            counter++;
+        }
+        else {
+            for (let index = range.rangebottom; index <= range.rangetop; index++) {
+                codes[counter] = range.staticcode;
+                counter++;
+            }
+        }
+    });
+
+    couponCodes = codes;
+}
+
+function scoreCalculator() {
+    let durationEl = document.querySelector('#' + componentsData.gameScreen.scoreboard.countDown.id)
+    console.log();
+}
+
+function addFonts() {
+    if (generalData.fontFiles === undefined) {
+        return
+    }
+    var addedFontFiles = [];
+    for (var fontFileIndex in generalData.fontFiles) {
+        var fontFile = generalData.fontFiles[fontFileIndex];
+        if (addedFontFiles.includes(fontFile)) {
+            continue;
+        }
+        var fontFamily = fontFile.split(".")[0];
+        var newStyle = document.createElement('style');
+        var cssContent = "@font-face{font-family:" + fontFamily + ";src:url('" + fontFile + "');}";
+        newStyle.appendChild(document.createTextNode(cssContent));
+        document.head.appendChild(newStyle);
+        addedFontFiles.push(fontFile);
+    }
+};
+
+function ARGBtoRGBA(argb) {
+    if (!argb || argb.length < 8) return argb
+
+    if (argb.substr(0, 1) !== '#') return argb.replace(/(..)(......)/, '$2$1')
+
+    return argb.replace(/#(..)(......)/, '#$2$1')
+}
+
+function fontSizeCalculator(BEFS) {
+    BEFS = parseInt(BEFS)
+    switch (BEFS) {
+        case 10:
+            return 28
+            break;
+        case 9:
+            return 26
+            break;
+        case 8:
+            return 24
+            break;
+        case 7:
+            return 22
+            break;
+        case 6:
+            return 20
+            break;
+        case 5:
+            return 18
+            break;
+        case 4:
+            return 16
+            break;
+        case 3:
+            return 14
+            break;
+        case 2:
+            return 12
+            break;
+        case 1:
+            return 10
+            break;
+        default:
+            return 18
+            break;
+    }
+}
+
+function slashController(text) {
+    if (!text) return text
+
+    let pos = text.indexOf('\\n');
+    while (pos > -1) {
+        text = text.replace("\\n", "\n");
+        pos = text.indexOf('\\n');
+    }
+    return text
+}
+
+function redirection(url) {
+    location.href = url
+}
+
+function getAndroidLink(lose) {
+    if (lose) {
+        if (componentsData.finishScreen.lose.loseAndroidLink) {
+            return componentsData.finishScreen.lose.loseAndroidLink
+        }
+        else {
+            return ""
+        }
+    } else {
+        if (componentsData.finishScreen.button.androidLink) {
+            return componentsData.finishScreen.button.androidLink
+        } else {
+            return ""
+        }
+    }
+}
 
 let utils = {
     randNum: (min, max) => {
@@ -972,19 +1576,6 @@ let utils = {
         cardSettings.cardWidth = w;
         cardSettings.cardHeight = h;
     },
-    getOffset: (el) => {
-        var _x = 0;
-        var _y = 0;
-        while (el && !isNaN(el.offsetLeft) && !isNaN(el.offsetTop)) {
-            _x += el.offsetLeft - el.scrollLeft;
-            _y += el.offsetTop - el.scrollTop;
-            el = el.offsetParent;
-        }
-        return {
-            top: _y,
-            left: _x
-        };
-    },
     startCountDown: (elem, seconds) => {
         var that = {};
 
@@ -997,24 +1588,26 @@ let utils = {
 
         that.count = function () {
             that.usedTime = Math.floor((+new Date() - that.startTime) / 10);
-
             var tt = that.totalTime - that.usedTime;
+            SCORE = Math.round(that.usedTime / 100)
+            // console.log("score",SCORE);
             if (tt <= 0) {
                 that.elem.innerHTML = '00:00.00';
                 clearInterval(that.timer);
-                finish();
+                loseCheck();
             } else {
                 var mi = Math.floor(tt / (60 * 100));
                 var ss = Math.floor((tt - mi * 60 * 100) / 100);
                 var ms = tt - Math.floor(tt / 100) * 100;
 
                 that.elem.innerHTML = that.fillZero(mi) + ":" + that.fillZero(ss) + "." + that.fillZero(ms.toFixed(0));
+                gameSettings.gameScreenSecondScoreEnable && updateScore(SCORE)
             }
         };
 
 
         if (!that.timer) {
-            that.timer = setInterval(that.count, 1);
+            that.timer = setInterval(that.count, 10);
         }
 
         that.fillZero = function (num) {
@@ -1034,19 +1627,60 @@ let utils = {
             return "Android";
         }
 
-        if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
+        if (/iPad|iPhone|iPod|Mac/.test(userAgent) && !window.MSStream) {
             return "iOS";
         }
 
         return "unknown";
     },
+    getBrowser: () => {
+        try {
+            // Opera 8.0+
+            var isOpera = (!!window.opr && !!opr.addons) || !!window.opera || navigator.userAgent.indexOf(' OPR/') >= 0;
+            if (isOpera) return "Opera"
+
+            // Firefox 1.0+
+            var isFirefox = typeof InstallTrigger !== 'undefined';
+            if (isFirefox) return "Firefox"
+
+            // Safari 3.0+ "[object HTMLElementConstructor]" 
+            var isSafari = /constructor/i.test(window.HTMLElement) || (function (p) { return p.toString() === "[object SafariRemoteNotification]"; })(!window['safari'] || (typeof safari !== 'undefined' && window['safari'].pushNotification));
+            if (!isSafari) isSafari = /iP(ad|hone|od).+Version\/[\d\.]+.*Safari/i.test(navigator.userAgent);
+
+            if (isSafari) return "Safari"
+
+            // Internet Explorer 6-11
+            var isIE = /*@cc_on!@*/false || !!document.documentMode;
+            if (isIE) return "IE"
+
+            // Edge 20+
+            var isEdge = !isIE && !!window.StyleMedia;
+            if (isEdge) return "Edge"
+
+            // Chrome 1 - 79
+            var isChrome = !!window.chrome && (!!window.chrome.webstore || !!window.chrome.runtime);
+            if (isChrome) return "Chrome"
+
+            // Edge (based on chromium) detection
+            var isEdgeChromium = isChrome && (navigator.userAgent.indexOf("Edg") != -1);
+            if (isEdgeChromium) return "EdgeChromium"
+
+            // Blink engine detection
+            // var isBlink = (isChrome || isOpera) && !!window.CSS;
+
+            return "unknown"
+        } catch (error) {
+            console.log("getBrowser error", error);
+            return "unknown"
+        }
+    },
     winCheck: () => {
         return SCORE > 0 ? true : false
     },
-    copyToClipboard: () => {
+    copyToClipboard: (lose) => {
         console.log("NATIVE COPYCLIPBORD");
         if (window.Android) {
-            Android.copyToClipboard(couponCodes[SCORE])
+            Android.copyToClipboard(couponCodes[SCORE], getAndroidLink(lose))
         } else if (window.webkit.messageHandlers.eventHandler) {
             window.webkit.messageHandlers.eventHandler.postMessage({
                 method: "copyToClipboard",
@@ -1097,7 +1731,42 @@ let utils = {
                 email: couponCodes[SCORE]
             })
         }
-    }
+    },
+    loadSound: () => {
+        AUDIO = document.createElement("audio")
+        AUDIO.src = generalData.sound;
+        AUDIO.currentTime = 0;
+        AUDIO.setAttribute("playsinline", true);
+        AUDIO.setAttribute("preload", "auto");
+        AUDIO.setAttribute("loop", true);
+        AUDIO.setAttribute("autoplay", true);
+        document.querySelector('head').appendChild(AUDIO);
+        try {
+            if (utils.getBrowser() == 'Safari') {
+                let html = document.querySelector('html');
+                html.addEventListener('touchstart', () => { AUDIO.play(); html.removeEventListener('touchstart', () => { }) })
+                html.addEventListener('click', () => { AUDIO.play(); html.removeEventListener('click', () => { }) })
+            }
+            else {
+                AUDIO.play();
+            }
+        } catch (error) {
+            console.log("loadSound error", error);
+        }
+    },
+    pauseSound: () => {
+        try {
+            const audio = document.querySelector("audio")
+            if (audio) {
+                !audio.paused && audio.pause();
+                audio.remove()
+            } else {
+                console.log("not closed sounnd");
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    },
 };
 
 /**
@@ -1106,8 +1775,6 @@ let utils = {
 function config() {
     document.body.setAttribute('style', '-webkit-user-select:none');
     CLICKABLE_DURATION = cardSettings.duration
-    utils.cardSizeCalculate(); // Card datası geldikten sonra çalıştırılmalı.
-    maxPairCalculator();
     pageChecker();
     createCloseButton();
 }

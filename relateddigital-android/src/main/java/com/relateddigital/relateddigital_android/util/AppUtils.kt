@@ -819,7 +819,7 @@ object AppUtils {
         }
         val fontFamily: String = extendedProps.fontFamily!!
 
-        val htmlStr: String = writeHtmlToFile(context, "findtowin")
+        val htmlStr: String = writeHtmlToFile(context, "find_to_win")
 
         if (fontFamily == "custom") {
             val fontExtension = getFontNameWithExtension(
