@@ -770,7 +770,7 @@ object AppUtils {
         if (giftRainModel == null || extendedProps == null) {
             return null
         }
-        val fontFamily: String = extendedProps.fontFamily!!
+        val fontFamily: String = extendedProps.fontFamily ?: return null
 
         val htmlStr: String = writeHtmlToFile(context, "gift_catch")
 
@@ -817,7 +817,7 @@ object AppUtils {
         if (findToWinModel == null || extendedProps == null) {
             return null
         }
-        val fontFamily: String = extendedProps.fontFamily!!
+        val fontFamily: String = extendedProps.fontFamily ?: return null
 
         val htmlStr: String = writeHtmlToFile(context, "find_to_win")
 
