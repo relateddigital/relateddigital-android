@@ -118,10 +118,16 @@ class FindToWinActivity : FragmentActivity(), FindToWinCompleteInterface,
     }
 
     override fun copyToClipboard(couponCode: String?, link: String?) {
-        val clipboard = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
-        val clip = ClipData.newPlainText("Coupon Code", couponCode)
-        clipboard.setPrimaryClip(clip)
-        Toast.makeText(applicationContext, getString(R.string.copied_to_clipboard), Toast.LENGTH_LONG).show()
+        if(!couponCode.isNullOrEmpty()) {
+            val clipboard = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
+            val clip = ClipData.newPlainText("Coupon Code", couponCode)
+            clipboard.setPrimaryClip(clip)
+            Toast.makeText(
+                applicationContext,
+                getString(R.string.copied_to_clipboard),
+                Toast.LENGTH_LONG
+            ).show()
+        }
         if(!link.isNullOrEmpty()) {
             this.link = link
         }
