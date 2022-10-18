@@ -591,6 +591,11 @@ object RequestHandler {
 
         val model = RelatedDigital.getRelatedDigitalModel(context)
 
+        if (model.getToken().isEmpty() || (model.getGoogleAppAlias().isEmpty() && model.getHuaweiAppAlias().isEmpty()) ) {
+            Log.e(LOG_TAG, "token or appKey cannot be null!")
+            return
+        }
+
         if(!model.isEqual(RelatedDigital.getPreviousModel()) && model.isValid(context)) {
             RelatedDigital.updatePreviousModel(context)
 
@@ -601,6 +606,11 @@ object RequestHandler {
     fun createRegisterEmailRequest(context: Context, registerEmailModel: RelatedDigitalModel) {
         if (Build.VERSION.SDK_INT < Constants.SDK_MIN_API_VERSION) {
             Log.e(LOG_TAG, "RelatedDigital SDK requires min API level 21!")
+            return
+        }
+
+        if (registerEmailModel.getToken().isEmpty() || (registerEmailModel.getGoogleAppAlias().isEmpty() && registerEmailModel.getHuaweiAppAlias().isEmpty()) ) {
+            Log.e(LOG_TAG, "token or appKey cannot be null!")
             return
         }
 
