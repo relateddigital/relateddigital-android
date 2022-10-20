@@ -63,14 +63,6 @@
         </service>
 
         <service
-            android:name=".push.services.RelatedDigitalHuaweiMessagingService"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="com.huawei.push.action.MESSAGING_EVENT" />
-            </intent-filter>
-        </service>
-
-        <service
             android:name="com.relateddigital.relateddigital_android.geofence.GeofenceTransitionsIntentService"
             android:enabled="true"
             android:permission="android.permission.BIND_JOB_SERVICE" />
