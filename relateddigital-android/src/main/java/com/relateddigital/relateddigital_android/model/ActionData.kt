@@ -155,6 +155,24 @@ class ActionData : Serializable {
     @SerializedName("secondPopup_videourl2")
     var mSecondPopupVideoUrl2: String? = null
 
+    @SerializedName("second_button_function")
+    var mSecondButtonFunction: String? = null
+
+    @SerializedName("second_button_text")
+    var mSecondButtonText: String? = null
+
+    @SerializedName("second_button_text_color")
+    var mSecondButtonTextColor: String? = null
+
+    @SerializedName("second_button_color")
+    var mSecondButtonColor: String? = null
+
+    @SerializedName("second_button_ios_lnk")
+    var mSecondButtonIosLink: String? = null
+
+    @SerializedName("second_button_android_lnk")
+    var mSecondButtonAndroidLink: String? = null
+
 
     fun getFontFamily(context: Context): Typeface? {
         if (mFontFamily == null || mFontFamily == "") {

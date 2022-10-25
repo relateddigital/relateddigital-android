@@ -145,6 +145,7 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
     }
 
     private fun setTemplate() {
+        binding.btnTemplateSecond.visibility = View.GONE
         if (!mInAppMessage!!.mActionData!!.mBackground.isNullOrEmpty()) {
             try {
                 binding.llBack.setBackgroundColor(Color.parseColor(mInAppMessage!!.mActionData!!.mBackground))
@@ -158,6 +159,9 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
                 setTitle()
                 setBody()
                 setButton()
+                if(!mInAppMessage!!.mActionData!!.mSecondButtonFunction.isNullOrEmpty()) {
+                    setupSecondButton()
+                }
                 setPromotionCode()
                 binding.ratingBar.visibility = View.GONE
                 binding.smileRating.visibility = View.GONE
@@ -444,6 +448,79 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
                     }
                 }
             }
+        }
+    }
+
+    private fun setupSecondButton() {
+        binding.btnTemplateSecond.visibility = View.VISIBLE
+        binding.btnTemplateSecond.text = mInAppMessage!!.mActionData!!.mSecondButtonText
+        if (!mInAppMessage!!.mActionData!!.mSecondButtonTextColor.isNullOrEmpty()) {
+            try {
+                binding.btnTemplateSecond.setTextColor(Color.parseColor(mInAppMessage!!.mActionData!!.mSecondButtonTextColor))
+            } catch (e: Exception) {
+                Log.w(
+                    LOG_TAG,
+                    "Could not parse the data given for button text color\nSetting the default value."
+                )
+                e.printStackTrace()
+                binding.btnTemplateSecond.setTextColor(
+                    ContextCompat.getColor(
+                        applicationContext,
+                        R.color.black
+                    )
+                )
+            }
+        } else {
+            binding.btnTemplateSecond.setTextColor(
+                ContextCompat.getColor(
+                    applicationContext,
+                    R.color.black
+                )
+            )
+        }
+        if (!mInAppMessage!!.mActionData!!.mSecondButtonColor.isNullOrEmpty()) {
+            try {
+                binding.btnTemplateSecond.setBackgroundColor(Color.parseColor(mInAppMessage!!.mActionData!!.mSecondButtonColor))
+            } catch (e: Exception) {
+                Log.w(
+                    LOG_TAG,
+                    "Could not parse the data given for button color\nSetting the default value."
+                )
+                e.printStackTrace()
+            }
+        }
+
+        binding.btnTemplateSecond.setOnClickListener {
+            RequestHandler.createInAppNotificationClickRequest(
+                applicationContext,
+                mInAppMessage,
+                rateReport
+            )
+            if (buttonCallback != null) {
+                RelatedDigital.setInAppButtonInterface(null)
+                buttonCallback!!.onPress(mInAppMessage!!.mActionData!!.mSecondButtonAndroidLink)
+            } else {
+                if (mInAppMessage!!.mActionData!!.mSecondButtonFunction == Constants.BUTTON_LINK) {
+                    if (!mInAppMessage!!.mActionData!!.mSecondButtonAndroidLink.isNullOrEmpty()) {
+                        try {
+                            val viewIntent = Intent(
+                                Intent.ACTION_VIEW,
+                                StringUtils.getURIfromUrlString(mInAppMessage!!.mActionData!!.mSecondButtonAndroidLink)
+                            )
+                            startActivity(viewIntent)
+                        } catch (e: ActivityNotFoundException) {
+                            Log.i(
+                                LOG_TAG,
+                                "User doesn't have an activity for notification URI"
+                            )
+                        }
+                    }
+                } else {
+                    AppUtils.goToNotificationSettings(applicationContext)
+                }
+            }
+            InAppUpdateDisplayState.releaseDisplayState(mIntentId)
+            finish()
         }
     }
 
