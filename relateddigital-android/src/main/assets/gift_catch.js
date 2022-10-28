@@ -1636,33 +1636,35 @@ function slashController(text) {
     return text
 }
 
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 /**
  * Difficulty level check
  */
 function setDifficulty() {
     switch (generalData.difficulty) {
         case 1:
-            difficulty.use = { ...difficulty.easy };
+            difficulty.use = _extends({}, difficulty.easy);
             timeOuts(1000, 1200);
             break;
         case 2:
-            difficulty.use = { ...difficulty.normal };
+            difficulty.use = _extends({}, difficulty.normal);
             timeOuts(700, 900);
             break;
         case 3:
-            difficulty.use = { ...difficulty.mid };
+            difficulty.use = _extends({}, difficulty.mid);
             timeOuts(400, 700);
             break;
         case 4:
-            difficulty.use = { ...difficulty.hard };
+            difficulty.use = _extends({}, difficulty.hard);
             timeOuts(100, 150);
             break;
         default:
-            difficulty.use = { ...difficulty.normal };
+            difficulty.use = _extends({}, difficulty.normal);
             timeOuts(700, 900);
             break;
     }
-    console.log(difficulty.use)
+    console.log(difficulty.use);
 }
 
 /**
