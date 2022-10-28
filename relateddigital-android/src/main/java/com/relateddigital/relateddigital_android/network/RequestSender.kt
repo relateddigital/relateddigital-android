@@ -215,7 +215,7 @@ object RequestSender {
                                 val actionsResponse = response.body()
                                 if (actionsResponse != null) {
                                     when {
-                                        actionsResponse.mSpinToWinList!!.isNotEmpty() -> {
+                                        !actionsResponse.mSpinToWinList.isNullOrEmpty() -> {
                                             ActivityUtils.parentActivity = currentRequest.parent
                                             val intent =
                                                     Intent(
@@ -227,7 +227,7 @@ object RequestSender {
                                             intent.putExtra("spin-to-win-data", spinToWinModel)
                                             currentRequest.parent!!.startActivity(intent)
                                         }
-                                        actionsResponse.mScratchToWinList!!.isNotEmpty() -> {
+                                        !actionsResponse.mScratchToWinList.isNullOrEmpty() -> {
                                             val intent =
                                                     Intent(
                                                             currentRequest.parent,
@@ -241,7 +241,7 @@ object RequestSender {
                                             )
                                             currentRequest.parent!!.startActivity(intent)
                                         }
-                                        actionsResponse.mMailSubscriptionForm!!.isNotEmpty() -> {
+                                        !actionsResponse.mMailSubscriptionForm.isNullOrEmpty() -> {
 
                                             if(!actionsResponse.mMailSubscriptionForm!![0].actiondata!!.taTemplate.isNullOrEmpty()
                                                 && actionsResponse.mMailSubscriptionForm!![0].actiondata!!.taTemplate == "customizable") {
@@ -262,14 +262,14 @@ object RequestSender {
                                                 )
                                             }
                                         }
-                                        actionsResponse.mProductStatNotifierList!!.isNotEmpty() -> {
+                                        !actionsResponse.mProductStatNotifierList.isNullOrEmpty() -> {
                                             val socialProofFragment: SocialProofFragment = SocialProofFragment.newInstance(actionsResponse.mProductStatNotifierList!![0])
 
                                             val transaction : FragmentTransaction= (currentRequest.parent!! as FragmentActivity).supportFragmentManager.beginTransaction()
                                             transaction.replace(android.R.id.content, socialProofFragment)
                                             transaction.commit()
                                         }
-                                        actionsResponse.mDrawer!!.isNotEmpty() -> {
+                                        !actionsResponse.mDrawer.isNullOrEmpty() -> {
                                             val inAppNotificationFragment = InAppNotificationFragment.newInstance(
                                                 actionsResponse.mDrawer!![0]
                                             )
@@ -278,7 +278,7 @@ object RequestSender {
                                             transaction.replace(android.R.id.content, inAppNotificationFragment)
                                             transaction.commit()
                                         }
-                                        actionsResponse.mGiftRain!!.isNotEmpty() -> {
+                                        !actionsResponse.mGiftRain.isNullOrEmpty() -> {
                                             ActivityUtils.parentActivity = currentRequest.parent
                                             val intent =
                                                 Intent(
@@ -290,7 +290,7 @@ object RequestSender {
                                             intent.putExtra("gift-rain-data", giftRainModel)
                                             currentRequest.parent!!.startActivity(intent)
                                         }
-                                        actionsResponse.mFindToWin!!.isNotEmpty() -> {
+                                        !actionsResponse.mFindToWin.isNullOrEmpty() -> {
                                             ActivityUtils.parentActivity = currentRequest.parent
                                             val intent =
                                                 Intent(
@@ -302,11 +302,29 @@ object RequestSender {
                                             intent.putExtra("find-to-win-data", findToWinModel)
                                             currentRequest.parent!!.startActivity(intent)
                                         }
+                                        !actionsResponse.mAppBanner.isNullOrEmpty() -> {
+                                            val visilabsResponse = VisilabsResponse(
+                                                JSONObject(Gson().toJson(actionsResponse.mAppBanner!![0])),
+                                                null,
+                                                null,
+                                                null,
+                                                null
+                                            )
+                                            currentRequest.visilabsCallback?.success(visilabsResponse)
+                                        }
                                         else -> {
                                             Log.e(
                                                     LOG_TAG,
                                                     "Response is null : " + response.raw().request.url.toString()
                                             )
+                                            val visilabsResponse = VisilabsResponse(
+                                                null,
+                                                null,
+                                                "Response is empty",
+                                                null,
+                                                "Response is empty"
+                                            )
+                                            currentRequest.visilabsCallback?.fail(visilabsResponse)
                                         }
                                     }
                                 } else {
@@ -314,6 +332,14 @@ object RequestSender {
                                             LOG_TAG,
                                             "Response is null : " + response.raw().request.url.toString()
                                     )
+                                    val visilabsResponse = VisilabsResponse(
+                                        null,
+                                        null,
+                                        "Response is empty",
+                                        null,
+                                        "Response is empty"
+                                    )
+                                    currentRequest.visilabsCallback?.fail(visilabsResponse)
                                 }
                             } catch (e: java.lang.Exception) {
                                 e.printStackTrace()
@@ -329,6 +355,14 @@ object RequestSender {
                                         LOG_TAG,
                                         "Fail Request Message : The response is not in the correct format"
                                 )
+                                val visilabsResponse = VisilabsResponse(
+                                    null,
+                                    null,
+                                    "Fail Request Message : The response is not in the correct format",
+                                    null,
+                                    "Fail Request Message : The response is not in the correct format"
+                                )
+                                currentRequest.visilabsCallback?.fail(visilabsResponse)
                             }
                         } else {
                             applyFailConditions(call.request().url.toString(), model, context)
@@ -337,6 +371,14 @@ object RequestSender {
                                     "Fail InApp Request : " + call.request().url.toString()
                             )
                             Log.w(LOG_TAG, "Fail Request Response Code : " + response.code())
+                            val visilabsResponse = VisilabsResponse(
+                                null,
+                                null,
+                                "Fail InApp Request",
+                                null,
+                                "Fail InApp Request"
+                            )
+                            currentRequest.visilabsCallback?.fail(visilabsResponse)
                         }
                     }
 
@@ -346,6 +388,14 @@ object RequestSender {
                                 LOG_TAG,
                                 "Fail Request Message : " + t.message
                         )
+                        val visilabsResponse = VisilabsResponse(
+                            null,
+                            null,
+                            "Fail Request",
+                            null,
+                            "Fail Request"
+                        )
+                        currentRequest.visilabsCallback?.fail(visilabsResponse)
                     }
                 })
             }

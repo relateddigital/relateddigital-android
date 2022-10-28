@@ -19,6 +19,7 @@ import com.bumptech.glide.load.MultiTransformation
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.GranularRoundedCorners
 import com.relateddigital.relateddigital_android.R
+import com.relateddigital.relateddigital_android.model.AppBanner
 
 
 class BannerCarouselAdapter(private val mContext: Context,
@@ -29,6 +30,7 @@ class BannerCarouselAdapter(private val mContext: Context,
     private var mRunnable: Runnable? = null
     private var mPosition = 0
     private var isScrolling = false
+    private var mAppBanner: AppBanner? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BannerHolder {
         val context = parent.context
@@ -51,7 +53,7 @@ class BannerCarouselAdapter(private val mContext: Context,
                         GranularRoundedCorners(30f, 30f, 30f, 30f)
                     )
                 )
-                .load("https://media-exp1.licdn.com/dms/image/C4E0BAQGmNKZy5oLtCg/company-logo_200_200/0/1639655091397?e=2147483647&v=beta&t=Bs-WyGPQ6VLsXN9TFKQo6AuZJ8zZxaRmTG6gLuvhAPU")
+                .load(mAppBanner!!.actionData!!.appBanners!![position].image)
                 .into(bannerHolder.swipeImageView!!)
 
             bannerHolder.dotIndicator!!.removeAllViews()
@@ -78,7 +80,7 @@ class BannerCarouselAdapter(private val mContext: Context,
             }
 
             bannerHolder.swipeImageView!!.setOnClickListener {
-                mBannerItemClickListener!!.bannerItemClicked("https://www.relateddigital.com/") // TODO : Real
+                mBannerItemClickListener!!.bannerItemClicked(mAppBanner!!.actionData!!.appBanners!![position].androidLink)
             }
         } else {
             Glide.with(mContext)
@@ -89,26 +91,27 @@ class BannerCarouselAdapter(private val mContext: Context,
                         GranularRoundedCorners(30f, 30f, 30f, 30f)
                     )
                 )
-                .load("https://media-exp1.licdn.com/dms/image/C4E0BAQGmNKZy5oLtCg/company-logo_200_200/0/1639655091397?e=2147483647&v=beta&t=Bs-WyGPQ6VLsXN9TFKQo6AuZJ8zZxaRmTG6gLuvhAPU")
+                .load(mAppBanner!!.actionData!!.appBanners!![position].image)
                 .into(bannerHolder.slideImageView!!)
 
             val numStr = (position + 1).toString() + "/" + itemCount.toString()
             bannerHolder.numberIndicator!!.text = numStr
 
             bannerHolder.slideImageView!!.setOnClickListener {
-                mBannerItemClickListener!!.bannerItemClicked("https://www.relateddigital.com/") // TODO : Real
+                mBannerItemClickListener!!.bannerItemClicked(mAppBanner!!.actionData!!.appBanners!![position].androidLink)
             }
         }
     }
 
     override fun getItemCount(): Int {
-        return 5 // TODO : real size here
+        return mAppBanner?.actionData?.appBanners?.size ?: 0
     }
 
-    fun setBannerList(recyclerView: RecyclerView) {
-        // TODO : real data here
-        isSwipe = true
+    fun setBannerList(recyclerView: RecyclerView, appBanner: AppBanner) {
+        mAppBanner = appBanner
+        isSwipe = mAppBanner!!.actionData!!.transitionAction == "swipe"
         val slidePeriod = 3
+
         mRecyclerView = recyclerView
         if (!isSwipe) {
             mRecyclerView.layoutManager =

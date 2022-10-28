@@ -6,41 +6,17 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/dp_16"
-        android:orientation="horizontal"
-        android:paddingLeft="4.0dp"
-        android:paddingTop="5.0dp"
-        android:paddingRight="4.0dp"
-        android:paddingBottom="1.0dp">
-
-        <EditText
-            android:id="@+id/et_banner_id"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_margin="2dp"
-            android:layout_weight="1"
-            android:autofillHints="@string/banner_id_optional"
-            android:hint="@string/banner_id_optional"
-            android:inputType="number"
-            android:textSize="12sp"
-            tools:ignore="LabelFor" />
-
-        <Button
-            android:id="@+id/btn_show_banner"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_margin="2dp"
-            android:layout_weight="1"
-            android:background="@drawable/rounded_corners_background"
-            android:text="@string/show_banner" />
-
-    </LinearLayout>
-
     <com.relateddigital.relateddigital_android.inapp.bannercarousel.BannerRecyclerView
         android:id="@+id/bannerListView"
         android:layout_width="match_parent"
-        android:layout_height="100dp"/>
+        android:layout_height="150dp"/>
+
+    <Button
+        android:id="@+id/btn_show_banner"
+        android:layout_gravity="center"
+        android:layout_width="150dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/rounded_corners_background"
+        android:text="@string/show_banner" />
 </LinearLayout>

@@ -31,6 +31,9 @@ class ActionResponse : Serializable {
     @SerializedName("FindToWin")
     var mFindToWin: List<FindToWin>? = null
 
+    @SerializedName("AppBanner")
+    var mAppBanner: List<AppBanner>? = null
+
     @SerializedName("VERSION")
     var version: Int? = null
 

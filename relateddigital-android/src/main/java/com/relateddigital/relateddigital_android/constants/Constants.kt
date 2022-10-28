@@ -55,7 +55,7 @@ class Constants {
         const val REQUEST_SUBS_EMAIL_KEY = "OM.subsemail"
         const val REQUEST_ACTION_ID_KEY = "action_id"
         const val REQUEST_ACTION_TYPE_KEY = "action_type"
-        const val REQUEST_ACTION_TYPE_VAL = "MailSubscriptionForm~SpinToWin~ScratchToWin~ProductStatNotifier~drawer~GiftRain~FindToWin"
+        const val REQUEST_ACTION_TYPE_VAL = "MailSubscriptionForm~SpinToWin~ScratchToWin~ProductStatNotifier~drawer~GiftRain~FindToWin~AppBanner"
 
 
         var VISILABS_PARAMETERS: List<VisilabsParameter>? = null
@@ -204,7 +204,7 @@ class Constants {
         const val PAYLOAD_SP_ARRAY_ID_KEY = "messages_with_id"
         const val NOTIFICATION_LOGIN_ID_KEY = "notification_login_id_key"
 
-        const val BANNER_CAROUSEL_ACTION_TYPE_VAL = "BannerTest" // TODO fix this after BE gets ready
+        const val BANNER_CAROUSEL_ACTION_TYPE_VAL = "AppBanner"
 
     }
 }

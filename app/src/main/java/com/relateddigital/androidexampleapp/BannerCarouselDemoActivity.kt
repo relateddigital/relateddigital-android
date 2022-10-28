@@ -5,7 +5,6 @@ import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.relateddigital.androidexampleapp.databinding.ActivityBannerCarouselDemoBinding
@@ -35,14 +34,11 @@ class BannerCarouselDemoActivity : AppCompatActivity() {
         }
 
         binding!!.btnShowBanner.setOnClickListener {
-            hideKeyboard(this)
-            binding!!.etBannerId.clearFocus()
             showBanner()
         }
     }
 
     private fun showBanner() {
-        val bannerId = binding!!.etBannerId.text.toString().trim()
         val bannerRequestListener = object : BannerRequestListener {
             override fun onRequestResult(isAvailable: Boolean) {
                 if (!isAvailable) {
@@ -50,27 +46,15 @@ class BannerCarouselDemoActivity : AppCompatActivity() {
                 }
             }
         }
-        if (bannerId.isEmpty()) {
-            binding!!.bannerListView.requestBannerCarouselAction(
-                context = applicationContext,
-                bannerRequestListener = bannerRequestListener,
-                bannerItemClickListener = bannerItemClickListener)
-        } else {
-            binding!!.bannerListView.requestBannerCarouselAction(
-                context = applicationContext,
-                actionId = bannerId,
-                bannerRequestListener = bannerRequestListener,
-                bannerItemClickListener = bannerItemClickListener)
-        }
-    }
 
-    private fun hideKeyboard(activity: AppCompatActivity) {
-        val imm = activity.getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
-        var view = activity.currentFocus
-        if (view == null) {
-            view = View(activity)
-        }
-        imm.hideSoftInputFromWindow(view.windowToken, 0)
+        val properties = HashMap<String, String>()
+        properties["OM.inapptype"] = "banner_carousel"
+
+        binding!!.bannerListView.requestBannerCarouselAction(
+            context = applicationContext,
+            properties = properties,
+            bannerRequestListener = bannerRequestListener,
+            bannerItemClickListener = bannerItemClickListener)
     }
 
     companion object {

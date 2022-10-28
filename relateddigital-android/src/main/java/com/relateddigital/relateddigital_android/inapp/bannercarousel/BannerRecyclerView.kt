@@ -7,10 +7,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SnapHelper
+import com.google.gson.Gson
 import com.relateddigital.relateddigital_android.RelatedDigital
 import com.relateddigital.relateddigital_android.constants.Constants
 import com.relateddigital.relateddigital_android.inapp.VisilabsCallback
 import com.relateddigital.relateddigital_android.inapp.VisilabsResponse
+import com.relateddigital.relateddigital_android.model.AppBanner
+import com.relateddigital.relateddigital_android.network.RequestHandler
 
 
 class BannerRecyclerView : RecyclerView {
@@ -23,7 +26,7 @@ class BannerRecyclerView : RecyclerView {
     constructor(context: Context?, attrs: AttributeSet?, defStyle: Int) : super(context!!, attrs, defStyle)
 
     fun requestBannerCarouselAction(context: Context,
-                                    actionId: String? = null,
+                                    properties: HashMap<String, String>?,
                                     bannerRequestListener: BannerRequestListener? = null,
                                     bannerItemClickListener: BannerItemClickListener? = null) {
 
@@ -36,30 +39,12 @@ class BannerRecyclerView : RecyclerView {
         if(RelatedDigital.getRelatedDigitalModel(context).getIsInAppNotificationEnabled()) {
             mBannerItemClickListener = bannerItemClickListener
             mBannerRequestListener = bannerRequestListener
-            val parameters = HashMap<String, String>()
-            if(actionId.isNullOrEmpty()) {
-                parameters[Constants.REQUEST_ACTION_TYPE_KEY] = Constants.BANNER_CAROUSEL_ACTION_TYPE_VAL
-            } else {
-                parameters[Constants.REQUEST_ACTION_ID_KEY] = actionId
-            }
 
-            //TODO : real request here when BE gets ready
-            /*RequestHandler.createStoryActionRequest(
+            RequestHandler.createBannerCarouselActionRequest(
                 mContext,
                 getBannerCallback(context),
-                parameters
-            )*/
-
-            // TODO : remove this when BE gets ready
-            val bannerCarouselAdapter = BannerCarouselAdapter(context, mBannerItemClickListener)
-            layoutManager = LinearLayoutManager(mContext, LinearLayoutManager.HORIZONTAL, false)
-            bannerCarouselAdapter.setBannerList(this)
-            setHasFixedSize(true)
-            adapter = bannerCarouselAdapter
-            val snapHelper: SnapHelper = PagerSnapHelper()
-            snapHelper.attachToRecyclerView(this)
-
-
+                properties
+            )
         } else {
             Log.e(LOG_TAG, "In-app notification is not enabled." +
                         "Call RelatedDigital.setIsInAppNotificationEnabled() first")
@@ -73,7 +58,14 @@ class BannerRecyclerView : RecyclerView {
             override fun success(response: VisilabsResponse?) {
                 mBannerRequestListener?.onRequestResult(true)
                 try {
-                    // TODO : get the real data and set it to adapter when BE gets ready
+                    val bannerCarouselAdapter = BannerCarouselAdapter(context, mBannerItemClickListener)
+                    layoutManager = LinearLayoutManager(mContext, LinearLayoutManager.HORIZONTAL, false)
+                    bannerCarouselAdapter.setBannerList(this@BannerRecyclerView, Gson().fromJson(response!!.json.toString(), AppBanner::class.java))
+                    setHasFixedSize(true)
+                    adapter = bannerCarouselAdapter
+                    val snapHelper: SnapHelper = PagerSnapHelper()
+                    snapHelper.attachToRecyclerView(this@BannerRecyclerView)
+
                 } catch (ex: Exception) {
                     Log.e(LOG_TAG, ex.message, ex)
                     mBannerRequestListener?.onRequestResult(false)
