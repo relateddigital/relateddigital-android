@@ -1,11 +1,16 @@
 package com.relateddigital.androidexampleapp
 
 import android.app.Application
+import android.text.TextUtils
 import android.util.Log
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.messaging.FirebaseMessaging
+import com.huawei.agconnect.AGConnectOptionsBuilder
+import com.huawei.hms.aaid.HmsInstanceId
+import com.huawei.hms.common.ApiException
 import com.relateddigital.relateddigital_android.RelatedDigital
 import com.relateddigital.relateddigital_android.model.RDNotificationPriority
+import com.relateddigital.relateddigital_android.util.GoogleUtils
 
 class MainApplication : Application() {
     override fun onCreate() {
@@ -25,7 +30,11 @@ class MainApplication : Application() {
         )
 
         // Enable Push Notifications
-        getFirebaseToken()
+        if(GoogleUtils.checkPlayService(this)) {
+            getFirebaseToken()
+        } else {
+            getHuaweiToken()
+        }
 
         // Enable Geofencing
         RelatedDigital.setIsGeofenceEnabled(
@@ -61,6 +70,43 @@ class MainApplication : Application() {
                     notificationPriority = RDNotificationPriority.NORMAL
                 )
             })
+    }
+
+    private fun getHuaweiToken() {
+        object : Thread() {
+            override fun run() {
+                try {
+                    val appId = AGConnectOptionsBuilder().build(applicationContext)
+                        .getString("client/app_id")
+                    val token = HmsInstanceId.getInstance(applicationContext).getToken(appId, "HCM")
+                    if (TextUtils.isEmpty(token) || token == null) {
+                        Log.e("Huawei Token : ", "Empty token!!!")
+                        return
+                    }
+                    Log.i("Huawei Token", "" + token)
+
+                    // Enable Push Notifications
+                    RelatedDigital.setIsPushNotificationEnabled(
+                        context = applicationContext,
+                        isPushNotificationEnabled = true,
+                        googleAppAlias = Constants.GOOGLE_APP_ALIAS,
+                        huaweiAppAlias = Constants.HUAWEI_APP_ALIAS,
+                        token = token,
+                        notificationSmallIcon = R.drawable.text_icon,
+                        notificationSmallIconDarkMode = R.drawable.text_icon_dark_mode,
+                        isNotificationLargeIcon = true,
+                        notificationLargeIcon = R.mipmap.ic_launcher,
+                        notificationLargeIconDarkMode = R.mipmap.ic_launcher,
+                        notificationPushIntent = "com.relateddigital.androidexampleapp.PushNotificationActivity",
+                        notificationChannelName = "relateddigital-android-test",
+                        notificationColor = "#d1dbbd",
+                        notificationPriority = RDNotificationPriority.NORMAL
+                    )
+                } catch (e: ApiException) {
+                    Log.e("Huawei Token", "Getting the token failed! $e")
+                }
+            }
+        }.start()
     }
 
 }
