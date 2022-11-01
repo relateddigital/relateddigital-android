@@ -12,6 +12,9 @@
     <content url="file://$MODULE_DIR$/../..">
       <excludeFolder url="file://$MODULE_DIR$/../../.gradle" />
       <excludeFolder url="file://$MODULE_DIR$/../../build" />
+      <excludeFolder url="file://$MODULE_DIR$/app" />
+      <excludeFolder url="file://$MODULE_DIR$/relateddigital-android" />
+      <excludeFolder url="file://$MODULE_DIR$/../../scripts" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

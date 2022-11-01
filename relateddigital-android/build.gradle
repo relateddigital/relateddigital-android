@@ -5,20 +5,11 @@ plugins {
 }
 group = 'com.github.relateddigital'
 
-task androidSourcesJar(type: Jar) {
-    classifier 'sources'
-    from android.sourceSets.main.java.srcDirs
-}
-
-project.afterEvaluate {
-    publishing {
-        publications {
-            release(MavenPublication) {
-                from components.release
-                artifact androidSourcesJar
-            }
-        }
-    }
+ext {
+    PUBLISH_GROUP_ID = 'com.github.relateddigital'
+    PUBLISH_VERSION = "1.0.3"
+    PUBLISH_VERSION_CODE = "50"
+    PUBLISH_ARTIFACT_ID = 'relateddigital-android'
 }
 
 android {
@@ -42,8 +33,8 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
     }
     kotlinOptions {
         jvmTarget = '1.8'
@@ -87,3 +78,5 @@ allprojects {
         enabled = false
     }
 }
+
+apply from: "${rootProject.projectDir}/scripts/publish-module.gradle"

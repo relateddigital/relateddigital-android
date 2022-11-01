@@ -38,3 +38,4 @@ local.properties
 /app/google-services.json
 /app/agconnect-services.json
 /app/keystore.jks
+/scripts/publish-root.gradle
