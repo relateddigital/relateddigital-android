@@ -5,6 +5,22 @@ plugins {
 }
 group = 'com.github.relateddigital'
 
+task androidSourcesJar(type: Jar) {
+    classifier 'sources'
+    from android.sourceSets.main.java.srcDirs
+}
+
+project.afterEvaluate {
+    publishing {
+        publications {
+            release(MavenPublication) {
+                from components.release
+                artifact androidSourcesJar
+            }
+        }
+    }
+}
+
 ext {
     PUBLISH_GROUP_ID = 'com.github.relateddigital'
     PUBLISH_VERSION = "1.0.3"
