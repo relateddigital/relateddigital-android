@@ -83,7 +83,7 @@ class GiftCatchJavaScriptInterface internal constructor(webViewDialogFragment: G
      * This method saves the promotion code shown
      */
     @JavascriptInterface
-    fun saveCodeGotten(code: String, email: String) {
+    fun saveCodeGotten(code: String, email: String, report: String) {
         sendPromotionCodeInfo(email = email, promotionCode = code)
         mShowCodeInterface.onCodeShown(code)
     }
