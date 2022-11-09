@@ -3,9 +3,12 @@ package com.relateddigital.relateddigital_android.inapp.giftcatch
 import android.util.Log
 import android.webkit.JavascriptInterface
 import com.google.gson.Gson
+import com.relateddigital.relateddigital_android.RelatedDigital
+import com.relateddigital.relateddigital_android.constants.Constants
 import com.relateddigital.relateddigital_android.model.GiftRain
 import com.relateddigital.relateddigital_android.model.MailSubReport
 import com.relateddigital.relateddigital_android.network.RequestHandler
+import java.util.HashMap
 
 class GiftCatchJavaScriptInterface internal constructor(webViewDialogFragment: GiftCatchWebDialogFragment,
                                                         @get:JavascriptInterface val response: String) {
@@ -79,7 +82,8 @@ class GiftCatchJavaScriptInterface internal constructor(webViewDialogFragment: G
      * This method saves the promotion code shown
      */
     @JavascriptInterface
-    fun saveCodeGotten(code: String) {
+    fun saveCodeGotten(code: String, email: String, actionId: String) {
+        sendPromotionCodeInfo(email = email, promotionCode = code, actionId = actionId)
         mShowCodeInterface.onCodeShown(code)
     }
 
@@ -91,5 +95,18 @@ class GiftCatchJavaScriptInterface internal constructor(webViewDialogFragment: G
         mListener = listener
         mCopyToClipboardInterface = copyToClipboardInterface
         mShowCodeInterface = showCodeInterface
+    }
+
+    private fun sendPromotionCodeInfo(email: String, promotionCode: String, actionId: String) {
+        val parameters = HashMap<String, String>()
+        parameters[Constants.PROMOTION_CODE_REQUEST_KEY] = promotionCode
+        parameters[Constants.ACTION_ID_REQUEST_KEY] = "act-$actionId"
+        if (email.isNotEmpty()) {
+            parameters[Constants.PROMOTION_CODE_EMAIL_REQUEST_KEY] = email
+        }
+        RelatedDigital.customEvent(
+            context = mWebViewDialogFragment.requireContext(),
+            pageName = Constants.PAGE_NAME_REQUEST_VAL,
+            properties = parameters)
     }
 }
