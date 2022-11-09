@@ -6,6 +6,7 @@ import com.google.gson.Gson
 import com.relateddigital.relateddigital_android.RelatedDigital
 import com.relateddigital.relateddigital_android.constants.Constants
 import com.relateddigital.relateddigital_android.model.GiftRain
+import com.relateddigital.relateddigital_android.model.GiftRainReport
 import com.relateddigital.relateddigital_android.model.MailSubReport
 import com.relateddigital.relateddigital_android.network.RequestHandler
 import java.util.HashMap
@@ -82,8 +83,8 @@ class GiftCatchJavaScriptInterface internal constructor(webViewDialogFragment: G
      * This method saves the promotion code shown
      */
     @JavascriptInterface
-    fun saveCodeGotten(code: String, email: String, actionId: String) {
-        sendPromotionCodeInfo(email = email, promotionCode = code, actionId = actionId)
+    fun saveCodeGotten(code: String, email: String) {
+        sendPromotionCodeInfo(email = email, promotionCode = code)
         mShowCodeInterface.onCodeShown(code)
     }
 
@@ -97,10 +98,11 @@ class GiftCatchJavaScriptInterface internal constructor(webViewDialogFragment: G
         mShowCodeInterface = showCodeInterface
     }
 
-    private fun sendPromotionCodeInfo(email: String, promotionCode: String, actionId: String) {
+    private fun sendPromotionCodeInfo(email: String, promotionCode: String) {
+        val actionId = "act-" + giftRainModel.actid
         val parameters = HashMap<String, String>()
         parameters[Constants.PROMOTION_CODE_REQUEST_KEY] = promotionCode
-        parameters[Constants.ACTION_ID_REQUEST_KEY] = "act-$actionId"
+        parameters[Constants.ACTION_ID_REQUEST_KEY] = actionId
         if (email.isNotEmpty()) {
             parameters[Constants.PROMOTION_CODE_EMAIL_REQUEST_KEY] = email
         }
