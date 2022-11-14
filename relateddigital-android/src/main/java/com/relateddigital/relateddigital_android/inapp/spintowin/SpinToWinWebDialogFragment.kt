@@ -21,9 +21,9 @@ class SpinToWinWebDialogFragment : DialogFragment() {
     private var baseUrl: String? = ""
     private var htmlString: String? = ""
     private var mIsRotation = false
-    private lateinit var mListener: SpinToWinCompleteInterface
-    private lateinit var mCopyToClipboardInterface: SpinToWinCopyToClipboardInterface
-    private lateinit var mSpinToWinShowCodeInterface: SpinToWinShowCodeInterface
+    private var mListener: SpinToWinCompleteInterface? = null
+    private var mCopyToClipboardInterface: SpinToWinCopyToClipboardInterface? = null
+    private var mSpinToWinShowCodeInterface: SpinToWinShowCodeInterface? = null
 
     fun display(fragmentManagerLoc: FragmentManager?): SpinToWinWebDialogFragment {
         this.show(fragmentManagerLoc!!, TAG)
