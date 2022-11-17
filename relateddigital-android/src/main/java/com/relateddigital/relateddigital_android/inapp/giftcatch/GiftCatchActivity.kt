@@ -13,11 +13,20 @@ import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentTransaction
 import com.google.gson.Gson
 import com.relateddigital.relateddigital_android.R
+import com.relateddigital.relateddigital_android.RelatedDigital
+import com.relateddigital.relateddigital_android.api.ApiMethods
+import com.relateddigital.relateddigital_android.api.JSApiClient
+import com.relateddigital.relateddigital_android.constants.Constants
 import com.relateddigital.relateddigital_android.model.GiftCatchExtendedProps
 import com.relateddigital.relateddigital_android.model.GiftRain
 import com.relateddigital.relateddigital_android.util.ActivityUtils
 import com.relateddigital.relateddigital_android.util.AppUtils
+import okhttp3.ResponseBody
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import java.net.URI
+import java.util.HashMap
 
 class GiftCatchActivity : FragmentActivity(), GiftCatchCompleteInterface,
     GiftCatchCopyToClipboardInterface, GiftCatchShowCodeInterface {
@@ -25,6 +34,11 @@ class GiftCatchActivity : FragmentActivity(), GiftCatchCompleteInterface,
     private var response: GiftRain? = null
     private var giftCatchPromotionCode = ""
     private var link = ""
+    private lateinit var activity: FragmentActivity
+    private lateinit var completeListener: GiftCatchCompleteInterface
+    private lateinit var copyToClipboardListener: GiftCatchCopyToClipboardInterface
+    private lateinit var showCodeListener: GiftCatchShowCodeInterface
+    private var giftCatchJsStr = ""
 
     companion object {
         private const val LOG_TAG = "GiftCatch"
@@ -33,41 +47,74 @@ class GiftCatchActivity : FragmentActivity(), GiftCatchCompleteInterface,
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        if (savedInstanceState != null) {
-            jsonStr = savedInstanceState.getString("gift-rain-json-str", "")
-        } else {
-            val intent = intent
-            if (intent != null && intent.hasExtra("gift-rain-data")) {
-                response = intent.getSerializableExtra("gift-rain-data") as GiftRain?
-                if (response != null) {
-                    jsonStr = Gson().toJson(response)
+        activity = this
+        completeListener = this
+        copyToClipboardListener = this
+        showCodeListener = this
+        val jsApi = JSApiClient.getClient(RelatedDigital.getRelatedDigitalModel(this).getRequestTimeoutInSecond())
+            ?.create(ApiMethods::class.java)
+        val headers = HashMap<String, String>()
+        headers[Constants.USER_AGENT_REQUEST_KEY] = RelatedDigital.getRelatedDigitalModel(this).getUserAgent()
+        val call: Call<ResponseBody> = jsApi?.getFindToWinJsFile(headers)!!
+        call.enqueue(object : Callback<ResponseBody?> {
+            override fun onResponse(
+                call: Call<ResponseBody?>,
+                responseJs: Response<ResponseBody?>
+            ) {
+                if (responseJs.isSuccessful) {
+                    Log.i(LOG_TAG, "Getting giftcatch.js is successful!")
+                    giftCatchJsStr = responseJs.body()!!.string()
+
+                    if (giftCatchJsStr.isEmpty()) {
+                        Log.e(LOG_TAG, "Getting giftcatch.js failed!")
+                        finish()
+                    } else {
+                        if (savedInstanceState != null) {
+                            jsonStr = savedInstanceState.getString("gift-rain-json-str", "")
+                        } else {
+                            val intent = intent
+                            if (intent != null && intent.hasExtra("gift-rain-data")) {
+                                response = intent.getSerializableExtra("gift-rain-data") as GiftRain?
+                                if (response != null) {
+                                    jsonStr = Gson().toJson(response)
+                                } else {
+                                    Log.e(LOG_TAG, "Could not get the gift-rain data properly!")
+                                    finish()
+                                }
+                            } else {
+                                Log.e(LOG_TAG, "Could not get the gift-rain data properly!")
+                                finish()
+                            }
+                        }
+
+                        if (jsonStr != null && jsonStr != "") {
+                            val res = AppUtils.createGiftRainCustomFontFiles(
+                                activity, jsonStr, giftCatchJsStr
+                            )
+                            if(res == null) {
+                                Log.e(LOG_TAG, "Could not get the gift-rain data properly!")
+                                finish()
+                            } else {
+                                val webViewDialogFragment: GiftCatchWebDialogFragment =
+                                    GiftCatchWebDialogFragment.newInstance(res[0], res[1], res[2])
+                                webViewDialogFragment.setGiftCatchListeners(completeListener, copyToClipboardListener, showCodeListener)
+                                webViewDialogFragment.display(supportFragmentManager)
+                            }
+                        } else {
+                            Log.e(LOG_TAG, "Could not get the gift-rain data properly!")
+                            finish()
+                        }
+                    }
                 } else {
-                    Log.e(LOG_TAG, "Could not get the gift-rain data properly!")
+                    Log.e(LOG_TAG, "Getting giftcatch.js failed!")
                     finish()
                 }
-            } else {
-                Log.e(LOG_TAG, "Could not get the gift-rain data properly!")
+            }
+            override fun onFailure(call: Call<ResponseBody?>, t: Throwable) {
+                Log.e(LOG_TAG, "Getting giftcatch.js failed! - ${t.message}")
                 finish()
             }
-        }
-
-        if (jsonStr != null && jsonStr != "") {
-            val res = AppUtils.createGiftRainCustomFontFiles(
-                this, jsonStr
-            )
-            if(res == null) {
-                Log.e(LOG_TAG, "Could not get the gift-rain data properly!")
-                finish()
-            } else {
-                val webViewDialogFragment: GiftCatchWebDialogFragment =
-                    GiftCatchWebDialogFragment.newInstance(res[0], res[1], res[2])
-                webViewDialogFragment.setGiftCatchListeners(this, this, this)
-                webViewDialogFragment.display(supportFragmentManager)
-            }
-        } else {
-            Log.e(LOG_TAG, "Could not get the gift-rain data properly!")
-            finish()
-        }
+        })
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

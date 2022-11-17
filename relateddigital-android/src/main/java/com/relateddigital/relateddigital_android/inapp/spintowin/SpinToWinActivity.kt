@@ -13,11 +13,20 @@ import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentTransaction
 import com.google.gson.Gson
 import com.relateddigital.relateddigital_android.R
+import com.relateddigital.relateddigital_android.RelatedDigital
+import com.relateddigital.relateddigital_android.api.ApiMethods
+import com.relateddigital.relateddigital_android.api.JSApiClient
+import com.relateddigital.relateddigital_android.constants.Constants
 import com.relateddigital.relateddigital_android.model.SpinToWin
 import com.relateddigital.relateddigital_android.model.SpinToWinExtendedProps
 import com.relateddigital.relateddigital_android.util.ActivityUtils
 import com.relateddigital.relateddigital_android.util.AppUtils
+import okhttp3.ResponseBody
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import java.net.URI
+import java.util.HashMap
 
 
 class SpinToWinActivity : FragmentActivity(), SpinToWinCompleteInterface,
@@ -26,44 +35,86 @@ class SpinToWinActivity : FragmentActivity(), SpinToWinCompleteInterface,
     private var response: SpinToWin? = null
     private var spinToWinPromotionCode = ""
     private var sliceLink = ""
+    private lateinit var activity: FragmentActivity
+    private lateinit var completeListener: SpinToWinCompleteInterface
+    private lateinit var copyToClipboardListener: SpinToWinCopyToClipboardInterface
+    private lateinit var showCodeListener: SpinToWinShowCodeInterface
+    private var spinToWinJsStr = ""
+
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        if (savedInstanceState != null) {
-            jsonStr = savedInstanceState.getString("spin-to-win-json-str", "")
-        } else {
-            val intent = intent
-            if (intent != null && intent.hasExtra("spin-to-win-data")) {
-                response = intent.getSerializableExtra("spin-to-win-data") as SpinToWin?
-                if (response != null) {
-                    jsonStr = Gson().toJson(response)
+        activity = this
+        completeListener = this
+        copyToClipboardListener = this
+        showCodeListener = this
+        val jsApi = JSApiClient.getClient(RelatedDigital.getRelatedDigitalModel(this).getRequestTimeoutInSecond())
+            ?.create(ApiMethods::class.java)
+        val headers = HashMap<String, String>()
+        headers[Constants.USER_AGENT_REQUEST_KEY] = RelatedDigital.getRelatedDigitalModel(this).getUserAgent()
+        val call: Call<ResponseBody> = jsApi?.getSpinToWinJsFile(headers)!!
+        call.enqueue(object : Callback<ResponseBody?> {
+            override fun onResponse(call: Call<ResponseBody?>, responseJs: Response<ResponseBody?>) {
+                if (responseJs.isSuccessful) {
+                    Log.i(LOG_TAG, "Getting spintowin.js is successful!")
+                    spinToWinJsStr = responseJs.body()!!.string()
+
+                    if(spinToWinJsStr.isEmpty()) {
+                        Log.e(LOG_TAG, "Getting spintowin.js failed!")
+                        finish()
+                    } else {
+                        if (savedInstanceState != null) {
+                            jsonStr = savedInstanceState.getString("spin-to-win-json-str", "")
+                        } else {
+                            val intent = intent
+                            if (intent != null && intent.hasExtra("spin-to-win-data")) {
+                                response =
+                                    intent.getSerializableExtra("spin-to-win-data") as SpinToWin?
+                                if (response != null) {
+                                    jsonStr = Gson().toJson(response)
+                                } else {
+                                    Log.e(LOG_TAG, "Could not get the spin-to-win data properly!")
+                                    finish()
+                                }
+                            } else {
+                                Log.e(LOG_TAG, "Could not get the spin-to-win data properly!")
+                                finish()
+                            }
+                        }
+                        if (jsonStr != null && jsonStr != "") {
+                            val res = AppUtils.createSpinToWinCustomFontFiles(
+                                activity, jsonStr, spinToWinJsStr
+                            )
+                            if (res == null) {
+                                Log.e(LOG_TAG, "Could not get the spin-to-win data properly!")
+                                finish()
+                            } else {
+                                val webViewDialogFragment: SpinToWinWebDialogFragment =
+                                    SpinToWinWebDialogFragment.newInstance(res[0], res[1], res[2])
+                                webViewDialogFragment.setSpinToWinListeners(
+                                    completeListener,
+                                    copyToClipboardListener,
+                                    showCodeListener
+                                )
+                                webViewDialogFragment.display(supportFragmentManager)
+                            }
+                        } else {
+                            Log.e(LOG_TAG, "Could not get the spin-to-win data properly!")
+                            finish()
+                        }
+                    }
                 } else {
-                    Log.e(LOG_TAG, "Could not get the spin-to-win data properly!")
+                    Log.e(LOG_TAG, "Getting spintowin.js failed!")
                     finish()
                 }
-            } else {
-                Log.e(LOG_TAG, "Could not get the spin-to-win data properly!")
+            }
+
+            override fun onFailure(call: Call<ResponseBody?>, t: Throwable) {
+                Log.e(LOG_TAG, "Getting spintowin.js failed! - ${t.message}")
                 finish()
             }
-        }
-        if (jsonStr != null && jsonStr != "") {
-            val res = AppUtils.createSpinToWinCustomFontFiles(
-                this, jsonStr
-            )
-            if(res == null) {
-                Log.e(LOG_TAG, "Could not get the spin-to-win data properly!")
-                finish()
-            } else {
-                val webViewDialogFragment: SpinToWinWebDialogFragment =
-                    SpinToWinWebDialogFragment.newInstance(res[0], res[1], res[2])
-                webViewDialogFragment.setSpinToWinListeners(this, this, this)
-                webViewDialogFragment.display(supportFragmentManager)
-            }
-        } else {
-            Log.e(LOG_TAG, "Could not get the spin-to-win data properly!")
-            finish()
-        }
+        })
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

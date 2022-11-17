@@ -103,6 +103,22 @@ interface ApiMethods {
     @POST("/log/mobileSdk")
     fun sendLogToGraylog(@Body graylogModel: GraylogModel?): Call<Void>
 
+    //Methods for js files -- mbls domain
+    @GET("/spintowin.js")
+    fun getSpinToWinJsFile(
+        @HeaderMap headers: Map<String, String>
+    ): Call<ResponseBody>
+
+    @GET("/find_to_win.js")
+    fun getFindToWinJsFile(
+        @HeaderMap headers: Map<String, String>
+    ): Call<ResponseBody>
+
+    @GET("/gift_catch.js")
+    fun getGiftCatchJsFile(
+        @HeaderMap headers: Map<String, String>
+    ): Call<ResponseBody>
+
     //Methods for remote config
     @GET("rc.json")
     fun getRemoteConfig(

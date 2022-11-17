@@ -13,11 +13,20 @@ import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentTransaction
 import com.google.gson.Gson
 import com.relateddigital.relateddigital_android.R
+import com.relateddigital.relateddigital_android.RelatedDigital
+import com.relateddigital.relateddigital_android.api.ApiMethods
+import com.relateddigital.relateddigital_android.api.JSApiClient
+import com.relateddigital.relateddigital_android.constants.Constants
 import com.relateddigital.relateddigital_android.model.FindToWin
 import com.relateddigital.relateddigital_android.model.FindToWinExtendedProps
 import com.relateddigital.relateddigital_android.util.ActivityUtils
 import com.relateddigital.relateddigital_android.util.AppUtils
+import okhttp3.ResponseBody
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import java.net.URI
+import java.util.HashMap
 
 class FindToWinActivity : FragmentActivity(), FindToWinCompleteInterface,
     FindToWinCopyToClipboardInterface, FindToWinShowCodeInterface {
@@ -25,6 +34,11 @@ class FindToWinActivity : FragmentActivity(), FindToWinCompleteInterface,
     private var response: FindToWin? = null
     private var findToWinPromotionCode = ""
     private var link = ""
+    private lateinit var activity: FragmentActivity
+    private lateinit var completeListener: FindToWinCompleteInterface
+    private lateinit var copyToClipboardListener: FindToWinCopyToClipboardInterface
+    private lateinit var showCodeListener: FindToWinShowCodeInterface
+    private var findToWinJsStr = ""
 
     companion object {
         private const val LOG_TAG = "FindToWin"
@@ -33,41 +47,74 @@ class FindToWinActivity : FragmentActivity(), FindToWinCompleteInterface,
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        if (savedInstanceState != null) {
-            jsonStr = savedInstanceState.getString("find-to-win-json-str", "")
-        } else {
-            val intent = intent
-            if (intent != null && intent.hasExtra("find-to-win-data")) {
-                response = intent.getSerializableExtra("find-to-win-data") as FindToWin?
-                if (response != null) {
-                    jsonStr = Gson().toJson(response)
+        activity = this
+        completeListener = this
+        copyToClipboardListener = this
+        showCodeListener = this
+        val jsApi = JSApiClient.getClient(RelatedDigital.getRelatedDigitalModel(this).getRequestTimeoutInSecond())
+            ?.create(ApiMethods::class.java)
+        val headers = HashMap<String, String>()
+        headers[Constants.USER_AGENT_REQUEST_KEY] = RelatedDigital.getRelatedDigitalModel(this).getUserAgent()
+        val call: Call<ResponseBody> = jsApi?.getFindToWinJsFile(headers)!!
+        call.enqueue(object : Callback<ResponseBody?> {
+            override fun onResponse(
+                call: Call<ResponseBody?>,
+                responseJs: Response<ResponseBody?>
+            ) {
+                if (responseJs.isSuccessful) {
+                    Log.i(LOG_TAG, "Getting findtowin.js is successful!")
+                    findToWinJsStr = responseJs.body()!!.string()
+
+                    if(findToWinJsStr.isEmpty()) {
+                        Log.e(LOG_TAG, "Getting findtowin.js failed!")
+                        finish()
+                    } else {
+                        if (savedInstanceState != null) {
+                            jsonStr = savedInstanceState.getString("find-to-win-json-str", "")
+                        } else {
+                            val intent = intent
+                            if (intent != null && intent.hasExtra("find-to-win-data")) {
+                                response = intent.getSerializableExtra("find-to-win-data") as FindToWin?
+                                if (response != null) {
+                                    jsonStr = Gson().toJson(response)
+                                } else {
+                                    Log.e(LOG_TAG, "Could not get the find-to-win data properly!")
+                                    finish()
+                                }
+                            } else {
+                                Log.e(LOG_TAG, "Could not get the find-to-win data properly!")
+                                finish()
+                            }
+                        }
+
+                        if (jsonStr != null && jsonStr != "") {
+                            val res = AppUtils.createFindToWinCustomFontFiles(
+                                activity, jsonStr, findToWinJsStr
+                            )
+                            if(res == null) {
+                                Log.e(LOG_TAG, "Could not get the find-to-win data properly!")
+                                finish()
+                            } else {
+                                val webViewDialogFragment: FindToWinWebDialogFragment =
+                                    FindToWinWebDialogFragment.newInstance(res[0], res[1], res[2])
+                                webViewDialogFragment.setFindToWinListeners(completeListener, copyToClipboardListener, showCodeListener)
+                                webViewDialogFragment.display(supportFragmentManager)
+                            }
+                        } else {
+                            Log.e(LOG_TAG, "Could not get the find-to-win data properly!")
+                            finish()
+                        }
+                    }
                 } else {
-                    Log.e(LOG_TAG, "Could not get the find-to-win data properly!")
+                    Log.e(LOG_TAG, "Getting findtowin.js failed!")
                     finish()
                 }
-            } else {
-                Log.e(LOG_TAG, "Could not get the find-to-win data properly!")
+            }
+            override fun onFailure(call: Call<ResponseBody?>, t: Throwable) {
+                Log.e(LOG_TAG, "Getting findtowin.js failed! - ${t.message}")
                 finish()
             }
-        }
-
-        if (jsonStr != null && jsonStr != "") {
-            val res = AppUtils.createFindToWinCustomFontFiles(
-                this, jsonStr
-            )
-            if(res == null) {
-                Log.e(LOG_TAG, "Could not get the find-to-win data properly!")
-                finish()
-            } else {
-                val webViewDialogFragment: FindToWinWebDialogFragment =
-                    FindToWinWebDialogFragment.newInstance(res[0], res[1], res[2])
-                webViewDialogFragment.setFindToWinListeners(this, this, this)
-                webViewDialogFragment.display(supportFragmentManager)
-            }
-        } else {
-            Log.e(LOG_TAG, "Could not get the find-to-win data properly!")
-            finish()
-        }
+        })
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

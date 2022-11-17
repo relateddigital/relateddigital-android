@@ -621,7 +621,7 @@ object AppUtils {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-    fun createSpinToWinCustomFontFiles(context: Context, jsonStr: String?): ArrayList<String?>? {
+    fun createSpinToWinCustomFontFiles(context: Context, jsonStr: String?, spinToWinJsStr: String): ArrayList<String?>? {
         var result: ArrayList<String?>? = null
         val spinToWinModel: SpinToWin?
         val extendedProps: SpinToWinExtendedProps?
@@ -648,7 +648,7 @@ object AppUtils {
         val promoCodesSoldOutMessageFontFamily: String =
             extendedProps.promocodesSoldOutMessageFontFamily!!
 
-        val htmlStr: String = writeHtmlToFile(context, "spintowin")
+        val htmlStr: String = writeHtmlToFile(context, "spintowin", spinToWinJsStr)
 
         if (displayNameFontFamily == "custom") {
             val fontExtension = getFontNameWithExtension(
@@ -752,7 +752,7 @@ object AppUtils {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-    fun createGiftRainCustomFontFiles(context: Context, jsonStr: String?): ArrayList<String?>? {
+    fun createGiftRainCustomFontFiles(context: Context, jsonStr: String?, jsStr: String): ArrayList<String?>? {
         var result: ArrayList<String?>? = null
         val giftRainModel: GiftRain?
         val extendedProps: GiftCatchExtendedProps?
@@ -772,7 +772,7 @@ object AppUtils {
         }
         val fontFamily: String = extendedProps.fontFamily ?: return null
 
-        val htmlStr: String = writeHtmlToFile(context, "gift_catch")
+        val htmlStr: String = writeHtmlToFile(context, "gift_catch", jsStr)
 
         if (fontFamily == "custom") {
             val fontExtension = getFontNameWithExtension(
@@ -799,7 +799,7 @@ object AppUtils {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-    fun createFindToWinCustomFontFiles(context: Context, jsonStr: String?): ArrayList<String?>? {
+    fun createFindToWinCustomFontFiles(context: Context, jsonStr: String?, jsStr: String): ArrayList<String?>? {
         var result: ArrayList<String?>? = null
         val findToWinModel: FindToWin?
         val extendedProps: FindToWinExtendedProps?
@@ -819,7 +819,7 @@ object AppUtils {
         }
         val fontFamily: String = extendedProps.fontFamily ?: return null
 
-        val htmlStr: String = writeHtmlToFile(context, "find_to_win")
+        val htmlStr: String = writeHtmlToFile(context, "find_to_win", jsStr)
 
         if (fontFamily == "custom") {
             val fontExtension = getFontNameWithExtension(
@@ -875,7 +875,7 @@ object AppUtils {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-    private fun writeHtmlToFile(context: Context, fileName: String): String {
+    private fun writeHtmlToFile(context: Context, fileName: String, jsStr: String): String {
         val htmlString: String
         val relatedDigitalCacheDir = context.filesDir
         var `is`: InputStream? = null
@@ -892,9 +892,7 @@ object AppUtils {
             fos = FileOutputStream(htmlFile, false)
             fos.write(bytes)
             fos.close()
-            `is` = context.assets.open("$fileName.js")
-            bytes = getBytesFromInputStream(`is`)
-            `is`.close()
+            bytes = jsStr.toByteArray()
             fos = FileOutputStream(jsFile)
             fos.write(bytes)
             fos.close()
