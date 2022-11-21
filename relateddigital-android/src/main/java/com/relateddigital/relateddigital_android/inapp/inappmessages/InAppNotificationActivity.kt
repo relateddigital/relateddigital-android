@@ -8,6 +8,7 @@ import android.content.ClipboardManager
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.Color
+import android.graphics.drawable.GradientDrawable
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -359,7 +360,8 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
             }
             if (!mInAppMessage!!.mActionData!!.mButtonColor.isNullOrEmpty()) {
                 try {
-                    binding.btnTemplate.setBackgroundColor(Color.parseColor(mInAppMessage!!.mActionData!!.mButtonColor))
+                    val gdButton = binding.btnTemplate.background as GradientDrawable
+                    gdButton.setColor(Color.parseColor(mInAppMessage!!.mActionData!!.mButtonColor))
                 } catch (e: Exception) {
                     Log.w(
                         LOG_TAG,
@@ -480,7 +482,8 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
         }
         if (!mInAppMessage!!.mActionData!!.mSecondButtonColor.isNullOrEmpty()) {
             try {
-                binding.btnTemplateSecond.setBackgroundColor(Color.parseColor(mInAppMessage!!.mActionData!!.mSecondButtonColor))
+                val gdButton = binding.btnTemplateSecond.background as GradientDrawable
+                gdButton.setColor(Color.parseColor(mInAppMessage!!.mActionData!!.mSecondButtonColor))
             } catch (e: Exception) {
                 Log.w(
                     LOG_TAG,
@@ -566,7 +569,8 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
         }
         if (!mInAppMessage!!.mActionData!!.mButtonColor.isNullOrEmpty()) {
             try {
-                binding.btnTemplate.setBackgroundColor(Color.parseColor(mInAppMessage!!.mActionData!!.mButtonColor))
+                val gdButton = binding.btnTemplate.background as GradientDrawable
+                gdButton.setColor(Color.parseColor(mInAppMessage!!.mActionData!!.mButtonColor))
             } catch (e: Exception) {
                 Log.w(LOG_TAG, "Could not parse the data given for button color\nSetting the default value.")
                 e.printStackTrace()
@@ -716,7 +720,8 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
         bindingSecondPopUp.button.typeface = mInAppMessage!!.mActionData!!.getFontFamily(this)
         bindingSecondPopUp.button.text = mInAppMessage!!.mActionData!!.mSecondPopupBtnText
         bindingSecondPopUp.button.setTextColor(Color.parseColor(mInAppMessage!!.mActionData!!.mButtonTextColor))
-        bindingSecondPopUp.button.setBackgroundColor(Color.parseColor(mInAppMessage!!.mActionData!!.mButtonColor))
+        val gdButton = bindingSecondPopUp.button.background as GradientDrawable
+        gdButton.setColor(Color.parseColor(mInAppMessage!!.mActionData!!.mButtonColor))
         bindingSecondPopUp.button.setOnClickListener {
             RequestHandler.createInAppNotificationClickRequest(applicationContext, mInAppMessage, npsSecondPopupRateReport)
             isNpsSecondPopupButtonClicked = true

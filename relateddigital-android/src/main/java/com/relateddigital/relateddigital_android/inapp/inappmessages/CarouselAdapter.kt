@@ -5,6 +5,7 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.graphics.Color
+import android.graphics.drawable.GradientDrawable
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -297,11 +298,8 @@ class CarouselAdapter(
 
         if (!mCarouselItems!![position].buttonText.isNullOrEmpty()) {
             if (!mCarouselItems!![position].buttonColor.isNullOrEmpty()) {
-                holder.carouselButton.setBackgroundColor(
-                    Color.parseColor(
-                        mCarouselItems!![position].buttonColor
-                    )
-                )
+                val gdButton = holder.carouselButton.background as GradientDrawable
+                gdButton.setColor(Color.parseColor(mCarouselItems!![position].buttonColor))
             }
             holder.carouselButton.text = mCarouselItems!![position].buttonText
             if (!mCarouselItems!![position].buttonTextColor.isNullOrEmpty()) {

@@ -106,6 +106,7 @@
                 android:layout_marginTop="4dp"
                 android:layout_marginRight="40dp"
                 android:layout_marginBottom="4dp"
+                android:background="@drawable/rounded_corners_full"
                 android:gravity="center"
                 android:paddingLeft="32dp"
                 android:paddingTop="8dp"
