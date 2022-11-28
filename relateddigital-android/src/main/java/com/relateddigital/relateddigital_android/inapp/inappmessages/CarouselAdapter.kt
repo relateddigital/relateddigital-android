@@ -300,6 +300,7 @@ class CarouselAdapter(
             if (!mCarouselItems!![position].buttonColor.isNullOrEmpty()) {
                 val gdButton = holder.carouselButton.background as GradientDrawable
                 gdButton.setColor(Color.parseColor(mCarouselItems!![position].buttonColor))
+                // TODO : gdButton.cornerRadius = real data as float (e.g. 30f)
             }
             holder.carouselButton.text = mCarouselItems!![position].buttonText
             if (!mCarouselItems!![position].buttonTextColor.isNullOrEmpty()) {

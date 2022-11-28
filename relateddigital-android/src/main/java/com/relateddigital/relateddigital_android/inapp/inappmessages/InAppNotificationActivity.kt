@@ -362,6 +362,7 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
                 try {
                     val gdButton = binding.btnTemplate.background as GradientDrawable
                     gdButton.setColor(Color.parseColor(mInAppMessage!!.mActionData!!.mButtonColor))
+                    // TODO : gdButton.cornerRadius = real data as float (e.g. 30f)
                 } catch (e: Exception) {
                     Log.w(
                         LOG_TAG,
@@ -484,6 +485,7 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
             try {
                 val gdButton = binding.btnTemplateSecond.background as GradientDrawable
                 gdButton.setColor(Color.parseColor(mInAppMessage!!.mActionData!!.mSecondButtonColor))
+                // TODO : gdButton.cornerRadius = real data as float (e.g. 30f)
             } catch (e: Exception) {
                 Log.w(
                     LOG_TAG,
@@ -571,6 +573,7 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
             try {
                 val gdButton = binding.btnTemplate.background as GradientDrawable
                 gdButton.setColor(Color.parseColor(mInAppMessage!!.mActionData!!.mButtonColor))
+                // TODO : gdButton.cornerRadius = real data as float (e.g. 30f)
             } catch (e: Exception) {
                 Log.w(LOG_TAG, "Could not parse the data given for button color\nSetting the default value.")
                 e.printStackTrace()
@@ -722,6 +725,7 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
         bindingSecondPopUp.button.setTextColor(Color.parseColor(mInAppMessage!!.mActionData!!.mButtonTextColor))
         val gdButton = bindingSecondPopUp.button.background as GradientDrawable
         gdButton.setColor(Color.parseColor(mInAppMessage!!.mActionData!!.mButtonColor))
+        // TODO : gdButton.cornerRadius = real data as float (e.g. 30f)
         bindingSecondPopUp.button.setOnClickListener {
             RequestHandler.createInAppNotificationClickRequest(applicationContext, mInAppMessage, npsSecondPopupRateReport)
             isNpsSecondPopupButtonClicked = true
