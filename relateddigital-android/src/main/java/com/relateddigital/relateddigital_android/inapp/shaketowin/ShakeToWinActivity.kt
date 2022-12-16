@@ -5,12 +5,14 @@ import android.content.ActivityNotFoundException
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Intent
+import android.content.pm.ActivityInfo
 import android.graphics.Color
 import android.graphics.Typeface
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
+import android.os.Build
 import android.os.Bundle
 import android.text.Editable
 import android.text.Html
@@ -25,16 +27,19 @@ import androidx.core.content.ContextCompat
 import com.bumptech.glide.Glide
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.ExoPlayer
+import com.google.gson.Gson
 import com.relateddigital.relateddigital_android.R
 import com.relateddigital.relateddigital_android.databinding.ActivityShakeToWinMailFormBinding
 import com.relateddigital.relateddigital_android.databinding.ActivityShakeToWinStep1Binding
 import com.relateddigital.relateddigital_android.databinding.ActivityShakeToWinStep2Binding
 import com.relateddigital.relateddigital_android.databinding.ActivityShakeToWinStep3Binding
 import com.relateddigital.relateddigital_android.inapp.scratchtowin.ScratchToWinActivity
+import com.relateddigital.relateddigital_android.model.*
 import com.relateddigital.relateddigital_android.network.RequestHandler
 import com.relateddigital.relateddigital_android.util.AppUtils
 import com.relateddigital.relateddigital_android.util.StringUtils
 import com.squareup.picasso.Picasso
+import java.net.URI
 import java.util.*
 import java.util.regex.Pattern
 import kotlin.math.sqrt
@@ -44,6 +49,8 @@ class ShakeToWinActivity : Activity(), SensorEventListener {
     private lateinit var bindingStep1: ActivityShakeToWinStep1Binding
     private lateinit var bindingStep2: ActivityShakeToWinStep2Binding
     private lateinit var bindingStep3: ActivityShakeToWinStep3Binding
+    private var mShakeToWinMessage : ShakeToWin? = null
+    private var mExtendedProps : ShakeToWinExtendedProps? = null
     private var mSensorManager: SensorManager? = null
     private var mAccelerometer = 0f
     private var mAccelerometerCurrent = 0f
@@ -52,6 +59,7 @@ class ShakeToWinActivity : Activity(), SensorEventListener {
     private var mTimerAfterShaking: Timer? = null
     private var isShaken = false
     private var isStep3 = false
+    //private var isMailForm = false?
     private var player: ExoPlayer? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,9 +70,27 @@ class ShakeToWinActivity : Activity(), SensorEventListener {
         setContentView(bindingMailForm.root)
         cacheResources()
 
-        //mShakeToWinMessage = getShakeToWinMessage();
+        //mShakeToWinMessage
+        shakeToWinMessage
+        parseExtendedProps()
+        //mShakeToWinMessage = getShakeToWinMessage()
         setupMailForm()
     }
+
+
+    private val shakeToWinMessage: Unit
+        get() {
+            val intent = intent
+            if (intent != null) {
+                if (intent.hasExtra("shake-to-win-data")) {
+                    mShakeToWinMessage = intent.getSerializableExtra("shake-to-win-data") as ShakeToWin?
+                }
+            }
+            if (mShakeToWinMessage == null) {
+                Log.e(LOG_TAG, "Could not get the content from the server!")
+                finish()
+            }
+        }
 
     override fun onDestroy() {
         if (mTimerWithoutShaking != null) {
@@ -95,7 +121,7 @@ class ShakeToWinActivity : Activity(), SensorEventListener {
 
     private fun setupMailForm() {
         //TODO : real data usage
-        val isMailForm = true
+        var isMailForm = mShakeToWinMessage!!.actiondata!!.mailSubscription!!
 
         if(isMailForm) {
             //TODO Get this from scratch-to-win
@@ -413,6 +439,15 @@ class ShakeToWinActivity : Activity(), SensorEventListener {
                 "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4") //TODO : real url here
         player!!.setMediaItem(mediaItem)
         player!!.prepare()
+    }
+
+    private fun parseExtendedProps() {
+        try {
+            mExtendedProps = Gson().fromJson(URI(mShakeToWinMessage!!.actiondata!!.ExtendedProps).path, ShakeToWinExtendedProps::class.java)
+        } catch (e: Exception) {
+            Log.e(LOG_TAG, "Extended properties could not be parsed properly!")
+            finish()
+        }
     }
 
     //Email Permit TextEmail Permit <LINK>TextEmail</LINK> Permit Text

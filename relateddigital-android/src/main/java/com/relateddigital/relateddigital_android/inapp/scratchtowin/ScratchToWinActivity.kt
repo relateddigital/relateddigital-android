@@ -70,6 +70,7 @@ class ScratchToWinActivity : Activity(), ScratchToWinInterface {
         setupCloseButton()
         setupScratchToWin()
         isMailSubsForm = mScratchToWinMessage!!.actiondata!!.mailSubscription!!
+
         if (isMailSubsForm) {
             binding.viewToBeScratched.setInvalidEmailMessage(mScratchToWinMessage!!.actiondata!!
                     .mailSubscriptionForm!!.invalidEmailMessage)

@@ -16,6 +16,7 @@ import com.relateddigital.relateddigital_android.inapp.giftcatch.GiftCatchActivi
 import com.relateddigital.relateddigital_android.inapp.mailsubsform.MailSubscriptionFormHalfFragment
 import com.relateddigital.relateddigital_android.inapp.notification.InAppNotificationFragment
 import com.relateddigital.relateddigital_android.inapp.scratchtowin.ScratchToWinActivity
+import com.relateddigital.relateddigital_android.inapp.shaketowin.ShakeToWinActivity
 import com.relateddigital.relateddigital_android.inapp.socialproof.SocialProofFragment
 import com.relateddigital.relateddigital_android.inapp.spintowin.SpinToWinActivity
 import com.relateddigital.relateddigital_android.model.*
@@ -238,6 +239,20 @@ object RequestSender {
                                             intent.putExtra(
                                                     "scratch-to-win-data",
                                                     scratchToWinModel
+                                            )
+                                            currentRequest.parent!!.startActivity(intent)
+                                        }
+                                        !actionsResponse.mShakeToWinList.isNullOrEmpty() -> {
+                                            val intent =
+                                                Intent(
+                                                    currentRequest.parent,
+                                                    ShakeToWinActivity::class.java
+                                                )
+                                            val shakeToWinModel: ShakeToWin =
+                                                actionsResponse.mShakeToWinList!![0]
+                                            intent.putExtra(
+                                                "shake-to-win-data",
+                                                shakeToWinModel
                                             )
                                             currentRequest.parent!!.startActivity(intent)
                                         }
