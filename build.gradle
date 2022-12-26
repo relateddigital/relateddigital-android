@@ -4,8 +4,7 @@ buildscript {
         google()
         mavenCentral()
         maven {
-            url 'http://developer.huawei.com/repo/'
-            allowInsecureProtocol(true)
+            url 'https://developer.huawei.com/repo/'
         }
     }
     dependencies {
@@ -28,8 +27,7 @@ allprojects {
         google()
         mavenCentral()
         maven {
-            url 'http://developer.huawei.com/repo/'
-            allowInsecureProtocol(true)
+            url 'https://developer.huawei.com/repo/'
         }
         maven { url 'https://jitpack.io' }
     }
