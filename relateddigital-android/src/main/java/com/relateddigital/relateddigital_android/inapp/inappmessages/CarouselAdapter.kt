@@ -318,6 +318,19 @@ class CarouselAdapter(
                     RelatedDigital.setInAppButtonInterface(null)
                     buttonCallback.onPress(mCarouselItems!![position].androidLnk)
                 } else {
+                   //TODO if(mCarouselItems!![position].buttonFunction)
+                    /*val clipboard =
+                        mContext.getSystemService(Activity.CLIPBOARD_SERVICE) as ClipboardManager
+                    val clip = ClipData.newPlainText(
+                        mContext.getString(R.string.coupon_code),
+                        mCarouselItems!![position].promotionCode
+                    )
+                    clipboard.setPrimaryClip(clip)
+                    Toast.makeText(
+                        mContext,
+                        mContext.getString(R.string.copied_to_clipboard),
+                        Toast.LENGTH_LONG
+                    ).show() */
                     carouselButtonInterface.onPress(mCarouselItems!![position].androidLnk)
                 }
                 finishCallback.onFinish()

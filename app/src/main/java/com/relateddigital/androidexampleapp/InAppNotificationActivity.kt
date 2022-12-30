@@ -121,7 +121,7 @@ class InAppNotificationActivity : AppCompatActivity() {
            // val intent = Intent(this, ShakeToWinActivity::class.java)
            // startActivity(intent)
             //TODO when backend side gets ready, use below
-            sendInAppRequest("shaketowin");
+            sendInAppRequest("ShakeToWin");
         }
 
         binding.appTrackerButton.setOnClickListener {

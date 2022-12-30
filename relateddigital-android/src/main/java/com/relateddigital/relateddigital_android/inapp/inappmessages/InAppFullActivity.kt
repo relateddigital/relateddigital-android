@@ -17,9 +17,11 @@ import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import com.relateddigital.relateddigital_android.R
 import com.relateddigital.relateddigital_android.RelatedDigital
+import com.relateddigital.relateddigital_android.constants.Constants
 import com.relateddigital.relateddigital_android.databinding.ActivityInAppFullBinding
 import com.relateddigital.relateddigital_android.inapp.InAppButtonInterface
 import com.relateddigital.relateddigital_android.inapp.InAppNotificationState
+import com.relateddigital.relateddigital_android.inapp.InAppNotificationType
 import com.relateddigital.relateddigital_android.inapp.InAppUpdateDisplayState
 import com.relateddigital.relateddigital_android.model.InAppMessage
 import com.relateddigital.relateddigital_android.network.RequestHandler
@@ -147,7 +149,9 @@ class InAppFullActivity : Activity(), IVisilabs {
                 RelatedDigital.setInAppButtonInterface(null)
                 buttonInterface.onPress(mInApp!!.mActionData!!.mAndroidLnk)
             } else {
-                if (!mInApp!!.mActionData!!.mAndroidLnk.isNullOrEmpty()) {
+                if (mInApp!!.mActionData!!.mSecondButtonFunction == Constants.BUTTON_LINK) {
+
+                    if (!mInApp!!.mActionData!!.mAndroidLnk.isNullOrEmpty()) {
                     try {
                         val viewIntent = Intent(
                             Intent.ACTION_VIEW,
@@ -158,7 +162,34 @@ class InAppFullActivity : Activity(), IVisilabs {
                         Log.i("Visilabs", "User doesn't have an activity for notification URI")
                     }
                 }
-            }
+                }
+                if (mInApp!!.mActionData!!.mSecondButtonFunction == Constants.BUTTON_COPY_REDIRECT) {
+                    if (mInApp!!.mActionData!!.mMsgType == InAppNotificationType.IMAGE_TEXT_BUTTON.toString()) {
+                        if (!mInApp!!.mActionData!!.mSecondButtonAndroidLink.isNullOrEmpty()) {
+                            try {
+                                val viewIntent = Intent(
+                                    Intent.ACTION_VIEW,
+                                    StringUtils.getURIfromUrlString(mInApp!!.mActionData!!.mAndroidLnk)
+                                )
+                                this@InAppFullActivity.startActivity(viewIntent)
+
+                            } catch  (e: ActivityNotFoundException) {
+                                Log.i("Visilabs", "User doesn't have an activity for notification URI")
+                            }
+                        }
+
+                        val clipboard = applicationContext.getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
+                        val clip = ClipData.newPlainText(getString(R.string.coupon_code), mInApp!!.mActionData!!.mPromotionCode)
+                        clipboard.setPrimaryClip(clip)
+                        Toast.makeText(applicationContext, getString(R.string.copied_to_clipboard), Toast.LENGTH_LONG).show()
+                    }
+
+                }
+                else {
+                    AppUtils.goToNotificationSettings(applicationContext)
+                }
+
+                }
             finish()
             InAppUpdateDisplayState.releaseDisplayState(mIntentId)
         }
