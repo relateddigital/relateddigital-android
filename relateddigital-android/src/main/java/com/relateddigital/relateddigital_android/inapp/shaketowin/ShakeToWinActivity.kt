@@ -36,7 +36,6 @@ import com.relateddigital.relateddigital_android.databinding.ActivityShakeToWinM
 import com.relateddigital.relateddigital_android.databinding.ActivityShakeToWinStep1Binding
 import com.relateddigital.relateddigital_android.databinding.ActivityShakeToWinStep2Binding
 import com.relateddigital.relateddigital_android.databinding.ActivityShakeToWinStep3Binding
-import com.relateddigital.relateddigital_android.inapp.scratchtowin.ScratchToWinActivity
 import com.relateddigital.relateddigital_android.model.*
 import com.relateddigital.relateddigital_android.network.RequestHandler
 import com.relateddigital.relateddigital_android.util.ActivityUtils
@@ -75,9 +74,8 @@ class ShakeToWinActivity : Activity(), SensorEventListener {
         shakeToWinMessage
         parseExtendedProps()
         //mShakeToWinMessage = getShakeToWinMessage()
-        setupMailForm()
         cacheResources()
-
+        setupMailForm()
     }
 
     private val shakeToWinMessage: Unit
@@ -107,10 +105,13 @@ class ShakeToWinActivity : Activity(), SensorEventListener {
         releasePlayer()
         //TODO real control whether the code is null or empty
         // set a variable on step3 when the code is shown
-        if(mExtendedProps!!.promocodeBannerText!!.isNotEmpty()) {
-            // start banner fragment here
+        if(!mExtendedProps!!.promocodeBannerText!!.isNotEmpty()) {
+            try {
+                val extendedProps = Gson().fromJson(URI(mShakeToWinMessage!!.actiondata!!.ExtendedProps).path,
+                    ShakeToWinExtendedProps::class.java
+                )
             val shakeToWinCodeBannerFragment =
-                ShakeToWinCodeBannerFragment.newInstance(mExtendedProps!!, mShakeToWinMessage!!.actiondata!!.promotionCode.toString())
+                ShakeToWinCodeBannerFragment.newInstance(extendedProps, mShakeToWinMessage!!.actiondata!!.promotionCode.toString())
 
             val transaction: FragmentTransaction =
                 (ActivityUtils.parentActivity as FragmentActivity).supportFragmentManager.beginTransaction()
@@ -118,6 +119,11 @@ class ShakeToWinActivity : Activity(), SensorEventListener {
             transaction.commit()
             ActivityUtils.parentActivity = null
         }
+            catch (e: Exception) {
+                Log.e(LOG_TAG, "ShakeToWinCodeBanner : " + e.message)
+            }
+        }
+
         super.onDestroy()
     }
 
@@ -126,33 +132,47 @@ class ShakeToWinActivity : Activity(), SensorEventListener {
         var isMailForm = mShakeToWinMessage!!.actiondata!!.mailSubscription!!
 
         if(isMailForm) {
-            //TODO backgroundColor it can be wrong
-            bindingMailForm.container.setBackgroundColor(Color.parseColor(mExtendedProps!!.backgroundColor))
+            //TODO : I couldn't make the background image.
+            if(mExtendedProps!!.backgroundColor!!.isNotEmpty()) {
+                bindingMailForm.container.setBackgroundColor(Color.parseColor(mExtendedProps!!.backgroundColor))
+            }
+            if (mExtendedProps!!.backgroundImage!!.isNotEmpty()){
+                Picasso.get().load(mExtendedProps!!.backgroundImage)
+                    .into(bindingMailForm.mainImage) }
+
             bindingMailForm.invalidEmailMessage.text = mShakeToWinMessage!!.actiondata!!.mailSubscriptionForm!!.invalidEmailMessage
             bindingMailForm.resultText.text = mShakeToWinMessage!!.actiondata!!.mailSubscriptionForm!!.checkConsentMessage
             bindingMailForm.emailPermitText.text = createHtml(mShakeToWinMessage!!.actiondata!!.mailSubscriptionForm!!.emailPermitText!!,
-                mExtendedProps!!.emailPermitTextUrl)
-            bindingMailForm.emailPermitText.textSize = mExtendedProps!!.emailPermitTextSize!!.toFloat()
-            bindingMailForm.emailPermitText.setOnClickListener {
-                if (!mExtendedProps!!.emailPermitTextUrl.isNullOrEmpty()) {
+                mExtendedProps!!.mailSubscriptionForm!!.emailPermitTextUrl!!)
+            bindingMailForm.emailPermitText.textSize = mExtendedProps!!.mailSubscriptionForm!!.emailPermitTextSize!!.toFloat() +10
+           bindingMailForm.emailPermitText.setOnClickListener {
+                if (!mExtendedProps!!.mailSubscriptionForm!!.emailPermitTextUrl.isNullOrEmpty()) {
                     try {
-                        val viewIntent = Intent(Intent.ACTION_VIEW, StringUtils.getURIfromUrlString(mExtendedProps!!.emailPermitTextUrl))
+                        val viewIntent = Intent(Intent.ACTION_VIEW, StringUtils.getURIfromUrlString(mExtendedProps!!.mailSubscriptionForm!!.emailPermitTextUrl))
                         startActivity(viewIntent)
                     } catch (e: ActivityNotFoundException) {
                         Log.i(LOG_TAG, "Could not direct to the url entered!")
                     }
                 }
             }
-            bindingMailForm.consentText.text = createHtml(mShakeToWinMessage!!.actiondata!!.mailSubscriptionForm!!.consentText!!,
-                mExtendedProps!!.consentTextUrl)
-            bindingMailForm.consentText.textSize = mExtendedProps!!.consentTextSize!!.toFloat()
-            bindingMailForm.consentText.setOnClickListener {
-                if (!mExtendedProps!!.consentTextUrl.isNullOrEmpty()) {
-                    try {
-                        val viewIntent = Intent(Intent.ACTION_VIEW, StringUtils.getURIfromUrlString(mExtendedProps!!.consentTextUrl))
-                        startActivity(viewIntent)
-                    } catch (e: ActivityNotFoundException) {
-                        Log.i(LOG_TAG, "Could not direct to the url entered!")
+            if(mShakeToWinMessage!!.actiondata!!.mailSubscriptionForm!!.consentText!!.isNotEmpty()) {
+                bindingMailForm.consentText.text = createHtml(
+                    mShakeToWinMessage!!.actiondata!!.mailSubscriptionForm!!.consentText!!,
+                    mExtendedProps!!.mailSubscriptionForm!!.consentTextUrl
+                )
+                bindingMailForm.consentText.textSize =
+                    mExtendedProps!!.mailSubscriptionForm!!.consentTextSize!!.toFloat() + 10
+                bindingMailForm.consentText.setOnClickListener {
+                    if (!mExtendedProps!!.mailSubscriptionForm!!.consentTextUrl.isNullOrEmpty()) {
+                        try {
+                            val viewIntent = Intent(
+                                Intent.ACTION_VIEW,
+                                StringUtils.getURIfromUrlString(mExtendedProps!!.mailSubscriptionForm!!.consentTextUrl)
+                            )
+                            startActivity(viewIntent)
+                        } catch (e: ActivityNotFoundException) {
+                            Log.i(LOG_TAG, "Could not direct to the url entered!")
+                        }
                     }
                 }
             }
@@ -167,32 +187,39 @@ class ShakeToWinActivity : Activity(), SensorEventListener {
             bindingMailForm.closeButton.setBackgroundResource(closeIcon)
             bindingMailForm.closeButton.setOnClickListener { finish() }
             //TODO Take into account the probability of being null after data comes for img
-            if (mShakeToWinMessage!!.actiondata!!.img!!.isNotEmpty()) {
+         /*   if (mShakeToWinMessage!!.actiondata!!.img!!.isNotEmpty()) {
                 Picasso.get().load(mShakeToWinMessage!!.actiondata!!.img)
                     .into(bindingMailForm.mainImage)
             } else {
                 Glide.with(this)
                     .load(mShakeToWinMessage!!.actiondata!!.img)
                     .into(bindingMailForm.mainImage)
-            }
+            } */
 
-            //TODO title and body can be wrong(I made similar to scratchToWin)
-            bindingMailForm.titleText.text = mShakeToWinMessage!!.actiondata!!.contentTitle!!.replace("\\n", "\n")
-            bindingMailForm.titleText.setTextColor(Color.parseColor(mExtendedProps!!.contentTitleTextColor))
-            bindingMailForm.titleText.textSize = mExtendedProps!!.contentBodyTextSize!!.toFloat() + 12
+            if(mShakeToWinMessage!!.actiondata!!.mailSubscriptionForm!!.title!!.isNotEmpty()) {
+            bindingMailForm.titleText.text = mShakeToWinMessage!!.actiondata!!.mailSubscriptionForm!!.title!!.replace("\\n", "\n")
+            bindingMailForm.titleText.setTextColor(Color.parseColor(mExtendedProps!!.mailSubscriptionForm!!.titleTextColor))
+            bindingMailForm.titleText.textSize = mExtendedProps!!.mailSubscriptionForm!!.titleTextSize!!.toFloat() + 12
             bindingMailForm.titleText.setTypeface(mExtendedProps!!.getContentTitleFontFamily(this), Typeface.BOLD)
+            }
+            if(mShakeToWinMessage!!.actiondata!!.mailSubscriptionForm!!.message!!.isNotEmpty()) {
+                bindingMailForm.bodyText.text =
+                    mShakeToWinMessage!!.actiondata!!.mailSubscriptionForm!!.message!!.replace(
+                        "\\n",
+                        "\n"
+                    )
+                bindingMailForm.bodyText.setTextColor(Color.parseColor(mExtendedProps!!.mailSubscriptionForm!!.textColor))
+                bindingMailForm.bodyText.textSize =
+                    mExtendedProps!!.mailSubscriptionForm!!.textSize!!.toFloat() + 8
+                bindingMailForm.bodyText.typeface = mExtendedProps!!.getContentBodyFontFamily(this)
 
-            bindingMailForm.bodyText.text = mShakeToWinMessage!!.actiondata!!.contentBody!!.replace("\\n", "\n")
-            bindingMailForm.bodyText.setTextColor(Color.parseColor(mExtendedProps!!.contentBodyTextColor))
-            bindingMailForm.bodyText.textSize = mExtendedProps!!.contentBodyTextSize!!.toFloat() + 8
-            bindingMailForm.bodyText.typeface = mExtendedProps!!.getContentBodyFontFamily(this)
-
+            }
             bindingMailForm.emailEdit.hint = mShakeToWinMessage!!.actiondata!!.mailSubscriptionForm!!.placeholder
             bindingMailForm.saveButton.text = mShakeToWinMessage!!.actiondata!!.mailSubscriptionForm!!.buttonLabel
-            bindingMailForm.saveButton.setTextColor(Color.parseColor(mExtendedProps!!.buttonTextColor))
-            bindingMailForm.saveButton.textSize = mExtendedProps!!.buttonTextSize!!.toFloat() + 10
+            bindingMailForm.saveButton.setTextColor(Color.parseColor(mExtendedProps!!.mailSubscriptionForm!!.buttonTextColor))
+            bindingMailForm.saveButton.textSize = mExtendedProps!!.mailSubscriptionForm!!.buttonTextSize!!.toFloat() + 10
             bindingMailForm.saveButton.typeface = mExtendedProps!!.getButtonFontFamily(this)
-            bindingMailForm.saveButton.setBackgroundColor(Color.parseColor(mExtendedProps!!.buttonColor))
+            bindingMailForm.saveButton.setBackgroundColor(Color.parseColor(mExtendedProps!!.mailSubscriptionForm!!.buttonColor))
             bindingMailForm.emailEdit.setOnFocusChangeListener { v, hasFocus ->
                 if (!hasFocus) {
                     hideKeyboard(v)
@@ -206,12 +233,11 @@ class ShakeToWinActivity : Activity(), SensorEventListener {
                     bindingMailForm.mailContainer.visibility = View.GONE
                     bindingMailForm.emailEdit.visibility = View.GONE
                     bindingMailForm.saveButton.visibility = View.GONE
-                    //TODO Up to the next comment line may be unnecessary
                     RequestHandler.createSubsJsonRequest(applicationContext,
                         mShakeToWinMessage!!.actiondata!!.type!!,
                         mShakeToWinMessage!!.actid.toString(),
                         mShakeToWinMessage!!.actiondata!!.auth!!, email)
-                    //To here
+
                     Toast.makeText(applicationContext, mShakeToWinMessage!!.actiondata!!.mailSubscriptionForm!!.successMessage, Toast.LENGTH_SHORT).show()
                     setContentView(bindingStep1.root)
                     setupStep1View()
@@ -327,7 +353,7 @@ class ShakeToWinActivity : Activity(), SensorEventListener {
                         runOnUiThread { setupStep3View() }
                     }
                 }
-                mTimerAfterShaking!!.schedule(task, mShakeToWinMessage!!.actiondata!!.gameElements!!.shakingTime!!.toLong()) //TODO: real data here
+                mTimerAfterShaking!!.schedule(task, mShakeToWinMessage!!.actiondata!!.gameElements!!.shakingTime!!.toLong())
             }
         }
     }
@@ -345,17 +371,32 @@ class ShakeToWinActivity : Activity(), SensorEventListener {
         mSensorManager!!.unregisterListener(this, mSensorManager!!.getDefaultSensor(Sensor.TYPE_ACCELEROMETER))
         setContentView(bindingStep3.root)
 
-        //TODO : is image useless? float?
+        //TODO : I couldn't make the background image.
         setupCloseButtonStep3()
-        bindingStep3.container.setBackgroundColor(Color.parseColor(mExtendedProps!!.promocodeBackgroundColor))
-        //Picasso.get().load("hploaded_images/163_1100_490_20210319175823217.jpg")
-          //      .into(bindingStep3.imageView)
-        bindingStep3.titleView.text = mShakeToWinMessage!!.actiondata!!.gameResultElements!!.title!!.replace("\\n", "\n")
-        bindingStep3.titleView.setTextColor(Color.parseColor(mExtendedProps!!.gameResultElements!!.titleTextColor))
-        bindingStep3.titleView.textSize = mExtendedProps!!.gameResultElements!!.titleTextSize!!.toFloat() +12
-        bindingStep3.bodyTextView.text =mShakeToWinMessage!!.actiondata!!.gameResultElements!!.message!!.replace("\\n", "\n")
-        bindingStep3.bodyTextView.setTextColor(Color.parseColor(mExtendedProps!!.gameResultElements!!.textColor))
-        bindingStep3.bodyTextView.textSize = mExtendedProps!!.gameResultElements!!.textSize!!.toFloat() +8
+        if(mExtendedProps!!.backgroundColor!!.isNotEmpty()) {
+            bindingStep3.container.setBackgroundColor(Color.parseColor(mExtendedProps!!.backgroundColor))
+        }
+        if (mExtendedProps!!.backgroundImage!!.isNotEmpty()){
+            Picasso.get().load(mExtendedProps!!.backgroundImage)
+            .into(bindingStep3.imageView) }
+
+if(mShakeToWinMessage!!.actiondata!!.gameResultElements!!.title!!.isNotEmpty()) {
+    bindingStep3.titleView.text =
+        mShakeToWinMessage!!.actiondata!!.gameResultElements!!.title!!.replace("\\n", "\n")
+    bindingStep3.titleView.setTextColor(Color.parseColor(mExtendedProps!!.gameResultElements!!.titleTextColor))
+    bindingStep3.titleView.textSize =
+        mExtendedProps!!.gameResultElements!!.titleTextSize!!.toFloat() + 12
+}
+        if(mShakeToWinMessage!!.actiondata!!.gameResultElements!!.message!!.isNotEmpty()) {
+            bindingStep3.bodyTextView.text =
+                mShakeToWinMessage!!.actiondata!!.gameResultElements!!.message!!.replace(
+                    "\\n",
+                    "\n"
+                )
+            bindingStep3.bodyTextView.setTextColor(Color.parseColor(mExtendedProps!!.gameResultElements!!.textColor))
+            bindingStep3.bodyTextView.textSize =
+                mExtendedProps!!.gameResultElements!!.textSize!!.toFloat() + 8
+        }
         bindingStep3.couponView.setBackgroundColor(Color.parseColor(mExtendedProps!!.promocodeBackgroundColor))
         bindingStep3.couponCodeView.text = mShakeToWinMessage!!.actiondata!!.promotionCode
         bindingStep3.couponCodeView.setTextColor(Color.parseColor(mExtendedProps!!.promocodeTextColor))

@@ -16,4 +16,7 @@ class ShakeToWin : Serializable{
 
     @SerializedName("actiondata")
     var actiondata: ShakeToWinActionData? = null
+
+    @SerializedName("panelv2"    ) var panelv2    : Boolean?    = null
+
 }
