@@ -63,6 +63,7 @@ class ShakeToWinActivity : Activity(), SensorEventListener {
     private var isShaken = false
     private var isStep3 = false
     private var player: ExoPlayer? = null
+    private var soundPlayer: ExoPlayer? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         bindingMailForm = ActivityShakeToWinMailFormBinding.inflate(layoutInflater)
@@ -93,6 +94,8 @@ class ShakeToWinActivity : Activity(), SensorEventListener {
         }
 
     override fun onDestroy() {
+        super.onDestroy()
+
         if (mTimerWithoutShaking != null) {
             mTimerWithoutShaking!!.cancel()
         }
@@ -105,7 +108,7 @@ class ShakeToWinActivity : Activity(), SensorEventListener {
         releasePlayer()
         //TODO real control whether the code is null or empty
         // set a variable on step3 when the code is shown
-        if(!mExtendedProps!!.promocodeBannerText!!.isNotEmpty()) {
+        if(mExtendedProps!!.promocodeBannerText!!.isNotEmpty()) {
             try {
                 val extendedProps = Gson().fromJson(URI(mShakeToWinMessage!!.actiondata!!.ExtendedProps).path,
                     ShakeToWinExtendedProps::class.java
@@ -124,7 +127,7 @@ class ShakeToWinActivity : Activity(), SensorEventListener {
             }
         }
 
-        super.onDestroy()
+
     }
 
     private fun setupMailForm() {
@@ -137,8 +140,12 @@ class ShakeToWinActivity : Activity(), SensorEventListener {
                 bindingMailForm.container.setBackgroundColor(Color.parseColor(mExtendedProps!!.backgroundColor))
             }
             if (mExtendedProps!!.backgroundImage!!.isNotEmpty()){
+
+
                 Picasso.get().load(mExtendedProps!!.backgroundImage)
-                    .into(bindingMailForm.mainImage) }
+                    .into(bindingMailForm.mainImage)
+                bindingMailForm.mainImage.visibility = View.VISIBLE
+            }
 
             bindingMailForm.invalidEmailMessage.text = mShakeToWinMessage!!.actiondata!!.mailSubscriptionForm!!.invalidEmailMessage
             bindingMailForm.resultText.text = mShakeToWinMessage!!.actiondata!!.mailSubscriptionForm!!.checkConsentMessage

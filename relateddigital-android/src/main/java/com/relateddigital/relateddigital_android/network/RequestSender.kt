@@ -243,6 +243,7 @@ object RequestSender {
                                             currentRequest.parent!!.startActivity(intent)
                                         }
                                         !actionsResponse.mShakeToWinList.isNullOrEmpty() -> {
+                                            ActivityUtils.parentActivity = currentRequest.parent
                                             val intent =
                                                 Intent(
                                                     currentRequest.parent,
