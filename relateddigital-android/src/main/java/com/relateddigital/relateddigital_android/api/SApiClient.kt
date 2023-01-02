@@ -26,7 +26,7 @@ object SApiClient {
             synchronized(SApiClient::class.java) {
                 if (retrofit == null) {
                     retrofit = Retrofit.Builder()
-                            .baseUrl("https://s.visilabs.net/")
+                            .baseUrl("http://tests.visilabs.net/")
                             .addConverterFactory(GsonConverterFactory.create())
                             .client(httpClient.build())
                             .build()

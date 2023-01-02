@@ -199,6 +199,7 @@ class Constants {
 
         const val BUTTON_LINK = "link"
         const val BUTTON_REDIRECT = "redirect"
+        const val BUTTON_COPY_REDIRECT = "copy_redirect"
 
         const val PAYLOAD_SP_ID_KEY = "payload_sp_with_id"
         const val PAYLOAD_SP_ARRAY_ID_KEY = "messages_with_id"

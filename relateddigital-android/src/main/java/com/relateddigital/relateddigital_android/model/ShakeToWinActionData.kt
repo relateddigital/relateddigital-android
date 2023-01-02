@@ -17,5 +17,16 @@ class ShakeToWinActionData : Serializable {
     @SerializedName("cid"                    ) var cid                  : String?               = null
     @SerializedName("staticcode"             ) var staticcode           : String?               = null
     @SerializedName("courseofaction"         ) var courseofaction       : String?               = null
+    @SerializedName("img"                    ) var img                  : String?               = null
+    @SerializedName("content_title"          ) var contentTitle         : String?               = null
+    @SerializedName("content_body"           ) var contentBody          : String?               = null
+    @SerializedName("auth")
+    var auth: String? = null
+
+    @SerializedName("promotion_code")
+    var promotionCode: String? = null
+
+    @SerializedName("type")
+    var type: String? = null
 
 }
