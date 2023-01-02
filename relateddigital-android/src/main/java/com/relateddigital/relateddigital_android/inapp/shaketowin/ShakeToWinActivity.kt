@@ -6,8 +6,11 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Intent
 import android.content.pm.ActivityInfo
+import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.Typeface
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.Drawable
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
@@ -141,10 +144,18 @@ class ShakeToWinActivity : Activity(), SensorEventListener {
             }
             if (mExtendedProps!!.backgroundImage!!.isNotEmpty()){
 
+                Picasso.get().load(mExtendedProps!!.backgroundImage).into(object : com.squareup.picasso.Target {
+                    override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {
+                        //TODO("not implemented")
+                    }
 
-                Picasso.get().load(mExtendedProps!!.backgroundImage)
-                    .into(bindingMailForm.mainImage)
-                bindingMailForm.mainImage.visibility = View.VISIBLE
+                    override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
+                        bindingMailForm.linearLayout.background = BitmapDrawable(resources, bitmap)
+                    }
+
+                    override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}
+
+                })
             }
 
             bindingMailForm.invalidEmailMessage.text = mShakeToWinMessage!!.actiondata!!.mailSubscriptionForm!!.invalidEmailMessage

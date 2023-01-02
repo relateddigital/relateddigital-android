@@ -6,6 +6,7 @@
     android:layout_height="wrap_content">
 
     <LinearLayout
+        android:id="@+id/linear_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
@@ -18,15 +19,8 @@
             android:layout_margin="5dp"
             android:textColor="#fff" />
 
-        <ImageView
-            android:id="@+id/main_image"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
-            android:layout_marginTop="12dp"
-            android:adjustViewBounds="true" />
+
+
 
         <TextView
             android:id="@+id/title_text"
