@@ -85,8 +85,8 @@ class ShakeToWinCodeBannerFragment :Fragment() {
     }
 
     private fun setupUi() {
-        if (!mExtendedProps!!.promocodeBackgroundColor.isNullOrEmpty()) {
-            binding.container.setBackgroundColor(Color.parseColor(mExtendedProps!!.promocodeBackgroundColor))
+        if (!mExtendedProps!!.promocodeBannerBackgroundColor.isNullOrEmpty()) {
+            binding.container.setBackgroundColor(Color.parseColor(mExtendedProps!!.promocodeBannerBackgroundColor))
         } else {
             binding.container.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.black))
         }
