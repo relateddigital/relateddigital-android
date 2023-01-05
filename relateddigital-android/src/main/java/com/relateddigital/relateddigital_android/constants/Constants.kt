@@ -55,7 +55,7 @@ class Constants {
         const val REQUEST_SUBS_EMAIL_KEY = "OM.subsemail"
         const val REQUEST_ACTION_ID_KEY = "action_id"
         const val REQUEST_ACTION_TYPE_KEY = "action_type"
-        const val REQUEST_ACTION_TYPE_VAL = "MailSubscriptionForm~SpinToWin~ScratchToWin~ProductStatNotifier~drawer~GiftRain~FindToWin~AppBanner"
+        const val REQUEST_ACTION_TYPE_VAL = "MailSubscriptionForm~SpinToWin~ScratchToWin~ProductStatNotifier~drawer~GiftRain~FindToWin~AppBanner~ShakeToWin"
 
 
         var VISILABS_PARAMETERS: List<VisilabsParameter>? = null
@@ -199,6 +199,7 @@ class Constants {
 
         const val BUTTON_LINK = "link"
         const val BUTTON_REDIRECT = "redirect"
+        const val BUTTON_COPY_REDIRECT = "copy_redirect"
 
         const val PAYLOAD_SP_ID_KEY = "payload_sp_with_id"
         const val PAYLOAD_SP_ARRAY_ID_KEY = "messages_with_id"

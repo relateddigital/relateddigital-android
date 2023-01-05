@@ -13,6 +13,9 @@ class ActionResponse : Serializable {
     @SerializedName("SpinToWin")
     var mSpinToWinList: List<SpinToWin>? = null
 
+    @SerializedName("ShakeToWin")
+    var mShakeToWinList: List<ShakeToWin>? = null
+
     @SerializedName("ScratchToWin")
     var mScratchToWinList: List<ScratchToWin>? = null
 
@@ -54,6 +57,11 @@ class ActionResponse : Serializable {
         get() = mSpinToWinList
         set(spinToWinList) {
             mSpinToWinList = spinToWinList
+        }
+    var shakeToWinList: List<ShakeToWin>?
+        get() = mShakeToWinList
+        set(ShakeToWin) {
+            mShakeToWinList = shakeToWinList
         }
     var scratchToWinList: List<ScratchToWin>?
         get() = mScratchToWinList
