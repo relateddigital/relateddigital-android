@@ -45,7 +45,10 @@ class InAppFullActivity : Activity(), IVisilabs {
             ?: intent.getIntExtra(INTENT_ID_KEY, Int.MAX_VALUE)
         mUpdateDisplayState = InAppUpdateDisplayState.claimDisplayState(mIntentId)
         if (mUpdateDisplayState == null) {
-            Log.e("Visilabs", "VisilabsNotificationActivity intent received, but nothing was found to show.")
+            Log.e(
+                "Visilabs",
+                "VisilabsNotificationActivity intent received, but nothing was found to show."
+            )
             InAppUpdateDisplayState.releaseDisplayState(mIntentId)
             finish()
             return
@@ -65,7 +68,8 @@ class InAppFullActivity : Activity(), IVisilabs {
     }
 
     override fun setUpView() {
-        val inAppNotificationState: InAppNotificationState? = mUpdateDisplayState!!.getDisplayState() as InAppNotificationState?
+        val inAppNotificationState: InAppNotificationState? =
+            mUpdateDisplayState!!.getDisplayState() as InAppNotificationState?
         if (inAppNotificationState != null) {
             mInApp = inAppNotificationState.getInAppMessage()
             if (mInApp != null) {
@@ -93,7 +97,7 @@ class InAppFullActivity : Activity(), IVisilabs {
         if (!mInApp!!.mActionData!!.mImg.isNullOrEmpty()) {
             binding.fivInAppImage.visibility = View.VISIBLE
             binding.fullVideoView.visibility = View.GONE
-            if(AppUtils.isAnImage(mInApp!!.mActionData!!.mImg)) {
+            if (AppUtils.isAnImage(mInApp!!.mActionData!!.mImg)) {
                 Picasso.get().load(mInApp!!.mActionData!!.mImg).into(binding.fivInAppImage)
             } else {
                 Glide.with(this)
@@ -102,7 +106,7 @@ class InAppFullActivity : Activity(), IVisilabs {
             }
         } else {
             binding.fivInAppImage.visibility = View.GONE
-            if(!mInApp!!.mActionData!!.mVideoUrl.isNullOrEmpty()) {
+            if (!mInApp!!.mActionData!!.mVideoUrl.isNullOrEmpty()) {
                 binding.fullVideoView.visibility = View.VISIBLE
                 initializePlayer()
                 startPlayer()
@@ -115,8 +119,9 @@ class InAppFullActivity : Activity(), IVisilabs {
 
     private fun setPromotionCode() {
         if (!StringUtils.isNullOrWhiteSpace(mInApp!!.mActionData!!.mPromotionCode)
-                && !StringUtils.isNullOrWhiteSpace(mInApp!!.mActionData!!.mPromoCodeBackgroundColor)
-                && !StringUtils.isNullOrWhiteSpace(mInApp!!.mActionData!!.mPromoCodeTextColor)) {
+            && !StringUtils.isNullOrWhiteSpace(mInApp!!.mActionData!!.mPromoCodeBackgroundColor)
+            && !StringUtils.isNullOrWhiteSpace(mInApp!!.mActionData!!.mPromoCodeTextColor)
+        ) {
             binding.llCouponContainer.visibility = View.VISIBLE
             binding.llCouponContainer.setBackgroundColor(Color.parseColor(mInApp!!.mActionData!!.mPromoCodeBackgroundColor))
             binding.tvCouponCode.text = mInApp!!.mActionData!!.mPromotionCode
@@ -149,10 +154,23 @@ class InAppFullActivity : Activity(), IVisilabs {
                 RelatedDigital.setInAppButtonInterface(null)
                 buttonInterface.onPress(mInApp!!.mActionData!!.mAndroidLnk)
             } else {
-                if (mInApp!!.mActionData!!.mSecondButtonFunction == Constants.BUTTON_LINK) {
-
-                    if (!mInApp!!.mActionData!!.mAndroidLnk.isNullOrEmpty()) {
+                if (!mInApp!!.mActionData!!.mAndroidLnk.isNullOrEmpty()) {
                     try {
+                        if (!mInApp!!.mActionData!!.mPromotionCode.isNullOrEmpty()) {
+
+                            val clipboard =
+                                applicationContext.getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
+                            val clip = ClipData.newPlainText(
+                                getString(R.string.coupon_code),
+                                mInApp!!.mActionData!!.mPromotionCode
+                            )
+                            clipboard.setPrimaryClip(clip)
+                            Toast.makeText(
+                                applicationContext,
+                                getString(R.string.copied_to_clipboard),
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
                         val viewIntent = Intent(
                             Intent.ACTION_VIEW,
                             StringUtils.getURIfromUrlString(mInApp!!.mActionData!!.mAndroidLnk)
@@ -162,34 +180,8 @@ class InAppFullActivity : Activity(), IVisilabs {
                         Log.i("Visilabs", "User doesn't have an activity for notification URI")
                     }
                 }
-                }
-                if (mInApp!!.mActionData!!.mSecondButtonFunction == Constants.BUTTON_COPY_REDIRECT) {
-                    if (mInApp!!.mActionData!!.mMsgType == InAppNotificationType.IMAGE_TEXT_BUTTON.toString()) {
-                        if (!mInApp!!.mActionData!!.mSecondButtonAndroidLink.isNullOrEmpty()) {
-                            try {
-                                val viewIntent = Intent(
-                                    Intent.ACTION_VIEW,
-                                    StringUtils.getURIfromUrlString(mInApp!!.mActionData!!.mAndroidLnk)
-                                )
-                                this@InAppFullActivity.startActivity(viewIntent)
+            }
 
-                            } catch  (e: ActivityNotFoundException) {
-                                Log.i("Visilabs", "User doesn't have an activity for notification URI")
-                            }
-                        }
-
-                        val clipboard = applicationContext.getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
-                        val clip = ClipData.newPlainText(getString(R.string.coupon_code), mInApp!!.mActionData!!.mPromotionCode)
-                        clipboard.setPrimaryClip(clip)
-                        Toast.makeText(applicationContext, getString(R.string.copied_to_clipboard), Toast.LENGTH_LONG).show()
-                    }
-
-                }
-                else {
-                    AppUtils.goToNotificationSettings(applicationContext)
-                }
-
-                }
             finish()
             InAppUpdateDisplayState.releaseDisplayState(mIntentId)
         }

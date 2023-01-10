@@ -23,13 +23,6 @@ class MainApplication : Application() {
             profileId = "356467332F6533766975593D",
             dataSource = "visistore")
 
-        /* dsource = mrhp
-         oid = 394A48556A2F76466136733D
-                 pid = 75763259366A3345686E303D
-
-                 organizationId = "676D325830564761676D453D",
-         profileId = "356467332F6533766975593D",
-         dataSource = "visistore") */
 
         // Enable In-App Notifications
         RelatedDigital.setIsInAppNotificationEnabled(

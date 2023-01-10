@@ -18,6 +18,7 @@ import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.ui.PlayerView
 import com.relateddigital.relateddigital_android.R
 import com.relateddigital.relateddigital_android.RelatedDigital
+import com.relateddigital.relateddigital_android.constants.Constants
 import com.relateddigital.relateddigital_android.model.InAppCarouselItem
 import com.relateddigital.relateddigital_android.model.InAppMessage
 import com.relateddigital.relateddigital_android.network.RequestHandler
@@ -318,20 +319,39 @@ class CarouselAdapter(
                     RelatedDigital.setInAppButtonInterface(null)
                     buttonCallback.onPress(mCarouselItems!![position].androidLnk)
                 } else {
-                   //TODO if(mCarouselItems!![position].buttonFunction)
-                    /*val clipboard =
-                        mContext.getSystemService(Activity.CLIPBOARD_SERVICE) as ClipboardManager
-                    val clip = ClipData.newPlainText(
-                        mContext.getString(R.string.coupon_code),
-                        mCarouselItems!![position].promotionCode
-                    )
-                    clipboard.setPrimaryClip(clip)
-                    Toast.makeText(
-                        mContext,
-                        mContext.getString(R.string.copied_to_clipboard),
-                        Toast.LENGTH_LONG
-                    ).show() */
-                    carouselButtonInterface.onPress(mCarouselItems!![position].androidLnk)
+                    if (mCarouselItems!![position].buttonFunction == Constants.BUTTON_LINK) {
+                        if (!mCarouselItems!![position].androidLnk.isNullOrEmpty()) {
+                            carouselButtonInterface.onPress(mCarouselItems!![position].androidLnk)
+                        }
+
+                    } else if (mCarouselItems!![position].buttonFunction == Constants.BUTTON_COPY_REDIRECT) {
+                        if (!mCarouselItems!![position].androidLnk.isNullOrEmpty()) {
+                            carouselButtonInterface.onPress(mCarouselItems!![position].androidLnk)
+                            val clipboard =
+                                mContext.getSystemService(Activity.CLIPBOARD_SERVICE) as ClipboardManager
+                            val clip = ClipData.newPlainText(
+                                mContext.getString(R.string.coupon_code),
+                                mCarouselItems!![position].promotionCode
+                            )
+                            clipboard.setPrimaryClip(clip)
+                            Toast.makeText(
+                                mContext,
+                                mContext.getString(R.string.copied_to_clipboard),
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
+                    } else if(mCarouselItems!![position].buttonFunction == Constants.BUTTON_REDIRECT) {
+                        AppUtils.goToNotificationSettings(mContext)
+
+                    }
+
+                    else {
+                        if (!mCarouselItems!![position].androidLnk.isNullOrEmpty()) {
+                            carouselButtonInterface.onPress(mCarouselItems!![position].androidLnk)
+                        }
+                        else
+                        AppUtils.goToNotificationSettings(mContext)
+                    }
                 }
                 finishCallback.onFinish()
             }

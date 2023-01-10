@@ -92,6 +92,9 @@ class InAppCarouselItem constructor(`in`: Parcel) : Parcelable {
     @SerializedName("background_color")
     var backgroundColor: String?
 
+    @SerializedName("button_function")
+    var buttonFunction: String?
+
     @SerializedName("ios_lnk")
     var iosLnk: String?
 
@@ -226,6 +229,7 @@ class InAppCarouselItem constructor(`in`: Parcel) : Parcelable {
         dest.writeString(iosLnk)
         dest.writeString(androidLnk)
         dest.writeString(videoUrl)
+        dest.writeString(buttonFunction)
     }
 
     companion object CREATOR : Parcelable.Creator<InAppCarouselItem> {
@@ -266,6 +270,7 @@ class InAppCarouselItem constructor(`in`: Parcel) : Parcelable {
         buttonTextsize = `in`.readString()
         backgroundImage = `in`.readString()
         backgroundColor = `in`.readString()
+        buttonFunction = `in`.readString()
         iosLnk = `in`.readString()
         androidLnk = `in`.readString()
         videoUrl = `in`.readString()
