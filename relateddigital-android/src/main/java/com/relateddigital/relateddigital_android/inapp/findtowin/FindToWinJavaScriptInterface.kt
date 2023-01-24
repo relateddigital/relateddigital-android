@@ -79,7 +79,7 @@ class FindToWinJavaScriptInterface internal constructor(webViewDialogFragment: F
      * This method saves the promotion code shown
      */
     @JavascriptInterface
-    fun saveCodeGotten(code: String) {
+    fun saveCodeGotten(code: String, email: String?, report: String?) {
         mShowCodeInterface.onCodeShown(code)
     }
 
