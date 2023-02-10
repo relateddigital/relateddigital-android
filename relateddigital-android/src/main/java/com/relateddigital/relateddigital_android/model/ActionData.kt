@@ -77,6 +77,15 @@ class ActionData : Serializable {
     @SerializedName("promotion_code")
     var mPromotionCode: String? = null
 
+    @SerializedName("promocode_copybutton_text")
+    var mPromoCodeCopyButtonText: String? = null
+
+    @SerializedName("promocode_copybutton_text_color")
+    var mPromoCodeCopyButtonTextColor: String? = null
+
+    @SerializedName("promocode_copybutton_color")
+    var mPromocodeCopyButtonColor: String? = null
+
     @SerializedName("number_colors")
     var mNumberColors: Array<String?>? = null
 
@@ -173,6 +182,9 @@ class ActionData : Serializable {
     @SerializedName("second_button_android_lnk")
     var mSecondButtonAndroidLink: String? = null
 
+    @SerializedName("button_border_radius")
+    var mButtonBorderRadius: Int? = null
+
 
     fun getFontFamily(context: Context): Typeface? {
         if (mFontFamily == null || mFontFamily == "") {
@@ -187,9 +199,13 @@ class ActionData : Serializable {
         if (FontFamily.Serif.toString() == mFontFamily!!.lowercase(Locale.getDefault())) {
             return Typeface.SERIF
         }
-        if(!mCustomFontFamilyAndroid.isNullOrEmpty()) {
+        if (!mCustomFontFamilyAndroid.isNullOrEmpty()) {
             if (isFontResourceAvailable(context, mCustomFontFamilyAndroid)) {
-                val id = context.resources.getIdentifier(mCustomFontFamilyAndroid, "font", context.packageName)
+                val id = context.resources.getIdentifier(
+                    mCustomFontFamilyAndroid,
+                    "font",
+                    context.packageName
+                )
                 return ResourcesCompat.getFont(context, id)
             }
         }

@@ -74,18 +74,44 @@
 
                         <TextView
                             android:id="@+id/tv_coupon_code"
-                            android:layout_width="match_parent"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_gravity="center"
+                            android:layout_gravity="center|center_horizontal|center_vertical"
                             android:ellipsize="end"
-                            android:gravity="center"
-                            android:paddingLeft="10dp"
-                            android:paddingTop="5dp"
-                            android:paddingRight="10dp"
-                            android:paddingBottom="5dp"
+                            android:paddingTop="10dp"
+                            android:paddingBottom="10dp"
                             android:text="@string/coupon_code" />
 
+                        <TextView
+                            android:id="@+id/tv_coupon_code_with_button"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center|start|center_horizontal"
+                            android:layout_marginStart="33dp"
+                            android:layout_marginTop="1dp"
+                            android:layout_marginEnd="140dp"
+                            android:layout_marginBottom="1dp"
+                            android:background="@drawable/textview_border"
+                            android:ellipsize="end"
+                            android:gravity="start"
+                            android:paddingLeft="45dp"
+                            android:paddingTop="4dp"
+                            android:paddingRight="45dp"
+                            android:paddingBottom="4dp"
+                            android:text="@string/coupon_code" />
+
+                        <Button
+                            android:id="@+id/copyButton"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center|end"
+                            android:layout_marginStart="190dp"
+                            android:layout_marginEnd="32dp"
+                            android:padding="5dp"
+                            android:text="Kopyala" />
+
                         <ImageView
+                            android:id="@+id/content_copy"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center|end"
@@ -130,6 +156,7 @@
                     android:visibility="gone" />
 
                 <LinearLayout
+                    android:id="@+id/ll_button_container"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="32dp"
@@ -142,10 +169,10 @@
                         android:id="@+id/btn_template"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
+                        android:layout_gravity="center"
                         android:layout_weight="1"
                         android:background="@drawable/rounded_corners_full"
                         android:padding="5dp"
-                        android:layout_gravity="center"
                         android:text="@string/OK"
                         android:textAllCaps="false" />
 

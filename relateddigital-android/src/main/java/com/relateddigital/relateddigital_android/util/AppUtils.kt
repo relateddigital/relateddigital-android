@@ -45,7 +45,7 @@ object AppUtils {
 
     private fun id(context: Context): String {
         if (sId.isEmpty()) {
-            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                 if (Environment.isExternalStorageManager()) {
                     try {
                         sId = getIdFromExternalStorage(context)
@@ -186,7 +186,7 @@ object AppUtils {
 
     fun getCarrier(context: Context): String {
         val manager = context
-                .getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
+            .getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
         return manager.networkOperator
     }
 
@@ -307,23 +307,41 @@ object AppUtils {
 
     fun getLocationPermissionStatus(context: Context?): LocationPermission {
         return if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P) {
-            if (ContextCompat.checkSelfPermission(context!!, Manifest.permission.ACCESS_FINE_LOCATION)
-                    == PackageManager.PERMISSION_GRANTED ||
-                    ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION)
-                    == PackageManager.PERMISSION_GRANTED) {
+            if (ContextCompat.checkSelfPermission(
+                    context!!,
+                    Manifest.permission.ACCESS_FINE_LOCATION
+                )
+                == PackageManager.PERMISSION_GRANTED ||
+                ContextCompat.checkSelfPermission(
+                    context,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                )
+                == PackageManager.PERMISSION_GRANTED
+            ) {
                 LocationPermission.ALWAYS
             } else {
                 LocationPermission.NONE
             }
         } else {
-            if (ContextCompat.checkSelfPermission(context!!, Manifest.permission.ACCESS_BACKGROUND_LOCATION)
-                    == PackageManager.PERMISSION_GRANTED) {
+            if (ContextCompat.checkSelfPermission(
+                    context!!,
+                    Manifest.permission.ACCESS_BACKGROUND_LOCATION
+                )
+                == PackageManager.PERMISSION_GRANTED
+            ) {
                 LocationPermission.ALWAYS
             } else {
-                if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
-                        == PackageManager.PERMISSION_GRANTED ||
-                        ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION)
-                        == PackageManager.PERMISSION_GRANTED) {
+                if (ContextCompat.checkSelfPermission(
+                        context,
+                        Manifest.permission.ACCESS_FINE_LOCATION
+                    )
+                    == PackageManager.PERMISSION_GRANTED ||
+                    ContextCompat.checkSelfPermission(
+                        context,
+                        Manifest.permission.ACCESS_COARSE_LOCATION
+                    )
+                    == PackageManager.PERMISSION_GRANTED
+                ) {
                     LocationPermission.APP_OPEN
                 } else {
                     LocationPermission.NONE
@@ -384,10 +402,11 @@ object AppUtils {
         for (key in map.keys) {
             if (!StringUtils.isNullOrWhiteSpace(key)) {
                 if (!(key != Constants.ORGANIZATION_ID_REQUEST_KEY && key != Constants.SITE_ID_REQUEST_KEY
-                                && key != Constants.EXVISITOR_ID_REQUEST_KEY && key != Constants.COOKIE_ID_REQUEST_KEY
-                                && key != Constants.ZONE_ID_KEY && key != Constants.BODY_KEY
-                                && key != Constants.TOKEN_ID_REQUEST_KEY && key != Constants.APP_ID_REQUEST_KEY
-                                && key != Constants.API_VERSION_REQUEST_KEY && key != Constants.FILTER_KEY)) {
+                            && key != Constants.EXVISITOR_ID_REQUEST_KEY && key != Constants.COOKIE_ID_REQUEST_KEY
+                            && key != Constants.ZONE_ID_KEY && key != Constants.BODY_KEY
+                            && key != Constants.TOKEN_ID_REQUEST_KEY && key != Constants.APP_ID_REQUEST_KEY
+                            && key != Constants.API_VERSION_REQUEST_KEY && key != Constants.FILTER_KEY)
+                ) {
                     map.remove(key)
                 }
             } else {
@@ -517,7 +536,7 @@ object AppUtils {
         return notificationIntent
     }
 
-    fun getStartActivityIntent(context: Context, pushMessage: Message) : Intent{
+    fun getStartActivityIntent(context: Context, pushMessage: Message): Intent {
         val intentStr: String =
             SharedPref.readString(context, Constants.INTENT_NAME)
         var intent: Intent
@@ -621,7 +640,11 @@ object AppUtils {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-    fun createSpinToWinCustomFontFiles(context: Context, jsonStr: String?, spinToWinJsStr: String): ArrayList<String?>? {
+    fun createSpinToWinCustomFontFiles(
+        context: Context,
+        jsonStr: String?,
+        spinToWinJsStr: String
+    ): ArrayList<String?>? {
         var result: ArrayList<String?>? = null
         val spinToWinModel: SpinToWin?
         val extendedProps: SpinToWinExtendedProps?
@@ -752,7 +775,11 @@ object AppUtils {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-    fun createGiftRainCustomFontFiles(context: Context, jsonStr: String?, jsStr: String): ArrayList<String?>? {
+    fun createGiftRainCustomFontFiles(
+        context: Context,
+        jsonStr: String?,
+        jsStr: String
+    ): ArrayList<String?>? {
         var result: ArrayList<String?>? = null
         val giftRainModel: GiftRain?
         val extendedProps: GiftCatchExtendedProps?
@@ -799,7 +826,11 @@ object AppUtils {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-    fun createFindToWinCustomFontFiles(context: Context, jsonStr: String?, jsStr: String): ArrayList<String?>? {
+    fun createFindToWinCustomFontFiles(
+        context: Context,
+        jsonStr: String?,
+        jsStr: String
+    ): ArrayList<String?>? {
         var result: ArrayList<String?>? = null
         val findToWinModel: FindToWin?
         val extendedProps: FindToWinExtendedProps?
@@ -844,6 +875,58 @@ object AppUtils {
         }
         return result
     }
+
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    fun createPuzzleCustomFontFiles(
+        context: Context,
+        jsonStr: String?,
+        jsStr: String
+    ): ArrayList<String?>? {
+        var result: ArrayList<String?>? = null
+        val puzzleModel: Puzzle?
+        val extendedProps: PuzzleExtendedProps?
+        val baseUrlPath = "file://" + context.filesDir.absolutePath + "/"
+        try {
+            puzzleModel = Gson().fromJson(jsonStr, Puzzle::class.java)
+            extendedProps = Gson().fromJson(
+                URI(puzzleModel.actiondata!!.extendedProps).path,
+                PuzzleExtendedProps::class.java
+            )
+        } catch (e: java.lang.Exception) {
+            Log.e("Puzzle", "Extended properties could not be parsed properly!")
+            return null
+        }
+        if (puzzleModel == null || extendedProps == null) {
+            return null
+        }
+        val fontFamily: String = extendedProps.fontFamily ?: return null
+
+        val htmlStr: String = writeHtmlToFile(context, "puzzle", jsStr)
+
+        if (fontFamily == "custom") {
+            val fontExtension = getFontNameWithExtension(
+                context,
+                extendedProps.customFontFamilyAndroid!!
+            )
+            if (fontExtension.isNotEmpty()) {
+                writeFontToFile(
+                    context,
+                    extendedProps.customFontFamilyAndroid!!,
+                    fontExtension
+                )
+                puzzleModel.fontFiles.add(fontExtension)
+            }
+        }
+
+        if (htmlStr.isNotEmpty()) {
+            result = ArrayList()
+            result.add(baseUrlPath)
+            result.add(htmlStr)
+            result.add(Gson().toJson(puzzleModel, Puzzle::class.java))
+        }
+        return result
+    }
+
 
     fun goToNotificationSettings(context: Context) {
         try {
@@ -926,7 +1009,7 @@ object AppUtils {
         context: Context,
         fontName: String,
         fontNameWithExtension: String
-    ){
+    ) {
         val relatedDigitalCacheDir = context.filesDir
         var `is`: InputStream? = null
         var fos: FileOutputStream? = null

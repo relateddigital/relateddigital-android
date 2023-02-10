@@ -104,6 +104,9 @@ class InAppCarouselItem constructor(`in`: Parcel) : Parcelable {
     @SerializedName("videourl")
     var videoUrl: String?
 
+    @SerializedName("button_border_radius")
+    var mButtonBorderRadius: Int? = null
+
     fun getTitleFontFamily(context: Context): Typeface? {
         if (titleFontFamily == null || titleFontFamily == "") {
             return Typeface.DEFAULT

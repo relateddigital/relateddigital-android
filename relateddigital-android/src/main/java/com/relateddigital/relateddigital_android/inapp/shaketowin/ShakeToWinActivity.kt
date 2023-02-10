@@ -79,6 +79,7 @@ class ShakeToWinActivity : Activity(), SensorEventListener {
         parseExtendedProps()
         cacheResources()
         setupMailForm()
+
     }
 
     private val shakeToWinMessage: Unit
@@ -512,12 +513,12 @@ class ShakeToWinActivity : Activity(), SensorEventListener {
 
     private fun initializeSoundPlayer() {
         soundPlayer = ExoPlayer.Builder(this).build()
-        bindingStep2.videoView.player = soundPlayer
         val mediaItem = MediaItem.fromUri(
-            mShakeToWinMessage!!.actiondata!!.gameElements!!.videoUrl.toString()
+            mShakeToWinMessage!!.actiondata!!.gameElements!!.soundUrl.toString()
         )
         soundPlayer!!.setMediaItem(mediaItem)
         soundPlayer!!.prepare()
+        soundPlayer!!.playWhenReady = true
     }
 
     private fun parseExtendedProps() {
