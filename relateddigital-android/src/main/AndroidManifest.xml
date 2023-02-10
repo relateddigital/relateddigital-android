@@ -9,8 +9,8 @@
         android:supportsRtl="true">
         <activity
             android:name=".inapp.story.StoryActivity"
-            android:theme="@style/Theme.AppCompat.NoActionBar"
-            android:noHistory="true"/>
+            android:noHistory="true"
+            android:theme="@style/Theme.AppCompat.NoActionBar" />
         <activity
             android:name=".inapp.shaketowin.ShakeToWinActivity"
             android:configChanges="orientation"
@@ -48,9 +48,10 @@
             android:noHistory="true"
             android:theme="@style/Theme.AppCompat.Light.Dialog.Alert"
             android:windowSoftInputMode="adjustResize" />
-        <activity android:name=".util.PermissionActivity"
-            android:theme="@style/Theme.Transparent"
-            android:noHistory="true"/>
+        <activity
+            android:name=".util.PermissionActivity"
+            android:noHistory="true"
+            android:theme="@style/Theme.Transparent" />
 
 
         <service
@@ -61,6 +62,13 @@
             </intent-filter>
         </service>
 
+        <service
+            android:name=".push.services.RelatedDigitalHuaweiMessagingService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.huawei.push.action.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
 
         <service
             android:name="com.relateddigital.relateddigital_android.geofence.GeofenceTransitionsIntentService"
@@ -74,12 +82,12 @@
         <receiver
             android:name="com.relateddigital.relateddigital_android.geofence.GeofenceBroadcastReceiver"
             android:enabled="true"
-            android:exported="false"/>
+            android:exported="false" />
 
         <receiver
             android:name=".push.carousel.CarouselEventReceiver"
-            android:exported="false"
-            android:enabled="true"/>
+            android:enabled="true"
+            android:exported="false" />
 
     </application>
 
