@@ -24,9 +24,9 @@ class MainApplication : Application() {
         // Initialize RelatedDigital with mandatory information
         RelatedDigital.init(
             context = applicationContext,
-            organizationId = testOrganizationId,
-            profileId = testProfileId,
-            dataSource = testDataSource)
+            organizationId = liveOrganizationId,
+            profileId = liveProfileId,
+            dataSource = liveDataSource)
 
 
         // Enable In-App Notifications
