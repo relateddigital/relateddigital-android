@@ -1,4 +1,4 @@
-package com.relateddigital.relateddigital_android
+package com.relateddigital.androidexampleapp
 
 import com.relateddigital.relateddigital_android.model.UtilResultModel
 import com.relateddigital.relateddigital_android.util.AppUtils

@@ -1,5 +1,6 @@
 package com.relateddigital.relateddigital_android.inapp.scratchtowin
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.*
 import android.util.AttributeSet
@@ -34,6 +35,7 @@ class EraseView(private val mContext: Context, attrs: AttributeSet?) : View(mCon
         super.onDraw(canvas)
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent): Boolean {
         return if (isItEnabled) {
             if (!isCompleted) {

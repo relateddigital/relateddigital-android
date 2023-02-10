@@ -24,7 +24,8 @@ You can find the documents about how to use the SDK on the following links:
 Related Digital Android SDK requires minimum API level 21.
 
 Please, add Maven jitpack repository into your project-level build.gradle file as shown below:
- ```java
+
+ ```gradle
 allprojects {
 	repositories {
 		...
@@ -33,9 +34,9 @@ allprojects {
 }
  ```
 
-Please, add the dependency of relateddigital-android library into your module-level build.gradle file as shown below:
+Please, add the dependency of `relateddigital-android` library into your module-level build.gradle file as shown below:
 
- ```java
+ ```gradle
 implementation 'com.github.relateddigital:relateddigital-android:1.0.8'
  ```
 

@@ -601,6 +601,9 @@ open class SmileRating : BaseRating {
             GREAT -> return 0.5f
             OKAY -> return 0.25f
             TERRIBLE -> return 0f
+            NONE -> {
+                return  0f
+            }
         }
         return 0f
     }

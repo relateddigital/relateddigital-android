@@ -9,7 +9,8 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
+        tools:ignore="ScopedStorage" />
 
     <uses-permission
         android:name="android.permission.QUERY_ALL_PACKAGES"
@@ -23,32 +24,35 @@
         android:roundIcon="@mipmap/ic_launcher"
         android:requestLegacyExternalStorage="true"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Androidexampleapp">
+        android:theme="@style/Theme.Androidexampleapp"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        tools:targetApi="s"
+        tools:ignore="DataExtractionRules">
         <activity
             android:name=".InAppNotificationActivity"
             android:label="@string/in_app_notification_page_label"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="fullSensor" />
         <activity
             android:name=".StoryDemoActivity"
             android:label="@string/story_page_label"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="fullSensor" />
         <activity
             android:name=".BannerCarouselDemoActivity"
             android:label="@string/banner_carousel"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="fullSensor" />
         <activity
             android:name=".EventActivity"
             android:label="@string/event_page_label"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="fullSensor" />
         <activity
             android:name=".PushNotificationActivity"
             android:label="@string/push_notification_page_label"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="fullSensor" />
         <activity
             android:name=".MainActivity"
             android:exported="true"
             android:label="@string/main_page_label"
-            android:screenOrientation="portrait">
+            android:screenOrientation="fullSensor">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
