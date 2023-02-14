@@ -20,16 +20,16 @@ object SApiClient {
             val interceptor = HttpLoggingInterceptor()
             interceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
             val httpClient = OkHttpClient.Builder()
-                    .addInterceptor(interceptor)
-                    .connectTimeout(connectTimeOutInSec.toLong(), TimeUnit.SECONDS)
-                    .readTimeout(30, TimeUnit.SECONDS)
+                .addInterceptor(interceptor)
+                .connectTimeout(connectTimeOutInSec.toLong(), TimeUnit.SECONDS)
+                .readTimeout(30, TimeUnit.SECONDS)
             synchronized(SApiClient::class.java) {
                 if (retrofit == null) {
                     retrofit = Retrofit.Builder()
-                            .baseUrl("https://s.visilabs.net/")
-                            .addConverterFactory(GsonConverterFactory.create())
-                            .client(httpClient.build())
-                            .build()
+                        .baseUrl(Constants.ACTION_ENDPOINT)
+                        .addConverterFactory(GsonConverterFactory.create())
+                        .client(httpClient.build())
+                        .build()
                 }
             }
         }

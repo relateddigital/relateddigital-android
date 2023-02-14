@@ -20,16 +20,16 @@ object LoggerApiClient {
             val interceptor = HttpLoggingInterceptor()
             interceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
             val httpClient = OkHttpClient.Builder()
-                    .addInterceptor(interceptor)
-                    .connectTimeout(connectTimeOutInSec.toLong(), TimeUnit.SECONDS)
-                    .readTimeout(30, TimeUnit.SECONDS)
+                .addInterceptor(interceptor)
+                .connectTimeout(connectTimeOutInSec.toLong(), TimeUnit.SECONDS)
+                .readTimeout(30, TimeUnit.SECONDS)
             synchronized(LoggerApiClient::class.java) {
                 if (retrofit == null) {
                     retrofit = Retrofit.Builder()
-                            .baseUrl("https://lgr.visilabs.net/")
-                            .addConverterFactory(GsonConverterFactory.create())
-                            .client(httpClient.build())
-                            .build()
+                        .baseUrl(Constants.LOGGER_ENDPOINT)
+                        .addConverterFactory(GsonConverterFactory.create())
+                        .client(httpClient.build())
+                        .build()
                 }
             }
         }

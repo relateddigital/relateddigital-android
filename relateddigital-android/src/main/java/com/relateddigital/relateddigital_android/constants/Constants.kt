@@ -207,5 +207,16 @@ class Constants {
 
         const val BANNER_CAROUSEL_ACTION_TYPE_VAL = "AppBanner"
 
+
+        const val SUBSCRIPTION_ENDPOINT = "https://pushs.euromsg.com/"
+        const val RETENTION_ENDPOINT = "https://pushr.euromsg.com/"
+
+        const val LOGGER_ENDPOINT = "https://lgr.visilabs.net/"
+        const val REALTIME_ENDPOINT = "https://lgr.visilabs.net/"
+        const val GRAYLOG_ENDPOINT = "https://gt.relateddigital.com/"
+        const val REMOTE_CONFIG_ENDPOINT = "https://mbls.visilabs.net/"
+
+        var ACTION_ENDPOINT = "https://s.visilabs.net/"
+
     }
 }

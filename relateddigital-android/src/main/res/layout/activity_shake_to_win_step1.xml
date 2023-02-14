@@ -9,18 +9,30 @@
         android:layout_height="match_parent"
         android:fillViewport="true">
 
-        <LinearLayout
+
+        <FrameLayout
             android:id="@+id/linear_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:paddingBottom="20dp">
 
+            <ImageView
+                android:id="@+id/image_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginEnd="20dp"
+                android:adjustViewBounds="true"
+                android:contentDescription="@string/image" />
+
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:gravity="center"
+                android:gravity="bottom|center"
                 android:orientation="vertical"
                 android:paddingLeft="16dp"
                 android:paddingRight="16dp">
@@ -32,12 +44,14 @@
                     android:layout_marginTop="12dp"
                     android:gravity="center"
                     android:paddingLeft="16dp"
-                    android:paddingTop="8dp"
+                    android:paddingTop="16dp"
                     android:paddingRight="16dp"
-                    android:paddingBottom="8dp" />
+                    android:paddingBottom="16dp" />
 
             </LinearLayout>
-        </LinearLayout>
+
+
+        </FrameLayout>
     </ScrollView>
 
     <ImageButton
@@ -46,5 +60,7 @@
         android:layout_height="32dp"
         android:layout_gravity="top|end"
         android:layout_margin="8dp"
+        android:contentDescription="@string/close"
         android:textColor="#fff" />
+
 </FrameLayout>

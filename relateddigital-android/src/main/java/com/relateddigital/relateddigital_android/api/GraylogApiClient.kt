@@ -27,7 +27,7 @@ object GraylogApiClient {
                     .writeTimeout(30, TimeUnit.SECONDS)
                     .build()
                 retrofit = Retrofit.Builder()
-                    .baseUrl("https://gt.relateddigital.com/")
+                    .baseUrl(Constants.GRAYLOG_ENDPOINT)
                     .addConverterFactory(GsonConverterFactory.create())
                     .client(okHttpClient)
                     .build()

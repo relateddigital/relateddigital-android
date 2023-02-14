@@ -37,5 +37,7 @@
 
     <string name="notification_right_arrow" translatable="false">\u003C</string>
     <string name="notification_left_arrow" translatable="false">\u003E</string>
+    <string name="invalid_email" translatable="false">invalid email</string>
+    <string name="image" translatable="false">image</string>
 
 </resources>

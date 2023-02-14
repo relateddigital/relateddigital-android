@@ -21,16 +21,16 @@ object RemoteConfigApiClient {
                 val interceptor = HttpLoggingInterceptor()
                 interceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
                 val httpClient: OkHttpClient.Builder = OkHttpClient.Builder()
-                        .addInterceptor(interceptor)
-                        .connectTimeout(30, TimeUnit.SECONDS)
-                        .readTimeout(30, TimeUnit.SECONDS)
+                    .addInterceptor(interceptor)
+                    .connectTimeout(30, TimeUnit.SECONDS)
+                    .readTimeout(30, TimeUnit.SECONDS)
                 synchronized(RemoteConfigApiClient::class.java) {
                     if (retrofit == null) {
                         retrofit = Retrofit.Builder()
-                                .baseUrl("https://mbls.visilabs.net/")
-                                .addConverterFactory(GsonConverterFactory.create())
-                                .client(httpClient.build())
-                                .build()
+                            .baseUrl(Constants.REMOTE_CONFIG_ENDPOINT)
+                            .addConverterFactory(GsonConverterFactory.create())
+                            .client(httpClient.build())
+                            .build()
                     }
                 }
             }
