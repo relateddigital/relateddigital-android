@@ -1,3 +1,5 @@
 include ':relateddigital-android'
 include ':app'
 rootProject.name = "androidexampleapp"
+include ':relateddigital-android-core'
+include ':relateddigital-google'

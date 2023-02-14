@@ -8,9 +8,17 @@
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/androidexampleapp.app.main.iml" filepath="$PROJECT_DIR$/.idea/modules/app/androidexampleapp.app.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/androidexampleapp.app.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/androidexampleapp.app.unitTest.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/relateddigital-android/androidexampleapp.relateddigital-android.iml" filepath="$PROJECT_DIR$/.idea/modules/relateddigital-android/androidexampleapp.relateddigital-android.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/relateddigital_android_core/androidexampleapp.relateddigital-android-core.iml" filepath="$PROJECT_DIR$/.idea/modules/relateddigital_android_core/androidexampleapp.relateddigital-android-core.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/relateddigital-android-core/androidexampleapp.relateddigital-android-core.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/relateddigital-android-core/androidexampleapp.relateddigital-android-core.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/relateddigital-android-core/androidexampleapp.relateddigital-android-core.main.iml" filepath="$PROJECT_DIR$/.idea/modules/relateddigital-android-core/androidexampleapp.relateddigital-android-core.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/relateddigital-android-core/androidexampleapp.relateddigital-android-core.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/relateddigital-android-core/androidexampleapp.relateddigital-android-core.unitTest.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/relateddigital-android/androidexampleapp.relateddigital-android.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/relateddigital-android/androidexampleapp.relateddigital-android.androidTest.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/relateddigital-android/androidexampleapp.relateddigital-android.main.iml" filepath="$PROJECT_DIR$/.idea/modules/relateddigital-android/androidexampleapp.relateddigital-android.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/relateddigital-android/androidexampleapp.relateddigital-android.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/relateddigital-android/androidexampleapp.relateddigital-android.unitTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/relateddigital-google/androidexampleapp.relateddigital-google.iml" filepath="$PROJECT_DIR$/.idea/modules/relateddigital-google/androidexampleapp.relateddigital-google.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/relateddigital-google/androidexampleapp.relateddigital-google.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/relateddigital-google/androidexampleapp.relateddigital-google.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/relateddigital-google/androidexampleapp.relateddigital-google.main.iml" filepath="$PROJECT_DIR$/.idea/modules/relateddigital-google/androidexampleapp.relateddigital-google.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/relateddigital-google/androidexampleapp.relateddigital-google.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/relateddigital-google/androidexampleapp.relateddigital-google.unitTest.iml" />
     </modules>
   </component>
 </project>

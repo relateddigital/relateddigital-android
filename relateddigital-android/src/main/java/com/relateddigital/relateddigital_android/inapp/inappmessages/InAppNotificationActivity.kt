@@ -348,7 +348,7 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
     }
 
     private fun setCouponCodeDesign() {
-        if (mInAppMessage!!.mActionData!!.mPromoCodeCopyButtonText!!.isNotEmpty()) {
+        if (mInAppMessage!!.mActionData!!.mPromoCodeCopyButtonText?.isNotEmpty() == true) {
             binding.copyButton.visibility = View.VISIBLE
             binding.tvCouponCodeWithButton.visibility = View.VISIBLE
             binding.contentCopy.visibility = View.GONE
@@ -996,7 +996,7 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
             binding.tvCouponCodeWithButton.text = mInAppMessage!!.mActionData!!.mPromotionCode
             binding.tvCouponCodeWithButton.setTextColor(Color.parseColor(mInAppMessage!!.mActionData!!.mPromoCodeTextColor))
             //TODO When data comes use the codes below
-            if (mInAppMessage!!.mActionData!!.mPromoCodeCopyButtonText!!.isNotEmpty()) {
+            if (mInAppMessage!!.mActionData!!.mPromoCodeCopyButtonText?.isNotEmpty() == true) {
                 binding.copyButton.setOnClickListener {
                     val clipboard =
                         applicationContext.getSystemService(CLIPBOARD_SERVICE) as ClipboardManager

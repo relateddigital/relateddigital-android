@@ -96,7 +96,8 @@
                             android:paddingTop="12dp"
                             android:paddingRight="45dp"
                             android:paddingBottom="12dp"
-                            android:text="@string/coupon_code" />
+                            android:text="@string/coupon_code"
+                            android:visibility="gone"/>
 
                         <Button
                             android:id="@+id/copyButton"
@@ -107,7 +108,8 @@
                             android:layout_marginEnd="32dp"
                             android:background="@drawable/rounded_corners_full"
                             android:padding="5dp"
-                            android:text="@string/kopyala" />
+                            android:text="@string/kopyala"
+                            android:visibility="gone"/>
 
                         <ImageView
                             android:id="@+id/content_copy"
