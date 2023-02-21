@@ -826,6 +826,57 @@ object AppUtils {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    fun createGiftBoxCustomFontFiles(
+        context: Context,
+        jsonStr: String?,
+        jsStr: String
+    ): ArrayList<String?>? {
+        var result: ArrayList<String?>? = null
+        val giftBoxModel: GiftBox?
+        val extendedProps: GiftBoxExtendedProps?
+        val baseUrlPath = "file://" + context.filesDir.absolutePath + "/"
+        try {
+            giftBoxModel = Gson().fromJson(jsonStr, GiftBox::class.java)
+            extendedProps = Gson().fromJson(
+                URI(giftBoxModel.actiondata!!.extendedProps).path,
+                GiftBoxExtendedProps::class.java
+            )
+        } catch (e: java.lang.Exception) {
+            Log.e("GiftBox", "Extended properties could not be parsed properly!")
+            return null
+        }
+        if (giftBoxModel == null || extendedProps == null) {
+            return null
+        }
+        val fontFamily: String = extendedProps.fontFamily ?: return null
+
+        val htmlStr: String = writeHtmlToFile(context, "gift_box", jsStr)
+
+        if (fontFamily == "custom") {
+            val fontExtension = getFontNameWithExtension(
+                context,
+                extendedProps.customFontFamilyAndroid!!
+            )
+            if (fontExtension.isNotEmpty()) {
+                writeFontToFile(
+                    context,
+                    extendedProps.customFontFamilyAndroid!!,
+                    fontExtension
+                )
+                giftBoxModel.fontFiles.add(fontExtension)
+            }
+        }
+
+        if (htmlStr.isNotEmpty()) {
+            result = ArrayList()
+            result.add(baseUrlPath)
+            result.add(htmlStr)
+            result.add(Gson().toJson(giftBoxModel, GiftBox::class.java))
+        }
+        return result
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     fun createFindToWinCustomFontFiles(
         context: Context,
         jsonStr: String?,

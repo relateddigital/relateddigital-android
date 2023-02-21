@@ -43,6 +43,7 @@
     <string name="gift_catch">GIFT CATCH</string>
     <string name="find_to_win">FIND TO WIN</string>
     <string name="banner_carousel">BANNER CAROUSEL PAGE</string>
+    <string name="giftbox">GIFTBOX</string>
 
     <string name="story_id_optional">Story ID (optional)</string>
     <string name="banner_id_optional">Banner ID (optional)</string>

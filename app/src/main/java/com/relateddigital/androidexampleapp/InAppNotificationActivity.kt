@@ -224,6 +224,10 @@ class InAppNotificationActivity : AppCompatActivity() {
             sendInAppRequest("giftrain")
         }
 
+        binding.giftboxButton.setOnClickListener {
+            sendInAppRequest("giftbox")
+        }
+
         binding.findToWinButton.setOnClickListener {
             sendInAppRequest("findtowin")
         }

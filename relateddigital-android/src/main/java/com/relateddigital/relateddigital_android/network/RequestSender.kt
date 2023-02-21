@@ -306,6 +306,19 @@ object RequestSender {
                                             intent.putExtra("gift-rain-data", giftRainModel)
                                             currentRequest.parent!!.startActivity(intent)
                                         }
+                                        //TODO Giftbox
+                                        /*!actionsResponse.mGiftBox.isNullOrEmpty() -> {
+                                            ActivityUtils.parentActivity = currentRequest.parent
+                                            val intent =
+                                                Intent(
+                                                    currentRequest.parent,
+                                                    GiftCatchActivity::class.java
+                                                )
+                                            val giftBoxModel: GiftBox =
+                                                actionsResponse.mGiftBox!![0]
+                                            intent.putExtra("gift-box-data", giftBoxModel)
+                                            currentRequest.parent!!.startActivity(intent)
+                                        } */
                                         !actionsResponse.mFindToWin.isNullOrEmpty() -> {
                                             ActivityUtils.parentActivity = currentRequest.parent
                                             val intent =
