@@ -429,6 +429,7 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
 
     private fun setButton() {
         if (mInAppMessage!!.mActionData!!.mBtnText.isNullOrEmpty()) {
+            binding.llButtonContainer.visibility = View.GONE
             binding.btnTemplate.visibility = View.GONE
         } else {
             binding.btnTemplate.typeface = mInAppMessage!!.mActionData!!.getFontFamily(this)
