@@ -20,10 +20,13 @@ import android.provider.Settings
 import android.telephony.TelephonyManager
 import android.util.Log
 import android.util.TypedValue
+import androidx.annotation.ChecksSdkIntAtLeast
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
+import androidx.test.core.app.ApplicationProvider
+import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import com.google.gson.Gson
 import com.relateddigital.relateddigital_android.BuildConfig
 import com.relateddigital.relateddigital_android.constants.Constants
@@ -435,6 +438,33 @@ object AppUtils {
             }
         }
         return false
+    }
+
+    fun getTargetSdkVersion(): Int {
+        var targetSdkVersion: Int =
+            ApplicationProvider.getApplicationContext<Context>().getApplicationInfo().targetSdkVersion
+        return targetSdkVersion
+      }
+
+    @ChecksSdkIntAtLeast(api = 33)
+    fun isPackageAndOsTargetsAbove(apiLevel: Int) =
+        Build.VERSION.SDK_INT > 32 &&
+                getTargetSdkVersion() > 32
+
+    @RequiresApi(api = 33)
+    fun isPermissionGranted(): Boolean {
+        val permissionStatus = ContextCompat.checkSelfPermission(
+            getApplicationContext(),
+            Manifest.permission.POST_NOTIFICATIONS
+        )
+        return permissionStatus == PackageManager.PERMISSION_GRANTED
+    }
+    fun isPushPermissionGranted(): Boolean {
+    return if (isPackageAndOsTargetsAbove(32)) {
+        isPermissionGranted()
+    } else {
+        false
+    }
     }
 
     fun getNotificationPermissionStatus(context: Context): String {
