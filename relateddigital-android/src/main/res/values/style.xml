@@ -32,5 +32,9 @@
         <item name="android:backgroundDimEnabled">false</item>
     </style>
 
+    <style name="Theme.AppCompat.Light.Dialog.AlertRounded" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="android:windowBackground">@drawable/rounded_corners_in_app</item>
+    </style>
+
 
 </resources>

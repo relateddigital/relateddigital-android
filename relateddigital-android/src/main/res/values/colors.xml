@@ -15,4 +15,6 @@
     <color name="purple_200">#FFBB86FC</color>
 
     <color name="bottom_sheet_button_color">#00897B</color>
+
+    <color name="transparent">#00000000</color>
 </resources>

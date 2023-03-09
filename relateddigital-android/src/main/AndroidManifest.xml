@@ -44,7 +44,7 @@
         <activity
             android:name=".inapp.inappmessages.InAppNotificationActivity"
             android:noHistory="true"
-            android:theme="@style/Theme.AppCompat.Light.Dialog.Alert" />
+            android:theme="@style/Theme.AppCompat.Light.Dialog.AlertRounded" />
         <activity
             android:name=".inapp.mailsubsform.MailSubscriptionFormActivity"
             android:noHistory="true"
