@@ -84,7 +84,7 @@
 
                         <TextView
                             android:id="@+id/tv_coupon_code_with_button"
-                            android:layout_width="192dp"
+                            android:layout_width="220dp"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center|start|center_horizontal"
                             android:layout_marginStart="20dp"
@@ -93,21 +93,21 @@
                             android:ellipsize="end"
                             android:gravity="center"
                             android:paddingLeft="45dp"
-                            android:paddingTop="12dp"
+                            android:paddingTop="15dp"
                             android:paddingRight="45dp"
-                            android:paddingBottom="12dp"
+                            android:paddingBottom="15dp"
                             android:text="@string/coupon_code"
                             android:visibility="gone" />
 
                         <Button
                             android:id="@+id/copyButton"
-                            android:layout_width="85dp"
-                            android:layout_height="43dp"
+                            android:layout_width="95dp"
+                            android:layout_height="wrap_content"
                             android:layout_gravity="center|end"
                             android:layout_marginStart="190dp"
                             android:layout_marginEnd="20dp"
                             android:background="@drawable/rounded_corners_full"
-                            android:padding="5dp"
+                            android:padding="6dp"
                             android:text="@string/kopyala"
                             android:visibility="gone" />
 

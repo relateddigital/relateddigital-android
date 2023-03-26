@@ -996,6 +996,7 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
             binding.tvCouponCode.setTextColor(Color.parseColor(mInAppMessage!!.mActionData!!.mPromoCodeTextColor))
             binding.tvCouponCodeWithButton.text = mInAppMessage!!.mActionData!!.mPromotionCode
             binding.tvCouponCodeWithButton.setTextColor(Color.parseColor(mInAppMessage!!.mActionData!!.mPromoCodeTextColor))
+            binding.tvCouponCodeWithButton.setTextSize(17f)
             //TODO When data comes use the codes below
             if (mInAppMessage!!.mActionData!!.mPromoCodeCopyButtonText?.isNotEmpty() == true) {
                 binding.copyButton.setOnClickListener {
