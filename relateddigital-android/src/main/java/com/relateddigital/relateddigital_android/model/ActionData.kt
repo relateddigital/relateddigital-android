@@ -183,7 +183,7 @@ class ActionData : Serializable {
     var mSecondButtonAndroidLink: String? = null
 
     @SerializedName("button_border_radius")
-    var mButtonBorderRadius: Int? = null
+    var mButtonBorderRadius: String? = null
 
 
     fun getFontFamily(context: Context): Typeface? {
