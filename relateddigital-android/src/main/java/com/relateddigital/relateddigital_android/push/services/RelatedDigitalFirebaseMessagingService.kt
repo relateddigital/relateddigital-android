@@ -33,7 +33,7 @@ class RelatedDigitalFirebaseMessagingService : FirebaseMessagingService() {
             token
         )
         PushUtils.sendBroadCast(
-            Constants.PUSH_RECEIVE_EVENT,
+            Constants.PUSH_REGISTER_EVENT,
             null,
             token,
             this

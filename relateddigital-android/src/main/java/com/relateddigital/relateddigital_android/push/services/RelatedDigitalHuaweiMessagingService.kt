@@ -14,10 +14,7 @@ import com.relateddigital.relateddigital_android.model.PushType
 import com.relateddigital.relateddigital_android.network.RequestHandler
 import com.relateddigital.relateddigital_android.push.PushNotificationManager
 import com.relateddigital.relateddigital_android.push.RetentionType
-import com.relateddigital.relateddigital_android.util.AppUtils
-import com.relateddigital.relateddigital_android.util.LogUtils
-import com.relateddigital.relateddigital_android.util.PayloadUtils
-import com.relateddigital.relateddigital_android.util.SharedPref
+import com.relateddigital.relateddigital_android.util.*
 import java.util.*
 
 class RelatedDigitalHuaweiMessagingService : HmsMessageService() {
@@ -29,6 +26,12 @@ class RelatedDigitalHuaweiMessagingService : HmsMessageService() {
         Log.i(LOG_TAG, "On new token : $token")
         val googleAppAlias: String = RelatedDigital.getGoogleAppAlias(this)
         val huaweiAppAlias: String = RelatedDigital.getHuaweiAppAlias(this)
+        PushUtils.sendBroadCast(
+            Constants.PUSH_REGISTER_EVENT,
+            null,
+            token,
+            this
+        )
         RelatedDigital.setIsPushNotificationEnabled(
             this,
             true,
@@ -71,6 +74,14 @@ class RelatedDigitalHuaweiMessagingService : HmsMessageService() {
         }
 
         Log.d(LOG_TAG, "HuaweiPayload : " + Gson().toJson(pushMessage))
+
+        PushUtils.sendBroadCast(
+            Constants.PUSH_RECEIVE_EVENT,
+            pushMessage,
+            null,
+            this
+        )
+
         if(!pushMessage.silent.isNullOrEmpty() && pushMessage.silent.equals("true", true)) {
             Log.i("RDHuawei", "Silent Push")
             RequestHandler.createRetentionRequest(

@@ -207,7 +207,6 @@ class Constants {
 
         const val BANNER_CAROUSEL_ACTION_TYPE_VAL = "AppBanner"
 
-
         const val SUBSCRIPTION_ENDPOINT = "https://pushs.euromsg.com/"
         const val RETENTION_ENDPOINT = "https://pushr.euromsg.com/"
 
@@ -220,7 +219,5 @@ class Constants {
 
         const val PUSH_REGISTER_EVENT = "com.relateddigital.relateddigital_android.push.intent.REGISTER"
         const val PUSH_RECEIVE_EVENT = "com.relateddigital.relateddigital_android.push.intent.RECEIVE"
-        const val PUSH_OPEN_EVENT = "com.relateddigital.relateddigital_android.push.intent.OPEN"
-
     }
 }
