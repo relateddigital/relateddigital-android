@@ -218,5 +218,9 @@ class Constants {
 
         var ACTION_ENDPOINT = "https://s.visilabs.net/"
 
+        const val PUSH_REGISTER_EVENT = "com.relateddigital.relateddigital_android.push.intent.REGISTER"
+        const val PUSH_RECEIVE_EVENT = "com.relateddigital.relateddigital_android.push.intent.RECEIVE"
+        const val PUSH_OPEN_EVENT = "com.relateddigital.relateddigital_android.push.intent.OPEN"
+
     }
 }

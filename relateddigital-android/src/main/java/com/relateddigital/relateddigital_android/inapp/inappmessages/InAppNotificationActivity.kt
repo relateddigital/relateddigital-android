@@ -14,6 +14,9 @@ import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.view.ViewGroup
+import android.widget.Button
+import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.view.updatePadding
@@ -214,6 +217,20 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
             InAppNotificationType.IMAGE_BUTTON.toString() -> {
                 binding.smileRating.visibility = View.GONE
                 binding.llTextContainer.visibility = View.GONE
+
+
+                val gdButton = binding.btnTemplate.background as GradientDrawable
+                gdButton.setColor(Color.parseColor(mInAppMessage!!.mActionData!!.mButtonColor))
+                gdButton.cornerRadius = 0f
+
+                val layoutParams = binding.llButtonContainer.layoutParams as LinearLayout.LayoutParams
+                layoutParams.setMargins(0, 0, 0, 0)
+                layoutParams.marginStart = 0
+                layoutParams.marginEnd = 0
+                binding.llButtonContainer.layoutParams = layoutParams
+
+
+
                 setButton()
             }
             InAppNotificationType.NPS.toString() -> {

@@ -71,14 +71,13 @@ class RelatedDigitalHuaweiMessagingService : HmsMessageService() {
         }
 
         Log.d(LOG_TAG, "HuaweiPayload : " + Gson().toJson(pushMessage))
-        if (!pushMessage.silent.isNullOrEmpty() && pushMessage.silent == "true") {
+        if(!pushMessage.silent.isNullOrEmpty() && pushMessage.silent.equals("true", true)) {
             Log.i("RDHuawei", "Silent Push")
             RequestHandler.createRetentionRequest(
                 this, RetentionType.SILENT,
                 pushMessage.pushId, pushMessage.emPushSp
             )
         } else {
-
             if (pushMessage.getPushType() != null && pushMessage.pushId != null) {
                 val pushNotificationManager = PushNotificationManager()
                 val notificationId = Random().nextInt()

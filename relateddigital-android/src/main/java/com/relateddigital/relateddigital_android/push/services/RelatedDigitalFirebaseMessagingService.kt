@@ -14,10 +14,7 @@ import com.relateddigital.relateddigital_android.model.PushType
 import com.relateddigital.relateddigital_android.network.RequestHandler
 import com.relateddigital.relateddigital_android.push.PushNotificationManager
 import com.relateddigital.relateddigital_android.push.RetentionType
-import com.relateddigital.relateddigital_android.util.AppUtils
-import com.relateddigital.relateddigital_android.util.LogUtils
-import com.relateddigital.relateddigital_android.util.PayloadUtils
-import com.relateddigital.relateddigital_android.util.SharedPref
+import com.relateddigital.relateddigital_android.util.*
 import java.util.*
 
 class RelatedDigitalFirebaseMessagingService : FirebaseMessagingService() {
@@ -34,6 +31,12 @@ class RelatedDigitalFirebaseMessagingService : FirebaseMessagingService() {
             googleAppAlias,
             huaweiAppAlias,
             token
+        )
+        PushUtils.sendBroadCast(
+            Constants.PUSH_RECEIVE_EVENT,
+            null,
+            token,
+            this
         )
     }
 
@@ -71,14 +74,20 @@ class RelatedDigitalFirebaseMessagingService : FirebaseMessagingService() {
 
         Log.d(LOG_TAG, "FirebasePayload : " + Gson().toJson(pushMessage))
 
-        if(!pushMessage.silent.isNullOrEmpty() && pushMessage.silent == "true") {
+        PushUtils.sendBroadCast(
+            Constants.PUSH_RECEIVE_EVENT,
+            pushMessage,
+            null,
+            this
+        )
+
+        if(!pushMessage.silent.isNullOrEmpty() && pushMessage.silent.equals("true", true)) {
             Log.i("RDFirebase", "Silent Push")
             RequestHandler.createRetentionRequest(
                 this, RetentionType.SILENT,
                 pushMessage.pushId, pushMessage.emPushSp
             )
         } else {
-
             if (pushMessage.getPushType() != null && pushMessage.pushId != null) {
                 val pushNotificationManager = PushNotificationManager()
                 val notificationId = Random().nextInt()
