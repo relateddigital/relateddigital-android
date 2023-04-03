@@ -6,6 +6,8 @@ import android.content.Intent
 import android.util.Log
 import androidx.fragment.app.FragmentActivity
 import com.google.gson.Gson
+import com.relateddigital.relateddigital_android.inapp.giftbox.GiftBoxActivity
+import com.relateddigital.relateddigital_android.model.GiftBox
 import com.relateddigital.relateddigital_android_core.RelatedDigital
 import com.relateddigital.relateddigital_android_core.api.*
 import com.relateddigital.relateddigital_android_core.constants.Constants
@@ -304,6 +306,18 @@ object RequestSender {
                                             val giftRainModel: GiftRain =
                                                 actionsResponse.mGiftRain!![0]
                                             intent.putExtra("gift-rain-data", giftRainModel)
+                                            currentRequest.parent!!.startActivity(intent)
+                                        }
+                                        !actionsResponse.mGiftBox.isNullOrEmpty() -> {
+                                            ActivityUtils.parentActivity = currentRequest.parent
+                                            val intent =
+                                                Intent(
+                                                    currentRequest.parent,
+                                                    GiftBoxActivity::class.java
+                                                )
+                                            val giftBoxModel: GiftBox =
+                                                actionsResponse.mGiftBox!![0]
+                                            intent.putExtra("gift-box-data", giftBoxModel)
                                             currentRequest.parent!!.startActivity(intent)
                                         }
                                         !actionsResponse.mFindToWin.isNullOrEmpty() -> {

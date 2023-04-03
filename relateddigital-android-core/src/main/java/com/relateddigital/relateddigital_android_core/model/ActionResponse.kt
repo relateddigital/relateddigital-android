@@ -1,6 +1,7 @@
 package com.relateddigital.relateddigital_android_core.model
 
 import com.google.gson.annotations.SerializedName
+import com.relateddigital.relateddigital_android.model.GiftBox
 import java.io.Serializable
 
 class ActionResponse : Serializable {
@@ -30,6 +31,9 @@ class ActionResponse : Serializable {
 
     @SerializedName("GiftRain")
     var mGiftRain: List<GiftRain>? = null
+
+    @SerializedName("GiftBox")
+    var mGiftBox: List<GiftBox>? = null
 
     @SerializedName("FindToWin")
     var mFindToWin: List<FindToWin>? = null

@@ -12,6 +12,7 @@ import com.relateddigital.relateddigital_android.constants.Constants
 import com.relateddigital.relateddigital_android.inapp.InAppManager
 import com.relateddigital.relateddigital_android.inapp.VisilabsResponse
 import com.relateddigital.relateddigital_android.inapp.findtowin.FindToWinActivity
+import com.relateddigital.relateddigital_android.inapp.giftbox.GiftBoxActivity
 import com.relateddigital.relateddigital_android.inapp.giftcatch.GiftCatchActivity
 import com.relateddigital.relateddigital_android.inapp.mailsubsform.MailSubscriptionFormHalfFragment
 import com.relateddigital.relateddigital_android.inapp.notification.InAppNotificationFragment
@@ -306,19 +307,18 @@ object RequestSender {
                                             intent.putExtra("gift-rain-data", giftRainModel)
                                             currentRequest.parent!!.startActivity(intent)
                                         }
-                                        //TODO Giftbox
-                                        /*!actionsResponse.mGiftBox.isNullOrEmpty() -> {
+                                        !actionsResponse.mGiftBox.isNullOrEmpty() -> {
                                             ActivityUtils.parentActivity = currentRequest.parent
                                             val intent =
                                                 Intent(
                                                     currentRequest.parent,
-                                                    GiftCatchActivity::class.java
+                                                    GiftBoxActivity::class.java
                                                 )
                                             val giftBoxModel: GiftBox =
                                                 actionsResponse.mGiftBox!![0]
                                             intent.putExtra("gift-box-data", giftBoxModel)
                                             currentRequest.parent!!.startActivity(intent)
-                                        } */
+                                        }
                                         !actionsResponse.mFindToWin.isNullOrEmpty() -> {
                                             ActivityUtils.parentActivity = currentRequest.parent
                                             val intent =
