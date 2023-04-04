@@ -5,6 +5,7 @@ import android.content.Context
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -20,6 +21,8 @@ import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.GranularRoundedCorners
 import com.relateddigital.relateddigital_android.R
 import com.relateddigital.relateddigital_android.model.AppBanner
+import com.relateddigital.relateddigital_android.model.MailSubReport
+import com.relateddigital.relateddigital_android.network.RequestHandler
 
 
 class BannerCarouselAdapter(private val mContext: Context,
@@ -100,6 +103,19 @@ class BannerCarouselAdapter(private val mContext: Context,
             bannerHolder.slideImageView!!.setOnClickListener {
                 mBannerItemClickListener!!.bannerItemClicked(mAppBanner!!.actionData!!.appBanners!![position].androidLink)
             }
+        }
+        var report: MailSubReport?
+        try {
+            report = MailSubReport()
+            report.impression = mAppBanner!!.actionData!!.report!!.impression
+            report.click = mAppBanner!!.actionData!!.report!!.click
+        } catch (e: Exception) {
+            Log.e("AppBanner : ", "There is no report to send!")
+            e.printStackTrace()
+            report = null
+        }
+        if (report != null) {
+            RequestHandler.createInAppActionClickRequest(mContext, report)
         }
     }
 
