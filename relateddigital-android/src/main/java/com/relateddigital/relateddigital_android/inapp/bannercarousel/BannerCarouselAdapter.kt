@@ -84,6 +84,19 @@ class BannerCarouselAdapter(private val mContext: Context,
 
             bannerHolder.swipeImageView!!.setOnClickListener {
                 mBannerItemClickListener!!.bannerItemClicked(mAppBanner!!.actionData!!.appBanners!![position].androidLink)
+                var report: MailSubReport?
+                try {
+                    report = MailSubReport()
+                    report.impression = mAppBanner!!.actionData!!.report!!.impression
+                    report.click = mAppBanner!!.actionData!!.report!!.click
+                } catch (e: Exception) {
+                    Log.e("AppBanner : ", "There is no report to send!")
+                    e.printStackTrace()
+                    report = null
+                }
+                if (report != null) {
+                    RequestHandler.createInAppActionClickRequest(mContext, report)
+                }
             }
         } else {
             Glide.with(mContext)
@@ -103,19 +116,6 @@ class BannerCarouselAdapter(private val mContext: Context,
             bannerHolder.slideImageView!!.setOnClickListener {
                 mBannerItemClickListener!!.bannerItemClicked(mAppBanner!!.actionData!!.appBanners!![position].androidLink)
             }
-        }
-        var report: MailSubReport?
-        try {
-            report = MailSubReport()
-            report.impression = mAppBanner!!.actionData!!.report!!.impression
-            report.click = mAppBanner!!.actionData!!.report!!.click
-        } catch (e: Exception) {
-            Log.e("AppBanner : ", "There is no report to send!")
-            e.printStackTrace()
-            report = null
-        }
-        if (report != null) {
-            RequestHandler.createInAppActionClickRequest(mContext, report)
         }
     }
 
