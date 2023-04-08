@@ -41,6 +41,12 @@ interface ApiMethods {
             @QueryMap queryParameters: Map<String, String>
     ): Call<List<InAppMessage>>
 
+    @GET("actjson")
+    fun getNpsWithNumbersRequestResponse(
+        @HeaderMap headers: Map<String, String>,
+        @QueryMap queryParameters: Map<String, String>
+    ): Call<List<InAppMessage>>
+
     //Methods to get Story, MailSubsForm, FAvs-type responses
     @GET("mobile")
     fun getGeneralActionRequestJsonResponse(

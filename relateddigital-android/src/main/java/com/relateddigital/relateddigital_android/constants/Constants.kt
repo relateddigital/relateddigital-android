@@ -118,6 +118,7 @@ class Constants {
         const val STORY_PHOTO_KEY = "photo"
         const val STORY_VIDEO_KEY = "video"
         const val STORY_ACTION_TYPE_VAL = "Story"
+        const val NPS_ACTION_TYPE_VAL = "nps_with_numbers"
 
         const val LOCATION_PERMISSION_REQUEST_KEY = "OM.locpermit"
         const val LOC_PERMISSION_ALWAYS_REQUEST_VAL = "always"

@@ -69,6 +69,7 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
     private var player: ExoPlayer? = null
     private var player2: ExoPlayer? = null
     private var carouselAdapter: CarouselAdapter? = null
+    private var result:Boolean = true
 
     @SuppressLint("ClickableViewAccessibility")
     public override fun onCreate(savedInstanceState: Bundle?) {
@@ -76,6 +77,7 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
         mIntentId = savedInstanceState?.getInt(INTENT_ID_KEY, Int.MAX_VALUE)
             ?: intent.getIntExtra(INTENT_ID_KEY, Int.MAX_VALUE)
         mInAppMessage = inAppMessage
+        if (isShowingNpsInApp) {
         if (mInAppMessage == null) {
             Log.e(LOG_TAG, "InAppMessage is null! Could not get display state!")
             InAppUpdateDisplayState.releaseDisplayState(mIntentId)
@@ -93,6 +95,7 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
             }
             cacheResources()
             setContentView(view)
+
             if (isShowingInApp) {
                 if (mInAppMessage!!.mActionData!!.mMsgType == InAppNotificationType.CAROUSEL.toString()) {
                     setupCarousel()
@@ -104,6 +107,7 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
                 finish()
             }
         }
+    }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -1142,6 +1146,21 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
             return if (mUpdateDisplayState == null) {
                 false
             } else InAppNotificationState.TYPE == mUpdateDisplayState!!.getDisplayState()!!.type
+        }
+    private val isShowingNpsInApp: Boolean
+        get() {
+            if(mInAppMessage!!.mActionData!!.mMsgType!!.equals("nps_with_numbers")) {
+                if (mInAppMessage!!.mActionData!!.mDisplayType!!.equals("inline")) {
+                    result = false
+                } else if (mInAppMessage!!.mActionData!!.mDisplayType == null && mInAppMessage!!.mActionData!!.mDisplayType!!.equals(
+                        "popup"
+                    )
+                ) {
+                    result = true
+                }
+            }
+
+            return result
         }
 
     override fun onSmileySelected(@BaseRating.Smiley smiley: Int, reselected: Boolean) {

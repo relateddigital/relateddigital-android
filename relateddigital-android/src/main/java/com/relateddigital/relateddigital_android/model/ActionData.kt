@@ -5,12 +5,16 @@ import android.graphics.Typeface
 import androidx.core.content.res.ResourcesCompat
 import com.google.gson.annotations.SerializedName
 import com.relateddigital.relateddigital_android.inapp.FontFamily
+import com.relateddigital.relateddigital_android.util.AppUtils.isFontResourceAvailable
 import java.io.Serializable
 import java.util.*
-import com.relateddigital.relateddigital_android.util.AppUtils.isFontResourceAvailable
 
 
 class ActionData : Serializable {
+
+    @SerializedName("display_type")
+    var mDisplayType: String? = null
+
     @SerializedName("alert_type")
     var mAlertType: String? = null
 
