@@ -838,7 +838,7 @@ object AppUtils {
         try {
             giftBoxModel = Gson().fromJson(jsonStr, GiftBox::class.java)
             extendedProps = Gson().fromJson(
-                URI(giftBoxModel.actiondata!!.extendedProps).path,
+                URI(giftBoxModel!!.actiondata!!.ExtendedProps).path,
                 GiftBoxExtendedProps::class.java
             )
         } catch (e: java.lang.Exception) {

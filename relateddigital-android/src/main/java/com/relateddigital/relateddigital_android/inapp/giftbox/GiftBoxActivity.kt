@@ -127,7 +127,7 @@ class GiftBoxActivity : FragmentActivity(), GiftBoxCompleteInterface,
         if (giftboxPromotionCode.isNotEmpty()) {
             try {
                 val extendedProps = Gson().fromJson(
-                    URI(response!!.actiondata!!.extendedProps).path,
+                    URI(response!!.actiondata!!.ExtendedProps).path,
                     GiftBoxExtendedProps::class.java
                 )
 

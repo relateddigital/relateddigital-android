@@ -47,7 +47,7 @@ class GiftBoxJavaScriptInterface internal constructor(webViewDialogFragment: Gif
     fun subscribeEmail(email: String?) {
         if (!email.isNullOrEmpty()) {
             subEmail = email
-            RequestHandler.createSubsJsonRequest(mWebViewDialogFragment.requireContext(), giftboxModel.actiondata!!.type!!,
+               RequestHandler.createSubsJsonRequest(mWebViewDialogFragment.requireContext(), giftboxModel.actiondata!!.type!!,
                 giftboxModel.actid.toString(), giftboxModel.actiondata!!.auth!!,
                 email)
         } else {
@@ -58,12 +58,13 @@ class GiftBoxJavaScriptInterface internal constructor(webViewDialogFragment: Gif
     /**
      * This method sends the report to the server
      */
+    /*
     @JavascriptInterface
     fun sendReport() {
         var report: MailSubReport?
         try {
             report = MailSubReport()
-            report.impression = giftboxModel.actiondata!!.report!!.impression
+            report.impression = giftboxModel.actiondata!!.!!.impression
             report.click = giftboxModel.actiondata!!.report!!.click
         } catch (e: Exception) {
             Log.e("GiftBox : ", "There is no report to send!")
@@ -74,6 +75,8 @@ class GiftBoxJavaScriptInterface internal constructor(webViewDialogFragment: Gif
             RequestHandler.createInAppActionClickRequest(mWebViewDialogFragment.requireContext(), report)
         }
     }
+
+    */
 
     /**
      * This method saves the promotion code shown
