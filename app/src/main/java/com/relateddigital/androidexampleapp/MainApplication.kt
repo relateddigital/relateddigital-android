@@ -18,7 +18,7 @@ class MainApplication : Application() {
     override fun onCreate() {
         super.onCreate()
 
-        initSdk(isTest = true)
+        initSdk(isTest = false)
 
         // Enable In-App Notifications
         RelatedDigital.setIsInAppNotificationEnabled(
