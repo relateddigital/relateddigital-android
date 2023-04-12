@@ -176,19 +176,6 @@ object RequestSender {
                                             null,JSONArray(Gson().toJson(inAppMessages)),null,null,null
                                         )
                                         currentRequest.visilabsCallback?.success(visilabsResponse)
-
-
-                                       /* !actionsResponse.mAppBanner.isNullOrEmpty() -> {
-                                            val visilabsResponse = VisilabsResponse(
-                                                JSONObject(Gson().toJson(actionsResponse.mAppBanner!![0])),
-                                                null,
-                                                null,
-                                                null,
-                                                null
-                                            )
-                                            currentRequest.visilabsCallback?.success(visilabsResponse)  */
-
-
                                     }
                                 }
                             } catch (e: Exception) {

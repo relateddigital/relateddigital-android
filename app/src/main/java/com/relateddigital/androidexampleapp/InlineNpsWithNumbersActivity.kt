@@ -7,7 +7,7 @@ import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.relateddigital.androidexampleapp.databinding.ActivityInlineBinding
+import com.relateddigital.androidexampleapp.databinding.ActivityInlineNpsWithNumbersBinding
 
 
 import com.relateddigital.relateddigital_android.inapp.inappmessages.inlineNpsWithNumbers.NpsItemClickListener
@@ -15,12 +15,12 @@ import java.util.*
 
 class InlineNpsWithNumbersActivity : AppCompatActivity() {
     private val LOG_TAG = "NpsActivity"
-    private lateinit var binding: ActivityInlineBinding
+    private lateinit var binding: ActivityInlineNpsWithNumbersBinding
     private var npsItemClickListener: NpsItemClickListener? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityInlineBinding.inflate(layoutInflater)
+        binding = ActivityInlineNpsWithNumbersBinding.inflate(layoutInflater)
         val view: View = binding!!.root
         setContentView(view)
 
