@@ -29,6 +29,7 @@ import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.Player
 import com.google.gson.Gson
 import com.relateddigital.relateddigital_android.R
+import com.relateddigital.relateddigital_android.RelatedDigital
 import com.relateddigital.relateddigital_android.constants.Constants
 import com.relateddigital.relateddigital_android.databinding.ActivityShakeToWinMailFormBinding
 import com.relateddigital.relateddigital_android.databinding.ActivityShakeToWinStep1Binding
@@ -61,6 +62,7 @@ class ShakeToWinActivity : Activity(), SensorEventListener {
     private var isStep3 = false
     private var player: ExoPlayer? = null
     private var soundPlayer: ExoPlayer? = null
+    private var promoemail =""
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         bindingMailForm = ActivityShakeToWinMailFormBinding.inflate(layoutInflater)
@@ -262,6 +264,7 @@ class ShakeToWinActivity : Activity(), SensorEventListener {
                         Toast.LENGTH_SHORT
                     ).show()
                     setContentView(bindingStep1.root)
+                    promoemail = email
                     setupStep1View()
                 } else {
                     if (!checkEmail(email)) {
@@ -485,6 +488,7 @@ class ShakeToWinActivity : Activity(), SensorEventListener {
                 }
             }
         }
+        sendPromotionCodeInfo(email = promoemail, promotionCode = mShakeToWinMessage!!.actiondata!!.promotionCode.toString())
     }
 
     private fun setupCloseButtonStep3() {
@@ -579,6 +583,20 @@ class ShakeToWinActivity : Activity(), SensorEventListener {
 
     private fun checkTheBoxes(): Boolean {
         return bindingMailForm.emailPermitCheckbox.isChecked && bindingMailForm.consentCheckbox.isChecked
+    }
+
+    private fun sendPromotionCodeInfo(email: String, promotionCode: String) {
+        val actionId = "act-" + mShakeToWinMessage!!.actid
+        val parameters = HashMap<String, String>()
+        parameters[Constants.PROMOTION_CODE_REQUEST_KEY] = promotionCode
+        parameters[Constants.ACTION_ID_REQUEST_KEY] = actionId
+        if (email.isNotEmpty()) {
+            parameters[Constants.PROMOTION_CODE_EMAIL_REQUEST_KEY] = email
+        }
+        RelatedDigital.customEvent(
+            context = this,
+            pageName = Constants.PAGE_NAME_REQUEST_VAL,
+            properties = parameters)
     }
 
     companion object {

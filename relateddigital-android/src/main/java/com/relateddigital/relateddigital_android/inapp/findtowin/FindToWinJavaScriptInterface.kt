@@ -3,9 +3,12 @@ package com.relateddigital.relateddigital_android.inapp.findtowin
 import android.util.Log
 import android.webkit.JavascriptInterface
 import com.google.gson.Gson
+import com.relateddigital.relateddigital_android.RelatedDigital
+import com.relateddigital.relateddigital_android.constants.Constants
 import com.relateddigital.relateddigital_android.model.FindToWin
 import com.relateddigital.relateddigital_android.model.MailSubReport
 import com.relateddigital.relateddigital_android.network.RequestHandler
+import java.util.*
 
 class FindToWinJavaScriptInterface internal constructor(webViewDialogFragment: FindToWinWebDialogFragment,
                                                         @get:JavascriptInterface val response: String) {
@@ -79,7 +82,8 @@ class FindToWinJavaScriptInterface internal constructor(webViewDialogFragment: F
      * This method saves the promotion code shown
      */
     @JavascriptInterface
-    fun saveCodeGotten(code: String, email: String?, report: String?) {
+    fun saveCodeGotten(code: String, email: String, report: String?) {
+        sendPromotionCodeInfo(email = email, promotionCode = code)
         mShowCodeInterface.onCodeShown(code)
     }
 
@@ -91,5 +95,19 @@ class FindToWinJavaScriptInterface internal constructor(webViewDialogFragment: F
         mListener = listener
         mCopyToClipboardInterface = copyToClipboardInterface
         mShowCodeInterface = showCodeInterface
+    }
+
+    private fun sendPromotionCodeInfo(email: String, promotionCode: String) {
+        val actionId = "act-" + findToWinModel.actid
+        val parameters = HashMap<String, String>()
+        parameters[Constants.PROMOTION_CODE_REQUEST_KEY] = promotionCode
+        parameters[Constants.ACTION_ID_REQUEST_KEY] = actionId
+        if (email.isNotEmpty()) {
+            parameters[Constants.PROMOTION_CODE_EMAIL_REQUEST_KEY] = email
+        }
+        RelatedDigital.customEvent(
+            context = mWebViewDialogFragment.requireContext(),
+            pageName = Constants.PAGE_NAME_REQUEST_VAL,
+            properties = parameters)
     }
 }

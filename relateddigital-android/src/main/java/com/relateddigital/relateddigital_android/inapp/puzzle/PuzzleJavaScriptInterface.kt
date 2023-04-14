@@ -3,9 +3,12 @@ package com.relateddigital.relateddigital_android.inapp.puzzle
 import android.util.Log
 import android.webkit.JavascriptInterface
 import com.google.gson.Gson
+import com.relateddigital.relateddigital_android.RelatedDigital
+import com.relateddigital.relateddigital_android.constants.Constants
 import com.relateddigital.relateddigital_android.model.Puzzle
 import com.relateddigital.relateddigital_android.model.MailSubReport
 import com.relateddigital.relateddigital_android.network.RequestHandler
+import java.util.*
 
 class PuzzleJavaScriptInterface internal constructor(webViewDialogFragment: PuzzleWebDialogFragment,
                                                         @get:JavascriptInterface val response: String) {
@@ -79,7 +82,8 @@ class PuzzleJavaScriptInterface internal constructor(webViewDialogFragment: Puzz
      * This method saves the promotion code shown
      */
     @JavascriptInterface
-    fun saveCodeGotten(code: String, email: String?, report: String?) {
+    fun saveCodeGotten(code: String, email: String, report: String?) {
+        sendPromotionCodeInfo(email = email, promotionCode = code)
         mShowCodeInterface.onCodeShown(code)
     }
 
@@ -92,4 +96,19 @@ class PuzzleJavaScriptInterface internal constructor(webViewDialogFragment: Puzz
         mCopyToClipboardInterface = copyToClipboardInterface
         mShowCodeInterface = showCodeInterface
     }
+
+    private fun sendPromotionCodeInfo(email: String, promotionCode: String) {
+        val actionId = "act-" + puzzleModel.actid
+        val parameters = HashMap<String, String>()
+        parameters[Constants.PROMOTION_CODE_REQUEST_KEY] = promotionCode
+        parameters[Constants.ACTION_ID_REQUEST_KEY] = actionId
+        if (email.isNotEmpty()) {
+            parameters[Constants.PROMOTION_CODE_EMAIL_REQUEST_KEY] = email
+        }
+        RelatedDigital.customEvent(
+            context = mWebViewDialogFragment.requireContext(),
+            pageName = Constants.PAGE_NAME_REQUEST_VAL,
+            properties = parameters)
+    }
+
 }
