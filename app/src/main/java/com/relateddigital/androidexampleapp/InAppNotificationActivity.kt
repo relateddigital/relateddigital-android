@@ -222,7 +222,7 @@ class InAppNotificationActivity : AppCompatActivity() {
         }
 
         binding.giftboxButton.setOnClickListener {
-            sendInAppRequest("giftbox")
+            sendInAppRequest("giftBox")
         }
 
         binding.findToWinButton.setOnClickListener {
