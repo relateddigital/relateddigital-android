@@ -484,9 +484,12 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
                 try {
                     val gdButton = binding.btnTemplate.background as GradientDrawable
                     gdButton.setColor(Color.parseColor(mInAppMessage!!.mActionData!!.mButtonColor))
-                    if (mInAppMessage!!.mActionData!!.mButtonBorderRadius != null) {
+                    if (!mInAppMessage!!.mActionData!!.mButtonBorderRadius.isNullOrEmpty()) {
                         gdButton.cornerRadius =
                             mInAppMessage!!.mActionData!!.mButtonBorderRadius!!.toFloat()
+                    }
+                    else {
+                        gdButton.cornerRadius = 0f
                     }
                 } catch (e: Exception) {
                     Log.w(
@@ -653,9 +656,12 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
             try {
                 val gdButton = binding.btnTemplateSecond.background as GradientDrawable
                 gdButton.setColor(Color.parseColor(mInAppMessage!!.mActionData!!.mSecondButtonColor))
-                if (mInAppMessage!!.mActionData!!.mButtonBorderRadius != null) {
+                if (!mInAppMessage!!.mActionData!!.mButtonBorderRadius.isNullOrEmpty()) {
                     gdButton.cornerRadius =
                         mInAppMessage!!.mActionData!!.mButtonBorderRadius!!.toFloat()
+                }
+                else {
+                    gdButton.cornerRadius = 0f
                 }
             } catch (e: Exception) {
                 Log.w(
@@ -788,9 +794,12 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
             try {
                 val gdButton = binding.btnTemplate.background as GradientDrawable
                 gdButton.setColor(Color.parseColor(mInAppMessage!!.mActionData!!.mButtonColor))
-                if (mInAppMessage!!.mActionData!!.mButtonBorderRadius != null) {
+                if (!mInAppMessage!!.mActionData!!.mButtonBorderRadius.isNullOrEmpty()) {
                     gdButton.cornerRadius =
                         mInAppMessage!!.mActionData!!.mButtonBorderRadius!!.toFloat()
+                }
+                else {
+                    gdButton.cornerRadius = 0f
                 }
             } catch (e: Exception) {
                 Log.w(
@@ -971,8 +980,11 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
         bindingSecondPopUp.button.setTextColor(Color.parseColor(mInAppMessage!!.mActionData!!.mButtonTextColor))
         val gdButton = bindingSecondPopUp.button.background as GradientDrawable
         gdButton.setColor(Color.parseColor(mInAppMessage!!.mActionData!!.mButtonColor))
-        if (mInAppMessage!!.mActionData!!.mButtonBorderRadius != null) {
+        if (!mInAppMessage!!.mActionData!!.mButtonBorderRadius.isNullOrEmpty()) {
             gdButton.cornerRadius = mInAppMessage!!.mActionData!!.mButtonBorderRadius!!.toFloat()
+        }
+        else {
+            gdButton.cornerRadius = 0f
         }
         bindingSecondPopUp.button.setOnClickListener {
             RequestHandler.createInAppNotificationClickRequest(
