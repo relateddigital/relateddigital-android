@@ -114,7 +114,7 @@ interface ApiMethods {
         @HeaderMap headers: Map<String, String>
     ): Call<ResponseBody>
 
-    @GET("/gift_box.js")
+    @GET("/giftbox.js")
     fun getGiftBoxJsFile(
         @HeaderMap headers: Map<String, String>
     ): Call<ResponseBody>

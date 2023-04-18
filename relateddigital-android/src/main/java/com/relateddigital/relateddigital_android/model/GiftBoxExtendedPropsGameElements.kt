@@ -1,4 +1,6 @@
 package com.relateddigital.relateddigital_android.model
 
-class GiftBoxExtendedPropsGameElements {
+import java.io.Serializable
+
+class GiftBoxExtendedPropsGameElements : Serializable {
 }

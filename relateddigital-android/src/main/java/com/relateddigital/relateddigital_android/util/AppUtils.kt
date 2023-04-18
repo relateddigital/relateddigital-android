@@ -850,7 +850,7 @@ object AppUtils {
         }
         val fontFamily: String = extendedProps.fontFamily ?: return null
 
-        val htmlStr: String = writeHtmlToFile(context, "gift_box", jsStr)
+        val htmlStr: String = writeHtmlToFile(context, "giftbox", jsStr)
 
         if (fontFamily == "custom") {
             val fontExtension = getFontNameWithExtension(

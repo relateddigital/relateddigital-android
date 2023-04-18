@@ -38,7 +38,6 @@ import retrofit2.Response
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.collections.ArrayList
 
 object RequestSender {
     private const val LOG_TAG = "Request Sender"

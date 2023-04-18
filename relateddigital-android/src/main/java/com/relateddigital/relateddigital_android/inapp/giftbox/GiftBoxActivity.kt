@@ -73,8 +73,8 @@ class GiftBoxActivity : FragmentActivity(), GiftBoxCompleteInterface,
                             jsonStr = savedInstanceState.getString("giftbox-json-str", "")
                         } else {
                             val intent = intent
-                            if (intent != null && intent.hasExtra("giftbox-data")) {
-                                response = intent.getSerializableExtra("giftbox-data") as GiftBox?
+                            if (intent != null && intent.hasExtra("gift-box-data")) {
+                                response = intent.getSerializableExtra("gift-box-data") as GiftBox?
                                 if (response != null) {
                                     jsonStr = Gson().toJson(response)
                                 } else {

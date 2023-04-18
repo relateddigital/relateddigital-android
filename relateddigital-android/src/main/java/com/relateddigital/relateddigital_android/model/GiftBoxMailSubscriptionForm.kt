@@ -1,8 +1,9 @@
 package com.relateddigital.relateddigital_android.model
 
 import com.google.gson.annotations.SerializedName
+import java.io.Serializable
 
-class GiftBoxMailSubscriptionForm {
+class GiftBoxMailSubscriptionForm : Serializable {
     @SerializedName("title"                 ) var title               : String? = null
     @SerializedName("message"               ) var message             : String? = null
     @SerializedName("placeholder"           ) var placeholder         : String? = null
