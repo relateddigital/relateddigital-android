@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -8,23 +7,20 @@
     <meta http-equiv="ScreenOrientation" content="autoRotate:disabled">
     <title>GiftBox Game</title>
 </head>
-
 <body>
-    <script src="giftbox.js"></script>
-    <script>
-        window.initGiftBox = function (responseConfig) {
-            initGiftBox(responseConfig);
-        }
-
-        if (window.Android) {
-            let responseConfig = Android.getResponse();
-            initGiftBox(responseConfig);
-        } else if (window.webkit.messageHandlers.eventHandler) {
-            window.webkit.messageHandlers.eventHandler.postMessage({
-                method: "initGiftBox"
-            })
-        }
+<script src="giftbox.js"></script>
+<script>
+      window.initFindGame = window.initGiftBoxGame = function(responseConfig) {
+        initGame(responseConfig);
+      };
+      if (window.Android) {
+        let responseConfig = Android.getResponse();
+        initGiftBoxGame(responseConfig);
+      } else if (window.webkit.messageHandlers.eventHandler) {
+        window.webkit.messageHandlers.eventHandler.postMessage({
+          method: 'initFindGame',
+        });
+      }
     </script>
 </body>
-
 </html>
