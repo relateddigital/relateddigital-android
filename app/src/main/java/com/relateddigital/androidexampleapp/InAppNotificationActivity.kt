@@ -228,6 +228,13 @@ class InAppNotificationActivity : AppCompatActivity() {
         binding.findToWinButton.setOnClickListener {
             sendInAppRequest("findtowin")
         }
+
+        binding.inlineNps.setOnClickListener{
+            val intent = Intent(this, InlineNpsWithNumbersActivity::class.java)
+             startActivity(intent)
+
+        }
+
     }
 
     private fun sendInAppRequest(type: String) {

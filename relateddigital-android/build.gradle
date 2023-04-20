@@ -23,18 +23,20 @@ project.afterEvaluate {
 
 ext {
     PUBLISH_GROUP_ID = 'com.github.relateddigital'
-    PUBLISH_VERSION = "1.0.9"
+    PUBLISH_VERSION = "1.1.2"
     PUBLISH_VERSION_CODE = "55"
     PUBLISH_ARTIFACT_ID = 'relateddigital-android'
 }
 
 android {
-    compileSdkVersion 33
+    compileSdkVersion 32
 
     defaultConfig {
         minSdkVersion 19
-        targetSdkVersion 33
-        buildConfigField 'String', 'VERSION_NAME', "\"1.0.9\""
+        targetSdkVersion 32
+        versionCode 1
+        versionName "1.1.2"
+        buildConfigField 'String', 'VERSION_NAME', "\"1.1.2\""
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
@@ -51,7 +53,7 @@ android {
         targetCompatibility JavaVersion.VERSION_11
     }
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_11.toString()
+        jvmTarget = '1.8'
     }
     buildFeatures {
         viewBinding true
@@ -64,21 +66,21 @@ android {
 }
 
 dependencies {
-    implementation 'androidx.core:core-ktx:1.9.0'
-    implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'com.google.android.material:material:1.8.0'
+    implementation 'androidx.core:core-ktx:1.8.0'
+    implementation 'androidx.appcompat:appcompat:1.4.2'
+    implementation 'com.google.android.material:material:1.6.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
-    api 'com.google.android.gms:play-services-base:18.1.0'
-    api 'com.google.firebase:firebase-messaging:23.1.1'
-    api 'com.google.android.gms:play-services-location:21.0.1'
-    api 'com.google.code.gson:gson:2.9.0'
+    api 'com.google.android.gms:play-services-base:18.0.1'
+    api 'com.google.firebase:firebase-messaging:23.0.5'
+    api 'com.google.android.gms:play-services-location:19.0.1'
+    api 'com.google.code.gson:gson:2.8.6'
     api 'com.squareup.picasso:picasso:2.71828'
     api 'com.github.bumptech.glide:glide:4.12.0'
     api 'com.squareup.retrofit2:retrofit:2.9.0'
     api 'com.squareup.retrofit2:converter-gson:2.9.0'
     api 'com.squareup.okhttp3:logging-interceptor:4.9.0'
-    api 'com.google.android.exoplayer:exoplayer-core:2.18.2'
-    api 'com.google.android.exoplayer:exoplayer-ui:2.18.2'
+    api 'com.google.android.exoplayer:exoplayer-core:2.17.1'
+    api 'com.google.android.exoplayer:exoplayer-ui:2.17.1'
     api 'de.hdodenhof:circleimageview:3.1.0'
     api 'com.huawei.agconnect:agconnect-core:1.7.2.300'
     api 'com.huawei.hms:push:6.7.0.300'
@@ -86,8 +88,8 @@ dependencies {
     //implementation project(path: ':relateddigital-android-core')
 
     testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.3'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.12.0'
 }
 

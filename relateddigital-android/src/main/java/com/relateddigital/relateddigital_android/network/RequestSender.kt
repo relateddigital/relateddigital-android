@@ -6,6 +6,7 @@ import android.content.Intent
 import android.util.Log
 import androidx.fragment.app.FragmentActivity
 import com.google.gson.Gson
+import com.google.gson.JsonArray
 import com.relateddigital.relateddigital_android.RelatedDigital
 import com.relateddigital.relateddigital_android.api.*
 import com.relateddigital.relateddigital_android.constants.Constants
@@ -169,6 +170,14 @@ object RequestSender {
                                             timerTask.getMessage()!!.mActionData!!.mWaitingTime!!.toLong() * 1000
                                 }
                                 timer.schedule(timerTask, delay)
+                                if (inAppMessages?.get(0)?.mActionData?.mMsgType!!.equals("nps_with_numbers")) {
+                                    if(inAppMessages?.get(0)?.mActionData?.mDisplayType!!.equals("inline")) {
+                                        val visilabsResponse = VisilabsResponse(
+                                            null,JSONArray(Gson().toJson(inAppMessages)),null,null,null
+                                        )
+                                        currentRequest.visilabsCallback?.success(visilabsResponse)
+                                    }
+                                }
                             } catch (e: Exception) {
                                 e.printStackTrace()
                                 Log.w(

@@ -118,6 +118,7 @@ class Constants {
         const val STORY_PHOTO_KEY = "photo"
         const val STORY_VIDEO_KEY = "video"
         const val STORY_ACTION_TYPE_VAL = "Story"
+        const val NPS_ACTION_TYPE_VAL = "nps_with_numbers"
 
         const val LOCATION_PERMISSION_REQUEST_KEY = "OM.locpermit"
         const val LOC_PERMISSION_ALWAYS_REQUEST_VAL = "always"
@@ -207,7 +208,6 @@ class Constants {
 
         const val BANNER_CAROUSEL_ACTION_TYPE_VAL = "AppBanner"
 
-
         const val SUBSCRIPTION_ENDPOINT = "https://pushs.euromsg.com/"
         const val RETENTION_ENDPOINT = "https://pushr.euromsg.com/"
 
@@ -218,5 +218,7 @@ class Constants {
 
         var ACTION_ENDPOINT = "https://s.visilabs.net/"
 
+        const val PUSH_REGISTER_EVENT = "com.relateddigital.relateddigital_android.push.intent.REGISTER"
+        const val PUSH_RECEIVE_EVENT = "com.relateddigital.relateddigital_android.push.intent.RECEIVE"
     }
 }

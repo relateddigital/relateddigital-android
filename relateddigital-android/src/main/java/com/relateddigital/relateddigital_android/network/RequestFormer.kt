@@ -89,6 +89,15 @@ object RequestFormer {
         addInAppNotificationExtraParameters(model, queryMap)
     }
 
+    fun formNpsActionRequest(
+        context: Context, model: RelatedDigitalModel?, pageName: String,
+        properties: HashMap<String, String>?,
+        queryMap: HashMap<String, String>, headerMap: HashMap<String, String>
+    ) {
+        fillCommonParameters(context, model, pageName, properties, queryMap, headerMap)
+        addInAppNotificationExtraParameters(model, queryMap)
+    }
+
     fun formBannerCarouselActionRequest(
         context: Context, model: RelatedDigitalModel?, pageName: String,
         properties: HashMap<String, String>?,

@@ -14,6 +14,9 @@ import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.view.ViewGroup
+import android.widget.Button
+import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.view.updatePadding
@@ -66,6 +69,7 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
     private var player: ExoPlayer? = null
     private var player2: ExoPlayer? = null
     private var carouselAdapter: CarouselAdapter? = null
+    private var result:Boolean = true
 
     @SuppressLint("ClickableViewAccessibility")
     public override fun onCreate(savedInstanceState: Bundle?) {
@@ -73,6 +77,7 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
         mIntentId = savedInstanceState?.getInt(INTENT_ID_KEY, Int.MAX_VALUE)
             ?: intent.getIntExtra(INTENT_ID_KEY, Int.MAX_VALUE)
         mInAppMessage = inAppMessage
+        if (isShowingNpsInApp) {
         if (mInAppMessage == null) {
             Log.e(LOG_TAG, "InAppMessage is null! Could not get display state!")
             InAppUpdateDisplayState.releaseDisplayState(mIntentId)
@@ -90,6 +95,7 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
             }
             cacheResources()
             setContentView(view)
+
             if (isShowingInApp) {
                 if (mInAppMessage!!.mActionData!!.mMsgType == InAppNotificationType.CAROUSEL.toString()) {
                     setupCarousel()
@@ -101,6 +107,7 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
                 finish()
             }
         }
+    }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -214,6 +221,20 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
             InAppNotificationType.IMAGE_BUTTON.toString() -> {
                 binding.smileRating.visibility = View.GONE
                 binding.llTextContainer.visibility = View.GONE
+
+
+                val gdButton = binding.btnTemplate.background as GradientDrawable
+                gdButton.setColor(Color.parseColor(mInAppMessage!!.mActionData!!.mButtonColor))
+                gdButton.cornerRadius = 0f
+
+                val layoutParams = binding.llButtonContainer.layoutParams as LinearLayout.LayoutParams
+                layoutParams.setMargins(0, 0, 0, 0)
+                layoutParams.marginStart = 0
+                layoutParams.marginEnd = 0
+                binding.llButtonContainer.layoutParams = layoutParams
+
+
+
                 setButton()
             }
             InAppNotificationType.NPS.toString() -> {
@@ -429,6 +450,7 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
 
     private fun setButton() {
         if (mInAppMessage!!.mActionData!!.mBtnText.isNullOrEmpty()) {
+            binding.llButtonContainer.visibility = View.GONE
             binding.btnTemplate.visibility = View.GONE
         } else {
             binding.btnTemplate.typeface = mInAppMessage!!.mActionData!!.getFontFamily(this)
@@ -462,9 +484,12 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
                 try {
                     val gdButton = binding.btnTemplate.background as GradientDrawable
                     gdButton.setColor(Color.parseColor(mInAppMessage!!.mActionData!!.mButtonColor))
-                    if (mInAppMessage!!.mActionData!!.mButtonBorderRadius != null) {
+                    if (!mInAppMessage!!.mActionData!!.mButtonBorderRadius.isNullOrEmpty()) {
                         gdButton.cornerRadius =
                             mInAppMessage!!.mActionData!!.mButtonBorderRadius!!.toFloat()
+                    }
+                    else {
+                        gdButton.cornerRadius = 0f
                     }
                 } catch (e: Exception) {
                     Log.w(
@@ -631,9 +656,12 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
             try {
                 val gdButton = binding.btnTemplateSecond.background as GradientDrawable
                 gdButton.setColor(Color.parseColor(mInAppMessage!!.mActionData!!.mSecondButtonColor))
-                if (mInAppMessage!!.mActionData!!.mButtonBorderRadius != null) {
+                if (!mInAppMessage!!.mActionData!!.mButtonBorderRadius.isNullOrEmpty()) {
                     gdButton.cornerRadius =
                         mInAppMessage!!.mActionData!!.mButtonBorderRadius!!.toFloat()
+                }
+                else {
+                    gdButton.cornerRadius = 0f
                 }
             } catch (e: Exception) {
                 Log.w(
@@ -766,9 +794,12 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
             try {
                 val gdButton = binding.btnTemplate.background as GradientDrawable
                 gdButton.setColor(Color.parseColor(mInAppMessage!!.mActionData!!.mButtonColor))
-                if (mInAppMessage!!.mActionData!!.mButtonBorderRadius != null) {
+                if (!mInAppMessage!!.mActionData!!.mButtonBorderRadius.isNullOrEmpty()) {
                     gdButton.cornerRadius =
                         mInAppMessage!!.mActionData!!.mButtonBorderRadius!!.toFloat()
+                }
+                else {
+                    gdButton.cornerRadius = 0f
                 }
             } catch (e: Exception) {
                 Log.w(
@@ -949,8 +980,11 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
         bindingSecondPopUp.button.setTextColor(Color.parseColor(mInAppMessage!!.mActionData!!.mButtonTextColor))
         val gdButton = bindingSecondPopUp.button.background as GradientDrawable
         gdButton.setColor(Color.parseColor(mInAppMessage!!.mActionData!!.mButtonColor))
-        if (mInAppMessage!!.mActionData!!.mButtonBorderRadius != null) {
+        if (!mInAppMessage!!.mActionData!!.mButtonBorderRadius.isNullOrEmpty()) {
             gdButton.cornerRadius = mInAppMessage!!.mActionData!!.mButtonBorderRadius!!.toFloat()
+        }
+        else {
+            gdButton.cornerRadius = 0f
         }
         bindingSecondPopUp.button.setOnClickListener {
             RequestHandler.createInAppNotificationClickRequest(
@@ -995,6 +1029,7 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
             binding.tvCouponCode.setTextColor(Color.parseColor(mInAppMessage!!.mActionData!!.mPromoCodeTextColor))
             binding.tvCouponCodeWithButton.text = mInAppMessage!!.mActionData!!.mPromotionCode
             binding.tvCouponCodeWithButton.setTextColor(Color.parseColor(mInAppMessage!!.mActionData!!.mPromoCodeTextColor))
+            binding.tvCouponCodeWithButton.setTextSize(17f)
             //TODO When data comes use the codes below
             if (mInAppMessage!!.mActionData!!.mPromoCodeCopyButtonText?.isNotEmpty() == true) {
                 binding.copyButton.setOnClickListener {
@@ -1123,6 +1158,21 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
             return if (mUpdateDisplayState == null) {
                 false
             } else InAppNotificationState.TYPE == mUpdateDisplayState!!.getDisplayState()!!.type
+        }
+    private val isShowingNpsInApp: Boolean
+        get() {
+            if(mInAppMessage!!.mActionData!!.mMsgType!!.equals("nps_with_numbers")) {
+                if (mInAppMessage!!.mActionData!!.mDisplayType!!.equals("inline")) {
+                    result = false
+                } else if (mInAppMessage!!.mActionData!!.mDisplayType == null && mInAppMessage!!.mActionData!!.mDisplayType!!.equals(
+                        "popup"
+                    )
+                ) {
+                    result = true
+                }
+            }
+
+            return result
         }
 
     override fun onSmileySelected(@BaseRating.Smiley smiley: Int, reselected: Boolean) {

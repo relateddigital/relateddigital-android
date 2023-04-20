@@ -21,6 +21,8 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import com.google.gson.Gson
 import com.relateddigital.relateddigital_android.R
+import com.relateddigital.relateddigital_android.RelatedDigital
+import com.relateddigital.relateddigital_android.constants.Constants
 import com.relateddigital.relateddigital_android.databinding.ActivityScratchToWinBinding
 import com.relateddigital.relateddigital_android.model.MailSubReport
 import com.relateddigital.relateddigital_android.model.ScratchToWin
@@ -29,6 +31,7 @@ import com.relateddigital.relateddigital_android.network.RequestHandler
 import com.relateddigital.relateddigital_android.util.StringUtils
 import com.squareup.picasso.Picasso
 import java.net.URI
+import java.util.*
 import java.util.regex.Pattern
 
 class ScratchToWinActivity : Activity(), ScratchToWinInterface {
@@ -36,6 +39,7 @@ class ScratchToWinActivity : Activity(), ScratchToWinInterface {
     private var mScratchToWinMessage: ScratchToWin? = null
     private var isMailSubsForm = false
     private var mExtendedProps: ScratchToWinExtendedProps? = null
+    private var promoemail =""
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityScratchToWinBinding.inflate(layoutInflater)
@@ -203,6 +207,7 @@ class ScratchToWinActivity : Activity(), ScratchToWinInterface {
                         mScratchToWinMessage!!.actiondata!!.type!!,
                         mScratchToWinMessage!!.actid.toString(),
                         mScratchToWinMessage!!.actiondata!!.auth!!, email)
+                promoemail = email
                 binding.viewToBeScratched.enableScratching()
                 Toast.makeText(applicationContext, mScratchToWinMessage!!.actiondata!!.mailSubscriptionForm!!.successMessage, Toast.LENGTH_SHORT).show()
             } else {
@@ -278,6 +283,7 @@ class ScratchToWinActivity : Activity(), ScratchToWinInterface {
 
     override fun onScratchingComplete() {
         sendReport()
+        sendPromotionCodeInfo(email = promoemail, promotionCode = mScratchToWinMessage!!.actiondata!!.promotionCode.toString())
         binding.copyToClipboard.visibility = View.VISIBLE
     }
 
@@ -295,6 +301,19 @@ class ScratchToWinActivity : Activity(), ScratchToWinInterface {
         if (report != null) {
             RequestHandler.createInAppActionClickRequest(applicationContext, report)
         }
+    }
+    private fun sendPromotionCodeInfo(email: String, promotionCode: String) {
+        val actionId = "act-" + mScratchToWinMessage!!.actid
+        val parameters = HashMap<String, String>()
+        parameters[Constants.PROMOTION_CODE_REQUEST_KEY] = promotionCode
+        parameters[Constants.ACTION_ID_REQUEST_KEY] = actionId
+        if (email.isNotEmpty()) {
+            parameters[Constants.PROMOTION_CODE_EMAIL_REQUEST_KEY] = email
+        }
+        RelatedDigital.customEvent(
+            context = this,
+            pageName = Constants.PAGE_NAME_REQUEST_VAL,
+            properties = parameters)
     }
 
     companion object {
