@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <manifest xmlns:tools="http://schemas.android.com/tools"
     xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.relateddigital.relateddigital_android">
+
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -39,6 +41,11 @@
             android:noHistory="true"
             android:screenOrientation="portrait" />
         <activity
+            android:name=".inapp.giftbox.GiftBoxActivity"
+            android:configChanges="orientation"
+            android:noHistory="true"
+            android:screenOrientation="portrait" />
+        <activity
             android:name=".inapp.inappmessages.InAppFullActivity"
             android:noHistory="true"
             android:theme="@style/Theme.AppCompat.Light.Dialog.Alert" />
@@ -56,7 +63,6 @@
             android:noHistory="true"
             android:theme="@style/Theme.Transparent" />
 
-
         <service
             android:name=".push.services.RelatedDigitalFirebaseMessagingService"
             android:exported="false">
@@ -64,7 +70,6 @@
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
-
         <service
             android:name=".push.services.RelatedDigitalHuaweiMessagingService"
             android:exported="false">
@@ -72,7 +77,6 @@
                 <action android:name="com.huawei.push.action.MESSAGING_EVENT" />
             </intent-filter>
         </service>
-
         <service
             android:name="com.relateddigital.relateddigital_android.geofence.GeofenceTransitionsIntentService"
             android:enabled="true"
@@ -81,17 +85,14 @@
         <receiver
             android:name="com.relateddigital.relateddigital_android.geofence.GeofenceAlarm"
             android:exported="false" />
-
         <receiver
             android:name="com.relateddigital.relateddigital_android.geofence.GeofenceBroadcastReceiver"
             android:enabled="true"
             android:exported="false" />
-
         <receiver
             android:name=".push.carousel.CarouselEventReceiver"
             android:enabled="true"
             android:exported="false" />
-
     </application>
 
 </manifest>

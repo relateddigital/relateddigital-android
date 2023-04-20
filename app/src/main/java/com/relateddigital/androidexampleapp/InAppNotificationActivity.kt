@@ -118,9 +118,6 @@ class InAppNotificationActivity : AppCompatActivity() {
         }
 
         binding.shakeToWinButton.setOnClickListener {
-           // val intent = Intent(this, ShakeToWinActivity::class.java)
-           // startActivity(intent)
-            //TODO when backend side gets ready, use below
             sendInAppRequest("ShakeToWin");
         }
 
@@ -222,6 +219,10 @@ class InAppNotificationActivity : AppCompatActivity() {
 
         binding.giftCatchButton.setOnClickListener {
             sendInAppRequest("giftrain")
+        }
+
+        binding.giftboxButton.setOnClickListener {
+            sendInAppRequest("giftBox")
         }
 
         binding.findToWinButton.setOnClickListener {
