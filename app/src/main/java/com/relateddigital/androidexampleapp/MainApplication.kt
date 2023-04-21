@@ -37,7 +37,7 @@ class MainApplication : Application() {
         // Enable Geofencing
         RelatedDigital.setIsGeofenceEnabled(
             context = applicationContext,
-            isGeofenceEnabled = false
+            isGeofenceEnabled = true
         )
     }
 
