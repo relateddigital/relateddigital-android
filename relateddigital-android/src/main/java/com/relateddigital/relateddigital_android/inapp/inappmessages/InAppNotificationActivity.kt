@@ -169,6 +169,19 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
                 e.printStackTrace()
             }
         }
+        else {
+            try {
+                binding.llBack.setBackgroundColor(Color.parseColor(mInAppMessage!!.mActionData!!.mButtonTextColor))
+            } catch (e: Exception) {
+                Log.w(
+                    LOG_TAG,
+                    "Could not parse the data given for background color\nSetting the default value."
+                )
+                e.printStackTrace()
+            }
+
+
+        }
         when (mInAppMessage!!.mActionData!!.mMsgType) {
             InAppNotificationType.IMAGE_TEXT_BUTTON.toString() -> {
                 setTitle()
@@ -219,21 +232,9 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
                 }
             }
             InAppNotificationType.IMAGE_BUTTON.toString() -> {
-                binding.smileRating.visibility = View.GONE
                 binding.llTextContainer.visibility = View.GONE
-
-
-                val gdButton = binding.btnTemplate.background as GradientDrawable
-                gdButton.setColor(Color.parseColor(mInAppMessage!!.mActionData!!.mButtonColor))
-                gdButton.cornerRadius = 0f
-
-                val layoutParams = binding.llButtonContainer.layoutParams as LinearLayout.LayoutParams
-                layoutParams.setMargins(0, 0, 0, 0)
-                layoutParams.marginStart = 0
-                layoutParams.marginEnd = 0
-                binding.llButtonContainer.layoutParams = layoutParams
-
-
+                binding.ratingBar.visibility = View.GONE
+                binding.smileRating.visibility = View.GONE
 
                 setButton()
             }
