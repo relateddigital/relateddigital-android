@@ -6,7 +6,6 @@ import android.content.Intent
 import android.util.Log
 import androidx.fragment.app.FragmentActivity
 import com.google.gson.Gson
-import com.google.gson.JsonArray
 import com.relateddigital.relateddigital_android.RelatedDigital
 import com.relateddigital.relateddigital_android.api.*
 import com.relateddigital.relateddigital_android.constants.Constants
@@ -138,59 +137,66 @@ object RequestSender {
 
             Domain.IN_APP_NOTIFICATION_ACT_JSON -> {
                 val actJsonInterface = SApiClient.getClient(model.getRequestTimeoutInSecond())
-                        ?.create(ApiMethods::class.java)
+                    ?.create(ApiMethods::class.java)
                 val call: Call<List<InAppMessage>> =
-                        actJsonInterface?.getGeneralRequestJsonResponse(
-                                currentRequest.headerMap, currentRequest.queryMap
-                        )!!
+                    actJsonInterface?.getGeneralRequestJsonResponse(
+                        currentRequest.headerMap, currentRequest.queryMap
+                    )!!
                 call.enqueue(object : Callback<List<InAppMessage>?> {
                     override fun onResponse(
-                            call: Call<List<InAppMessage>?>,
-                            response: Response<List<InAppMessage>?>
+                        call: Call<List<InAppMessage>?>,
+                        response: Response<List<InAppMessage>?>
                     ) {
                         if (response.isSuccessful) {
                             applySuccessConditions(
-                                    response.headers(), response.raw().request.url.toString(),
-                                    model, Domain.IN_APP_NOTIFICATION_ACT_JSON, context
+                                response.headers(), response.raw().request.url.toString(),
+                                model, Domain.IN_APP_NOTIFICATION_ACT_JSON, context
                             )
                             try {
                                 val inAppMessages = response.body()
-                                Log.i(
+                                if (!inAppMessages.isNullOrEmpty()) {
+                                    Log.i(
                                         LOG_TAG,
                                         "Successful InApp Request : " + call.request().url.toString()
-                                )
-                                val timer = Timer("InAppNotification Delay Timer", false)
-                                val timerTask = InAppNotificationTimer(
+                                    )
+                                    val timer = Timer("InAppNotification Delay Timer", false)
+                                    val timerTask = InAppNotificationTimer(
                                         null, 0,
                                         inAppMessages, currentRequest.parent, model, context
-                                )
-                                var delay: Long = 0
-                                if (timerTask.getMessage() != null) {
-                                    delay =
+                                    )
+                                    var delay: Long = 0
+                                    if (timerTask.getMessage() != null) {
+                                        delay =
                                             timerTask.getMessage()!!.mActionData!!.mWaitingTime!!.toLong() * 1000
-                                }
-                                timer.schedule(timerTask, delay)
-                                if (inAppMessages?.get(0)?.mActionData?.mMsgType!!.equals("nps_with_numbers")) {
-                                    if(inAppMessages?.get(0)?.mActionData?.mDisplayType!!.equals("inline")) {
-                                        val visilabsResponse = VisilabsResponse(
-                                            null,JSONArray(Gson().toJson(inAppMessages)),null,null,null
-                                        )
-                                        currentRequest.visilabsCallback?.success(visilabsResponse)
                                     }
+                                    timer.schedule(timerTask, delay)
+                                    if (inAppMessages[0].mActionData?.mMsgType == "nps_with_numbers") {
+                                        if (inAppMessages[0].mActionData?.mDisplayType == "inline") {
+                                            val visilabsResponse = VisilabsResponse(
+                                                null, JSONArray(Gson().toJson(inAppMessages)), null, null, null
+                                            )
+                                            currentRequest.visilabsCallback?.success(visilabsResponse)
+                                        }
+                                    }
+                                } else {
+                                    Log.w(
+                                        LOG_TAG, "Empty or null inAppMessages list: " +
+                                                response.raw().request.url.toString()
+                                    )
                                 }
                             } catch (e: Exception) {
                                 e.printStackTrace()
                                 Log.w(
-                                        LOG_TAG, "Could not parse the response for the" +
-                                        " request - not in the expected format : " +
-                                        response.raw().request.url.toString()
+                                    LOG_TAG, "Could not parse the response for the" +
+                                            " request - not in the expected format : " +
+                                            response.raw().request.url.toString()
                                 )
                             }
                         } else {
                             applyFailConditions(call.request().url.toString(), model, context)
                             Log.w(
-                                    LOG_TAG,
-                                    "Fail InApp Request : " + call.request().url.toString()
+                                LOG_TAG,
+                                "Fail InApp Request : " + call.request().url.toString()
                             )
                             Log.w(LOG_TAG, "Fail Request Response Code : " + response.code())
                         }
@@ -203,6 +209,7 @@ object RequestSender {
                     }
                 })
             }
+
 
             Domain.IN_APP_ACTION_MOBILE -> {
                 val mobileInterface = SApiClient.getClient(model.getRequestTimeoutInSecond())

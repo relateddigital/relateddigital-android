@@ -98,7 +98,12 @@ class PuzzleActivity : FragmentActivity(), PuzzleCompleteInterface,
                                 val webViewDialogFragment: PuzzleWebDialogFragment =
                                     PuzzleWebDialogFragment.newInstance(res[0], res[1], res[2])
                                 webViewDialogFragment.setPuzzleListeners(completeListener, copyToClipboardListener, showCodeListener)
-                                webViewDialogFragment.display(supportFragmentManager)
+                                if (!isFinishing && !supportFragmentManager.isDestroyed) {
+                                    webViewDialogFragment.display(supportFragmentManager)
+                                } else {
+                                    Log.e(LOG_TAG, "Activity is finishing or FragmentManager is destroyed!")
+                                    finish()
+                                }
                             }
                         } else {
                             Log.e(LOG_TAG, "Could not get the puzzle data properly!")

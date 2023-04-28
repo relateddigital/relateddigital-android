@@ -210,7 +210,8 @@ object PayloadUtils {
         var i = 0
         while (i < jsonArray.length()) {
             try {
-                if (isOld(context, jsonArray.getJSONObject(i).getString("date"))) {
+                val jsonObject = jsonArray.getJSONObject(i)
+                if (!jsonObject.has("date") || (jsonObject.has("date") && isOld(context, jsonObject.getString("date")))) {
                     jsonArray.remove(i)
                     i--
                 }

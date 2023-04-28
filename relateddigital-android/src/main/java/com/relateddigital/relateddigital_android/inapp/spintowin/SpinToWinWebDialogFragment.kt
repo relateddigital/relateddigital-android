@@ -26,7 +26,9 @@ class SpinToWinWebDialogFragment : DialogFragment() {
     private var mSpinToWinShowCodeInterface: SpinToWinShowCodeInterface? = null
 
     fun display(fragmentManagerLoc: FragmentManager?): SpinToWinWebDialogFragment {
-        this.show(fragmentManagerLoc!!, TAG)
+        val ft = fragmentManagerLoc?.beginTransaction()
+        ft?.add(this, TAG)
+        ft?.commitAllowingStateLoss()
         return this
     }
 

@@ -98,7 +98,12 @@ class GiftBoxActivity : FragmentActivity(), GiftBoxCompleteInterface,
                                 val webViewDialogFragment: GiftBoxWebDialogFragment =
                                     GiftBoxWebDialogFragment.newInstance(res[0], res[1], res[2])
                                 webViewDialogFragment.setGiftBoxListeners(completeListener, copyToClipboardListener, showCodeListener)
-                                webViewDialogFragment.display(supportFragmentManager)
+                                if (!isFinishing && !supportFragmentManager.isDestroyed) {
+                                    webViewDialogFragment.display(supportFragmentManager)
+                                } else {
+                                    Log.e(LOG_TAG, "Activity is finishing or FragmentManager is destroyed!")
+                                    finish()
+                                }
                             }
                         } else {
                             Log.e(LOG_TAG, "Could not get the giftbox data properly!")

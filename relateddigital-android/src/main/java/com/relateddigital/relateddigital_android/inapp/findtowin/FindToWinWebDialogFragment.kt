@@ -26,7 +26,9 @@ class FindToWinWebDialogFragment : DialogFragment() {
     private lateinit var mShowCodeInterface: FindToWinShowCodeInterface
 
     fun display(fragmentManagerLoc: FragmentManager?): FindToWinWebDialogFragment {
-        this.show(fragmentManagerLoc!!, TAG)
+        val ft = fragmentManagerLoc?.beginTransaction()
+        ft?.add(this, TAG)
+        ft?.commitAllowingStateLoss()
         return this
     }
 

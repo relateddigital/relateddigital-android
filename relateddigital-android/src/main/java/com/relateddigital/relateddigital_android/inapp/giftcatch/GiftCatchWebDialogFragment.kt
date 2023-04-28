@@ -26,7 +26,9 @@ class GiftCatchWebDialogFragment : DialogFragment() {
     private lateinit var mShowCodeInterface: GiftCatchShowCodeInterface
 
     fun display(fragmentManagerLoc: FragmentManager?): GiftCatchWebDialogFragment {
-        this.show(fragmentManagerLoc!!, TAG)
+        val ft = fragmentManagerLoc?.beginTransaction()
+        ft?.add(this, TAG)
+        ft?.commitAllowingStateLoss()
         return this
     }
 

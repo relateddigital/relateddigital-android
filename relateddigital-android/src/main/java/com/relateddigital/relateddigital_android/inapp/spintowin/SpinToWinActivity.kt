@@ -97,7 +97,12 @@ class SpinToWinActivity : FragmentActivity(), SpinToWinCompleteInterface,
                                     copyToClipboardListener,
                                     showCodeListener
                                 )
-                                webViewDialogFragment.display(supportFragmentManager)
+                                if (!isFinishing && !supportFragmentManager.isDestroyed) {
+                                    webViewDialogFragment.display(supportFragmentManager)
+                                } else {
+                                    Log.e(LOG_TAG, "Activity is finishing or FragmentManager is destroyed!")
+                                    finish()
+                                }
                             }
                         } else {
                             Log.e(LOG_TAG, "Could not get the spin-to-win data properly!")

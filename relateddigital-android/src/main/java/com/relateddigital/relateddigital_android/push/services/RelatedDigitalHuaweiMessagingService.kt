@@ -17,7 +17,7 @@ import com.relateddigital.relateddigital_android.push.RetentionType
 import com.relateddigital.relateddigital_android.util.*
 import java.util.*
 
-class RelatedDigitalHuaweiMessagingService : HmsMessageService() {
+open class RelatedDigitalHuaweiMessagingService : HmsMessageService() {
     companion object {
         private const val LOG_TAG = "RDHMessagingService"
     }

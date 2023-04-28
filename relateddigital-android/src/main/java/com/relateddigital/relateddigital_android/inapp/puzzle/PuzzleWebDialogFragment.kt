@@ -26,7 +26,9 @@ class PuzzleWebDialogFragment : DialogFragment() {
     private lateinit var mShowCodeInterface: PuzzleShowCodeInterface
 
     fun display(fragmentManagerLoc: FragmentManager?): PuzzleWebDialogFragment {
-        this.show(fragmentManagerLoc!!, TAG)
+        val ft = fragmentManagerLoc?.beginTransaction()
+        ft?.add(this, TAG)
+        ft?.commitAllowingStateLoss()
         return this
     }
 
