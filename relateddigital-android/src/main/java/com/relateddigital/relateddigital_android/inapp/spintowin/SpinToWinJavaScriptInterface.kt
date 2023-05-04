@@ -15,6 +15,7 @@ import com.relateddigital.relateddigital_android.model.MailSubReport
 import com.relateddigital.relateddigital_android.model.Slice
 import com.relateddigital.relateddigital_android.model.SpinToWin
 import com.relateddigital.relateddigital_android.network.RequestHandler
+import com.relateddigital.relateddigital_android.network.requestHandler.InAppActionClickRequest
 import org.json.JSONObject
 import java.util.*
 
@@ -90,7 +91,7 @@ class SpinToWinJavaScriptInterface internal constructor(webViewDialogFragment: S
             report = null
         }
         if (report != null) {
-            RequestHandler.createInAppActionClickRequest(mWebViewDialogFragment.requireContext(), report)
+            InAppActionClickRequest.createInAppActionClickRequest(mWebViewDialogFragment.requireContext(), report)
         }
     }
 

@@ -56,7 +56,7 @@ object RequestHandler {
         )
     }
 
-    fun createInAppNotificationRequest(
+    /*fun createInAppNotificationRequest(
             context: Context, model: RelatedDigitalModel, pageName: String,
             properties: HashMap<String, String>?, parent: Activity? = null
     ) {
@@ -86,7 +86,7 @@ object RequestHandler {
         )
     }
 
-    fun createInAppActionRequest(
+     fun createInAppActionRequest(
             context: Context, model: RelatedDigitalModel, pageName: String,
             properties: HashMap<String, String>?, parent: Activity? = null
     ) {
@@ -156,7 +156,7 @@ object RequestHandler {
                         null
                 ), RelatedDigital.getRelatedDigitalModel(context), context
         )
-    }
+    } */
 
     fun createInAppNotificationClickRequest(
             context: Context, inAppMessage: InAppMessage?, rating: String?

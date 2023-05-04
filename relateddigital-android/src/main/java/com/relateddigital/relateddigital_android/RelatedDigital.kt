@@ -22,6 +22,8 @@ import com.relateddigital.relateddigital_android.locationPermission.LocationPerm
 import com.relateddigital.relateddigital_android.model.*
 import com.relateddigital.relateddigital_android.network.RequestFormer
 import com.relateddigital.relateddigital_android.network.RequestHandler
+import com.relateddigital.relateddigital_android.network.requestHandler.InAppActionRequest
+import com.relateddigital.relateddigital_android.network.requestHandler.InAppNotificationRequest
 import com.relateddigital.relateddigital_android.push.EuromessageCallback
 import com.relateddigital.relateddigital_android.push.PushMessageInterface
 import com.relateddigital.relateddigital_android.push.RetentionType
@@ -1018,14 +1020,14 @@ object RelatedDigital {
         if(model != null) {
             if (model!!.getIsInAppNotificationEnabled()) {
                 if(parent != null) {
-                    RequestHandler.createInAppNotificationRequest(
+                    InAppNotificationRequest.createInAppNotificationRequest(
                         context,
                         model!!,
                         pageName,
                         properties,
                         parent
                     )
-                    RequestHandler.createInAppActionRequest(
+                    InAppActionRequest.createInAppActionRequest(
                         context,
                         model!!,
                         pageName,

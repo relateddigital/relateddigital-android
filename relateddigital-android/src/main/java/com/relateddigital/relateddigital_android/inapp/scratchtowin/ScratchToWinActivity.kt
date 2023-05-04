@@ -28,6 +28,7 @@ import com.relateddigital.relateddigital_android.model.MailSubReport
 import com.relateddigital.relateddigital_android.model.ScratchToWin
 import com.relateddigital.relateddigital_android.model.ScratchToWinExtendedProps
 import com.relateddigital.relateddigital_android.network.RequestHandler
+import com.relateddigital.relateddigital_android.network.requestHandler.InAppActionClickRequest
 import com.relateddigital.relateddigital_android.util.StringUtils
 import com.squareup.picasso.Picasso
 import java.net.URI
@@ -299,7 +300,7 @@ class ScratchToWinActivity : Activity(), ScratchToWinInterface {
             report = null
         }
         if (report != null) {
-            RequestHandler.createInAppActionClickRequest(applicationContext, report)
+            InAppActionClickRequest.createInAppActionClickRequest(applicationContext, report)
         }
     }
     private fun sendPromotionCodeInfo(email: String, promotionCode: String) {

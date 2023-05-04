@@ -23,6 +23,7 @@ import com.relateddigital.relateddigital_android.inapp.InAppUpdateDisplayState
 import com.relateddigital.relateddigital_android.model.ExtendedProps
 import com.relateddigital.relateddigital_android.model.MailSubscriptionForm
 import com.relateddigital.relateddigital_android.network.RequestHandler
+import com.relateddigital.relateddigital_android.network.requestHandler.InAppActionClickRequest
 import java.net.URI
 import java.net.URISyntaxException
 import java.util.*
@@ -168,7 +169,7 @@ class MailSubscriptionFormActivity : Activity() {
             if (!checkCheckBoxes()) {
                 return@OnClickListener
             }
-            RequestHandler.createInAppActionClickRequest(applicationContext, mMailSubscriptionForm!!.actiondata!!.report)
+            InAppActionClickRequest.createInAppActionClickRequest(applicationContext, mMailSubscriptionForm!!.actiondata!!.report)
             RequestHandler.createSubsJsonRequest(applicationContext, "subscription_email", mMailSubscriptionForm!!.actid!!,
                 mMailSubscriptionForm!!.actiondata!!.auth!!, email)
 

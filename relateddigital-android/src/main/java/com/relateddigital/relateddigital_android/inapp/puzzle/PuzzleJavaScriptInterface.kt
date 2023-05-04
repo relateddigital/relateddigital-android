@@ -8,6 +8,7 @@ import com.relateddigital.relateddigital_android.constants.Constants
 import com.relateddigital.relateddigital_android.model.Puzzle
 import com.relateddigital.relateddigital_android.model.MailSubReport
 import com.relateddigital.relateddigital_android.network.RequestHandler
+import com.relateddigital.relateddigital_android.network.requestHandler.InAppActionClickRequest
 import java.util.*
 
 class PuzzleJavaScriptInterface internal constructor(webViewDialogFragment: PuzzleWebDialogFragment,
@@ -74,7 +75,7 @@ class PuzzleJavaScriptInterface internal constructor(webViewDialogFragment: Puzz
             report = null
         }
         if (report != null) {
-            RequestHandler.createInAppActionClickRequest(mWebViewDialogFragment.requireContext(), report)
+            InAppActionClickRequest.createInAppActionClickRequest(mWebViewDialogFragment.requireContext(), report)
         }
     }
 

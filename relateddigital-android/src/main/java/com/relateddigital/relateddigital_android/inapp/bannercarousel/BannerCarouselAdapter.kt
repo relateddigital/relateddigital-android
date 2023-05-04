@@ -23,6 +23,7 @@ import com.relateddigital.relateddigital_android.R
 import com.relateddigital.relateddigital_android.model.AppBanner
 import com.relateddigital.relateddigital_android.model.MailSubReport
 import com.relateddigital.relateddigital_android.network.RequestHandler
+import com.relateddigital.relateddigital_android.network.requestHandler.InAppActionClickRequest
 
 
 class BannerCarouselAdapter(private val mContext: Context,
@@ -95,7 +96,7 @@ class BannerCarouselAdapter(private val mContext: Context,
                     report = null
                 }
                 if (report != null) {
-                    RequestHandler.createInAppActionClickRequest(mContext, report)
+                    InAppActionClickRequest.createInAppActionClickRequest(mContext, report)
                 }
             }
         } else {
@@ -126,7 +127,7 @@ class BannerCarouselAdapter(private val mContext: Context,
                     report = null
                 }
                 if (report != null) {
-                    RequestHandler.createInAppActionClickRequest(mContext, report)
+                    InAppActionClickRequest.createInAppActionClickRequest(mContext, report)
                 }
             }
         }

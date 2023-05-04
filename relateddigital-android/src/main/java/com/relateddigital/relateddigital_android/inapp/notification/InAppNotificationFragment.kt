@@ -24,6 +24,7 @@ import com.relateddigital.relateddigital_android.model.Drawer
 import com.relateddigital.relateddigital_android.model.DrawerExtendedProps
 import com.relateddigital.relateddigital_android.model.MailSubReport
 import com.relateddigital.relateddigital_android.network.RequestHandler
+import com.relateddigital.relateddigital_android.network.requestHandler.InAppActionClickRequest
 import com.squareup.picasso.Picasso
 import java.net.URI
 import java.net.URISyntaxException
@@ -451,7 +452,7 @@ class InAppNotificationFragment : Fragment() {
                 report = null
             }
             if (report != null) {
-                RequestHandler.createInAppActionClickRequest(requireActivity(), report)
+                InAppActionClickRequest.createInAppActionClickRequest(requireActivity(), report)
             }
             if (buttonInterface != null) {
                 RelatedDigital.setInAppButtonInterface(null)
@@ -738,7 +739,7 @@ class InAppNotificationFragment : Fragment() {
                 report = null
             }
             if (report != null) {
-                RequestHandler.createInAppActionClickRequest(requireActivity(), report)
+                InAppActionClickRequest.createInAppActionClickRequest(requireActivity(), report)
             }
             if (buttonInterface != null) {
                 RelatedDigital.setInAppButtonInterface(null)
@@ -1025,7 +1026,7 @@ class InAppNotificationFragment : Fragment() {
                 report = null
             }
             if (report != null) {
-                RequestHandler.createInAppActionClickRequest(requireActivity(), report)
+                InAppActionClickRequest.createInAppActionClickRequest(requireActivity(), report)
             }
             if (buttonInterface != null) {
                 RelatedDigital.setInAppButtonInterface(null)
@@ -1314,7 +1315,7 @@ class InAppNotificationFragment : Fragment() {
                 report = null
             }
             if (report != null) {
-                RequestHandler.createInAppActionClickRequest(requireActivity(), report)
+                InAppActionClickRequest.createInAppActionClickRequest(requireActivity(), report)
             }
             if (buttonInterface != null) {
                 RelatedDigital.setInAppButtonInterface(null)
@@ -1603,7 +1604,7 @@ class InAppNotificationFragment : Fragment() {
                 report = null
             }
             if (report != null) {
-                RequestHandler.createInAppActionClickRequest(requireActivity(), report)
+                InAppActionClickRequest.createInAppActionClickRequest(requireActivity(), report)
             }
             if (buttonInterface != null) {
                 RelatedDigital.setInAppButtonInterface(null)
@@ -1892,7 +1893,7 @@ class InAppNotificationFragment : Fragment() {
                 report = null
             }
             if (report != null) {
-                RequestHandler.createInAppActionClickRequest(requireActivity(), report)
+                InAppActionClickRequest.createInAppActionClickRequest(requireActivity(), report)
             }
             if (buttonInterface != null) {
                 RelatedDigital.setInAppButtonInterface(null)

@@ -9,6 +9,7 @@ import com.relateddigital.relateddigital_android.model.GiftRain
 import com.relateddigital.relateddigital_android.model.GiftRainReport
 import com.relateddigital.relateddigital_android.model.MailSubReport
 import com.relateddigital.relateddigital_android.network.RequestHandler
+import com.relateddigital.relateddigital_android.network.requestHandler.InAppActionClickRequest
 import java.util.HashMap
 
 class GiftCatchJavaScriptInterface internal constructor(webViewDialogFragment: GiftCatchWebDialogFragment,
@@ -75,7 +76,7 @@ class GiftCatchJavaScriptInterface internal constructor(webViewDialogFragment: G
             report = null
         }
         if (report != null) {
-            RequestHandler.createInAppActionClickRequest(mWebViewDialogFragment.requireContext(), report)
+            InAppActionClickRequest.createInAppActionClickRequest(mWebViewDialogFragment.requireContext(), report)
         }
     }
 
