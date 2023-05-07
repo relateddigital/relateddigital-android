@@ -20,9 +20,10 @@ import com.bumptech.glide.load.MultiTransformation
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.GranularRoundedCorners
 import com.relateddigital.relateddigital_android.R
+import com.relateddigital.relateddigital_android.RelatedDigital
+import com.relateddigital.relateddigital_android.constants.Constants
 import com.relateddigital.relateddigital_android.model.AppBanner
 import com.relateddigital.relateddigital_android.model.MailSubReport
-import com.relateddigital.relateddigital_android.network.RequestHandler
 import com.relateddigital.relateddigital_android.network.requestHandler.InAppActionClickRequest
 
 
@@ -35,6 +36,7 @@ class BannerCarouselAdapter(private val mContext: Context,
     private var mPosition = 0
     private var isScrolling = false
     private var mAppBanner: AppBanner? = null
+    private var clickedUrl = ""
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BannerHolder {
         val context = parent.context
@@ -84,10 +86,15 @@ class BannerCarouselAdapter(private val mContext: Context,
             }
 
             bannerHolder.swipeImageView!!.setOnClickListener {
-                mBannerItemClickListener!!.bannerItemClicked(mAppBanner!!.actionData!!.appBanners!![position].androidLink)
+                clickedUrl = mAppBanner!!.actionData!!.appBanners!![position].androidLink!!.toString()
+                mBannerItemClickListener!!.bannerItemClicked(clickedUrl)
                 var report: MailSubReport?
                 try {
                     report = MailSubReport()
+                    val parameters = HashMap<String, String>()
+                    parameters[Constants.APP_BANNER_PARAMETER_KEY] = clickedUrl
+
+                    RelatedDigital.customEvent(mContext,"BannerClick", parameters)
                     report.impression = mAppBanner!!.actionData!!.report!!.impression
                     report.click = mAppBanner!!.actionData!!.report!!.click
                 } catch (e: Exception) {
@@ -115,10 +122,15 @@ class BannerCarouselAdapter(private val mContext: Context,
             bannerHolder.numberIndicator!!.text = numStr
 
             bannerHolder.slideImageView!!.setOnClickListener {
-                mBannerItemClickListener!!.bannerItemClicked(mAppBanner!!.actionData!!.appBanners!![position].androidLink)
+                clickedUrl = mAppBanner!!.actionData!!.appBanners!![position].androidLink!!.toString()
+                mBannerItemClickListener!!.bannerItemClicked(clickedUrl)
                 var report: MailSubReport?
                 try {
                     report = MailSubReport()
+                    val parameters = HashMap<String, String>()
+                    parameters[Constants.APP_BANNER_PARAMETER_KEY] = clickedUrl
+
+                    RelatedDigital.customEvent(mContext,"BannerClick", parameters)
                     report!!.impression = mAppBanner!!.actionData!!.report!!.impression
                     report!!.click = mAppBanner!!.actionData!!.report!!.click
                 } catch (e: Exception) {

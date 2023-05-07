@@ -48,6 +48,7 @@ class Constants {
         const val B_LOGIN_KEY_REQUEST_KEY = "OM.b_login"
         const val SIGN_UP_REQUEST_KEY = "SignUp"
         const val B_SIGN_UP_KEY_REQUEST_KEY = "OM.b_sgnp"
+        const val APP_BANNER_PARAMETER_KEY = "OM.OSB"
 
         const val REQUEST_TYPE_KEY = "type"
         const val REQUEST_AUTH_KEY = "auth"
