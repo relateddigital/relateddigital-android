@@ -22,6 +22,7 @@ import com.relateddigital.relateddigital_android.inapp.InAppNotificationState
 import com.relateddigital.relateddigital_android.inapp.InAppUpdateDisplayState
 import com.relateddigital.relateddigital_android.model.InAppMessage
 import com.relateddigital.relateddigital_android.network.RequestHandler
+import com.relateddigital.relateddigital_android.network.requestHandler.InAppNotificationClickRequest
 import com.relateddigital.relateddigital_android.util.AppUtils
 import com.squareup.picasso.Picasso
 
@@ -110,7 +111,7 @@ class HalfScreenFragment : Fragment() {
         binding.halfScreenContainerTop.setOnClickListener {
             val uriString: String? = mInAppMessage!!.mActionData!!.mAndroidLnk
             val buttonInterface: InAppButtonInterface? = RelatedDigital.getInAppButtonInterface()
-            RequestHandler.createInAppNotificationClickRequest(requireActivity(), mInAppMessage, null)
+            InAppNotificationClickRequest.createInAppNotificationClickRequest(requireActivity(), mInAppMessage, null)
             if (buttonInterface != null) {
                 RelatedDigital.setInAppButtonInterface(null)
                 buttonInterface.onPress(uriString)
@@ -165,7 +166,7 @@ class HalfScreenFragment : Fragment() {
         binding.halfScreenContainerBot.setOnClickListener {
             val uriString: String? = mInAppMessage!!.mActionData!!.mAndroidLnk
             val buttonInterface: InAppButtonInterface? = RelatedDigital.getInAppButtonInterface()
-            RequestHandler.createInAppNotificationClickRequest(requireActivity(), mInAppMessage, null)
+            InAppNotificationClickRequest.createInAppNotificationClickRequest(requireActivity(), mInAppMessage, null)
             if (buttonInterface != null) {
                 RelatedDigital.setInAppButtonInterface(null)
                 buttonInterface.onPress(uriString)

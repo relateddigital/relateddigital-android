@@ -22,6 +22,7 @@ import com.relateddigital.relateddigital_android.inapp.InAppNotificationState
 import com.relateddigital.relateddigital_android.inapp.InAppUpdateDisplayState
 import com.relateddigital.relateddigital_android.model.InAppMessage
 import com.relateddigital.relateddigital_android.network.RequestHandler
+import com.relateddigital.relateddigital_android.network.requestHandler.InAppNotificationClickRequest
 import java.util.*
 
 class InAppBottomSheetFragment : BottomSheetDialogFragment() {
@@ -119,7 +120,7 @@ class InAppBottomSheetFragment : BottomSheetDialogFragment() {
                     }
                 }
             }
-            RequestHandler.createInAppNotificationClickRequest(
+            InAppNotificationClickRequest.createInAppNotificationClickRequest(
                 mParent!!,
                 mInAppMessage,
                 null

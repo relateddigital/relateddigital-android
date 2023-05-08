@@ -21,6 +21,7 @@ import com.relateddigital.relateddigital_android.model.InAppMessage
 import com.relateddigital.relateddigital_android.util.AnimationManager
 import com.squareup.picasso.Picasso
 import com.relateddigital.relateddigital_android.network.RequestHandler
+import com.relateddigital.relateddigital_android.network.requestHandler.InAppNotificationClickRequest
 
 
 class InAppMiniFragment: Fragment() {
@@ -140,7 +141,7 @@ class InAppMiniFragment: Fragment() {
             override fun onSingleTapUp(event: MotionEvent): Boolean {
                 val uriString: String? = mInAppMessage!!.mActionData!!.mAndroidLnk
                 val buttonInterface: InAppButtonInterface? = RelatedDigital.getInAppButtonInterface()
-                RequestHandler.createInAppNotificationClickRequest(activity, mInAppMessage, null)
+                InAppNotificationClickRequest.createInAppNotificationClickRequest(activity, mInAppMessage, null)
                 if (buttonInterface != null) {
                     RelatedDigital.setInAppButtonInterface(null)
                     buttonInterface.onPress(uriString)

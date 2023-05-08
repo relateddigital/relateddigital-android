@@ -9,6 +9,7 @@ import com.relateddigital.relateddigital_android.model.FindToWin
 import com.relateddigital.relateddigital_android.model.MailSubReport
 import com.relateddigital.relateddigital_android.network.RequestHandler
 import com.relateddigital.relateddigital_android.network.requestHandler.InAppActionClickRequest
+import com.relateddigital.relateddigital_android.network.requestHandler.SubsJsonRequest
 import java.util.*
 
 class FindToWinJavaScriptInterface internal constructor(webViewDialogFragment: FindToWinWebDialogFragment,
@@ -51,7 +52,7 @@ class FindToWinJavaScriptInterface internal constructor(webViewDialogFragment: F
     fun subscribeEmail(email: String?) {
         if (!email.isNullOrEmpty()) {
             subEmail = email
-            RequestHandler.createSubsJsonRequest(mWebViewDialogFragment.requireContext(), findToWinModel.actiondata!!.type!!,
+            SubsJsonRequest.createSubsJsonRequest(mWebViewDialogFragment.requireContext(), findToWinModel.actiondata!!.type!!,
                 findToWinModel.actid.toString(), findToWinModel.actiondata!!.auth!!,
                 email)
         } else {

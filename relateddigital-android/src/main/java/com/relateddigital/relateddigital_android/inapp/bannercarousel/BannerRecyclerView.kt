@@ -14,6 +14,7 @@ import com.relateddigital.relateddigital_android.inapp.VisilabsCallback
 import com.relateddigital.relateddigital_android.inapp.VisilabsResponse
 import com.relateddigital.relateddigital_android.model.AppBanner
 import com.relateddigital.relateddigital_android.network.RequestHandler
+import com.relateddigital.relateddigital_android.network.requestHandler.BannerCarouselActionRequest
 
 
 class BannerRecyclerView : RecyclerView {
@@ -40,7 +41,7 @@ class BannerRecyclerView : RecyclerView {
             mBannerItemClickListener = bannerItemClickListener
             mBannerRequestListener = bannerRequestListener
 
-            RequestHandler.createBannerCarouselActionRequest(
+            BannerCarouselActionRequest.createBannerCarouselActionRequest(
                 mContext,
                 getBannerCallback(context),
                 properties

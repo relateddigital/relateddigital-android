@@ -39,6 +39,7 @@ import com.relateddigital.relateddigital_android.inapp.InAppNotificationType
 import com.relateddigital.relateddigital_android.inapp.InAppUpdateDisplayState
 import com.relateddigital.relateddigital_android.model.InAppMessage
 import com.relateddigital.relateddigital_android.network.RequestHandler
+import com.relateddigital.relateddigital_android.network.requestHandler.InAppNotificationClickRequest
 import com.relateddigital.relateddigital_android.util.AppUtils
 import com.relateddigital.relateddigital_android.util.StringUtils
 import com.squareup.picasso.Picasso
@@ -203,7 +204,7 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
                 binding.btnTemplate.visibility = View.GONE
                 binding.llButtonContainer.visibility = View.GONE
                 binding.ivTemplate.setOnClickListener {
-                    RequestHandler.createInAppNotificationClickRequest(
+                    InAppNotificationClickRequest.createInAppNotificationClickRequest(
                         applicationContext,
                         mInAppMessage,
                         rateReport
@@ -502,7 +503,7 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
             }
             binding.btnTemplate.setOnClickListener {
                 if (npsType == NpsType.NONE) {
-                    RequestHandler.createInAppNotificationClickRequest(
+                    InAppNotificationClickRequest.createInAppNotificationClickRequest(
                         applicationContext,
                         mInAppMessage,
                         rateReport
@@ -594,7 +595,7 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
                     finish()
                 } else {
                     if (isRatingEntered) {
-                        RequestHandler.createInAppNotificationClickRequest(
+                        InAppNotificationClickRequest.createInAppNotificationClickRequest(
                             applicationContext,
                             mInAppMessage,
                             rateReport
@@ -674,7 +675,7 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
         }
 
         binding.btnTemplateSecond.setOnClickListener {
-            RequestHandler.createInAppNotificationClickRequest(
+            InAppNotificationClickRequest.createInAppNotificationClickRequest(
                 applicationContext,
                 mInAppMessage,
                 rateReport
@@ -815,7 +816,7 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
             if (binding.ratingBar.rating != 0f) {
                 if (secondPopUpType == NpsSecondPopUpType.FEEDBACK_FORM) {
                     if (isRatingAboveThreshold) {
-                        RequestHandler.createInAppNotificationClickRequest(
+                        InAppNotificationClickRequest.createInAppNotificationClickRequest(
                             applicationContext,
                             mInAppMessage,
                             rateReport
@@ -988,7 +989,7 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
             gdButton.cornerRadius = 0f
         }
         bindingSecondPopUp.button.setOnClickListener {
-            RequestHandler.createInAppNotificationClickRequest(
+            InAppNotificationClickRequest.createInAppNotificationClickRequest(
                 applicationContext,
                 mInAppMessage,
                 npsSecondPopupRateReport
@@ -1212,7 +1213,7 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
             }
             if (mInAppMessage!!.mActionData!!.mMsgType == InAppNotificationType.NPS_AND_SECOND_POP_UP.toString()) {
                 if (!isNpsSecondPopupButtonClicked && isNpsSecondPopupActivated) {
-                    RequestHandler.createInAppNotificationClickRequest(
+                    InAppNotificationClickRequest.createInAppNotificationClickRequest(
                         applicationContext,
                         mInAppMessage,
                         rateReport

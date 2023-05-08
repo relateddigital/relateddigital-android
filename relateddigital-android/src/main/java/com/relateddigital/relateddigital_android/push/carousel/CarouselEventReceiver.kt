@@ -8,6 +8,7 @@ import com.relateddigital.relateddigital_android.constants.Constants
 import com.relateddigital.relateddigital_android.model.Carousel
 import com.relateddigital.relateddigital_android.model.Message
 import com.relateddigital.relateddigital_android.network.RequestHandler
+import com.relateddigital.relateddigital_android.network.requestHandler.RetentionRequest
 import com.relateddigital.relateddigital_android.push.RetentionType
 
 class CarouselEventReceiver : BroadcastReceiver() {
@@ -34,7 +35,7 @@ class CarouselEventReceiver : BroadcastReceiver() {
     }
 
     private fun sendOpenReport(message: Message, context: Context) {
-        RequestHandler.createRetentionRequest(
+        RetentionRequest.createRetentionRequest(
             context, RetentionType.OPEN,
             message.pushId, message.emPushSp
         )

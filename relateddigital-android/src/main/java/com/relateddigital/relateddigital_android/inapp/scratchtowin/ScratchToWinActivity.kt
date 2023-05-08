@@ -29,6 +29,7 @@ import com.relateddigital.relateddigital_android.model.ScratchToWin
 import com.relateddigital.relateddigital_android.model.ScratchToWinExtendedProps
 import com.relateddigital.relateddigital_android.network.RequestHandler
 import com.relateddigital.relateddigital_android.network.requestHandler.InAppActionClickRequest
+import com.relateddigital.relateddigital_android.network.requestHandler.SubsJsonRequest
 import com.relateddigital.relateddigital_android.util.StringUtils
 import com.squareup.picasso.Picasso
 import java.net.URI
@@ -204,7 +205,7 @@ class ScratchToWinActivity : Activity(), ScratchToWinInterface {
                 binding.mailContainer.visibility = View.GONE
                 binding.emailEdit.visibility = View.GONE
                 binding.saveMail.visibility = View.GONE
-                RequestHandler.createSubsJsonRequest(applicationContext,
+                SubsJsonRequest.createSubsJsonRequest(applicationContext,
                         mScratchToWinMessage!!.actiondata!!.type!!,
                         mScratchToWinMessage!!.actid.toString(),
                         mScratchToWinMessage!!.actiondata!!.auth!!, email)

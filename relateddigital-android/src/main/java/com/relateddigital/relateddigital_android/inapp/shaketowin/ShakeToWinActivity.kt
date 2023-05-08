@@ -37,6 +37,7 @@ import com.relateddigital.relateddigital_android.databinding.ActivityShakeToWinS
 import com.relateddigital.relateddigital_android.databinding.ActivityShakeToWinStep3Binding
 import com.relateddigital.relateddigital_android.model.*
 import com.relateddigital.relateddigital_android.network.RequestHandler
+import com.relateddigital.relateddigital_android.network.requestHandler.SubsJsonRequest
 import com.relateddigital.relateddigital_android.util.ActivityUtils
 import com.relateddigital.relateddigital_android.util.StringUtils
 import com.squareup.picasso.Picasso
@@ -251,7 +252,7 @@ class ShakeToWinActivity : Activity(), SensorEventListener {
                     bindingMailForm.mailContainer.visibility = View.GONE
                     bindingMailForm.emailEdit.visibility = View.GONE
                     bindingMailForm.saveButton.visibility = View.GONE
-                    RequestHandler.createSubsJsonRequest(
+                    SubsJsonRequest.createSubsJsonRequest(
                         applicationContext,
                         mShakeToWinMessage!!.actiondata!!.type!!,
                         mShakeToWinMessage!!.actid.toString(),

@@ -16,6 +16,7 @@ import com.relateddigital.relateddigital_android.RelatedDigital
 import com.relateddigital.relateddigital_android.model.GeoFenceEntity
 import com.relateddigital.relateddigital_android.model.GeofenceListResponse
 import com.relateddigital.relateddigital_android.network.RequestHandler
+import com.relateddigital.relateddigital_android.network.requestHandler.GeofenceGetListResponseRequest
 import com.relateddigital.relateddigital_android.util.GeoFencesUtils
 import java.util.*
 
@@ -149,7 +150,7 @@ class GpsManager(context: Context) {
                 Log.e(TAG, "Fail Request Message : " + t.message)
             }
         }
-        RequestHandler.createGeofenceGetListResponseRequest(mApplication,
+            GeofenceGetListResponseRequest.createGeofenceGetListResponseRequest(mApplication,
             mLastKnownLocation!!.latitude, mLastKnownLocation!!.longitude, callback
         )
     }

@@ -20,6 +20,7 @@ import com.relateddigital.relateddigital_android.model.BannerStories
 import com.relateddigital.relateddigital_android.model.StoryBannerExtendedProps
 import com.relateddigital.relateddigital_android.model.StoryLookingBannerResponse
 import com.relateddigital.relateddigital_android.network.RequestHandler
+import com.relateddigital.relateddigital_android.network.requestHandler.StoryImpressionClickRequest
 import com.relateddigital.relateddigital_android.util.PersistentTargetManager
 import com.squareup.picasso.Picasso
 import java.net.URI
@@ -61,7 +62,7 @@ class StoryLookingBannerAdapter(var mContext: Context, var mStoryItemClickListen
         val extendedPropsEncoded = mExtendsProps
         storyHolder.llStoryContainer.setOnClickListener {
             val locLink: String = mStoryLookingBanner!!.Story!![0].actiondata!!.stories!![position].link!!
-            RequestHandler.createStoryImpressionClickRequest(mContext, mStoryLookingBanner!!.Story!![0].actiondata!!.report!!.click)
+            StoryImpressionClickRequest.createStoryImpressionClickRequest(mContext, mStoryLookingBanner!!.Story!![0].actiondata!!.report!!.click)
             Log.i("StoryActivityShows ", "$actionid : $storyTitle")
             PersistentTargetManager.saveShownStory(mContext, actionid!!, storyTitle!!)
             setStoryList(mStoryLookingBanner, mExtendsProps)

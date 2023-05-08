@@ -16,6 +16,8 @@ import com.relateddigital.relateddigital_android.model.Slice
 import com.relateddigital.relateddigital_android.model.SpinToWin
 import com.relateddigital.relateddigital_android.network.RequestHandler
 import com.relateddigital.relateddigital_android.network.requestHandler.InAppActionClickRequest
+import com.relateddigital.relateddigital_android.network.requestHandler.SpinToWinPromoCodeRequest
+import com.relateddigital.relateddigital_android.network.requestHandler.SubsJsonRequest
 import org.json.JSONObject
 import java.util.*
 
@@ -67,7 +69,7 @@ class SpinToWinJavaScriptInterface internal constructor(webViewDialogFragment: S
     fun subscribeEmail(email: String?) {
         if (!email.isNullOrEmpty()) {
             subEmail = email
-            RequestHandler.createSubsJsonRequest(mWebViewDialogFragment.requireContext(), spinToWinModel.actiondata!!.type!!,
+            SubsJsonRequest.createSubsJsonRequest(mWebViewDialogFragment.requireContext(), spinToWinModel.actiondata!!.type!!,
                     spinToWinModel.actid.toString(), spinToWinModel.actiondata!!.auth!!,
                     email)
         } else {
@@ -130,7 +132,7 @@ class SpinToWinJavaScriptInterface internal constructor(webViewDialogFragment: S
                 queryParameters["promotionid"] = selectedCode
                 queryParameters["promoauth"] = promoAuth
                 queryParameters["actionid"] = actId.toString()
-                RequestHandler.createSpinToWinPromoCodeRequest(mWebViewDialogFragment.requireContext(),
+                SpinToWinPromoCodeRequest.createSpinToWinPromoCodeRequest(mWebViewDialogFragment.requireContext(),
                         getVisilabsCallback(selectedIndex,
                                 selectedSliceText), queryParameters)
             } catch (e: java.lang.Exception) {

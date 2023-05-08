@@ -10,6 +10,7 @@ import com.relateddigital.relateddigital_android.model.GiftRainReport
 import com.relateddigital.relateddigital_android.model.MailSubReport
 import com.relateddigital.relateddigital_android.network.RequestHandler
 import com.relateddigital.relateddigital_android.network.requestHandler.InAppActionClickRequest
+import com.relateddigital.relateddigital_android.network.requestHandler.SubsJsonRequest
 import java.util.HashMap
 
 class GiftCatchJavaScriptInterface internal constructor(webViewDialogFragment: GiftCatchWebDialogFragment,
@@ -52,7 +53,7 @@ class GiftCatchJavaScriptInterface internal constructor(webViewDialogFragment: G
     fun subscribeEmail(email: String?) {
         if (!email.isNullOrEmpty()) {
             subEmail = email
-            RequestHandler.createSubsJsonRequest(mWebViewDialogFragment.requireContext(), giftRainModel.actiondata!!.type!!,
+            SubsJsonRequest.createSubsJsonRequest(mWebViewDialogFragment.requireContext(), giftRainModel.actiondata!!.type!!,
                 giftRainModel.actid.toString(), giftRainModel.actiondata!!.auth!!,
                 email)
         } else {

@@ -17,6 +17,7 @@ import com.relateddigital.relateddigital_android.inapp.InAppNotificationState
 import com.relateddigital.relateddigital_android.inapp.InAppUpdateDisplayState
 import com.relateddigital.relateddigital_android.model.InAppMessage
 import com.relateddigital.relateddigital_android.network.RequestHandler
+import com.relateddigital.relateddigital_android.network.requestHandler.InAppNotificationClickRequest
 
 class InAppAlertFragment : DialogFragment() {
     private var mInAppStateId = 0
@@ -63,7 +64,7 @@ class InAppAlertFragment : DialogFragment() {
                             }
                         }
                     }
-                    RequestHandler.createInAppNotificationClickRequest(
+                    InAppNotificationClickRequest.createInAppNotificationClickRequest(
                         mContext!!,
                         mInAppMessage,
                         null

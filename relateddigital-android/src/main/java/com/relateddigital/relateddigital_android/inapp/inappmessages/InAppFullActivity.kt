@@ -25,6 +25,7 @@ import com.relateddigital.relateddigital_android.inapp.InAppNotificationType
 import com.relateddigital.relateddigital_android.inapp.InAppUpdateDisplayState
 import com.relateddigital.relateddigital_android.model.InAppMessage
 import com.relateddigital.relateddigital_android.network.RequestHandler
+import com.relateddigital.relateddigital_android.network.requestHandler.InAppNotificationClickRequest
 import com.relateddigital.relateddigital_android.util.AppUtils
 import com.relateddigital.relateddigital_android.util.StringUtils
 import com.squareup.picasso.Picasso
@@ -149,7 +150,7 @@ class InAppFullActivity : Activity(), IVisilabs {
     private fun clickEvents() {
         binding.btnInApp.setOnClickListener {
             val buttonInterface: InAppButtonInterface? = RelatedDigital.getInAppButtonInterface()
-            RequestHandler.createInAppNotificationClickRequest(applicationContext, mInApp, null)
+            InAppNotificationClickRequest.createInAppNotificationClickRequest(applicationContext, mInApp, null)
             if (buttonInterface != null) {
                 RelatedDigital.setInAppButtonInterface(null)
                 buttonInterface.onPress(mInApp!!.mActionData!!.mAndroidLnk)

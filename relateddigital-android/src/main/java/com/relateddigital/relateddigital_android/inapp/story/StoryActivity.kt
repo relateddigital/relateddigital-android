@@ -26,6 +26,7 @@ import com.relateddigital.relateddigital_android.model.StoryItems
 import com.relateddigital.relateddigital_android.model.StorySkinBasedActionData
 import com.relateddigital.relateddigital_android.model.StorySkinBasedExtendedProps
 import com.relateddigital.relateddigital_android.network.RequestHandler
+import com.relateddigital.relateddigital_android.network.requestHandler.StoryImpressionClickRequest
 import com.relateddigital.relateddigital_android.util.AppUtils
 import com.relateddigital.relateddigital_android.util.AppUtils.getFontFamily
 import com.relateddigital.relateddigital_android.util.PersistentTargetManager
@@ -200,7 +201,7 @@ class StoryActivity : Activity(), StoriesProgressView.StoriesListener {
             )
         }
         val impressionReport: String = mBannerActionData!!.report!!.impression!!
-        RequestHandler.createStoryImpressionClickRequest(applicationContext, impressionReport)
+        StoryImpressionClickRequest.createStoryImpressionClickRequest(applicationContext, impressionReport)
         if (!mStories!!.thumbnail.equals("")) {
             Picasso.get().load(mStories!!.thumbnail).into(mIvCover)
         }
@@ -233,7 +234,7 @@ class StoryActivity : Activity(), StoriesProgressView.StoriesListener {
 
     override fun onNext() {
         mCountdownEndGifView.visibility = View.GONE
-        RequestHandler.createStoryImpressionClickRequest(applicationContext, mBannerActionData!!.report!!.impression)
+        StoryImpressionClickRequest.createStoryImpressionClickRequest(applicationContext, mBannerActionData!!.report!!.impression)
         if (mStories!!.getItems()!!.size > mStoryItemPosition + 1) {
             setStoryItem(mStories!!.getItems()!![++mStoryItemPosition])
         }
@@ -241,7 +242,7 @@ class StoryActivity : Activity(), StoriesProgressView.StoriesListener {
 
     override fun onPrev() {
         mCountdownEndGifView.visibility = View.GONE
-        RequestHandler.createStoryImpressionClickRequest(applicationContext, mBannerActionData!!.report!!.impression)
+        StoryImpressionClickRequest.createStoryImpressionClickRequest(applicationContext, mBannerActionData!!.report!!.impression)
         if (mStoryItemPosition - 1 < 0) {
             if (mStoryPosition - 1 < mBannerActionData!!.stories!!.size && mStoryPosition - 1 > -1) {
                 mStoryPosition--
@@ -416,7 +417,7 @@ class StoryActivity : Activity(), StoriesProgressView.StoriesListener {
             mBtnStory.visibility = View.GONE
         }
         mBtnStory.setOnClickListener {
-            RequestHandler.createStoryImpressionClickRequest(applicationContext, mBannerActionData!!.report!!.click)
+            StoryImpressionClickRequest.createStoryImpressionClickRequest(applicationContext, mBannerActionData!!.report!!.click)
             mActivity!!.finish()
             if (mStoryItemClickListener != null) {
                 mStoryItemClickListener!!.storyItemClicked(item.targetUrl)

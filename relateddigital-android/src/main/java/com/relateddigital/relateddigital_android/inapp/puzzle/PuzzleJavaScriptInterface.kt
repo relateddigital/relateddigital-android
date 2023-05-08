@@ -9,6 +9,7 @@ import com.relateddigital.relateddigital_android.model.Puzzle
 import com.relateddigital.relateddigital_android.model.MailSubReport
 import com.relateddigital.relateddigital_android.network.RequestHandler
 import com.relateddigital.relateddigital_android.network.requestHandler.InAppActionClickRequest
+import com.relateddigital.relateddigital_android.network.requestHandler.SubsJsonRequest
 import java.util.*
 
 class PuzzleJavaScriptInterface internal constructor(webViewDialogFragment: PuzzleWebDialogFragment,
@@ -51,7 +52,7 @@ class PuzzleJavaScriptInterface internal constructor(webViewDialogFragment: Puzz
     fun subscribeEmail(email: String?) {
         if (!email.isNullOrEmpty()) {
             subEmail = email
-            RequestHandler.createSubsJsonRequest(mWebViewDialogFragment.requireContext(), puzzleModel.actiondata!!.type!!,
+            SubsJsonRequest.createSubsJsonRequest(mWebViewDialogFragment.requireContext(), puzzleModel.actiondata!!.type!!,
                 puzzleModel.actid.toString(), puzzleModel.actiondata!!.auth!!,
                 email)
         } else {

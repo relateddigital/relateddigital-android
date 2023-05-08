@@ -12,6 +12,7 @@ import com.relateddigital.relateddigital_android.constants.Constants
 import com.relateddigital.relateddigital_android.model.Message
 import com.relateddigital.relateddigital_android.model.PushType
 import com.relateddigital.relateddigital_android.network.RequestHandler
+import com.relateddigital.relateddigital_android.network.requestHandler.RetentionRequest
 import com.relateddigital.relateddigital_android.push.PushNotificationManager
 import com.relateddigital.relateddigital_android.push.RetentionType
 import com.relateddigital.relateddigital_android.util.*
@@ -83,7 +84,7 @@ open class RelatedDigitalFirebaseMessagingService : FirebaseMessagingService() {
 
         if(!pushMessage.silent.isNullOrEmpty() && pushMessage.silent.equals("true", true)) {
             Log.i("RDFirebase", "Silent Push")
-            RequestHandler.createRetentionRequest(
+            RetentionRequest.createRetentionRequest(
                 this, RetentionType.SILENT,
                 pushMessage.pushId, pushMessage.emPushSp
             )
@@ -167,7 +168,7 @@ open class RelatedDigitalFirebaseMessagingService : FirebaseMessagingService() {
                 if (pushMessage.deliver != null &&
                     pushMessage.deliver!!.lowercase() == "true"
                 ) {
-                    RequestHandler.createRetentionRequest(
+                    RetentionRequest.createRetentionRequest(
                         this, RetentionType.DELIVER,
                         pushMessage.pushId, pushMessage.emPushSp
                     )

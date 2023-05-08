@@ -22,6 +22,7 @@ import com.relateddigital.relateddigital_android.constants.Constants
 import com.relateddigital.relateddigital_android.model.InAppCarouselItem
 import com.relateddigital.relateddigital_android.model.InAppMessage
 import com.relateddigital.relateddigital_android.network.RequestHandler
+import com.relateddigital.relateddigital_android.network.requestHandler.InAppNotificationClickRequest
 import com.relateddigital.relateddigital_android.util.AppUtils
 import com.squareup.picasso.Picasso
 
@@ -316,7 +317,7 @@ class CarouselAdapter(
                 mContext
             )
             holder.carouselButton.setOnClickListener {
-                RequestHandler.createInAppNotificationClickRequest(mContext, message, "")
+                InAppNotificationClickRequest.createInAppNotificationClickRequest(mContext, message, "")
                 val buttonCallback = RelatedDigital.getInAppButtonInterface()
                 if (buttonCallback != null) {
                     RelatedDigital.setInAppButtonInterface(null)

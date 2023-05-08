@@ -19,6 +19,7 @@ import com.relateddigital.relateddigital_android.model.MailSubActionData
 import com.relateddigital.relateddigital_android.model.MailSubscriptionFormHalfExtendedProps
 import com.relateddigital.relateddigital_android.network.RequestHandler
 import com.relateddigital.relateddigital_android.network.requestHandler.InAppActionClickRequest
+import com.relateddigital.relateddigital_android.network.requestHandler.SubsJsonRequest
 import com.relateddigital.relateddigital_android.util.AppUtils
 import com.squareup.picasso.Picasso
 import java.net.URI
@@ -182,7 +183,7 @@ class MailSubscriptionFormHalfFragment : Fragment() {
             }
 
             InAppActionClickRequest.createInAppActionClickRequest(requireContext(), mResponse!!.report)
-            RequestHandler.createSubsJsonRequest(requireContext(), "subscription_email", actId,
+            SubsJsonRequest.createSubsJsonRequest(requireContext(), "subscription_email", actId,
                 mResponse!!.auth!!, email)
 
             Toast.makeText(activity, mResponse!!.success_message, Toast.LENGTH_SHORT).show()

@@ -22,6 +22,8 @@ import com.relateddigital.relateddigital_android.inapp.inappmessages.NpsWithNumb
 import com.relateddigital.relateddigital_android.model.InAppMessage
 import com.relateddigital.relateddigital_android.model.RelatedDigitalModel
 import com.relateddigital.relateddigital_android.network.RequestHandler
+import com.relateddigital.relateddigital_android.network.requestHandler.InAppNotificationClickRequest
+import com.relateddigital.relateddigital_android.network.requestHandler.NpsWithNumbersRequest
 import com.relateddigital.relateddigital_android.util.AppUtils
 import com.relateddigital.relateddigital_android.util.StringUtils
 import com.squareup.picasso.Picasso
@@ -70,7 +72,7 @@ class InlineNpsWithNumbersView : LinearLayout {
         if(RelatedDigital.getRelatedDigitalModel(context).getIsInAppNotificationEnabled()) {
             mNpsItemClickListener = npsItemClickListener
 
-            RequestHandler.createNpsWithNumbersRequest(
+            NpsWithNumbersRequest.createNpsWithNumbersRequest(
                 mContext,
                 getNpsCallback(context, null),
                 properties,
@@ -310,7 +312,7 @@ class InlineNpsWithNumbersView : LinearLayout {
             btnTemplate.setOnClickListener {
                 if (isRatingEntered) {
 
-                    RequestHandler.createInAppNotificationClickRequest(mContext,mInAppMessage, getRateReport(msgType, actId))
+                    InAppNotificationClickRequest.createInAppNotificationClickRequest(mContext,mInAppMessage, getRateReport(msgType, actId))
                     if (buttonCallback != null) {
                         RelatedDigital.setInAppButtonInterface(null)
                         buttonCallback.onPress(mInAppMessage!!.mActionData!!.mAndroidLnk)

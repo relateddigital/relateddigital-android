@@ -9,6 +9,7 @@ import androidx.core.app.JobIntentService
 import com.google.android.gms.location.Geofence
 import com.google.android.gms.location.GeofencingEvent
 import com.relateddigital.relateddigital_android.network.RequestHandler
+import com.relateddigital.relateddigital_android.network.requestHandler.GeofenceTriggerRequest
 import com.relateddigital.relateddigital_android.util.GeoFencesUtils
 import java.lang.Exception
 
@@ -68,7 +69,7 @@ class GeofenceTransitionsIntentService : JobIntentService() {
         Log.i(TAG, geofence_guid)
         val geofenceParts = geofence_guid.split("_").toTypedArray()
         if (geofenceParts.size > 2) {
-            RequestHandler.createGeofenceTriggerRequest(this, lati, longi,
+            GeofenceTriggerRequest.createGeofenceTriggerRequest(this, lati, longi,
                 geofenceParts[0], geofenceParts[2])
         }
     }

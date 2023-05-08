@@ -23,7 +23,7 @@ object RequestHandler {
 
     private var latestDeliverPushId: String = ""
     private var latestOpenPushId: String = ""
-
+/*
     fun createLoggerRequest(
             context: Context, model: RelatedDigitalModel, pageName: String,
             properties: HashMap<String, String>?
@@ -56,7 +56,7 @@ object RequestHandler {
         )
     }
 
-    /*fun createInAppNotificationRequest(
+    fun createInAppNotificationRequest(
             context: Context, model: RelatedDigitalModel, pageName: String,
             properties: HashMap<String, String>?, parent: Activity? = null
     ) {
@@ -156,7 +156,7 @@ object RequestHandler {
                         null
                 ), RelatedDigital.getRelatedDigitalModel(context), context
         )
-    } */
+    }
 
     fun createInAppNotificationClickRequest(
             context: Context, inAppMessage: InAppMessage?, rating: String?
@@ -665,7 +665,6 @@ object RequestHandler {
             RequestSender.sendSubscriptionRequest(context, model, RetryCounterManager.counterId, callback)
         }
     }
-
     fun createRegisterEmailRequest(context: Context, registerEmailModel: RelatedDigitalModel) {
         if (Build.VERSION.SDK_INT < Constants.SDK_MIN_API_VERSION) {
             Log.e(LOG_TAG, "RelatedDigital SDK requires min API level 21!")
@@ -679,6 +678,7 @@ object RequestHandler {
 
         RequestSender.sendSubscriptionRequest(context, registerEmailModel, RetryCounterManager.counterId, null)
     }
+
 
     fun createRetentionRequest(
         context: Context, type: RetentionType,
@@ -742,5 +742,5 @@ object RequestHandler {
 
             RequestSender.sendRetentionRequest(context, retention, RetryCounterManager.counterId)
         }
-    }
+    }*/
 }

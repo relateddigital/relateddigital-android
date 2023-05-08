@@ -24,6 +24,7 @@ import com.relateddigital.relateddigital_android.model.ExtendedProps
 import com.relateddigital.relateddigital_android.model.MailSubscriptionForm
 import com.relateddigital.relateddigital_android.network.RequestHandler
 import com.relateddigital.relateddigital_android.network.requestHandler.InAppActionClickRequest
+import com.relateddigital.relateddigital_android.network.requestHandler.SubsJsonRequest
 import java.net.URI
 import java.net.URISyntaxException
 import java.util.*
@@ -170,7 +171,7 @@ class MailSubscriptionFormActivity : Activity() {
                 return@OnClickListener
             }
             InAppActionClickRequest.createInAppActionClickRequest(applicationContext, mMailSubscriptionForm!!.actiondata!!.report)
-            RequestHandler.createSubsJsonRequest(applicationContext, "subscription_email", mMailSubscriptionForm!!.actid!!,
+            SubsJsonRequest.createSubsJsonRequest(applicationContext, "subscription_email", mMailSubscriptionForm!!.actid!!,
                 mMailSubscriptionForm!!.actiondata!!.auth!!, email)
 
             binding.tvCheckConsentMessage.visibility = View.VISIBLE

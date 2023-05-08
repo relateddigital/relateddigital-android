@@ -14,6 +14,7 @@ import com.relateddigital.relateddigital_android.inapp.VisilabsResponse
 import com.relateddigital.relateddigital_android.model.StoryLookingBannerResponse
 import com.relateddigital.relateddigital_android.model.StorySkinBasedResponse
 import com.relateddigital.relateddigital_android.network.RequestHandler
+import com.relateddigital.relateddigital_android.network.requestHandler.StoryActionRequest
 
 class StoryRecyclerView : RecyclerView {
     private var mContext: Context = context
@@ -34,7 +35,7 @@ class StoryRecyclerView : RecyclerView {
             mStoryItemClickListener = storyItemClickListener
             val parameters = HashMap<String, String>()
             parameters[Constants.REQUEST_ACTION_TYPE_KEY] = Constants.STORY_ACTION_TYPE_VAL
-            RequestHandler.createStoryActionRequest(
+            StoryActionRequest.createStoryActionRequest(
                 mContext,
                 getStoryCallback(context, null),
                 parameters
@@ -51,7 +52,7 @@ class StoryRecyclerView : RecyclerView {
             mStoryItemClickListener = storyItemClickListener
             val parameters = HashMap<String, String>()
             parameters[Constants.REQUEST_ACTION_ID_KEY] = actionId
-            RequestHandler.createStoryActionRequest(
+            StoryActionRequest.createStoryActionRequest(
                 mContext,
                 getStoryCallback(context, null),
                 parameters
@@ -69,7 +70,7 @@ class StoryRecyclerView : RecyclerView {
             mStoryItemClickListener = storyItemClickListener
             val parameters = HashMap<String, String>()
             parameters[Constants.REQUEST_ACTION_TYPE_KEY] = Constants.STORY_ACTION_TYPE_VAL
-            RequestHandler.createStoryActionRequest(
+            StoryActionRequest.createStoryActionRequest(
                 mContext,
                 getStoryCallback(context, storyRequestListener),
                 parameters
@@ -88,7 +89,7 @@ class StoryRecyclerView : RecyclerView {
             mStoryItemClickListener = storyItemClickListener
             val parameters = HashMap<String, String>()
             parameters[Constants.REQUEST_ACTION_ID_KEY] = actionId
-            RequestHandler.createStoryActionRequest(
+            StoryActionRequest.createStoryActionRequest(
                 mContext,
                 getStoryCallback(context, storyRequestListener),
                 parameters
