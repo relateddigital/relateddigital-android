@@ -55,6 +55,9 @@ class SpinToWinActionData : Serializable {
     @SerializedName("promocode_title")
     var promocodeTitle: String? = null
 
+    @SerializedName("redirectbutton_label")
+    var redirectbuttonLabel: String? = null
+
     @SerializedName("copybutton_label")
     var copybuttonLabel: String? = null
 
@@ -64,7 +67,5 @@ class SpinToWinActionData : Serializable {
     @SerializedName("promocodes_soldout_message")
     var promoCodesSoldOutMessage: String? = null
 
-    @SerializedName("copybutton_function")
-    var copyButtonFunction: String? = null
 
 }
