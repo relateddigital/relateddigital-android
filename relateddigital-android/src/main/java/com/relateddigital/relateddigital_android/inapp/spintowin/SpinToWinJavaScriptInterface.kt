@@ -50,8 +50,12 @@ class SpinToWinJavaScriptInterface internal constructor(webViewDialogFragment: S
     @JavascriptInterface
     fun copyToClipboard(couponCode: String?) {
         mWebViewDialogFragment.dismiss()
-
-            mCopyToClipboardInterface?.copyToClipboard(couponCode, spinToWinModel.actiondata!!.slices!![selectedIndex].androidLink)
+        if(!spinToWinModel.actiondata!!.slices!![selectedIndex].androidLink.isNullOrEmpty()) {
+            mCopyToClipboardInterface?.copyToClipboard(
+                couponCode,
+                spinToWinModel.actiondata!!.slices!![selectedIndex].androidLink
+            )
+        }
 
     }
 
