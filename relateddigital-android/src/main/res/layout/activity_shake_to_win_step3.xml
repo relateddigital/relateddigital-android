@@ -59,7 +59,7 @@
                         android:id="@+id/coupon_code_view"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginEnd="@dimen/ct_coupon_code_margin_right"
+                        android:gravity="center"
                         android:padding="@dimen/ct_button_padding"
                         android:textSize="@dimen/ct_coupon_code_text_size" />
 

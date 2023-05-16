@@ -464,6 +464,7 @@ class ShakeToWinActivity : Activity(), SensorEventListener {
         bindingStep3.buttonView.setBackgroundColor(Color.parseColor(mExtendedProps!!.copybuttonColor))
         bindingStep3.buttonView.setTextColor(Color.parseColor(mExtendedProps!!.copybuttonTextColor))
         bindingStep3.buttonView.textSize = mExtendedProps!!.copybuttonTextSize!!.toFloat() + 10
+        sendPromotionCodeInfo(email = promoemail, promotionCode = mShakeToWinMessage!!.actiondata!!.promotionCode.toString())
         bindingStep3.buttonView.setOnClickListener {
             val clipboard = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
             val clip = ClipData.newPlainText(
@@ -484,12 +485,15 @@ class ShakeToWinActivity : Activity(), SensorEventListener {
                         StringUtils.getURIfromUrlString(mShakeToWinMessage!!.actiondata!!.androidLnk)
                     )
                     startActivity(viewIntent)
+                    finish()
                 } catch (e: Exception) {
                     Log.i(LOG_TAG, "Error : Could not direct to the URI given")
                 }
             }
+            else
+                finish()
         }
-        sendPromotionCodeInfo(email = promoemail, promotionCode = mShakeToWinMessage!!.actiondata!!.promotionCode.toString())
+
     }
 
     private fun setupCloseButtonStep3() {
