@@ -13,8 +13,8 @@ class GiftBoxActionData: Serializable {
     @SerializedName("game_result_elements"   ) var gameResultElements   : GiftBoxGameResultElements?   = GiftBoxGameResultElements()
     @SerializedName("copybutton_label"       ) var copybuttonLabel      : String?               = null
     @SerializedName("copybutton_function"    ) var copybuttonFunction   : String?               = null
-    @SerializedName("ios_lnk"                ) var iosLnk               : String?               = null
-    @SerializedName("android_lnk"            ) var androidLnk           : String?               = null
+    @SerializedName("ios_lnk"                ) var iosLink               : String?               = null
+    @SerializedName("android_lnk"            ) var androidLink           : String?               = null
     @SerializedName("ExtendedProps"          ) var ExtendedProps        : String?               = null
     @SerializedName("report"                 ) var report               : GiftBoxReport?                = GiftBoxReport()
     @SerializedName("auth"                   ) var auth                 : String?               = null
