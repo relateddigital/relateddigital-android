@@ -139,7 +139,8 @@ object PayloadUtils {
         var res = false
         for (i in 0 until jsonArray!!.length()) {
             try {
-                if (jsonArray.getJSONObject(i).getString("pushId") == message.pushId) {
+                if (jsonArray.getJSONObject(i).has("pushId")&&
+                    jsonArray.getJSONObject(i).getString("pushId") == message.pushId) {
                     res = true
                     break
                 }
@@ -212,6 +213,10 @@ object PayloadUtils {
             try {
                 val jsonObject = jsonArray.getJSONObject(i)
                 if (!jsonObject.has("date") || (jsonObject.has("date") && isOld(context, jsonObject.getString("date")))) {
+                    jsonArray.remove(i)
+                    i--
+                }
+                if (!jsonObject.has("pushId") || (jsonObject.has("pushId") )) {
                     jsonArray.remove(i)
                     i--
                 }

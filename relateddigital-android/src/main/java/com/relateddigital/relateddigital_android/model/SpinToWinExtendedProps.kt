@@ -155,11 +155,11 @@ class SpinToWinExtendedProps : Serializable {
     var promocode_banner_button_label: String? = null
 
     @SerializedName("displayname_text_align")
-    var displaynameTextAlign: String? = null
+    var displayNameTextAlign: String? = null
 
     @SerializedName("redirectbutton_color")
-    var redirectbuttonColor: String? = null
+    var redirectButtonColor: String? = null
 
     @SerializedName("redirectbutton_text_color")
-    var redirectbuttonTextColor: String? = null
+    var redirectButtonTextColor: String? = null
 }
