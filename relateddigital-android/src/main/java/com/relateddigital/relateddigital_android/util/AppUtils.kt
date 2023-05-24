@@ -927,56 +927,6 @@ object AppUtils {
         return result
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-    fun createPuzzleCustomFontFiles(
-        context: Context,
-        jsonStr: String?,
-        jsStr: String
-    ): ArrayList<String?>? {
-        var result: ArrayList<String?>? = null
-        val puzzleModel: Puzzle?
-        val extendedProps: PuzzleExtendedProps?
-        val baseUrlPath = "file://" + context.filesDir.absolutePath + "/"
-        try {
-            puzzleModel = Gson().fromJson(jsonStr, Puzzle::class.java)
-            extendedProps = Gson().fromJson(
-                URI(puzzleModel.actiondata!!.extendedProps).path,
-                PuzzleExtendedProps::class.java
-            )
-        } catch (e: java.lang.Exception) {
-            Log.e("Puzzle", "Extended properties could not be parsed properly!")
-            return null
-        }
-        if (puzzleModel == null || extendedProps == null) {
-            return null
-        }
-        val fontFamily: String = extendedProps.fontFamily ?: return null
-
-        val htmlStr: String = writeHtmlToFile(context, "puzzle", jsStr)
-
-        if (fontFamily == "custom") {
-            val fontExtension = getFontNameWithExtension(
-                context,
-                extendedProps.customFontFamilyAndroid!!
-            )
-            if (fontExtension.isNotEmpty()) {
-                writeFontToFile(
-                    context,
-                    extendedProps.customFontFamilyAndroid!!,
-                    fontExtension
-                )
-                puzzleModel.fontFiles.add(fontExtension)
-            }
-        }
-
-        if (htmlStr.isNotEmpty()) {
-            result = ArrayList()
-            result.add(baseUrlPath)
-            result.add(htmlStr)
-            result.add(Gson().toJson(puzzleModel, Puzzle::class.java))
-        }
-        return result
-    }
 
 
     fun goToNotificationSettings(context: Context) {

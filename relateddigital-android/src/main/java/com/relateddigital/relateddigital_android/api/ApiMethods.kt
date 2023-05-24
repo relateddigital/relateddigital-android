@@ -130,10 +130,6 @@ interface ApiMethods {
         @HeaderMap headers: Map<String, String>
     ): Call<ResponseBody>
 
-    @GET("/puzzle.js")
-    fun getPuzzleJsFile(
-        @HeaderMap headers: Map<String, String>
-    ): Call<ResponseBody>
 
     //Methods for remote config
     @GET("rc.json")
