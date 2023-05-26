@@ -671,7 +671,7 @@ object AppUtils {
         val promoCodesSoldOutMessageFontFamily: String =
             extendedProps.promocodesSoldOutMessageFontFamily!!
 
-        val htmlStr: String = writeHtmlToFile(context, "spintowin", spinToWinJsStr)
+        val htmlStr: String = writeHtmlToFile(context, "spin_to_win", spinToWinJsStr)
 
         if (displayNameFontFamily == "custom") {
             val fontExtension = getFontNameWithExtension(

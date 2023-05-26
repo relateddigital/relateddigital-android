@@ -110,7 +110,7 @@ interface ApiMethods {
     fun sendLogToGraylog(@Body graylogModel: GraylogModel?): Call<Void>
 
     //Methods for js files -- mbls domain
-    @GET("/spintowin.js")
+    @GET("/spin_to_win.js")
     fun getSpinToWinJsFile(
         @HeaderMap headers: Map<String, String>
     ): Call<ResponseBody>
