@@ -24,4 +24,8 @@ class Slice : Serializable {
 
     @SerializedName("android_lnk")
     var androidLink: String? = null
+
+    @SerializedName("infotext")
+    var infotext: String? = null
+
 }
