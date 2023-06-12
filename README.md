@@ -4,7 +4,7 @@
 
 # Latest Version 
 
-***May 16, 2023*** - [v1.1.5](https://github.com/relateddigital/relateddigital-android/releases)
+***June 12, 2023*** - [v1.1.6](https://github.com/relateddigital/relateddigital-android/releases)
 
 # About SDK
 
@@ -37,7 +37,7 @@ allprojects {
 Please, add the dependency of `relateddigital-android` library into your module-level build.gradle file as shown below:
 
  ```gradle
-implementation 'com.github.relateddigital:relateddigital-android:1.1.5'
+implementation 'com.github.relateddigital:relateddigital-android:1.1.6'
  ```
 
 # Licences
