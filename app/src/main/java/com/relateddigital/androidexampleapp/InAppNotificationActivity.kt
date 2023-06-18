@@ -229,11 +229,11 @@ class InAppNotificationActivity : AppCompatActivity() {
             sendInAppRequest("findtowin")
         }
 
-        binding.giftboxButton.setOnClickListener {
-            sendInAppRequest("giftBox")
+        binding.chooseFavoritedButton.setOnClickListener {
+            sendInAppRequest("chooseFavorited")
         }
 
-        binding.inlineNps.setOnClickListener{
+        binding.inlineNpsButton.setOnClickListener{
             val intent = Intent(this, InlineNpsWithNumbersActivity::class.java)
              startActivity(intent)
 

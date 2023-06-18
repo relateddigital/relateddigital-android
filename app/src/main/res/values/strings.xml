@@ -44,7 +44,8 @@
     <string name="find_to_win">FIND TO WIN</string>
     <string name="banner_carousel">BANNER CAROUSEL PAGE</string>
     <string name="giftbox">GIFTBOX</string>
-    <string name="inline_nps_with_numbers">Inline Nps With Numbers</string>
+    <string name="inline_nps_with_numbers">INLINE NPS WITH NUMBERS</string>
+    <string name="choose_favorited">CHOOSE FAVORITED</string>
 
 
     <string name="story_id_optional">Story ID (optional)</string>
