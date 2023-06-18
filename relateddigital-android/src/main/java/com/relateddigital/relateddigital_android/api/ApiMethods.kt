@@ -120,6 +120,11 @@ interface ApiMethods {
         @HeaderMap headers: Map<String, String>
     ): Call<ResponseBody>
 
+    @GET("/choose_favorited.js")
+    fun getChooseFavoritedJsFile(
+        @HeaderMap headers: Map<String, String>
+    ): Call<ResponseBody>
+
     @GET("/giftbox.js")
     fun getGiftBoxJsFile(
         @HeaderMap headers: Map<String, String>
