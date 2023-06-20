@@ -1,4 +1,4 @@
-package com.relateddigital.relateddigital_android.inapp.choosefavorited
+package com.relateddigital.relateddigital_android.inapp.choosefavorite
 
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -14,7 +14,7 @@ import com.relateddigital.relateddigital_android.RelatedDigital
 import com.relateddigital.relateddigital_android.api.ApiMethods
 import com.relateddigital.relateddigital_android.api.JSApiClient
 import com.relateddigital.relateddigital_android.constants.Constants
-import com.relateddigital.relateddigital_android.model.ChooseFavorited
+import com.relateddigital.relateddigital_android.model.ChooseFavorite
 import com.relateddigital.relateddigital_android.util.AppUtils
 import okhttp3.ResponseBody
 import retrofit2.Call
@@ -22,20 +22,20 @@ import retrofit2.Callback
 import retrofit2.Response
 import java.util.HashMap
 
-class ChooseFavoritedActivity : FragmentActivity(), ChooseFavoritedCompleteInterface,
-    ChooseFavoritedCopyToClipboardInterface, ChooseFavoritedShowCodeInterface {
+class ChooseFavoriteActivity : FragmentActivity(), ChooseFavoriteCompleteInterface,
+    ChooseFavoriteCopyToClipboardInterface, ChooseFavoriteShowCodeInterface {
     private var jsonStr: String? = ""
-    private var response: ChooseFavorited? = null
-    private var chooseFavoritedPromotionCode = ""
+    private var response: ChooseFavorite? = null
+    private var chooseFavoritePromotionCode = ""
     private var link = ""
     private lateinit var activity: FragmentActivity
-    private lateinit var completeListener: ChooseFavoritedCompleteInterface
-    private lateinit var copyToClipboardListener: ChooseFavoritedCopyToClipboardInterface
-    private lateinit var showCodeListener: ChooseFavoritedShowCodeInterface
-    private var chooseFavoritedJsStr = ""
+    private lateinit var completeListener: ChooseFavoriteCompleteInterface
+    private lateinit var copyToClipboardListener: ChooseFavoriteCopyToClipboardInterface
+    private lateinit var showCodeListener: ChooseFavoriteShowCodeInterface
+    private var chooseFavoriteJsStr = ""
 
     companion object {
-        private const val LOG_TAG = "ChooseFavorited"
+        private const val LOG_TAG = "ChooseFavorite"
     }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
@@ -49,68 +49,68 @@ class ChooseFavoritedActivity : FragmentActivity(), ChooseFavoritedCompleteInter
             ?.create(ApiMethods::class.java)
         val headers = HashMap<String, String>()
         headers[Constants.USER_AGENT_REQUEST_KEY] = RelatedDigital.getRelatedDigitalModel(this).getUserAgent()
-        val call: Call<ResponseBody> = jsApi?.getChooseFavoritedJsFile(headers)!!
+        val call: Call<ResponseBody> = jsApi?.getChooseFavoriteJsFile(headers)!!
         call.enqueue(object : Callback<ResponseBody?> {
             override fun onResponse(
                 call: Call<ResponseBody?>,
                 responseJs: Response<ResponseBody?>
             ) {
                 if (responseJs.isSuccessful) {
-                    Log.i(ChooseFavoritedActivity.LOG_TAG, "Getting chooseFavorited.js is successful!")
-                    chooseFavoritedJsStr = responseJs.body()!!.string()
+                    Log.i(ChooseFavoriteActivity.LOG_TAG, "Getting chooseFavorite.js is successful!")
+                    chooseFavoriteJsStr = responseJs.body()!!.string()
 
-                    if(chooseFavoritedJsStr.isEmpty()) {
-                        Log.e(ChooseFavoritedActivity.LOG_TAG, "Getting chooseFavorited.js failed!")
+                    if(chooseFavoriteJsStr.isEmpty()) {
+                        Log.e(ChooseFavoriteActivity.LOG_TAG, "Getting chooseFavorite.js failed!")
                         finish()
                     } else {
                         if (savedInstanceState != null) {
-                            jsonStr = savedInstanceState.getString("chooseFavorited-json-str", "")
+                            jsonStr = savedInstanceState.getString("chooseFavorite-json-str", "")
                         } else {
                             val intent = intent
                             if (intent != null && intent.hasExtra("gift-box-data")) {
-                                response = intent.getSerializableExtra("gift-box-data") as ChooseFavorited?
+                                response = intent.getSerializableExtra("gift-box-data") as ChooseFavorite?
                                 if (response != null) {
                                     jsonStr = Gson().toJson(response)
                                 } else {
-                                    Log.e(ChooseFavoritedActivity.LOG_TAG, "Could not get the chooseFavorited data properly!")
+                                    Log.e(ChooseFavoriteActivity.LOG_TAG, "Could not get the chooseFavorite data properly!")
                                     finish()
                                 }
                             } else {
-                                Log.e(ChooseFavoritedActivity.LOG_TAG, "Could not get the chooseFavorited data properly!")
+                                Log.e(ChooseFavoriteActivity.LOG_TAG, "Could not get the chooseFavorite data properly!")
                                 finish()
                             }
                         }
 
                         if (jsonStr != null && jsonStr != "") {
-                            val res = AppUtils.createChooseFavoritedCustomFontFiles(
-                                activity, jsonStr, chooseFavoritedJsStr
+                            val res = AppUtils.createChooseFavoriteCustomFontFiles(
+                                activity, jsonStr, chooseFavoriteJsStr
                             )
                             if(res == null) {
-                                Log.e(ChooseFavoritedActivity.LOG_TAG, "Could not get the chooseFavorited data properly!")
+                                Log.e(ChooseFavoriteActivity.LOG_TAG, "Could not get the chooseFavorite data properly!")
                                 finish()
                             } else {
-                                val webViewDialogFragment: ChooseFavoritedWebDialogFragment =
-                                    ChooseFavoritedWebDialogFragment.newInstance(res[0], res[1], res[2])
-                                webViewDialogFragment.setChooseFavoritedListeners(completeListener, copyToClipboardListener, showCodeListener)
+                                val webViewDialogFragment: ChooseFavoriteWebDialogFragment =
+                                    ChooseFavoriteWebDialogFragment.newInstance(res[0], res[1], res[2])
+                                webViewDialogFragment.setChooseFavoriteListeners(completeListener, copyToClipboardListener, showCodeListener)
                                 if (!isFinishing && !supportFragmentManager.isDestroyed) {
                                     webViewDialogFragment.display(supportFragmentManager)
                                 } else {
-                                    Log.e(ChooseFavoritedActivity.LOG_TAG, "Activity is finishing or FragmentManager is destroyed!")
+                                    Log.e(ChooseFavoriteActivity.LOG_TAG, "Activity is finishing or FragmentManager is destroyed!")
                                     finish()
                                 }
                             }
                         } else {
-                            Log.e(ChooseFavoritedActivity.LOG_TAG, "Could not get the chooseFavorited data properly!")
+                            Log.e(ChooseFavoriteActivity.LOG_TAG, "Could not get the chooseFavorite data properly!")
                             finish()
                         }
                     }
                 } else {
-                    Log.e(ChooseFavoritedActivity.LOG_TAG, "Getting chooseFavorited.js failed!")
+                    Log.e(ChooseFavoriteActivity.LOG_TAG, "Getting chooseFavorite.js failed!")
                     finish()
                 }
             }
             override fun onFailure(call: Call<ResponseBody?>, t: Throwable) {
-                Log.e(ChooseFavoritedActivity.LOG_TAG, "Getting chooseFavorited.js failed! - ${t.message}")
+                Log.e(ChooseFavoriteActivity.LOG_TAG, "Getting chooseFavorite.js failed! - ${t.message}")
                 finish()
             }
         })
@@ -138,6 +138,6 @@ class ChooseFavoritedActivity : FragmentActivity(), ChooseFavoritedCompleteInter
     }
 
     override fun onCodeShown(code: String) {
-        chooseFavoritedPromotionCode = code
+        chooseFavoritePromotionCode = code
     }
 }

@@ -1,4 +1,4 @@
-package com.relateddigital.relateddigital_android.inapp.choosefavorited
+package com.relateddigital.relateddigital_android.inapp.choosefavorite
 
 import android.annotation.SuppressLint
 import android.os.Build
@@ -16,17 +16,17 @@ import com.relateddigital.relateddigital_android.R
 import com.relateddigital.relateddigital_android.constants.Constants
 
 
-class ChooseFavoritedWebDialogFragment :DialogFragment(){
+class ChooseFavoriteWebDialogFragment :DialogFragment(){
     private var webView: WebView? = null
     private var mResponse: String? = null
     private var baseUrl: String? = ""
     private var htmlString: String? = ""
     private var mIsRotation = false
-    private lateinit var mListener: ChooseFavoritedCompleteInterface
-    private lateinit var mCopyToClipboardInterface: ChooseFavoritedCopyToClipboardInterface
-    private lateinit var mShowCodeInterface: ChooseFavoritedShowCodeInterface
+    private lateinit var mListener: ChooseFavoriteCompleteInterface
+    private lateinit var mCopyToClipboardInterface: ChooseFavoriteCopyToClipboardInterface
+    private lateinit var mShowCodeInterface: ChooseFavoriteShowCodeInterface
 
-    fun display(fragmentManagerLoc: FragmentManager?): ChooseFavoritedWebDialogFragment {
+    fun display(fragmentManagerLoc: FragmentManager?): ChooseFavoriteWebDialogFragment {
         val ft = fragmentManagerLoc?.beginTransaction()
         ft?.add(this, TAG)
         ft?.commitAllowingStateLoss()
@@ -50,8 +50,8 @@ class ChooseFavoritedWebDialogFragment :DialogFragment(){
             baseUrl = requireArguments().getString("baseUrl")
             htmlString = requireArguments().getString("htmlString")
             mResponse = requireArguments().getString("response")
-            mJavaScriptInterface = ChooseFavoritedJavaScriptInterface(this, mResponse!!)
-            mJavaScriptInterface!!.setChooseFavoritedListeners(mListener, mCopyToClipboardInterface, mShowCodeInterface)
+            mJavaScriptInterface = ChooseFavoriteJavaScriptInterface(this, mResponse!!)
+            mJavaScriptInterface!!.setChooseFavoriteListeners(mListener, mCopyToClipboardInterface, mShowCodeInterface)
         }
     }
 
@@ -97,13 +97,13 @@ class ChooseFavoritedWebDialogFragment :DialogFragment(){
                 return true
             }
         }
-    val javaScriptInterface: ChooseFavoritedJavaScriptInterface?
+    val javaScriptInterface: ChooseFavoriteJavaScriptInterface?
         get() = mJavaScriptInterface
 
-    fun setChooseFavoritedListeners(
-        listener: ChooseFavoritedCompleteInterface,
-        copyToClipboardInterface: ChooseFavoritedCopyToClipboardInterface,
-        showCodeInterface: ChooseFavoritedShowCodeInterface
+    fun setChooseFavoriteListeners(
+        listener: ChooseFavoriteCompleteInterface,
+        copyToClipboardInterface: ChooseFavoriteCopyToClipboardInterface,
+        showCodeInterface: ChooseFavoriteShowCodeInterface
     ) {
         mListener = listener
         mCopyToClipboardInterface = copyToClipboardInterface
@@ -117,14 +117,14 @@ class ChooseFavoritedWebDialogFragment :DialogFragment(){
         private const val ARG_PARAM1 = "response"
         private const val ARG_PARAM2 = "baseUrl"
         private const val ARG_PARAM3 = "htmlString"
-        private var mJavaScriptInterface: ChooseFavoritedJavaScriptInterface? = null
-        fun newInstance(baseUrl: String?, htmlString: String?, response: String?): ChooseFavoritedWebDialogFragment {
-            val fragment = ChooseFavoritedWebDialogFragment()
+        private var mJavaScriptInterface: ChooseFavoriteJavaScriptInterface? = null
+        fun newInstance(baseUrl: String?, htmlString: String?, response: String?): ChooseFavoriteWebDialogFragment {
+            val fragment = ChooseFavoriteWebDialogFragment()
             val args = Bundle()
             args.putString(ARG_PARAM1, response)
             args.putString(ARG_PARAM2, baseUrl)
             args.putString(ARG_PARAM3, htmlString)
-            mJavaScriptInterface = ChooseFavoritedJavaScriptInterface(fragment, response!!)
+            mJavaScriptInterface = ChooseFavoriteJavaScriptInterface(fragment, response!!)
             fragment.arguments = args
             return fragment
         }

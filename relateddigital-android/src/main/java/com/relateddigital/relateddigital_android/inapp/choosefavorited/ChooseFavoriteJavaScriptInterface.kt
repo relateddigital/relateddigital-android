@@ -1,23 +1,23 @@
-package com.relateddigital.relateddigital_android.inapp.choosefavorited
+package com.relateddigital.relateddigital_android.inapp.choosefavorite
 
 import android.util.Log
 import android.webkit.JavascriptInterface
 import com.google.gson.Gson
-import com.relateddigital.relateddigital_android.model.ChooseFavorited
+import com.relateddigital.relateddigital_android.model.ChooseFavorite
 import com.relateddigital.relateddigital_android.network.requestHandler.SubsJsonRequest
 
-class ChooseFavoritedJavaScriptInterface internal constructor(webViewDialogFragment: ChooseFavoritedWebDialogFragment,
-                                                              @get:JavascriptInterface val response: String) {
-    var mWebViewDialogFragment: ChooseFavoritedWebDialogFragment = webViewDialogFragment
-    private lateinit var mListener: ChooseFavoritedCompleteInterface
-    private lateinit var mCopyToClipboardInterface: ChooseFavoritedCopyToClipboardInterface
-    private lateinit var mShowCodeInterface: ChooseFavoritedShowCodeInterface
-    private val chooseFavoritedModel: ChooseFavorited = Gson().fromJson(this.response, ChooseFavorited::class.java)
+class ChooseFavoriteJavaScriptInterface internal constructor(webViewDialogFragment: ChooseFavoriteWebDialogFragment,
+                                                             @get:JavascriptInterface val response: String) {
+    var mWebViewDialogFragment: ChooseFavoriteWebDialogFragment = webViewDialogFragment
+    private lateinit var mListener: ChooseFavoriteCompleteInterface
+    private lateinit var mCopyToClipboardInterface: ChooseFavoriteCopyToClipboardInterface
+    private lateinit var mShowCodeInterface: ChooseFavoriteShowCodeInterface
+    private val chooseFavoriteModel: ChooseFavorite = Gson().fromJson(this.response, ChooseFavorite::class.java)
 
     private var subEmail = ""
 
     /**
-     * This method closes ChooseFavoritedActivity
+     * This method closes ChooseFavoriteActivity
      */
     @JavascriptInterface
     fun close() {
@@ -46,11 +46,11 @@ class ChooseFavoritedJavaScriptInterface internal constructor(webViewDialogFragm
     fun subscribeEmail(email: String?) {
         if (!email.isNullOrEmpty()) {
             subEmail = email
-            SubsJsonRequest.createSubsJsonRequest(mWebViewDialogFragment.requireContext(), chooseFavoritedModel.actiondata!!.type!!,
-                chooseFavoritedModel.actid.toString(), chooseFavoritedModel.actiondata!!.auth!!,
+            SubsJsonRequest.createSubsJsonRequest(mWebViewDialogFragment.requireContext(), chooseFavoriteModel.actiondata!!.type!!,
+                chooseFavoriteModel.actid.toString(), chooseFavoriteModel.actiondata!!.auth!!,
                 email)
         } else {
-            Log.e("ChooseFavorited : ", "Email entered is not valid!")
+            Log.e("ChooseFavorite : ", "Email entered is not valid!")
         }
     }
 
@@ -63,10 +63,10 @@ class ChooseFavoritedJavaScriptInterface internal constructor(webViewDialogFragm
         var report: MailSubReport?
         try {
             report = MailSubReport()
-            report.impression = chooseFavoritedModel.actiondata!!.!!.impression
-            report.click = chooseFavoritedModel.actiondata!!.report!!.click
+            report.impression = chooseFavoriteModel.actiondata!!.!!.impression
+            report.click = chooseFavoriteModel.actiondata!!.report!!.click
         } catch (e: Exception) {
-            Log.e("ChooseFavorited : ", "There is no report to send!")
+            Log.e("ChooseFavorite : ", "There is no report to send!")
             e.printStackTrace()
             report = null
         }
@@ -85,10 +85,10 @@ class ChooseFavoritedJavaScriptInterface internal constructor(webViewDialogFragm
         mShowCodeInterface.onCodeShown(code)
     }
 
-    fun setChooseFavoritedListeners(
-        listener: ChooseFavoritedCompleteInterface,
-        copyToClipboardInterface: ChooseFavoritedCopyToClipboardInterface,
-        showCodeInterface: ChooseFavoritedShowCodeInterface
+    fun setChooseFavoriteListeners(
+        listener: ChooseFavoriteCompleteInterface,
+        copyToClipboardInterface: ChooseFavoriteCopyToClipboardInterface,
+        showCodeInterface: ChooseFavoriteShowCodeInterface
     ) {
         mListener = listener
         mCopyToClipboardInterface = copyToClipboardInterface

@@ -3,22 +3,22 @@ package com.relateddigital.relateddigital_android.model
 import com.google.gson.annotations.SerializedName
 import java.io.Serializable
 
-class ChooseFavoritedActionData : Serializable {
+class ChooseFavoriteActionData : Serializable {
 
     @SerializedName("mail_subscription")
     var mailSubscription: Boolean? = null
 
     @SerializedName("mail_subscription_form")
-    var mailSubscriptionForm: ChooseFavoritedMailSubscriptionForm? = null
+    var mailSubscriptionForm: ChooseFavoriteMailSubscriptionForm? = null
 
     @SerializedName("gamification_rules")
-    var gamificationRules: ChooseFavoritedGamificationRules? = null
+    var gamificationRules: ChooseFavoriteGamificationRules? = null
 
     @SerializedName("game_elements")
-    var gameElements: ChooseFavoritedGameElements? = null
+    var gameElements: ChooseFavoriteGameElements? = null
 
     @SerializedName("game_result_elements")
-    var gameResultElements: ChooseFavoritedGameResultElements? = null
+    var gameResultElements: ChooseFavoriteGameResultElements? = null
 
     @SerializedName("copybutton_label")
     var copyButtonLabel: String? = null
@@ -33,13 +33,13 @@ class ChooseFavoritedActionData : Serializable {
     var androidLink: String? = null
 
     @SerializedName("promo_codes")
-    var promoCodes: List<ChooseFavoritedPromoCode?>? = null
+    var promoCodes: List<ChooseFavoritePromoCode?>? = null
 
     @SerializedName("ExtendedProps")
     var extendedProps: String? = null
 
     @SerializedName("report")
-    var report: ChooseFavoritedReport? = null
+    var report: ChooseFavoriteReport? = null
 
     @SerializedName("auth")
     var auth: String? = null

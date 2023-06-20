@@ -1,4 +1,4 @@
-package com.relateddigital.relateddigital_android.inapp.choosefavorited
+package com.relateddigital.relateddigital_android.inapp.choosefavorite
 
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -17,20 +17,20 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import com.relateddigital.relateddigital_android.R
-import com.relateddigital.relateddigital_android.databinding.FragmentChoosefavoritedCodeBannerBinding
+import com.relateddigital.relateddigital_android.databinding.FragmentChooseFavoriteCodeBannerBinding
 import com.relateddigital.relateddigital_android.inapp.FontFamily
-import com.relateddigital.relateddigital_android.model.ChooseFavoritedExtendedProps
+import com.relateddigital.relateddigital_android.model.ChooseFavoriteExtendedProps
 import com.relateddigital.relateddigital_android.util.AppUtils
 import java.util.*
 
 /**
  * A simple [Fragment] subclass.
- * Use the [ChooseFavoritedCodeBannerFragment.newInstance] factory method to
+ * Use the [ChooseFavoriteCodeBannerFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
-class ChooseFavoritedCodeBannerFragment : Fragment() {
+class ChooseFavoriteCodeBannerFragment : Fragment() {
     companion object {
-        private const val LOG_TAG = "ChooseFavoritedBanner"
+        private const val LOG_TAG = "ChooseFavoriteBanner"
 
         // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
         private const val ARG_PARAM1 = "banner_data"
@@ -42,13 +42,13 @@ class ChooseFavoritedCodeBannerFragment : Fragment() {
          *
          * @param extendedProps Parameter 1.
          * @param code Parameter 2.
-         * @return A new instance of fragment ChooseFavoritedCodeBannerFragment.
+         * @return A new instance of fragment ChooseFavoriteCodeBannerFragment.
          */
         fun newInstance(
-            extendedProps: ChooseFavoritedExtendedProps,
+            extendedProps: ChooseFavoriteExtendedProps,
             code: String
-        ): ChooseFavoritedCodeBannerFragment {
-            val fragment = ChooseFavoritedCodeBannerFragment()
+        ): ChooseFavoriteCodeBannerFragment {
+            val fragment = ChooseFavoriteCodeBannerFragment()
             val args = Bundle()
             args.putSerializable(ARG_PARAM1, extendedProps)
             args.putString(ARG_PARAM2, code)
@@ -57,13 +57,13 @@ class ChooseFavoritedCodeBannerFragment : Fragment() {
         }
     }
 
-    private var mExtendedProps: ChooseFavoritedExtendedProps? = null
+    private var mExtendedProps: ChooseFavoriteExtendedProps? = null
     private var bannerCode: String? = null
-    private lateinit var binding: FragmentChoosefavoritedCodeBannerBinding
+    private lateinit var binding: FragmentChooseFavoriteCodeBannerBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mExtendedProps = requireArguments().getSerializable(ARG_PARAM1) as ChooseFavoritedExtendedProps
+        mExtendedProps = requireArguments().getSerializable(ARG_PARAM1) as ChooseFavoriteExtendedProps
         bannerCode = requireArguments().getString(ARG_PARAM2)
         if (bannerCode.isNullOrEmpty()) {
             endFragment()
@@ -74,7 +74,7 @@ class ChooseFavoritedCodeBannerFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentChoosefavoritedCodeBannerBinding.inflate(inflater, container, false)
+        binding = FragmentChooseFavoriteCodeBannerBinding.inflate(inflater, container, false)
         val view: View = binding.root
 
         hideStatusBar()
@@ -195,7 +195,7 @@ class ChooseFavoritedCodeBannerFragment : Fragment() {
     private fun endFragment() {
         if (activity != null) {
             requireActivity().supportFragmentManager.beginTransaction()
-                .remove(this@ChooseFavoritedCodeBannerFragment).commit()
+                .remove(this@ChooseFavoriteCodeBannerFragment).commit()
         }
     }
 
