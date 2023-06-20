@@ -2,7 +2,7 @@ package com.relateddigital.relateddigital_android.model
 
 import com.google.gson.annotations.SerializedName
 
-class ChooseFavoritedGameElements {
+class ChooseFavoriteGameElements {
     @SerializedName("card_images")
     var cardImages: List<String>? = null
 

@@ -928,26 +928,26 @@ object AppUtils {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-    fun createChooseFavoritedCustomFontFiles(
+    fun createChooseFavoriteCustomFontFiles(
         context: Context,
         jsonStr: String?,
         jsStr: String
     ): ArrayList<String?>? {
         var result: ArrayList<String?>? = null
-        val chooseFavoritedModel: ChooseFavorited?
-        val extendedProps: ChooseFavoritedExtendedProps?
+        val chooseFavoriteModel: ChooseFavorite?
+        val extendedProps: ChooseFavoriteExtendedProps?
         val baseUrlPath = "file://" + context.filesDir.absolutePath + "/"
         try {
-            chooseFavoritedModel = Gson().fromJson(jsonStr, ChooseFavorited::class.java)
+            chooseFavoriteModel = Gson().fromJson(jsonStr, ChooseFavorite::class.java)
             extendedProps = Gson().fromJson(
-                URI(chooseFavoritedModel.actiondata!!.extendedProps).path,
-                ChooseFavoritedExtendedProps::class.java
+                URI(chooseFavoriteModel.actiondata!!.extendedProps).path,
+                ChooseFavoriteExtendedProps::class.java
             )
         } catch (e: java.lang.Exception) {
-            Log.e("ChooseFavorited", "Extended properties could not be parsed properly!")
+            Log.e("ChooseFavorite", "Extended properties could not be parsed properly!")
             return null
         }
-        if (chooseFavoritedModel == null || extendedProps == null) {
+        if (chooseFavoriteModel == null || extendedProps == null) {
             return null
         }
         val fontFamily: String = extendedProps.fontFamily ?: return null
@@ -965,7 +965,7 @@ object AppUtils {
                     extendedProps.customFontFamilyAndroid!!,
                     fontExtension
                 )
-                chooseFavoritedModel.fontFiles.add(fontExtension)
+                chooseFavoriteModel.fontFiles.add(fontExtension)
             }
         }
 
@@ -973,7 +973,7 @@ object AppUtils {
             result = ArrayList()
             result.add(baseUrlPath)
             result.add(htmlStr)
-            result.add(Gson().toJson(chooseFavoritedModel, ChooseFavorited::class.java))
+            result.add(Gson().toJson(chooseFavoriteModel, ChooseFavorite::class.java))
         }
         return result
     }

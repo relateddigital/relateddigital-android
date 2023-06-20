@@ -3,7 +3,7 @@ package com.relateddigital.relateddigital_android.model
 import com.google.gson.annotations.SerializedName
 import java.io.Serializable
 
-class ChooseFavoritedExtendedProps : Serializable{
+class ChooseFavoriteExtendedProps : Serializable{
     @SerializedName("background_image")
     var backgroundImage: String? = null
 
@@ -23,16 +23,16 @@ class ChooseFavoritedExtendedProps : Serializable{
     var closeButtonColor: String? = null
 
     @SerializedName("mail_subscription_form")
-    var mailSubscriptionForm: ChooseFavoritedExtendedPropsMailSubscriptionForm? = null
+    var mailSubscriptionForm: ChooseFavoriteExtendedPropsMailSubscriptionForm? = null
 
     @SerializedName("gamification_rules")
-    var gamificationRules: ChooseFavoritedExtendedPropsGamificationRules? = null
+    var gamificationRules: ChooseFavoriteExtendedPropsGamificationRules? = null
 
     @SerializedName("game_elements")
-    var gameElements: ChooseFavoritedExtendedPropsGameElements? = null
+    var gameElements: ChooseFavoriteExtendedPropsGameElements? = null
 
     @SerializedName("game_result_elements")
-    var gameResultElements: ChooseFavoritedExtendedPropsGameResultElements? = null
+    var gameResultElements: ChooseFavoriteExtendedPropsGameResultElements? = null
 
     @SerializedName("promocode_background_color")
     var promocodeBackgroundColor: String? = null

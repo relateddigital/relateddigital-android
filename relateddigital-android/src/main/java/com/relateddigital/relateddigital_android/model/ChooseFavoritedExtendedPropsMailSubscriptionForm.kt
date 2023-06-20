@@ -3,7 +3,7 @@ package com.relateddigital.relateddigital_android.model
 import com.google.gson.annotations.SerializedName
 import java.io.Serializable
 
-class ChooseFavoritedExtendedPropsMailSubscriptionForm : Serializable {
+class ChooseFavoriteExtendedPropsMailSubscriptionForm : Serializable {
 
     @SerializedName("title_text_color")
     var titleTextColor: String? = null

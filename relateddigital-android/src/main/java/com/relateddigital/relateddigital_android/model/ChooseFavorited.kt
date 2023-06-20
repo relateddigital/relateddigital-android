@@ -3,7 +3,7 @@ package com.relateddigital.relateddigital_android.model
 import com.google.gson.annotations.SerializedName
 import java.io.Serializable
 
-class ChooseFavorited : Serializable {
+class ChooseFavorite : Serializable {
     var fontFiles = ArrayList<String>()
 
     @SerializedName("actid")
@@ -16,5 +16,5 @@ class ChooseFavorited : Serializable {
     var actiontype: String? = null
 
     @SerializedName("actiondata")
-    var actiondata: ChooseFavoritedActionData? = null
+    var actiondata: ChooseFavoriteActionData? = null
 }

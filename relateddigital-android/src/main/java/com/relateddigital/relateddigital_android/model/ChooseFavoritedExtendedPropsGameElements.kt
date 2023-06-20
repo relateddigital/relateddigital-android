@@ -3,7 +3,7 @@ package com.relateddigital.relateddigital_android.model
 import com.google.gson.annotations.SerializedName
 import java.io.Serializable
 
-class ChooseFavoritedExtendedPropsGameElements : Serializable {
+class ChooseFavoriteExtendedPropsGameElements : Serializable {
     @SerializedName("scoreboard_shape")
     var scoreboardShape: String? = null
 

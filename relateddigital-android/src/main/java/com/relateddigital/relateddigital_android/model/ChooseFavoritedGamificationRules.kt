@@ -2,7 +2,7 @@ package com.relateddigital.relateddigital_android.model
 
 import com.google.gson.annotations.SerializedName
 
-class ChooseFavoritedGamificationRules {
+class ChooseFavoriteGamificationRules {
     @SerializedName("background_image")
     var backgroundImage: String? = null
 

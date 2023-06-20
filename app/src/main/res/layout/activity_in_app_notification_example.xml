@@ -443,7 +443,7 @@
                 android:text="@string/inline_nps_with_numbers" />
 
             <Button
-                android:id="@+id/chooseFavoritedButton"
+                android:id="@+id/chooseFavoriteButton"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_marginStart="@dimen/in_app_button_left_right_margin"
@@ -451,7 +451,7 @@
                 android:layout_weight="1"
                 android:background="@drawable/rounded_corners_background"
                 android:padding="@dimen/in_app_button_padding"
-                android:text="@string/choose_favorited" />
+                android:text="@string/choose_favorite" />
 
 
         </LinearLayout>

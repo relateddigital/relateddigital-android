@@ -229,8 +229,8 @@ class InAppNotificationActivity : AppCompatActivity() {
             sendInAppRequest("findtowin")
         }
 
-        binding.chooseFavoritedButton.setOnClickListener {
-            sendInAppRequest("chooseFavorited")
+        binding.chooseFavoriteButton.setOnClickListener {
+            sendInAppRequest("chooseFavorite")
         }
 
         binding.inlineNpsButton.setOnClickListener{
