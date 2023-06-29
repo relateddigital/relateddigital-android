@@ -34,6 +34,9 @@ class ActionResponse : Serializable {
     @SerializedName("GiftBox")
     var mGiftBox: List<GiftBox>? = null
 
+    @SerializedName("ChooseFavorite")
+    var mChooseFavoriteList: List<ChooseFavorite>? = null
+
     @SerializedName("FindToWin")
     var mFindToWin: List<FindToWin>? = null
 
@@ -60,6 +63,11 @@ class ActionResponse : Serializable {
         get() = mSpinToWinList
         set(spinToWinList) {
             mSpinToWinList = spinToWinList
+        }
+    var chooseFavoriteList: List<ChooseFavorite>?
+        get() = mChooseFavoriteList
+        set(chooseFavoriteList) {
+            mChooseFavoriteList = chooseFavoriteList
         }
     var shakeToWinList: List<ShakeToWin>?
         get() = mShakeToWinList

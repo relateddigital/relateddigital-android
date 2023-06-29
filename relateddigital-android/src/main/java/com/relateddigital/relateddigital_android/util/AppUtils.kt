@@ -940,7 +940,7 @@ object AppUtils {
         try {
             chooseFavoriteModel = Gson().fromJson(jsonStr, ChooseFavorite::class.java)
             extendedProps = Gson().fromJson(
-                URI(chooseFavoriteModel.actiondata!!.extendedProps).path,
+                URI(chooseFavoriteModel.actiondata!!.ExtendedProps).path,
                 ChooseFavoriteExtendedProps::class.java
             )
         } catch (e: java.lang.Exception) {

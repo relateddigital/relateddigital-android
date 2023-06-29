@@ -45,6 +45,12 @@
             android:configChanges="orientation"
             android:noHistory="true"
             android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".inapp.choosefavorite.ChooseFavoriteActivity"
+            android:configChanges="orientation"
+            android:noHistory="true"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".inapp.inappmessages.InAppFullActivity"
             android:noHistory="true"

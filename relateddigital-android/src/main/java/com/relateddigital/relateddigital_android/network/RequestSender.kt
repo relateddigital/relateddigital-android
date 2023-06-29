@@ -11,6 +11,7 @@ import com.relateddigital.relateddigital_android.api.*
 import com.relateddigital.relateddigital_android.constants.Constants
 import com.relateddigital.relateddigital_android.inapp.InAppManager
 import com.relateddigital.relateddigital_android.inapp.VisilabsResponse
+import com.relateddigital.relateddigital_android.inapp.choosefavorite.ChooseFavoriteActivity
 import com.relateddigital.relateddigital_android.inapp.findtowin.FindToWinActivity
 import com.relateddigital.relateddigital_android.inapp.giftbox.GiftBoxActivity
 import com.relateddigital.relateddigital_android.inapp.giftcatch.GiftCatchActivity
@@ -332,6 +333,18 @@ object RequestSender {
                                             val giftBoxModel: GiftBox =
                                                 actionsResponse.mGiftBox!![0]
                                             intent.putExtra("gift-box-data", giftBoxModel)
+                                            currentRequest.parent!!.startActivity(intent)
+                                        }
+                                        !actionsResponse.mChooseFavoriteList.isNullOrEmpty() -> {
+                                            ActivityUtils.parentActivity = currentRequest.parent
+                                            val intent =
+                                                Intent(
+                                                    currentRequest.parent,
+                                                    ChooseFavoriteActivity::class.java
+                                                )
+                                            val chooseFavoriteModel: ChooseFavorite =
+                                                actionsResponse.mChooseFavoriteList!![0]
+                                            intent.putExtra("choose-favorite-data", chooseFavoriteModel)
                                             currentRequest.parent!!.startActivity(intent)
                                         }
                                         !actionsResponse.mFindToWin.isNullOrEmpty() -> {

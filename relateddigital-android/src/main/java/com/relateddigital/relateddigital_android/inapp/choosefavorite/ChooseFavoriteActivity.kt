@@ -67,8 +67,8 @@ class ChooseFavoriteActivity : FragmentActivity(), ChooseFavoriteCompleteInterfa
                             jsonStr = savedInstanceState.getString("chooseFavorite-json-str", "")
                         } else {
                             val intent = intent
-                            if (intent != null && intent.hasExtra("gift-box-data")) {
-                                response = intent.getSerializableExtra("gift-box-data") as ChooseFavorite?
+                            if (intent != null && intent.hasExtra("choose-favorite-data")) {
+                                response = intent.getSerializableExtra("choose-favorite-data") as ChooseFavorite?
                                 if (response != null) {
                                     jsonStr = Gson().toJson(response)
                                 } else {

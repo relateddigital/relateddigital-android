@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="ScreenOrientation" content="autoRotate:disabled">
+    <title>Choose Favorite</title>
+</head>
+
+<body>
+<script src="choose_favorite.js"></script>
+<script>
+        window.initChooseFavoriteGame = function (responseConfig) {
+            initChooseFavoriteGame(responseConfig);
+        }
+
+        if (window.Android) {
+            let responseConfig = Android.getResponse();
+            initChooseFavoriteGame(responseConfig);
+        } else if (window.webkit.messageHandlers.eventHandler) {
+            window.webkit.messageHandlers.eventHandler.postMessage({
+                method: "initFindGame"
+            })
+        }
+    </script>
+</body>
+
+</html>

@@ -43,7 +43,7 @@ class ChooseFavoriteJavaScriptInterface internal constructor(webViewDialogFragme
      * @param email : String - the value entered for email
      */
     @JavascriptInterface
-    fun subscribeEmail(email: String?) {
+   /* fun subscribeEmail(email: String?) {
         if (!email.isNullOrEmpty()) {
             subEmail = email
             SubsJsonRequest.createSubsJsonRequest(mWebViewDialogFragment.requireContext(), chooseFavoriteModel.actiondata!!.type!!,
@@ -52,7 +52,7 @@ class ChooseFavoriteJavaScriptInterface internal constructor(webViewDialogFragme
         } else {
             Log.e("ChooseFavorite : ", "Email entered is not valid!")
         }
-    }
+    } */
 
     /**
      * This method sends the report to the server
@@ -80,7 +80,7 @@ class ChooseFavoriteJavaScriptInterface internal constructor(webViewDialogFragme
     /**
      * This method saves the promotion code shown
      */
-    @JavascriptInterface
+   // @JavascriptInterface
     fun saveCodeGotten(code: String, email: String?, report: String?) {
         mShowCodeInterface.onCodeShown(code)
     }

@@ -230,7 +230,7 @@ class InAppNotificationActivity : AppCompatActivity() {
         }
 
         binding.chooseFavoriteButton.setOnClickListener {
-            sendInAppRequest("chooseFavorite")
+            sendInAppRequest("choosefavorite")
         }
 
         binding.inlineNpsButton.setOnClickListener{
