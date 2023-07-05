@@ -47,5 +47,10 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(this@MainActivity, BannerCarouselDemoActivity::class.java)
             startActivity(intent)
         }
+
+        binding.swipeCarouselPage.setOnClickListener {
+            val intent = Intent(this@MainActivity, SwipeCarouselActivity::class.java)
+            startActivity(intent)
+        }
     }
 }

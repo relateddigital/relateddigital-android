@@ -25,12 +25,15 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Androidexampleapp">
         <activity
+            android:name=".SwipeCarouselActivity"
+            android:exported="false" />
+        <activity
             android:name=".InlineNpsWithNumbersActivity"
             android:exported="false" />
         <activity
             android:name=".InAppNotificationActivity"
             android:label="@string/in_app_notification_page_label"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".StoryDemoActivity"
             android:label="@string/story_page_label"

@@ -7,6 +7,7 @@
     <string name="story_page_label">Story</string>
     <string name="event_page">EVENT PAGE</string>
     <string name="story_page">STORY PAGE</string>
+    <string name="swipe_carousel_page">SWIPE CAROUSEL PAGE</string>
     <string name="in_app_notification_page">IN-APP NOTIFICATION PAGE</string>
     <string name="push_notification_page">PUSH NOTIFICATION PAGE</string>
     <string name="custom_event_1">CUSTOM EVENT 1</string>
