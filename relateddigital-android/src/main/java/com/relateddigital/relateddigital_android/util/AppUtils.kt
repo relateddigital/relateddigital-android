@@ -952,7 +952,7 @@ object AppUtils {
         }
         val fontFamily: String = extendedProps.fontFamily ?: return null
 
-        val htmlStr: String = writeHtmlToFile(context, "find_to_win", jsStr)
+        val htmlStr: String = writeHtmlToFile(context, "swiping", jsStr)
 
         if (fontFamily == "custom") {
             val fontExtension = getFontNameWithExtension(

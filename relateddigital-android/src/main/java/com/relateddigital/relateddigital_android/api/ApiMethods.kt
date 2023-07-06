@@ -120,8 +120,8 @@ interface ApiMethods {
         @HeaderMap headers: Map<String, String>
     ): Call<ResponseBody>
 
-    @GET("/choose_favorite.js")
-    fun getChooseFavoriteJsFile(
+    @GET("/swiping.js")
+    fun getSwipingJsFile(
         @HeaderMap headers: Map<String, String>
     ): Call<ResponseBody>
 

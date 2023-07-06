@@ -49,7 +49,7 @@ class ChooseFavoriteActivity : FragmentActivity(), ChooseFavoriteCompleteInterfa
             ?.create(ApiMethods::class.java)
         val headers = HashMap<String, String>()
         headers[Constants.USER_AGENT_REQUEST_KEY] = RelatedDigital.getRelatedDigitalModel(this).getUserAgent()
-        val call: Call<ResponseBody> = jsApi?.getChooseFavoriteJsFile(headers)!!
+        val call: Call<ResponseBody> = jsApi?.getSwipingJsFile(headers)!!
         call.enqueue(object : Callback<ResponseBody?> {
             override fun onResponse(
                 call: Call<ResponseBody?>,
