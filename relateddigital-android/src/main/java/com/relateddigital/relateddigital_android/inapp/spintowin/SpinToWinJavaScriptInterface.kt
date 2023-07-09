@@ -14,7 +14,6 @@ import com.relateddigital.relateddigital_android.inapp.VisilabsResponse
 import com.relateddigital.relateddigital_android.model.MailSubReport
 import com.relateddigital.relateddigital_android.model.Slice
 import com.relateddigital.relateddigital_android.model.SpinToWin
-import com.relateddigital.relateddigital_android.network.RequestHandler
 import com.relateddigital.relateddigital_android.network.requestHandler.InAppActionClickRequest
 import com.relateddigital.relateddigital_android.network.requestHandler.SpinToWinPromoCodeRequest
 import com.relateddigital.relateddigital_android.network.requestHandler.SubsJsonRequest
@@ -55,6 +54,9 @@ class SpinToWinJavaScriptInterface internal constructor(webViewDialogFragment: S
                 couponCode,
                 spinToWinModel.actiondata!!.slices!![selectedIndex].androidLink
             )
+        }
+        else {
+            mCopyToClipboardInterface!!.copyToClipboard(couponCode, null)
         }
 
     }
