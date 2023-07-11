@@ -2,12 +2,15 @@ package com.relateddigital.relateddigital_android.inapp.choosefavorite
 
 import android.content.ClipData
 import android.content.ClipboardManager
+import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.FragmentActivity
+import androidx.fragment.app.FragmentTransaction
 import com.google.gson.Gson
 import com.relateddigital.relateddigital_android.R
 import com.relateddigital.relateddigital_android.RelatedDigital
@@ -15,11 +18,14 @@ import com.relateddigital.relateddigital_android.api.ApiMethods
 import com.relateddigital.relateddigital_android.api.JSApiClient
 import com.relateddigital.relateddigital_android.constants.Constants
 import com.relateddigital.relateddigital_android.model.ChooseFavorite
+import com.relateddigital.relateddigital_android.model.ChooseFavoriteExtendedProps
+import com.relateddigital.relateddigital_android.util.ActivityUtils
 import com.relateddigital.relateddigital_android.util.AppUtils
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.net.URI
 import java.util.HashMap
 
 class ChooseFavoriteActivity : FragmentActivity(), ChooseFavoriteCompleteInterface,
@@ -114,6 +120,47 @@ class ChooseFavoriteActivity : FragmentActivity(), ChooseFavoriteCompleteInterfa
                 finish()
             }
         })
+    }
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putString("choosefavorite-json-str", jsonStr)
+        super.onSaveInstanceState(outState)
+    }
+    override fun onDestroy() {
+        super.onDestroy()
+        if (chooseFavoritePromotionCode.isNotEmpty()) {
+            try {
+                val extendedProps = Gson().fromJson(
+                    URI(response!!.actiondata!!.ExtendedProps).path,
+                    ChooseFavoriteExtendedProps::class.java
+                )
+
+                if (!extendedProps.promocodeBannerButtonLabel.isNullOrEmpty()) {
+                    if(ActivityUtils.parentActivity != null) {
+                        val chooseFavoriteCodeBannerFragment =
+                            ChooseFavoriteCodeBannerFragment.newInstance(extendedProps, chooseFavoritePromotionCode)
+
+                        val transaction: FragmentTransaction =
+                            (ActivityUtils.parentActivity as FragmentActivity).supportFragmentManager.beginTransaction()
+                        transaction.replace(android.R.id.content, chooseFavoriteCodeBannerFragment)
+                        transaction.commit()
+                        ActivityUtils.parentActivity = null
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e(ChooseFavoriteActivity.LOG_TAG, "ChooseFavoriteCodeBanner : " + e.message)
+            }
+        }
+
+        if (link.isNotEmpty()) {
+            val uri: Uri
+            try {
+                uri = Uri.parse(link)
+                val viewIntent = Intent(Intent.ACTION_VIEW, uri)
+                startActivity(viewIntent)
+            } catch (e: Exception) {
+                Log.w(ChooseFavoriteActivity.LOG_TAG, "Can't parse notification URI, will not take any action", e)
+            }
+        }
     }
 
     override fun onCompleted() {

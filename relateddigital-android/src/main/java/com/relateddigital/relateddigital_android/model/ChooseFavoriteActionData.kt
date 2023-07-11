@@ -12,5 +12,7 @@ class ChooseFavoriteActionData : Serializable {
     @SerializedName("copybutton_label"       ) var copybuttonLabel      : String?               = null
     @SerializedName("copybutton_function"    ) var copybuttonFunction   : String?               = null
     @SerializedName("ExtendedProps"          ) var ExtendedProps        : String?               = null
-
+    @SerializedName("auth"                   ) var auth                 : String?               = null
+    @SerializedName("type"                   ) var type                 : String?               = null
+    @SerializedName("report"                 ) var report               : ChooseFavoriteReport? = null
 }
