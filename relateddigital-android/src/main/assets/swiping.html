@@ -1,30 +1,110 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="ScreenOrientation" content="autoRotate:disabled">
-    <title>Swiping</title>
+    <title>SWIPING GAME</title>
 </head>
-
 <body>
 <script src="swiping.js"></script>
-<script>
-        window.initSwipingGame = function (responseConfig) {
-            initGame(responseConfig);
+<script type="text/javascript">
+    console.log("swiping");
+    var config = {};
+    var swiping = {};
+    window.initSwiping = function(responseConfig) {
+      config = responseConfig
+      swiping = new Swiping(config);
+    }
+    if (window.Android) {
+      config = JSON.parse(Android.getResponse());
+      initSwiping(config);
+    } else if (window.webkit && window.webkit.messageHandlers.eventHandler) {
+      window.webkit.messageHandlers.eventHandler.postMessage({
+        method: "initSwiping"
+      });
+      window.console.log = function(message) {
+        var stringMessage = message;
+        if (typeof message !== "string") {
+          stringMessage = JSON.stringify(message);
         }
-
-        if (window.Android) {
-            let responseConfig = Android.getResponse();
-            initGame(responseConfig);
-        } else if (window.webkit.messageHandlers.eventHandler) {
-            window.webkit.messageHandlers.eventHandler.postMessage({
-                method: "initSwipingGame"
-            })
-        }
-    </script>
+        window.webkit.messageHandlers.eventHandler.postMessage({
+          method: "console.log",
+          message: stringMessage
+        });
+      };
+    } else {
+      const extendedProps = {
+        "background_image": "",
+        "background_color": "#557BA9",
+        "font_family": "custom",
+        "custom_font_family_ios": "iOSFontFamily",
+        "custom_font_family_android": "AndroidFontFamily",
+        "close_button_color": "white",
+        "mail_subscription_form": {},
+        "gamification_rules": {
+          "button_color": "#001DD0",
+          "button_text_color": "#C0C0C0",
+          "button_text_size": "4"
+        },
+        "game_elements": {
+          "likebutton_color": "#FFFFFF",
+          "likebutton_background_color": "#00E15C",
+          "ignorebutton_color": "#FFF8F8",
+          "ignorebutton_background_color": "#FC0000"
+        },
+        "game_result_elements": {
+          "title_text_color": "#00C1B0",
+          "title_text_size": "2",
+          "text_color": "",
+          "text_size": ""
+        },
+        "promocode_background_color": "#FF6767",
+        "promocode_text_color": "#180D0D",
+        "copybutton_color": "#9E5959",
+        "copybutton_text_color": "#890909",
+        "copybutton_text_size": "2",
+        "promocode_banner_text": "",
+        "promocode_banner_text_color": "",
+        "promocode_banner_background_color": "",
+        "promocode_banner_button_label": ""
+      };
+      let extendedPropsString = JSON.stringify(extendedProps);
+      //console.log(extendedPropsString);
+      extendedPropsString = encodeURI(extendedPropsString);
+      //console.log(extendedPropsString);
+      config = {
+        "mail_subscription": false,
+        "mail_subscription_form": {},
+        "gamification_rules": {
+          "background_image": "https://imgvisilabsnet.azureedge.net/choose_favorite/uploaded_images/debug/112_885_914_20230620095801329.png",
+          "button_label": "ButtonLabel1"
+        },
+        "game_elements": {
+          "favorite_images": [{
+            "image": "https://imgvisilabsnet.azureedge.net/choose_favorite/uploaded_images/debug/112_885_914_20230620095833616.png",
+            "staticcode": "ASFQW3FG1",
+            "ios_lnk": "http://iOSLink1",
+            "android_lnk": "http://AndroidLink1",
+            "result_displaytext": "Result Display Text 1"
+          }, {
+            "image": "https://imgvisilabsnet.azureedge.net/choose_favorite/uploaded_images/debug/112_885_914_20230620100333154.png",
+            "staticcode": "DFDHRHS2",
+            "ios_lnk": "http://iOSLink2",
+            "android_lnk": "http://AndroidLink2",
+            "result_displaytext": "Result Display Text 2"
+          }]
+        },
+        "game_result_elements": {
+          "title": "Tebrikler \nKod Kazandınız",
+          "message": "Aşağıdan kodu kopyalayarak \nalışverişinizde kullanabilirsiniz"
+        },
+        "copybutton_label": "Copy to clipboard",
+        "copybutton_function": "copy_redirect",
+        "ExtendedProps": extendedPropsString
+      }
+      initSwiping(config);
+    }
+  </script>
 </body>
-
 </html>
