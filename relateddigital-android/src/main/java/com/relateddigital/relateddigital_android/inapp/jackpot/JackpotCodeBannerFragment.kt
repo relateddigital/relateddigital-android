@@ -1,4 +1,4 @@
-package com.relateddigital.relateddigital_android.inapp.choosefavorite
+package com.relateddigital.relateddigital_android.inapp.jackpot
 
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -17,20 +17,20 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import com.relateddigital.relateddigital_android.R
-import com.relateddigital.relateddigital_android.databinding.FragmentChooseFavoriteCodeBannerBinding
+import com.relateddigital.relateddigital_android.databinding.FragmentJackpotCodeBannerBinding
 import com.relateddigital.relateddigital_android.inapp.FontFamily
-import com.relateddigital.relateddigital_android.model.ChooseFavoriteExtendedProps
+import com.relateddigital.relateddigital_android.model.JackpotExtendedProps
 import com.relateddigital.relateddigital_android.util.AppUtils
 import java.util.*
 
 /**
  * A simple [Fragment] subclass.
- * Use the [ChooseFavoriteCodeBannerFragment.newInstance] factory method to
+ * Use the [JackpotCodeBannerFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
-class ChooseFavoriteCodeBannerFragment : Fragment() {
+class JackpotCodeBannerFragment : Fragment() {
     companion object {
-        private const val LOG_TAG = "ChooseFavoriteBanner"
+        private const val LOG_TAG = "JackpotBanner"
 
         // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
         private const val ARG_PARAM1 = "banner_data"
@@ -42,13 +42,13 @@ class ChooseFavoriteCodeBannerFragment : Fragment() {
          *
          * @param extendedProps Parameter 1.
          * @param code Parameter 2.
-         * @return A new instance of fragment ChooseFavoriteCodeBannerFragment.
+         * @return A new instance of fragment JackpotCodeBannerFragment.
          */
         fun newInstance(
-            extendedProps: ChooseFavoriteExtendedProps,
+            extendedProps: JackpotExtendedProps,
             code: String
-        ): ChooseFavoriteCodeBannerFragment {
-            val fragment = ChooseFavoriteCodeBannerFragment()
+        ): JackpotCodeBannerFragment {
+            val fragment = JackpotCodeBannerFragment()
             val args = Bundle()
             args.putSerializable(ARG_PARAM1, extendedProps)
             args.putString(ARG_PARAM2, code)
@@ -57,13 +57,13 @@ class ChooseFavoriteCodeBannerFragment : Fragment() {
         }
     }
 
-    private var mExtendedProps: ChooseFavoriteExtendedProps? = null
+    private var mExtendedProps: JackpotExtendedProps? = null
     private var bannerCode: String? = null
-    private lateinit var binding: FragmentChooseFavoriteCodeBannerBinding
+    private lateinit var binding: FragmentJackpotCodeBannerBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mExtendedProps = requireArguments().getSerializable(ARG_PARAM1) as ChooseFavoriteExtendedProps
+        mExtendedProps = requireArguments().getSerializable(ARG_PARAM1) as JackpotExtendedProps
         bannerCode = requireArguments().getString(ARG_PARAM2)
         if (bannerCode.isNullOrEmpty()) {
             endFragment()
@@ -74,7 +74,7 @@ class ChooseFavoriteCodeBannerFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentChooseFavoriteCodeBannerBinding.inflate(inflater, container, false)
+        binding = FragmentJackpotCodeBannerBinding.inflate(inflater, container, false)
         val view: View = binding.root
 
         hideStatusBar()
@@ -119,7 +119,7 @@ class ChooseFavoriteCodeBannerFragment : Fragment() {
             binding.bannerCode.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
         }
 
-
+        /*
         if (!mExtendedProps!!.gameResultElements!!.textSize.isNullOrEmpty()) {
             binding.bannerText.textSize = mExtendedProps!!.gameResultElements!!.textSize!!.toFloat() + 10
             binding.bannerLabel.textSize = mExtendedProps!!.gameResultElements!!.textSize!!.toFloat() + 12
@@ -129,7 +129,7 @@ class ChooseFavoriteCodeBannerFragment : Fragment() {
             binding.bannerLabel.textSize = 16f
             binding.bannerCode.textSize = 14f
         }
-
+         */
 
         if (mExtendedProps!!.fontFamily.isNullOrEmpty()) {
             binding.bannerText.typeface = Typeface.DEFAULT
@@ -195,7 +195,7 @@ class ChooseFavoriteCodeBannerFragment : Fragment() {
     private fun endFragment() {
         if (activity != null) {
             requireActivity().supportFragmentManager.beginTransaction()
-                .remove(this@ChooseFavoriteCodeBannerFragment).commit()
+                .remove(this@JackpotCodeBannerFragment).commit()
         }
     }
 

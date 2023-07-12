@@ -775,6 +775,58 @@ object AppUtils {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    fun createJackpotCustomFontFiles(
+        context: Context,
+        jsonStr: String?,
+        jsStr: String
+    ): ArrayList<String?>? {
+        var result: ArrayList<String?>? = null
+        val jackpotModel: Jackpot?
+        val extendedProps: JackpotExtendedProps?
+        val baseUrlPath = "file://" + context.filesDir.absolutePath + "/"
+        try {
+            jackpotModel = Gson().fromJson(jsonStr, Jackpot::class.java)
+            extendedProps = Gson().fromJson(
+                URI(jackpotModel!!.actiondata!!.extendedProps).path,
+                JackpotExtendedProps::class.java
+            )
+        } catch (e: java.lang.Exception) {
+            Log.e("Jackpot", "Extended properties could not be parsed properly!")
+            return null
+        }
+        if (jackpotModel == null || extendedProps == null) {
+            return null
+        }
+        val fontFamily: String = extendedProps.fontFamily ?: return null
+
+        val htmlStr: String = writeHtmlToFile(context, "jackpot", jsStr)
+
+        if (fontFamily == "custom") {
+            val fontExtension = getFontNameWithExtension(
+                context,
+                extendedProps.customFontFamilyAndroid!!
+            )
+            if (fontExtension.isNotEmpty()) {
+                writeFontToFile(
+                    context,
+                    extendedProps.customFontFamilyAndroid!!,
+                    fontExtension
+                )
+                jackpotModel.fontFiles.add(fontExtension)
+            }
+        }
+
+        if (htmlStr.isNotEmpty()) {
+            result = ArrayList()
+            result.add(baseUrlPath)
+            result.add(htmlStr)
+            result.add(Gson().toJson(jackpotModel, Jackpot::class.java))
+        }
+        return result
+    }
+
+
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     fun createGiftRainCustomFontFiles(
         context: Context,
         jsonStr: String?,
