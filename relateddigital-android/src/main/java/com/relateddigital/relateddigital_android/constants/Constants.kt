@@ -56,7 +56,7 @@ class Constants {
         const val REQUEST_SUBS_EMAIL_KEY = "OM.subsemail"
         const val REQUEST_ACTION_ID_KEY = "action_id"
         const val REQUEST_ACTION_TYPE_KEY = "action_type"
-        const val REQUEST_ACTION_TYPE_VAL = "MailSubscriptionForm~SpinToWin~ScratchToWin~ProductStatNotifier~drawer~GiftRain~FindToWin~AppBanner~ShakeToWin~GiftBox~ChooseFavorite"
+        const val REQUEST_ACTION_TYPE_VAL = "MailSubscriptionForm~SpinToWin~ScratchToWin~ProductStatNotifier~drawer~GiftRain~FindToWin~AppBanner~ShakeToWin~GiftBox~ChooseFavorite~Jackpot"
 
 
         var VISILABS_PARAMETERS: List<VisilabsParameter>? = null

@@ -212,11 +212,11 @@ object PayloadUtils {
         while (i < jsonArray.length()) {
             try {
                 val jsonObject = jsonArray.getJSONObject(i)
-                if (!jsonObject.has("date") || (jsonObject.has("date") && isOld(context, jsonObject.getString("date")))) {
+                if (!jsonObject.has("date") || ((jsonObject.has("date") && isOld(context, jsonObject.getString("date"))))) {
                     jsonArray.remove(i)
                     i--
                 }
-                if (!jsonObject.has("pushId") || (jsonObject.has("pushId") )) {
+                if (!jsonObject.has("pushId")) {
                     jsonArray.remove(i)
                     i--
                 }
