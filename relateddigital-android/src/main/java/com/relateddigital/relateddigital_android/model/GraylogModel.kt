@@ -32,6 +32,9 @@ class GraylogModel : Serializable {
     @SerializedName("sdkVersion")
     var sdkVersion = ""
 
+    @SerializedName("sdkType")
+    var sdkType = "native"
+
     @SerializedName("osType")
     var osType = ""
 

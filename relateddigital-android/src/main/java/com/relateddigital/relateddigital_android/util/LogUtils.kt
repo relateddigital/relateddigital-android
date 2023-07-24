@@ -50,6 +50,7 @@ object LogUtils {
         graylogModel.token = RelatedDigital.getRelatedDigitalModel(context).getToken()
         graylogModel.appVersion = RelatedDigital.getRelatedDigitalModel(context).getAppVersion()
         graylogModel.sdkVersion = RelatedDigital.getRelatedDigitalModel(context).getSdkVersion()
+        graylogModel.sdkType = RelatedDigital.getRelatedDigitalModel(context).getSdkType()
         graylogModel.osType = RelatedDigital.getRelatedDigitalModel(context).getOsType()
         graylogModel.osVersion = RelatedDigital.getRelatedDigitalModel(context).getOsVersion()
         graylogModel.deviceName = RelatedDigital.getRelatedDigitalModel(context).getDeviceName()

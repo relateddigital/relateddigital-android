@@ -82,6 +82,7 @@ object RelatedDigital {
             osType = AppUtils.getOsType(),
             osVersion = AppUtils.getOsVersion(),
             sdkVersion = AppUtils.getSdkVersion(),
+            sdkType = AppUtils.getSdkType(),
             deviceType = AppUtils.getDeviceType(),
             deviceName = AppUtils.getDeviceName(),
             carrier = AppUtils.getCarrier(context),
@@ -680,6 +681,20 @@ object RelatedDigital {
         }
     }
 
+    fun getSdkType(context: Context): String {
+        return if (model != null) {
+            model!!.getSdkType()
+        } else {
+            if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
+                model = Gson().fromJson(SharedPref.readString(context,
+                    Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
+                model!!.getSdkType()
+            } else {
+                AppUtils.getSdkType()
+            }
+        }
+    }
+
     @JvmStatic
     fun getDeviceType(context: Context): String {
         return if (model != null) {
@@ -871,6 +886,7 @@ object RelatedDigital {
             osType = AppUtils.getOsType(),
             osVersion = AppUtils.getOsVersion(),
             sdkVersion = AppUtils.getSdkVersion(),
+            sdkType = AppUtils.getSdkType(),
             deviceType = AppUtils.getDeviceType(),
             deviceName = AppUtils.getDeviceName(),
             carrier = AppUtils.getCarrier(context),

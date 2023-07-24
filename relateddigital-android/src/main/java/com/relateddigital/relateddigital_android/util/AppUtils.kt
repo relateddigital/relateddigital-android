@@ -170,6 +170,10 @@ object AppUtils {
         return BuildConfig.VERSION_NAME
     }
 
+    fun getSdkType(): String {
+        return BuildConfig.SDK_TYPE
+    }
+
     fun getOsType(): String {
         return "Android"
     }

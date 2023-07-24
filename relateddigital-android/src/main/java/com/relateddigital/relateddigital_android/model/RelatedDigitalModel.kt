@@ -34,6 +34,7 @@ class RelatedDigitalModel(
         private var osType: String = "ANDROID",
         private var osVersion: String,
         private var sdkVersion: String,
+        private var sdkType: String,
         private var deviceType: String,
         private var deviceName: String,
         private var carrier: String,
@@ -162,6 +163,13 @@ class RelatedDigitalModel(
     fun setSdkVersion(context: Context, sdkVersion: String) {
         synchronized(this) {
             this.sdkVersion = sdkVersion
+            saveToSharedPrefs(context)
+        }
+    }
+
+    fun setSdkType(context: Context, sdkType: String = "native") {
+        synchronized(this) {
+            this.sdkType = sdkType
             saveToSharedPrefs(context)
         }
     }
@@ -426,6 +434,12 @@ class RelatedDigitalModel(
         }
     }
 
+    fun getSdkType(): String {
+        synchronized(this) {
+            return sdkType
+        }
+    }
+
     fun getDeviceType(): String {
         synchronized(this) {
             return deviceType
@@ -640,6 +654,7 @@ class RelatedDigitalModel(
                         isStringEqual(osType, previousModel.getOsType()) &&
                         isStringEqual(osVersion, previousModel.getOsVersion()) &&
                         isStringEqual(sdkVersion, previousModel.getSdkVersion()) &&
+                        isStringEqual(sdkType, previousModel.getSdkType()) &&
                         isStringEqual(deviceType, previousModel.getDeviceType()) &&
                         isStringEqual(deviceName, previousModel.getDeviceName()) &&
                         isStringEqual(carrier, previousModel.getCarrier()) &&
@@ -742,6 +757,12 @@ class RelatedDigitalModel(
                 AppUtils.getSdkVersion()
             } else {
                 fromModel.getSdkVersion()
+            }
+
+            sdkType = if (fromModel.getSdkType().isNullOrEmpty()) {
+                AppUtils.getSdkType()
+            } else {
+                fromModel.getSdkType()
             }
             deviceType = if (fromModel.getDeviceType().isNullOrEmpty()) {
                 AppUtils.getDeviceType()

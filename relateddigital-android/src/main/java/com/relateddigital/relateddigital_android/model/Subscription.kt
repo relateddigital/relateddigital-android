@@ -43,6 +43,9 @@ class Subscription(context: Context, model: RelatedDigitalModel) : Serializable 
     @SerializedName("sdkVersion")
     var sdkVersion: String? = null
 
+    @SerializedName("sdkType")
+    var sdkType: String? = "native"
+
     @SerializedName("firstTime")
     var firstTime = 0
 
@@ -66,6 +69,7 @@ class Subscription(context: Context, model: RelatedDigitalModel) : Serializable 
         identifierForVendor = model.getIdentifierForVendor()
         advertisingIdentifier = model.getAdvertisingIdentifier()
         sdkVersion = model.getSdkVersion()
+        sdkType = model.getSdkType()
         extra.clear()
         extra.putAll(model.getExtra())
     }

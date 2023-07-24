@@ -279,6 +279,7 @@ object RequestFormer {
         queryMap[Constants.NOTIFICATION_PERMISSION_REQUEST_KEY] = model.getPushPermissionStatus()
         queryMap[Constants.API_VERSION_REQUEST_KEY] = model.getApiVersion()
         queryMap[Constants.SDK_VERSION_REQUEST_KEY] = model.getSdkVersion()
+        queryMap[Constants.SDK_TYPE_REQUEST_KEY] = model.getSdkType()
         queryMap[Constants.NRV_REQUEST_KEY] = mNrv.toString()
         queryMap[Constants.PVIV_REQUEST_KEY] = mPviv.toString()
         queryMap[Constants.TVC_REQUEST_KEY] = mTvc.toString()

@@ -25,6 +25,7 @@ class Constants {
         const val URI_REQUEST_KEY = "OM.uri"
         const val MAPPL_REQUEST_KEY = "OM.mappl"
         const val SDK_VERSION_REQUEST_KEY = "sdk_version"
+        const val SDK_TYPE_REQUEST_KEY = "sdk_type"
         const val APP_VERSION_REQUEST_KEY = "OM.appVersion"
         const val API_VERSION_REQUEST_KEY = "OM.apiver"
         const val NRV_REQUEST_KEY = "OM.nrv"
