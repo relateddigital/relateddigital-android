@@ -22,8 +22,11 @@ import android.util.Patterns
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
+import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentTransaction
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.target.DrawableImageViewTarget
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.Player
@@ -524,12 +527,27 @@ class ShakeToWinActivity : Activity(), SensorEventListener {
 
     private fun initializePlayer() {
         player = ExoPlayer.Builder(this).build()
+        if (!mShakeToWinMessage!!.actiondata!!.gameElements!!.videoUrl.toString().isNullOrEmpty()) {
+        bindingStep2.videoView.visibility = View.VISIBLE
         bindingStep2.videoView.player = player
         val mediaItem = MediaItem.fromUri(
             mShakeToWinMessage!!.actiondata!!.gameElements!!.videoUrl.toString()
         )
         player!!.setMediaItem(mediaItem)
         player!!.prepare()
+        }
+        else
+            //TODO when backend ready this code will change
+            bindingStep2.videoView.visibility = View.VISIBLE
+            bindingStep2.videoView.player = player
+            val mediaItem = MediaItem.fromUri(
+                mShakeToWinMessage!!.actiondata!!.gameElements!!.videoUrl.toString()
+            )
+            player!!.setMediaItem(mediaItem)
+            player!!.prepare()
+           // bindingStep2.imageViewGif.visibility = View.VISIBLE
+           // Glide.with(this).load("https://media.giphy.com/media/4gH9mQjn6OGQg/giphy.gif").into( DrawableImageViewTarget(bindingStep2.imageViewGif));
+
     }
 
     private fun initializeSoundPlayer() {
