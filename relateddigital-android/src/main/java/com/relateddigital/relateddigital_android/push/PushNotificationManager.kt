@@ -202,7 +202,25 @@ class PushNotificationManager {
         } else {
             NotificationCompat.PRIORITY_DEFAULT
         }
+        // TODO : When backend ready edit
+        /*val actionIntent = PendingIntent.getActivity(
+            context,
+            0,
+            Intent(context, YourActionActivity::class.java),
+            PendingIntent.FLAG_UPDATE_CURRENT
+        )
 
+
+            val actionIcon = R.drawable.notification_button // Icon to use in action button (drawable)
+            val actionTitle = "Open" // Title to show on action button
+
+
+            val action = NotificationCompat.Action.Builder(
+                actionIcon,
+                actionTitle,
+                actionIntent
+            ).build()
+            */
         val style = if (pushImage == null) NotificationCompat.BigTextStyle()
             .bigText(pushMessage.message) else NotificationCompat.BigPictureStyle()
             .bigPicture(pushImage).setSummaryText(pushMessage.message)
@@ -217,6 +235,8 @@ class PushNotificationManager {
                 .setDefaults(Notification.DEFAULT_VIBRATE or Notification.FLAG_SHOW_LIGHTS)
                 .setPriority(importance)
                 .setContentText(pushMessage.message)
+                // TODO !!
+                //.addAction(action)
         setNumber(mBuilder, context)
         setNotificationSmallIcon(mBuilder, context)
         if (pushMessage.sound != null) {
