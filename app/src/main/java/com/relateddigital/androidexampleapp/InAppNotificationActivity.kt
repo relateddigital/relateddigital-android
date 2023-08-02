@@ -234,7 +234,7 @@ class InAppNotificationActivity : AppCompatActivity() {
         }
 
         binding.jackpotButton.setOnClickListener {
-            sendInAppRequest("Jackpot")
+            sendInAppRequest("slotMachine")
         }
 
         binding.inlineNpsButton.setOnClickListener{

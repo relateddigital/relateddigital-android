@@ -1,4 +1,4 @@
-package com.relateddigital.relateddigital_android.inapp.jackpot
+package com.relateddigital.relateddigital_android.inapp.slotmachine
 
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -19,16 +19,16 @@ import androidx.fragment.app.FragmentActivity
 import com.relateddigital.relateddigital_android.R
 import com.relateddigital.relateddigital_android.databinding.FragmentJackpotCodeBannerBinding
 import com.relateddigital.relateddigital_android.inapp.FontFamily
-import com.relateddigital.relateddigital_android.model.JackpotExtendedProps
+import com.relateddigital.relateddigital_android.model.SlotMachineExtendedProps
 import com.relateddigital.relateddigital_android.util.AppUtils
 import java.util.*
 
 /**
  * A simple [Fragment] subclass.
- * Use the [JackpotCodeBannerFragment.newInstance] factory method to
+ * Use the [SlotMachineCodeBannerFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
-class JackpotCodeBannerFragment : Fragment() {
+class SlotMachineCodeBannerFragment : Fragment() {
     companion object {
         private const val LOG_TAG = "JackpotBanner"
 
@@ -45,10 +45,10 @@ class JackpotCodeBannerFragment : Fragment() {
          * @return A new instance of fragment JackpotCodeBannerFragment.
          */
         fun newInstance(
-            extendedProps: JackpotExtendedProps,
+            extendedProps: SlotMachineExtendedProps,
             code: String
-        ): JackpotCodeBannerFragment {
-            val fragment = JackpotCodeBannerFragment()
+        ): SlotMachineCodeBannerFragment {
+            val fragment = SlotMachineCodeBannerFragment()
             val args = Bundle()
             args.putSerializable(ARG_PARAM1, extendedProps)
             args.putString(ARG_PARAM2, code)
@@ -57,13 +57,13 @@ class JackpotCodeBannerFragment : Fragment() {
         }
     }
 
-    private var mExtendedProps: JackpotExtendedProps? = null
+    private var mExtendedProps: SlotMachineExtendedProps? = null
     private var bannerCode: String? = null
     private lateinit var binding: FragmentJackpotCodeBannerBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mExtendedProps = requireArguments().getSerializable(ARG_PARAM1) as JackpotExtendedProps
+        mExtendedProps = requireArguments().getSerializable(ARG_PARAM1) as SlotMachineExtendedProps
         bannerCode = requireArguments().getString(ARG_PARAM2)
         if (bannerCode.isNullOrEmpty()) {
             endFragment()
@@ -195,7 +195,7 @@ class JackpotCodeBannerFragment : Fragment() {
     private fun endFragment() {
         if (activity != null) {
             requireActivity().supportFragmentManager.beginTransaction()
-                .remove(this@JackpotCodeBannerFragment).commit()
+                .remove(this@SlotMachineCodeBannerFragment).commit()
         }
     }
 

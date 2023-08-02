@@ -1,4 +1,4 @@
-package com.relateddigital.relateddigital_android.inapp.jackpot
+package com.relateddigital.relateddigital_android.inapp.slotmachine
 
 import android.annotation.SuppressLint
 import android.os.Build
@@ -14,19 +14,18 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
 import com.relateddigital.relateddigital_android.R
 import com.relateddigital.relateddigital_android.constants.Constants
-import com.relateddigital.relateddigital_android.inapp.jackpot.*
 
-class JackpotWebDialogFragment : DialogFragment() {
+class SlotMachineWebDialogFragment: DialogFragment() {
     private var webView: WebView? = null
     private var mResponse: String? = null
     private var baseUrl: String? = ""
     private var htmlString: String? = ""
     private var mIsRotation = false
-    private lateinit var mListener: JackpotCompleteInterface
-    private lateinit var mCopyToClipboardInterface: JackpotCopyToClipboardInterface
-    private lateinit var mShowCodeInterface: JackpotShowCodeInterface
+    private lateinit var mListener: SlotMachineCompleteInterface
+    private lateinit var mCopyToClipboardInterface: SlotMachineCopyToClipboardInterface
+    private lateinit var mShowCodeInterface: SlotMachineShowCodeInterface
 
-    fun display(fragmentManagerLoc: FragmentManager?): JackpotWebDialogFragment {
+    fun display(fragmentManagerLoc: FragmentManager?): SlotMachineWebDialogFragment {
         val ft = fragmentManagerLoc?.beginTransaction()
         ft?.add(this, TAG)
         ft?.commitAllowingStateLoss()
@@ -50,8 +49,8 @@ class JackpotWebDialogFragment : DialogFragment() {
             baseUrl = requireArguments().getString("baseUrl")
             htmlString = requireArguments().getString("htmlString")
             mResponse = requireArguments().getString("response")
-            mJavaScriptInterface = JackpotJavaScriptInterface(this, mResponse!!)
-            mJavaScriptInterface!!.setJackpotListeners(mListener, mCopyToClipboardInterface, mShowCodeInterface)
+            mJavaScriptInterface = SlotMachineJavaScriptInterface(this, mResponse!!)
+            mJavaScriptInterface!!.setSlotMachineListeners(mListener, mCopyToClipboardInterface, mShowCodeInterface)
         }
     }
 
@@ -97,13 +96,13 @@ class JackpotWebDialogFragment : DialogFragment() {
                 return true
             }
         }
-    val javaScriptInterface: JackpotJavaScriptInterface?
+    val javaScriptInterface: SlotMachineJavaScriptInterface?
         get() = mJavaScriptInterface
 
-    fun setJackpotListeners(
-        listener: JackpotCompleteInterface,
-        copyToClipboardInterface: JackpotCopyToClipboardInterface,
-        showCodeInterface: JackpotShowCodeInterface
+    fun setSlotMachineListeners(
+        listener: SlotMachineCompleteInterface,
+        copyToClipboardInterface: SlotMachineCopyToClipboardInterface,
+        showCodeInterface: SlotMachineShowCodeInterface
     ) {
         mListener = listener
         mCopyToClipboardInterface = copyToClipboardInterface
@@ -117,14 +116,14 @@ class JackpotWebDialogFragment : DialogFragment() {
         private const val ARG_PARAM1 = "response"
         private const val ARG_PARAM2 = "baseUrl"
         private const val ARG_PARAM3 = "htmlString"
-        private var mJavaScriptInterface: JackpotJavaScriptInterface? = null
-        fun newInstance(baseUrl: String?, htmlString: String?, response: String?): JackpotWebDialogFragment {
-            val fragment = JackpotWebDialogFragment()
+        private var mJavaScriptInterface: SlotMachineJavaScriptInterface? = null
+        fun newInstance(baseUrl: String?, htmlString: String?, response: String?): SlotMachineWebDialogFragment {
+            val fragment = SlotMachineWebDialogFragment()
             val args = Bundle()
             args.putString(ARG_PARAM1, response)
             args.putString(ARG_PARAM2, baseUrl)
             args.putString(ARG_PARAM3, htmlString)
-            mJavaScriptInterface = JackpotJavaScriptInterface(fragment, response!!)
+            mJavaScriptInterface = SlotMachineJavaScriptInterface(fragment, response!!)
             fragment.arguments = args
             return fragment
         }

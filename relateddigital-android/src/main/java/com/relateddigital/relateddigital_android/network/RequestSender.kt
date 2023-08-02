@@ -15,6 +15,7 @@ import com.relateddigital.relateddigital_android.inapp.choosefavorite.ChooseFavo
 import com.relateddigital.relateddigital_android.inapp.findtowin.FindToWinActivity
 import com.relateddigital.relateddigital_android.inapp.giftbox.GiftBoxActivity
 import com.relateddigital.relateddigital_android.inapp.giftcatch.GiftCatchActivity
+import com.relateddigital.relateddigital_android.inapp.slotmachine.SlotMachineActivity
 import com.relateddigital.relateddigital_android.inapp.mailsubsform.MailSubscriptionFormHalfFragment
 import com.relateddigital.relateddigital_android.inapp.notification.InAppNotificationFragment
 import com.relateddigital.relateddigital_android.inapp.scratchtowin.ScratchToWinActivity
@@ -357,6 +358,18 @@ object RequestSender {
                                             val findToWinModel: FindToWin =
                                                 actionsResponse.mFindToWin!![0]
                                             intent.putExtra("find-to-win-data", findToWinModel)
+                                            currentRequest.parent!!.startActivity(intent)
+                                        }
+                                        !actionsResponse.mSlotMachine.isNullOrEmpty() -> {
+                                            ActivityUtils.parentActivity = currentRequest.parent
+                                            val intent =
+                                                Intent(
+                                                    currentRequest.parent,
+                                                    SlotMachineActivity::class.java
+                                                )
+                                            val slotMachineModel: SlotMachine =
+                                                actionsResponse.mSlotMachine!![0]
+                                            intent.putExtra("slotMachine-data", slotMachineModel)
                                             currentRequest.parent!!.startActivity(intent)
                                         }
                                         !actionsResponse.mAppBanner.isNullOrEmpty() -> {

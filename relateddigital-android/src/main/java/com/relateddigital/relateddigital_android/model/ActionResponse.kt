@@ -34,6 +34,9 @@ class ActionResponse : Serializable {
     @SerializedName("GiftBox")
     var mGiftBox: List<GiftBox>? = null
 
+    @SerializedName("SlotMachine")
+    var mSlotMachine: List<SlotMachine>? = null
+
     @SerializedName("ChooseFavorite")
     var mChooseFavoriteList: List<ChooseFavorite>? = null
 

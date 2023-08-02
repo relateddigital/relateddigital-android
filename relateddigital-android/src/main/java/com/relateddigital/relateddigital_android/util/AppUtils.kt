@@ -779,31 +779,31 @@ object AppUtils {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-    fun createJackpotCustomFontFiles(
+    fun createSlotMachineCustomFontFiles(
         context: Context,
         jsonStr: String?,
         jsStr: String
     ): ArrayList<String?>? {
         var result: ArrayList<String?>? = null
-        val jackpotModel: Jackpot?
-        val extendedProps: JackpotExtendedProps?
+        val slotMachineModel: SlotMachine?
+        val extendedProps: SlotMachineExtendedProps?
         val baseUrlPath = "file://" + context.filesDir.absolutePath + "/"
         try {
-            jackpotModel = Gson().fromJson(jsonStr, Jackpot::class.java)
+            slotMachineModel = Gson().fromJson(jsonStr, SlotMachine::class.java)
             extendedProps = Gson().fromJson(
-                URI(jackpotModel!!.actiondata!!.extendedProps).path,
-                JackpotExtendedProps::class.java
+                URI(slotMachineModel!!.actiondata!!.extendedProps).path,
+                SlotMachineExtendedProps::class.java
             )
         } catch (e: java.lang.Exception) {
-            Log.e("Jackpot", "Extended properties could not be parsed properly!")
+            Log.e("SlotMachine", "Extended properties could not be parsed properly!")
             return null
         }
-        if (jackpotModel == null || extendedProps == null) {
+        if (slotMachineModel == null || extendedProps == null) {
             return null
         }
         val fontFamily: String = extendedProps.fontFamily ?: return null
 
-        val htmlStr: String = writeHtmlToFile(context, "jackpot", jsStr)
+        val htmlStr: String = writeHtmlToFile(context, "slotMachine", jsStr)
 
         if (fontFamily == "custom") {
             val fontExtension = getFontNameWithExtension(
@@ -816,7 +816,7 @@ object AppUtils {
                     extendedProps.customFontFamilyAndroid!!,
                     fontExtension
                 )
-                jackpotModel.fontFiles.add(fontExtension)
+                slotMachineModel.fontFiles.add(fontExtension)
             }
         }
 
@@ -824,7 +824,7 @@ object AppUtils {
             result = ArrayList()
             result.add(baseUrlPath)
             result.add(htmlStr)
-            result.add(Gson().toJson(jackpotModel, Jackpot::class.java))
+            result.add(Gson().toJson(slotMachineModel, SlotMachine::class.java))
         }
         return result
     }

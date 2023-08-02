@@ -1,4 +1,4 @@
-package com.relateddigital.relateddigital_android.inapp.jackpot
+package com.relateddigital.relateddigital_android.inapp.slotmachine
 
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -17,12 +17,8 @@ import com.relateddigital.relateddigital_android.RelatedDigital
 import com.relateddigital.relateddigital_android.api.ApiMethods
 import com.relateddigital.relateddigital_android.api.JSApiClient
 import com.relateddigital.relateddigital_android.constants.Constants
-import com.relateddigital.relateddigital_android.inapp.jackpot.JackpotCompleteInterface
-import com.relateddigital.relateddigital_android.inapp.jackpot.JackpotCopyToClipboardInterface
-import com.relateddigital.relateddigital_android.inapp.jackpot.JackpotShowCodeInterface
-import com.relateddigital.relateddigital_android.inapp.jackpot.*
-import com.relateddigital.relateddigital_android.model.Jackpot
-import com.relateddigital.relateddigital_android.model.JackpotExtendedProps
+import com.relateddigital.relateddigital_android.model.SlotMachine
+import com.relateddigital.relateddigital_android.model.SlotMachineExtendedProps
 import com.relateddigital.relateddigital_android.util.ActivityUtils
 import com.relateddigital.relateddigital_android.util.AppUtils
 import okhttp3.ResponseBody
@@ -32,20 +28,20 @@ import retrofit2.Response
 import java.net.URI
 import java.util.HashMap
 
-class JackpotActivity : FragmentActivity(), JackpotCompleteInterface,
-    JackpotCopyToClipboardInterface, JackpotShowCodeInterface {
+class SlotMachineActivity : FragmentActivity(), SlotMachineCompleteInterface,
+    SlotMachineCopyToClipboardInterface, SlotMachineShowCodeInterface {
     private var jsonStr: String? = ""
-    private var response: Jackpot? = null
-    private var jackpotPromotionCode = ""
+    private var response: SlotMachine? = null
+    private var slotMachinePromotionCode = ""
     private var link = ""
     private lateinit var activity: FragmentActivity
-    private lateinit var completeListener: JackpotCompleteInterface
-    private lateinit var copyToClipboardListener: JackpotCopyToClipboardInterface
-    private lateinit var showCodeListener: JackpotShowCodeInterface
-    private var jackpotJsStr = ""
+    private lateinit var completeListener: SlotMachineCompleteInterface
+    private lateinit var copyToClipboardListener: SlotMachineCopyToClipboardInterface
+    private lateinit var showCodeListener: SlotMachineShowCodeInterface
+    private var slotMachineJsStr = ""
 
     companion object {
-        private const val LOG_TAG = "Jackpot"
+        private const val LOG_TAG = "SlotMachine"
     }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
@@ -59,49 +55,49 @@ class JackpotActivity : FragmentActivity(), JackpotCompleteInterface,
             ?.create(ApiMethods::class.java)
         val headers = HashMap<String, String>()
         headers[Constants.USER_AGENT_REQUEST_KEY] = RelatedDigital.getRelatedDigitalModel(this).getUserAgent()
-        val call: Call<ResponseBody> = jsApi?.getJackpotJsFile(headers)!!
+        val call: Call<ResponseBody> = jsApi?.getSlotMachineJsFile(headers)!!
         call.enqueue(object : Callback<ResponseBody?> {
             override fun onResponse(
                 call: Call<ResponseBody?>,
                 responseJs: Response<ResponseBody?>
             ) {
                 if (responseJs.isSuccessful) {
-                    Log.i(LOG_TAG, "Getting jackpot.js is successful!")
-                    jackpotJsStr = responseJs.body()!!.string()
+                    Log.i(LOG_TAG, "Getting slotMachine.js is successful!")
+                    slotMachineJsStr = responseJs.body()!!.string()
 
-                    if(jackpotJsStr.isEmpty()) {
-                        Log.e(LOG_TAG, "Getting jackpot.js failed!")
+                    if(slotMachineJsStr.isEmpty()) {
+                        Log.e(LOG_TAG, "Getting slotMachine.js failed!")
                         finish()
                     } else {
                         if (savedInstanceState != null) {
-                            jsonStr = savedInstanceState.getString("jackpot-json-str", "")
+                            jsonStr = savedInstanceState.getString("slotMachine-json-str", "")
                         } else {
                             val intent = intent
-                            if (intent != null && intent.hasExtra("jackpot-data")) {
-                                response = intent.getSerializableExtra("jackpot-data") as Jackpot?
+                            if (intent != null && intent.hasExtra("slotMachine-data")) {
+                                response = intent.getSerializableExtra("slotMachine-data") as SlotMachine?
                                 if (response != null) {
                                     jsonStr = Gson().toJson(response)
                                 } else {
-                                    Log.e(LOG_TAG, "Could not get the jackpot data properly!")
+                                    Log.e(LOG_TAG, "Could not get the slotMachine data properly!")
                                     finish()
                                 }
                             } else {
-                                Log.e(LOG_TAG, "Could not get the jackpot data properly!")
+                                Log.e(LOG_TAG, "Could not get the slotMachine data properly!")
                                 finish()
                             }
                         }
 
                         if (jsonStr != null && jsonStr != "") {
-                            val res = AppUtils.createJackpotCustomFontFiles(
-                                activity, jsonStr, jackpotJsStr
+                            val res = AppUtils.createSlotMachineCustomFontFiles(
+                                activity, jsonStr, slotMachineJsStr
                             )
                             if(res == null) {
-                                Log.e(LOG_TAG, "Could not get the jackpot data properly!")
+                                Log.e(LOG_TAG, "Could not get the slotMachine data properly!")
                                 finish()
                             } else {
-                                val webViewDialogFragment: JackpotWebDialogFragment =
-                                    JackpotWebDialogFragment.newInstance(res[0], res[1], res[2])
-                                webViewDialogFragment.setJackpotListeners(completeListener, copyToClipboardListener, showCodeListener)
+                                val webViewDialogFragment: SlotMachineWebDialogFragment =
+                                    SlotMachineWebDialogFragment.newInstance(res[0], res[1], res[2])
+                                webViewDialogFragment.setSlotMachineListeners(completeListener, copyToClipboardListener, showCodeListener)
                                 if (!isFinishing && !supportFragmentManager.isDestroyed) {
                                     webViewDialogFragment.display(supportFragmentManager)
                                 } else {
@@ -110,50 +106,50 @@ class JackpotActivity : FragmentActivity(), JackpotCompleteInterface,
                                 }
                             }
                         } else {
-                            Log.e(LOG_TAG, "Could not get the jackpot data properly!")
+                            Log.e(LOG_TAG, "Could not get the slotMachine data properly!")
                             finish()
                         }
                     }
                 } else {
-                    Log.e(LOG_TAG, "Getting jackpot.js failed!")
+                    Log.e(LOG_TAG, "Getting slotMachine.js failed!")
                     finish()
                 }
             }
             override fun onFailure(call: Call<ResponseBody?>, t: Throwable) {
-                Log.e(LOG_TAG, "Getting jackpot.js failed! - ${t.message}")
+                Log.e(LOG_TAG, "Getting slotMachine.js failed! - ${t.message}")
                 finish()
             }
         })
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
-        outState.putString("jackpot-json-str", jsonStr)
+        outState.putString("slotMachine-json-str", jsonStr)
         super.onSaveInstanceState(outState)
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        if (jackpotPromotionCode.isNotEmpty()) {
+        if (slotMachinePromotionCode.isNotEmpty()) {
             try {
                 val extendedProps = Gson().fromJson(
                     URI(response!!.actiondata!!.extendedProps).path,
-                    JackpotExtendedProps::class.java
+                    SlotMachineExtendedProps::class.java
                 )
 
                 if (!extendedProps.promocodeBannerButtonLabel.isNullOrEmpty()) {
                     if(ActivityUtils.parentActivity != null) {
-                        val jackpotCodeBannerFragment =
-                            JackpotCodeBannerFragment.newInstance(extendedProps, jackpotPromotionCode)
+                        val slotMachineCodeBannerFragment =
+                            SlotMachineCodeBannerFragment.newInstance(extendedProps, slotMachinePromotionCode)
 
                         val transaction: FragmentTransaction =
                             (ActivityUtils.parentActivity as FragmentActivity).supportFragmentManager.beginTransaction()
-                        transaction.replace(android.R.id.content, jackpotCodeBannerFragment)
+                        transaction.replace(android.R.id.content, slotMachineCodeBannerFragment)
                         transaction.commit()
                         ActivityUtils.parentActivity = null
                     }
                 }
             } catch (e: Exception) {
-                Log.e(LOG_TAG, "JackpotCodeBanner : " + e.message)
+                Log.e(LOG_TAG, "slotMachineCodeBanner : " + e.message)
             }
         }
 
@@ -191,6 +187,6 @@ class JackpotActivity : FragmentActivity(), JackpotCompleteInterface,
     }
 
     override fun onCodeShown(code: String) {
-        jackpotPromotionCode = code
+        slotMachinePromotionCode = code
     }
 }

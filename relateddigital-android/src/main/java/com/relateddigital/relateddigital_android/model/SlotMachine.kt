@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName
 import java.io.Serializable
 import java.util.ArrayList
 
-class Jackpot : Serializable {
+class SlotMachine : Serializable {
     var fontFiles = ArrayList<String>()
 
     @SerializedName("actid")
@@ -17,5 +17,5 @@ class Jackpot : Serializable {
     var actiontype: String? = null
 
     @SerializedName("actiondata")
-    var actiondata: JackpotActionData? = null
+    var actiondata: SlotMachineActionData? = null
 }

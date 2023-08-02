@@ -1,25 +1,25 @@
-package com.relateddigital.relateddigital_android.inapp.jackpot
+package com.relateddigital.relateddigital_android.inapp.slotmachine
 
 import android.util.Log
 import android.webkit.JavascriptInterface
 import com.google.gson.Gson
-import com.relateddigital.relateddigital_android.model.Jackpot
+import com.relateddigital.relateddigital_android.model.SlotMachine
 import com.relateddigital.relateddigital_android.model.MailSubReport
 import com.relateddigital.relateddigital_android.network.requestHandler.InAppActionClickRequest
 import com.relateddigital.relateddigital_android.network.requestHandler.SubsJsonRequest
 
-class JackpotJavaScriptInterface  internal constructor(webViewDialogFragment: JackpotWebDialogFragment,
-                                                       @get:JavascriptInterface val response: String) {
-    var mWebViewDialogFragment: JackpotWebDialogFragment = webViewDialogFragment
-    private lateinit var mListener: JackpotCompleteInterface
-    private lateinit var mCopyToClipboardInterface: JackpotCopyToClipboardInterface
-    private lateinit var mShowCodeInterface: JackpotShowCodeInterface
-    private val jackpotModel: Jackpot = Gson().fromJson(this.response, Jackpot::class.java)
+class SlotMachineJavaScriptInterface  internal constructor(webViewDialogFragment: SlotMachineWebDialogFragment,
+                                                           @get:JavascriptInterface val response: String) {
+    var mWebViewDialogFragment: SlotMachineWebDialogFragment = webViewDialogFragment
+    private lateinit var mListener: SlotMachineCompleteInterface
+    private lateinit var mCopyToClipboardInterface: SlotMachineCopyToClipboardInterface
+    private lateinit var mShowCodeInterface: SlotMachineShowCodeInterface
+    private val slotMachineModel: SlotMachine = Gson().fromJson(this.response, SlotMachine::class.java)
 
     private var subEmail = ""
 
     /**
-     * This method closes JackpotActivity
+     * This method closes SlotMachineActivity
      */
     @JavascriptInterface
     fun close() {
@@ -48,11 +48,11 @@ class JackpotJavaScriptInterface  internal constructor(webViewDialogFragment: Ja
     fun subscribeEmail(email: String?) {
         if (!email.isNullOrEmpty()) {
             subEmail = email
-            SubsJsonRequest.createSubsJsonRequest(mWebViewDialogFragment.requireContext(), jackpotModel.actiondata!!.type!!,
-                jackpotModel.actid.toString(), jackpotModel.actiondata!!.auth!!,
+            SubsJsonRequest.createSubsJsonRequest(mWebViewDialogFragment.requireContext(), slotMachineModel.actiondata!!.type!!,
+                slotMachineModel.actid.toString(), slotMachineModel.actiondata!!.auth!!,
                 email)
         } else {
-            Log.e("Jackpot : ", "Email entered is not valid!")
+            Log.e("SlotMachine : ", "Email entered is not valid!")
         }
     }
 
@@ -65,10 +65,10 @@ class JackpotJavaScriptInterface  internal constructor(webViewDialogFragment: Ja
         var report: MailSubReport?
         try {
             report = MailSubReport()
-            report.impression = jackpotModel.actiondata!!.report!!.impression
-            report.click = jackpotModel.actiondata!!.report!!.click
+            report.impression = slotMachineModel.actiondata!!.report!!.impression
+            report.click = slotMachineModel.actiondata!!.report!!.click
         } catch (e: Exception) {
-            Log.e("Jackpot : ", "There is no report to send!")
+            Log.e("SlotMachine : ", "There is no report to send!")
             e.printStackTrace()
             report = null
         }
@@ -87,10 +87,10 @@ class JackpotJavaScriptInterface  internal constructor(webViewDialogFragment: Ja
         mShowCodeInterface.onCodeShown(code)
     }
 
-    fun setJackpotListeners(
-        listener: JackpotCompleteInterface,
-        copyToClipboardInterface: JackpotCopyToClipboardInterface,
-        showCodeInterface: JackpotShowCodeInterface
+    fun setSlotMachineListeners(
+        listener: SlotMachineCompleteInterface,
+        copyToClipboardInterface: SlotMachineCopyToClipboardInterface,
+        showCodeInterface: SlotMachineShowCodeInterface
     ) {
         mListener = listener
         mCopyToClipboardInterface = copyToClipboardInterface
