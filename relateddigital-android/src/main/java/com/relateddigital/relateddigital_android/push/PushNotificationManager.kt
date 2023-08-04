@@ -203,16 +203,19 @@ class PushNotificationManager {
             NotificationCompat.PRIORITY_DEFAULT
         }
         // TODO : When backend ready edit
-        /*val actionIntent = PendingIntent.getActivity(
+
+        val linkUri = Uri.parse(pushMessage?.actions?.get(0)?.Url) // Burada hedef URL'yi belirtin
+        val actionIntent = PendingIntent.getActivity(
             context,
             0,
-            Intent(context, YourActionActivity::class.java),
+            Intent(Intent.ACTION_VIEW, linkUri),
             PendingIntent.FLAG_UPDATE_CURRENT
         )
 
 
-            val actionIcon = R.drawable.notification_button // Icon to use in action button (drawable)
-            val actionTitle = "Open" // Title to show on action button
+
+            val actionIcon = pushMessage?.actions?.get(0)?.Icon!!.toInt() // Icon to use in action button (drawable)
+            val actionTitle = pushMessage?.actions?.get(0)?.Title  // Title to show on action button
 
 
             val action = NotificationCompat.Action.Builder(
@@ -220,7 +223,7 @@ class PushNotificationManager {
                 actionTitle,
                 actionIntent
             ).build()
-            */
+
         val style = if (pushImage == null) NotificationCompat.BigTextStyle()
             .bigText(pushMessage.message) else NotificationCompat.BigPictureStyle()
             .bigPicture(pushImage).setSummaryText(pushMessage.message)
@@ -236,7 +239,7 @@ class PushNotificationManager {
                 .setPriority(importance)
                 .setContentText(pushMessage.message)
                 // TODO !!
-                //.addAction(action)
+                .addAction(action)
         setNumber(mBuilder, context)
         setNotificationSmallIcon(mBuilder, context)
         if (pushMessage.sound != null) {

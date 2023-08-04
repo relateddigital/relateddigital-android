@@ -2,6 +2,7 @@ package com.relateddigital.relateddigital_android.model
 
 import android.content.Context
 import android.os.Bundle
+import com.google.gson.annotations.SerializedName
 import com.relateddigital.relateddigital_android.util.LogUtils
 import org.json.JSONArray
 import org.json.JSONException
@@ -40,6 +41,8 @@ class Message : Serializable {
         private set
     private val params: MutableMap<String, String> = HashMap()
     private var elements: ArrayList<Element>? = null
+   // private var actions: ArrayList<Actions>? = null
+    @SerializedName("actions") var actions: ArrayList<Actions?>? = null
     var loginID: String? = null
 
     constructor(context: Context, bundle: Map<String, String?>) {
