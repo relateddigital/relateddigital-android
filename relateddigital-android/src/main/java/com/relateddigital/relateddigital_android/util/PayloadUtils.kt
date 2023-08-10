@@ -165,6 +165,8 @@ object PayloadUtils {
                     "yyyy-MM-dd HH:mm:ss",
                     Locale.getDefault()
                 ).format(Date())
+            message.status = "D"
+            message.openDate = ""
             jsonArray!!.put(JSONObject(Gson().toJson(message)))
             jsonArray
         } catch (e: Exception) {
@@ -190,6 +192,8 @@ object PayloadUtils {
                     "yyyy-MM-dd HH:mm:ss",
                     Locale.getDefault()
                 ).format(Date())
+            message.status = "D"
+            message.openDate = ""
             jsonArray!!.put(JSONObject(Gson().toJson(message)))
             jsonArray
         } catch (e: Exception) {
@@ -268,6 +272,8 @@ object PayloadUtils {
                     "yyyy-MM-dd HH:mm:ss",
                     Locale.getDefault()
                 ).format(Date())
+            message.status = "D"
+            message.openDate = ""
             jsonArray.put(JSONObject(Gson().toJson(message)))
             jsonObject.put(Constants.PAYLOAD_SP_ARRAY_KEY, jsonArray)
             SharedPref.writeString(context, Constants.PAYLOAD_SP_KEY, jsonObject.toString())
@@ -294,6 +300,8 @@ object PayloadUtils {
                     "yyyy-MM-dd HH:mm:ss",
                     Locale.getDefault()
                 ).format(Date())
+            message.status = "D"
+            message.openDate = ""
             jsonArray.put(JSONObject(Gson().toJson(message)))
             jsonObject.put(Constants.PAYLOAD_SP_ARRAY_ID_KEY, jsonArray)
             SharedPref.writeString(context, Constants.PAYLOAD_SP_ID_KEY, jsonObject.toString())
@@ -309,6 +317,48 @@ object PayloadUtils {
             Log.e(LOG_TAG, e.message!!)
         }
     }
+
+    fun updatePayload(context: Context, pushId: String?) {
+        try {
+            val jsonString = SharedPref.readString(context, Constants.PAYLOAD_SP_KEY, "")
+            val jsonObject = JSONObject(jsonString)
+
+            val payloadsArray = jsonObject.optJSONArray(Constants.PAYLOAD_SP_ARRAY_KEY)
+
+            if (payloadsArray != null) {
+                for (i in 0 until payloadsArray.length()) {
+                    val payloadObject = payloadsArray.getJSONObject(i)
+                    val existingPushId = payloadObject.optString("pushId", "")
+
+                    if (existingPushId == pushId) {
+                        // Güncelleme işlemlerini yap
+                        payloadObject.put("status", "O")
+                        payloadObject.put("openDate", SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date()))
+
+                        // Güncellenmiş JSON'ı kaydet
+                        SharedPref.writeString(context, Constants.PAYLOAD_SP_KEY, jsonObject.toString())
+                        return // Güncelleme işlemi tamamlandı, fonksiyondan çık
+                    }
+                }
+
+                // Eğer bu noktaya gelinirse, belirtilen pushId ile bir payload bulunamamıştır.
+                Log.e(LOG_TAG, "Payload with pushId $pushId not found!")
+            } else {
+                Log.e(LOG_TAG, "Payload array is null or empty!")
+            }
+        } catch (e: Exception) {
+            val element = Throwable().stackTrace[0]
+            LogUtils.formGraylogModel(
+                context,
+                "e",
+                "Updating push message string : " + e.message,
+                element.className + "/" + element.methodName + "/" + element.lineNumber
+            )
+            Log.e(LOG_TAG, "Could not update the push message!")
+            Log.e(LOG_TAG, e.message!!)
+        }
+    }
+
 
     private fun compareDates(context: Context, str1: String, str2: String): Boolean {
         var res = false

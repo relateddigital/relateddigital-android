@@ -10,6 +10,7 @@ import com.relateddigital.relateddigital_android.model.Message
 import com.relateddigital.relateddigital_android.network.RequestHandler
 import com.relateddigital.relateddigital_android.network.requestHandler.RetentionRequest
 import com.relateddigital.relateddigital_android.push.RetentionType
+import com.relateddigital.relateddigital_android.util.PayloadUtils
 
 class CarouselEventReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
@@ -39,6 +40,7 @@ class CarouselEventReceiver : BroadcastReceiver() {
             context, RetentionType.OPEN,
             message.pushId, message.emPushSp
         )
+        PayloadUtils.updatePayload(context, message.pushId)
     }
 
     companion object {

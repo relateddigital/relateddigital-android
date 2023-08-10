@@ -12,6 +12,10 @@ import java.util.HashMap
 
 class Message : Serializable {
     var date: String?
+
+    var openDate: String?
+
+    var status: String?
     var mediaUrl: String?
         private set
     var altUrl: String?
@@ -53,6 +57,8 @@ class Message : Serializable {
             }
         }
         date = bundle["date"]
+        openDate = bundle["openDate"]
+        status = bundle["status"]
         mediaUrl = bundle["mediaUrl"]
         pushId = bundle["pushId"]
         url = bundle["url"]
@@ -112,6 +118,8 @@ class Message : Serializable {
             params[key] = value.toString()
         }
         date = bundle.getString("date")
+        openDate = bundle.getString("openDate")
+        status = bundle.getString("status")
         mediaUrl = bundle.getString("mediaUrl")
         pushId = bundle.getString("pushId")
         url = bundle.getString("url")

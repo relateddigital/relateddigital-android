@@ -972,6 +972,7 @@ object RelatedDigital {
                 context, RetentionType.OPEN,
                 message.pushId, message.emPushSp
             )
+            PayloadUtils.updatePayload(context, message.pushId)
         } else {
             Log.e(LOG_TAG, "Push notification is not enabled." +
                     "Call RelatedDigital.setIsPushNotificationEnabled() first")
