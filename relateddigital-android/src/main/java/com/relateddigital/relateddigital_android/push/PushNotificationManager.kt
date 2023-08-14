@@ -202,8 +202,28 @@ class PushNotificationManager {
         } else {
             NotificationCompat.PRIORITY_DEFAULT
         }
+        // TODO : When backend ready edit
+
+       /* val linkUri = Uri.parse("https://www.boun.edu.tr/") // Define target Url here
+        val actionIntent = PendingIntent.getActivity(
+            context,
+            0,
+            Intent(Intent.ACTION_VIEW, linkUri),
+            PendingIntent.FLAG_UPDATE_CURRENT
+        )
 
 
+
+        val actionIcon = R.drawable.ic_carousel_icon// Icon to use in action button (drawable)
+        val actionTitle = "Title" // Title to show on action button
+
+
+        val action = NotificationCompat.Action.Builder(
+            actionIcon,
+            actionTitle,
+            actionIntent
+        ).build()
+*/
         val style = if (pushImage == null) NotificationCompat.BigTextStyle()
             .bigText(pushMessage.message) else NotificationCompat.BigPictureStyle()
             .bigPicture(pushImage).setSummaryText(pushMessage.message)
@@ -218,7 +238,8 @@ class PushNotificationManager {
                 .setDefaults(Notification.DEFAULT_VIBRATE or Notification.FLAG_SHOW_LIGHTS)
                 .setPriority(importance)
                 .setContentText(pushMessage.message)
-
+                // TODO !!
+                //.addAction(action)
         setNumber(mBuilder, context)
         setNotificationSmallIcon(mBuilder, context)
         if (pushMessage.sound != null) {
