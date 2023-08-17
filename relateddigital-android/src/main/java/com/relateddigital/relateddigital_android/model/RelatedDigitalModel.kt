@@ -656,6 +656,21 @@ fun setUtmTerm(context: Context, utmTerm: String) {
             if (model.getExVisitorId() != null) {
                 this.exVisitorId = model.getExVisitorId()
             }
+            if (model.getUtmCampaign() != null) {
+                this.utmCampaign = model.getUtmCampaign()
+            }
+            if (model.getUtmContent() != null) {
+                this.utmContent = model.getUtmContent()
+            }
+            if (model.getUtmSource() != null) {
+                this.utmSource= model.getUtmSource()
+            }
+            if (model.getUtmMedium() != null) {
+                this.utmMedium = model.getUtmMedium()
+            }
+            if (model.getUtmTerm() != null) {
+                this.utmTerm = model.getUtmTerm()
+            }
             if (model.getToken() != null) {
                 this.token = model.getToken()
             }
@@ -886,6 +901,31 @@ fun setUtmTerm(context: Context, utmTerm: String) {
                 null
             } else {
                 fromModel.getCookie()
+            }
+            utmCampaign = if (fromModel.getUtmCampaign() == null) {
+                null
+            } else {
+                fromModel.getUtmCampaign()
+            }
+            utmContent = if (fromModel.getUtmContent() == null) {
+                null
+            } else {
+                fromModel.getUtmContent()
+            }
+            utmMedium = if (fromModel.getUtmMedium() == null) {
+                null
+            } else {
+                fromModel.getUtmMedium()
+            }
+            utmTerm = if (fromModel.getUtmTerm() == null) {
+                null
+            } else {
+                fromModel.getUtmTerm()
+            }
+            utmSource = if (fromModel.getUtmSource() == null) {
+                null
+            } else {
+                fromModel.getUtmSource()
             }
             extra = HashMap()
             for (i in fromModel.getExtra().keys.toTypedArray().indices) {
