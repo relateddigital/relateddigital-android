@@ -91,7 +91,12 @@ object RelatedDigital {
             userAgent = AppUtils.getUserAgent(),
             cookieId = AppUtils.getCookieId(context),
             visitorData = "",
-            visitData = ""
+            visitData = "",
+            utmCampaign = AppUtils.getUtmCampaign(context),
+            utmMedium = AppUtils.getUtmMedium(context),
+            utmSource = AppUtils.getUtmSource(context),
+            utmContent = AppUtils.getUtmContent(context),
+            utmTerm = AppUtils.getUtmTerm(context)
         )
     }
 
@@ -465,6 +470,107 @@ object RelatedDigital {
     }
 
     @JvmStatic
+    fun setUtmCampaign(context: Context, utmCampaign: String) {
+        if (model != null) {
+            model!!.setUtmCampaign(context, utmCampaign)
+        } else {
+            if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
+                model = Gson().fromJson(
+                    SharedPref.readString(
+                        context,
+                        Constants.RELATED_DIGITAL_MODEL_KEY
+                    ), RelatedDigitalModel::class.java
+                )
+                model!!.setUtmCampaign(context, utmCampaign)
+            } else {
+                model = createInitialModel(context)
+                model!!.setUtmCampaign(context, utmCampaign)
+            }
+        }
+    }
+
+    @JvmStatic
+    fun setUtmMedium(context: Context, utmMedium: String) {
+        if (model != null) {
+            model!!.setUtmMedium(context, utmMedium)
+        } else {
+            if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
+                model = Gson().fromJson(
+                    SharedPref.readString(
+                        context,
+                        Constants.RELATED_DIGITAL_MODEL_KEY
+                    ), RelatedDigitalModel::class.java
+                )
+                model!!.setUtmMedium(context, utmMedium)
+            } else {
+                model = createInitialModel(context)
+                model!!.setUtmMedium(context, utmMedium)
+            }
+        }
+    }
+
+    @JvmStatic
+    fun setUtmSource(context: Context, utmSource: String) {
+        if (model != null) {
+            model!!.setUtmSource(context, utmSource)
+        } else {
+            if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
+                model = Gson().fromJson(
+                    SharedPref.readString(
+                        context,
+                        Constants.RELATED_DIGITAL_MODEL_KEY
+                    ), RelatedDigitalModel::class.java
+                )
+                model!!.setUtmSource(context, utmSource)
+            } else {
+                model = createInitialModel(context)
+                model!!.setUtmSource(context, utmSource)
+            }
+        }
+    }
+
+    @JvmStatic
+    fun setUtmContent(context: Context, utmContent: String) {
+        if (model != null) {
+            model!!.setUtmContent(context, utmContent)
+        } else {
+            if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
+                model = Gson().fromJson(
+                    SharedPref.readString(
+                        context,
+                        Constants.RELATED_DIGITAL_MODEL_KEY
+                    ), RelatedDigitalModel::class.java
+                )
+                model!!.setUtmContent(context, utmContent)
+            } else {
+                model = createInitialModel(context)
+                model!!.setUtmContent(context, utmContent)
+            }
+        }
+    }
+
+    @JvmStatic
+    fun setUtmTerm(context: Context, utmTerm: String) {
+        if (model != null) {
+            model!!.setUtmTerm(context, utmTerm)
+        } else {
+            if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
+                model = Gson().fromJson(
+                    SharedPref.readString(
+                        context,
+                        Constants.RELATED_DIGITAL_MODEL_KEY
+                    ), RelatedDigitalModel::class.java
+                )
+                model!!.setUtmTerm(context, utmTerm)
+            } else {
+                model = createInitialModel(context)
+                model!!.setUtmTerm(context, utmTerm)
+            }
+        }
+    }
+
+
+    @JvmStatic
     fun setInAppButtonInterface(inAppButtonInterface: InAppButtonInterface?) {
         this.inAppButtonInterface = inAppButtonInterface
     }
@@ -803,6 +909,106 @@ object RelatedDigital {
     }
 
     @JvmStatic
+    fun getUtmCampaign(context: Context): String? {
+        return if (model != null) {
+            model!!.getUtmCampaign()
+        } else {
+            if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
+                model = Gson().fromJson(
+                    SharedPref.readString(
+                        context,
+                        Constants.RELATED_DIGITAL_MODEL_KEY
+                    ), RelatedDigitalModel::class.java
+                )
+                model!!.getUtmCampaign()
+            } else {
+                Log.e(LOG_TAG, "utmCampaign has never been set before!!")
+                ""
+            }
+        }
+    }
+
+    @JvmStatic
+    fun getUtmMedium(context: Context): String? {
+        return if (model != null) {
+            model!!.getUtmMedium()
+        } else {
+            if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
+                model = Gson().fromJson(
+                    SharedPref.readString(
+                        context,
+                        Constants.RELATED_DIGITAL_MODEL_KEY
+                    ), RelatedDigitalModel::class.java
+                )
+                model!!.getUtmMedium()
+            } else {
+                Log.e(LOG_TAG, "utmMedium has never been set before!!")
+                ""
+            }
+        }
+    }
+
+    @JvmStatic
+    fun getUtmSource(context: Context): String? {
+        return if (model != null) {
+            model!!.getUtmSource()
+        } else {
+            if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
+                model = Gson().fromJson(
+                    SharedPref.readString(
+                        context,
+                        Constants.RELATED_DIGITAL_MODEL_KEY
+                    ), RelatedDigitalModel::class.java
+                )
+                model!!.getUtmSource()
+            } else {
+                Log.e(LOG_TAG, "utmSource has never been set before!!")
+                ""
+            }
+        }
+    }
+
+    @JvmStatic
+    fun getUtmContent(context: Context): String? {
+        return if (model != null) {
+            model!!.getUtmContent()
+        } else {
+            if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
+                model = Gson().fromJson(
+                    SharedPref.readString(
+                        context,
+                        Constants.RELATED_DIGITAL_MODEL_KEY
+                    ), RelatedDigitalModel::class.java
+                )
+                model!!.getUtmContent()
+            } else {
+                Log.e(LOG_TAG, "utmContent has never been set before!!")
+                ""
+            }
+        }
+    }
+
+    @JvmStatic
+    fun getUtmTerm(context: Context): String? {
+        return if (model != null) {
+            model!!.getUtmTerm()
+        } else {
+            if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
+                model = Gson().fromJson(
+                    SharedPref.readString(
+                        context,
+                        Constants.RELATED_DIGITAL_MODEL_KEY
+                    ), RelatedDigitalModel::class.java
+                )
+                model!!.getUtmTerm()
+            } else {
+                Log.e(LOG_TAG, "utmTerm has never been set before!!")
+                ""
+            }
+        }
+    }
+
+    @JvmStatic
     fun getToken(context: Context): String {
         return if (model != null) {
             model!!.getToken()
@@ -895,7 +1101,12 @@ object RelatedDigital {
             userAgent = AppUtils.getUserAgent(),
             cookieId = AppUtils.getCookieId(context),
             visitorData = "",
-            visitData = ""
+            visitData = "",
+            utmCampaign = AppUtils.getUtmCampaign(context),
+            utmMedium = AppUtils.getUtmMedium(context),
+            utmSource = AppUtils.getUtmSource(context),
+            utmContent = AppUtils.getUtmContent(context),
+            utmTerm = AppUtils.getUtmTerm(context)
         )
         previousModel!!.copyFrom(context, model!!)
     }
@@ -980,12 +1191,12 @@ object RelatedDigital {
     }
 
     @JvmStatic
-    fun sendCampaignParameters(context: Context, properties: HashMap<String, String>) {
+    fun sendCampaignParameters(context: Context, properties: HashMap<String, String>, parent: Activity? = null) {
         if(properties.isEmpty()) {
             Log.e(LOG_TAG, "The map cannot be empty!")
             return
         } else {
-            customEvent(context, Constants.PAGE_NAME_REQUEST_VAL, properties)
+            customEvent(context, Constants.PAGE_NAME_REQUEST_VAL, properties, parent)
         }
     }
 

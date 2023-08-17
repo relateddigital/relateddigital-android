@@ -258,6 +258,47 @@ object RequestFormer {
                 }
                 properties.remove(Constants.APP_ID_REQUEST_KEY)
             }
+            if (properties.containsKey(Constants.UTM_CAMPAIGN)) {
+                if (properties[Constants.UTM_CAMPAIGN] != null) {
+                    model!!.setUtmCampaign(
+                        context,
+                        properties[Constants.UTM_CAMPAIGN]!!
+                    )
+                }
+            }
+            if (properties.containsKey(Constants.UTM_MEDIUM)) {
+                if (properties[Constants.UTM_MEDIUM] != null) {
+                    model!!.setUtmMedium(
+                        context,
+                        properties[Constants.UTM_MEDIUM]!!
+                    )
+                }
+            }
+            if (properties.containsKey(Constants.UTM_SOURCE)) {
+                if (properties[Constants.UTM_SOURCE] != null) {
+                    model!!.setUtmSource(
+                        context,
+                        properties[Constants.UTM_SOURCE]!!
+                    )
+                }
+            }
+            if (properties.containsKey(Constants.UTM_TERM)) {
+                if (properties[Constants.UTM_TERM] != null) {
+                    model!!.setUtmTerm(
+                        context,
+                        properties[Constants.UTM_TERM]!!
+                    )
+                }
+            }
+            if (properties.containsKey(Constants.UTM_CONTENT)) {
+                if (properties[Constants.UTM_CONTENT] != null) {
+                    model!!.setUtmContent(
+                        context,
+                        properties[Constants.UTM_CONTENT]!!
+                    )
+                }
+            }
+
         }
 
         try {
@@ -284,6 +325,12 @@ object RequestFormer {
         queryMap[Constants.PVIV_REQUEST_KEY] = mPviv.toString()
         queryMap[Constants.TVC_REQUEST_KEY] = mTvc.toString()
         queryMap[Constants.LVT_REQUEST_KEY] = mLvt.toString()
+        queryMap[Constants.UTM_CAMPAIGN] = model.getUtmCampaign()!!
+        queryMap[Constants.UTM_MEDIUM] = model.getUtmMedium()!!
+        queryMap[Constants.UTM_SOURCE] = model.getUtmSource()!!
+        queryMap[Constants.UTM_TERM] = model.getUtmTerm()!!
+        queryMap[Constants.UTM_CONTENT] = model.getUtmContent()!!
+
 
         if (properties != null) {
             for (i in properties.keys.indices) {
@@ -300,6 +347,26 @@ object RequestFormer {
 
         if (model.getExVisitorId().isNotEmpty()) {
             queryMap[Constants.EXVISITOR_ID_REQUEST_KEY] = model.getExVisitorId()
+        }
+
+        if (model.getUtmCampaign()!!.isNotEmpty()) {
+            queryMap[Constants.UTM_CAMPAIGN] = model.getUtmCampaign()!!
+        }
+
+        if (model.getUtmMedium()!!.isNotEmpty()) {
+            queryMap[Constants.UTM_MEDIUM] = model.getUtmMedium()!!
+        }
+
+        if (model.getUtmSource()!!.isNotEmpty()) {
+            queryMap[Constants.UTM_SOURCE] = model.getUtmSource()!!
+        }
+
+        if (model.getUtmTerm()!!.isNotEmpty()) {
+            queryMap[Constants.UTM_TERM] = model.getUtmTerm()!!
+        }
+
+        if (model.getUtmContent()!!.isNotEmpty()) {
+            queryMap[Constants.UTM_CONTENT] = model.getUtmContent()!!
         }
 
         if (model.getToken().isNotEmpty()) {

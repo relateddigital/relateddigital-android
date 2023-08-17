@@ -5,6 +5,7 @@ import android.content.Intent
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.*
 import com.google.gson.Gson
@@ -90,7 +91,13 @@ class PushNotificationActivity : AppCompatActivity() {
                         "Successful",
                         Toast.LENGTH_SHORT
                     ).show()
-                    // Make your implementation by using pushMessages here:
+                    for (i in 0 until pushMessages.count()) {
+                        pushMessages[i].pushId?.let { it1 -> Log.d("PushMesaj PushId", it1) }
+                        pushMessages[i].date?.let { it2 -> Log.d("PushMesaj Date", it2) }
+                        pushMessages[i].status?.let { it3 -> Log.d("PushMesaj Status", it3) }
+                        pushMessages[i].openDate?.let { it4 -> Log.d("PushMesaj OpenDate", it4) }
+                    }
+
                 }
 
                 override fun fail(errorMessage: String) {

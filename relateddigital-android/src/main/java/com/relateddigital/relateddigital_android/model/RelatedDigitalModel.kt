@@ -48,7 +48,12 @@ class RelatedDigitalModel(
         private var visitorData: String,
         private var visitData: String,
         private var cookie: LoadBalanceCookie? = null,
-        private var extra: HashMap<String, Any> = HashMap()
+        private var extra: HashMap<String, Any> = HashMap(),
+        private var utmCampaign: String?,
+        private var utmContent: String?,
+        private var utmMedium: String?,
+        private var utmSource: String?,
+        private var utmTerm: String?
 ) : Serializable {
 
     companion object {
@@ -236,6 +241,41 @@ class RelatedDigitalModel(
             if (previousExVisitorId.isNotEmpty() && previousExVisitorId != this.exVisitorId) {
                 PersistentTargetManager.clearParameters(context)
             }
+            saveToSharedPrefs(context)
+        }
+    }
+
+    fun setUtmCampaign(context: Context, utmCampaign: String) {
+        synchronized(this) {
+            this.utmCampaign = utmCampaign
+            saveToSharedPrefs(context)
+        }
+    }
+
+fun setUtmContent(context: Context, utmContent: String) {
+        synchronized(this) {
+            this.utmContent = utmContent
+            saveToSharedPrefs(context)
+        }
+    }
+
+fun setUtmMedium(context: Context, utmMedium: String) {
+        synchronized(this) {
+            this.utmMedium = utmMedium
+            saveToSharedPrefs(context)
+        }
+    }
+
+fun setUtmSource(context: Context, utmSource: String) {
+        synchronized(this) {
+            this.utmSource = utmSource
+            saveToSharedPrefs(context)
+        }
+    }
+
+fun setUtmTerm(context: Context, utmTerm: String) {
+        synchronized(this) {
+            this.utmTerm = utmTerm
             saveToSharedPrefs(context)
         }
     }
@@ -479,6 +519,36 @@ class RelatedDigitalModel(
     fun getExVisitorId(): String {
         synchronized(this) {
             return exVisitorId
+        }
+    }
+
+    fun getUtmCampaign(): String? {
+        synchronized(this) {
+            return utmCampaign
+        }
+    }
+
+    fun getUtmContent(): String? {
+        synchronized(this) {
+            return utmContent
+        }
+    }
+
+    fun getUtmMedium(): String? {
+        synchronized(this) {
+            return utmMedium
+        }
+    }
+
+    fun getUtmSource(): String? {
+        synchronized(this) {
+            return utmSource
+        }
+    }
+
+    fun getUtmTerm(): String? {
+        synchronized(this) {
+            return utmTerm
         }
     }
 

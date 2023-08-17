@@ -216,6 +216,26 @@ object AppUtils {
         return cookieId
     }
 
+    fun getUtmCampaign(context: Context): String {
+        return SharedPref.readString(context, Constants.UTM_CAMPAIGN, "")
+    }
+
+    fun getUtmContent(context: Context): String {
+        return SharedPref.readString(context, Constants.UTM_CONTENT, "")
+    }
+
+    fun getUtmMedium(context: Context): String {
+        return SharedPref.readString(context, Constants.UTM_MEDIUM, "")
+    }
+
+    fun getUtmSource(context: Context): String {
+        return SharedPref.readString(context, Constants.UTM_SOURCE, "")
+    }
+
+    fun getUtmTerm(context: Context): String {
+        return SharedPref.readString(context, Constants.UTM_TERM, "")
+    }
+
     private fun createNewCookieId(): String {
         return UUID.randomUUID().toString()
     }
@@ -410,6 +430,9 @@ object AppUtils {
                             && key != Constants.ZONE_ID_KEY && key != Constants.BODY_KEY
                             && key != Constants.TOKEN_ID_REQUEST_KEY && key != Constants.APP_ID_REQUEST_KEY
                             && key != Constants.API_VERSION_REQUEST_KEY && key != Constants.FILTER_KEY)
+                            && key != Constants.UTM_CAMPAIGN && key != Constants.UTM_CONTENT
+                            && key != Constants.UTM_MEDIUM && key != Constants.UTM_SOURCE
+                            && key != Constants.UTM_TERM
                 ) {
                     map.remove(key)
                 }

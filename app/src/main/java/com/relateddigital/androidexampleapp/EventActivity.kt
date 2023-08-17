@@ -45,7 +45,7 @@ class EventActivity : AppCompatActivity() {
             parameters["OM.sys.TokenID"] = token
             parameters["OM.sys.AppID"] = appID
             parameters["OM.exVisitorID"] = binding.tvExvisitorId.text.toString()
-            RelatedDigital.customEvent(applicationContext,"Homepage", parameters)
+            RelatedDigital.customEvent(applicationContext,"Homepage", parameters, this)
             Toast.makeText(applicationContext, "Homepage", Toast.LENGTH_LONG).show()
         }
 
@@ -59,7 +59,7 @@ class EventActivity : AppCompatActivity() {
             parameters["OM.ppr"] = "30.0"
             parameters["OM.pv.1"] = "Sky Systems"
             parameters["OM.inv"] = "10"
-            RelatedDigital.customEvent(applicationContext,"Product View", parameters)
+            RelatedDigital.customEvent(applicationContext,"Product View", parameters, this)
             Toast.makeText(applicationContext, "Product View", Toast.LENGTH_LONG).show()
         }
 
@@ -69,7 +69,7 @@ class EventActivity : AppCompatActivity() {
             parameters["OM.sys.AppID"] = appID
             parameters["OM.exVisitorID"] = binding.tvExvisitorId.text.toString()
             parameters["OM.clist"] = "3518"
-            RelatedDigital.customEvent(applicationContext,"Category View", parameters)
+            RelatedDigital.customEvent(applicationContext,"Category View", parameters, this)
             Toast.makeText(applicationContext, "Category View", Toast.LENGTH_LONG).show()
         }
 
@@ -82,8 +82,21 @@ class EventActivity : AppCompatActivity() {
             parameters["OM.pb"] = "1147254"
             parameters["OM.ppr"] = "90.0"
             parameters["OM.pu"] = "3"
-            RelatedDigital.customEvent(applicationContext,"Product View", parameters)
+            RelatedDigital.customEvent(applicationContext,"Product View", parameters, this)
             Toast.makeText(applicationContext, "Product View", Toast.LENGTH_LONG).show()
+        }
+        binding.btnSendcampaign.setOnClickListener {
+            val parameters = HashMap<String, String>()
+            parameters["OM.sys.TokenID"] = token
+            parameters["OM.sys.AppID"] = appID
+            parameters["OM.exVisitorID"] = binding.tvExvisitorId.text.toString()
+            parameters["utm_campaign"] = "hosgeldin"
+            parameters["utm_source"] = "relateddigital"
+            parameters["utm_medium"] = "push"
+            parameters["utm_content"] = "campaign_content"
+            parameters["utm_term"] = "utmterm"
+            RelatedDigital.sendCampaignParameters(applicationContext, parameters, this)
+            Toast.makeText(applicationContext, "Send Campaign", Toast.LENGTH_LONG).show()
         }
     }
 }
