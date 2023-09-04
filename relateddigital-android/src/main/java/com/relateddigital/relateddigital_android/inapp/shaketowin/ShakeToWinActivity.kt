@@ -528,26 +528,37 @@ class ShakeToWinActivity : Activity(), SensorEventListener {
     private fun initializePlayer() {
         player = ExoPlayer.Builder(this).build()
         if (!mShakeToWinMessage!!.actiondata!!.gameElements!!.videoUrl.toString().isNullOrEmpty()) {
-        bindingStep2.videoView.visibility = View.VISIBLE
-        bindingStep2.videoView.player = player
-        val mediaItem = MediaItem.fromUri(
-            mShakeToWinMessage!!.actiondata!!.gameElements!!.videoUrl.toString()
-        )
-        player!!.setMediaItem(mediaItem)
-        player!!.prepare()
-        }
-        else
-            //TODO when backend ready this code will change
-            bindingStep2.videoView.visibility = View.VISIBLE
-            bindingStep2.videoView.player = player
-            val mediaItem = MediaItem.fromUri(
-                mShakeToWinMessage!!.actiondata!!.gameElements!!.videoUrl.toString()
-            )
-            player!!.setMediaItem(mediaItem)
-            player!!.prepare()
-           // bindingStep2.imageViewGif.visibility = View.VISIBLE
-           // Glide.with(this).load("https://media.giphy.com/media/4gH9mQjn6OGQg/giphy.gif").into( DrawableImageViewTarget(bindingStep2.imageViewGif));
+            val url = mShakeToWinMessage!!.actiondata!!.gameElements!!.videoUrl.toString()
+            if(url.endsWith(".mp4")) {
+                bindingStep2.videoView.visibility = View.VISIBLE
+                bindingStep2.videoView.player = player
+                val mediaItem = MediaItem.fromUri(
+                    mShakeToWinMessage!!.actiondata!!.gameElements!!.videoUrl.toString()
+                )
+                player!!.setMediaItem(mediaItem)
+                player!!.prepare()
+            }
+            else if(url.endsWith(".gif")) {
+                bindingStep2.videoView.visibility = View.VISIBLE
+                bindingStep2.videoView.player = player
+                val mediaItem = mShakeToWinMessage!!.actiondata!!.gameElements!!.videoUrl.toString()
 
+                player!!.prepare()
+                bindingStep2.imageViewGif.visibility = View.VISIBLE
+                Glide.with(this).load(mediaItem)
+                    .into(DrawableImageViewTarget(bindingStep2.imageViewGif));
+            }
+            else {
+                Log.e(LOG_TAG, "Video Url could not be parsed properly!")
+                bindingStep2.videoView.visibility = View.VISIBLE
+                bindingStep2.videoView.player = player
+                val mediaItem = MediaItem.fromUri(
+                    mShakeToWinMessage!!.actiondata!!.gameElements!!.videoUrl.toString()
+                )
+                player!!.setMediaItem(mediaItem)
+                player!!.prepare()
+            }
+        }
     }
 
     private fun initializeSoundPlayer() {
