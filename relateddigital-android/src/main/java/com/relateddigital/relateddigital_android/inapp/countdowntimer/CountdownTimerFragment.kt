@@ -125,7 +125,7 @@ class CountdownTimerFragment : Fragment() {
         binding.couponTextTop.text = "1D48KNSDF92A"
         binding.couponTextTop.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
         //binding.couponTop.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.white))
-        binding.couponButtonTop.setOnClickListener {
+        /*binding.couponButtonTop.setOnClickListener {
             //TODO: send click report here
             val clipboard = requireActivity().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
             //TODO: get coupon text from the response instead of view here
@@ -133,7 +133,7 @@ class CountdownTimerFragment : Fragment() {
             clipboard.setPrimaryClip(clip)
             Toast.makeText(requireActivity(), getString(R.string.copied_to_clipboard), Toast.LENGTH_LONG).show()
             //TODO track this click later
-        }
+        } */
     }
 
     private fun adjustCouponViewBot() {

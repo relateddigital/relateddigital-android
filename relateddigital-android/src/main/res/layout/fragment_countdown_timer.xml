@@ -7,7 +7,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingBottom="@dimen/ct_main_container_bottom_padding"
-        android:background="@drawable/carousel_rounded_corner"> >
+        android:background="@drawable/carousel_rounded_corner">
 
         <TextView
             android:id="@+id/title_top"
@@ -15,10 +15,10 @@
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
-            android:gravity="center"
-            android:layout_marginTop="@dimen/ct_title_top_margin"
             android:layout_marginLeft="@dimen/ct_title_left_right_margin"
+            android:layout_marginTop="@dimen/ct_title_top_margin"
             android:layout_marginRight="@dimen/ct_title_left_right_margin"
+            android:gravity="center"
             android:textSize="@dimen/ct_title_text_size" />
 
         <TextView
@@ -187,15 +187,17 @@
             android:layout_marginTop="@dimen/ct_close_button_margin"
             android:layout_marginRight="@dimen/ct_close_button_margin" />
 
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/inner_timer_container_top"
             android:layout_marginTop="@dimen/ct_timer_button_margin"
-            android:paddingRight="@dimen/ct_left_right_padding"
-            android:paddingLeft="@dimen/ct_left_right_padding"
+            android:layout_marginBottom="10dp"
             android:gravity="center"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:paddingLeft="@dimen/ct_left_right_padding"
+            android:paddingRight="@dimen/ct_left_right_padding">
+
 
             <TextView
                 android:id="@+id/coupon_text_top"
@@ -207,27 +209,22 @@
                 android:background="@drawable/rounded_corner_countdown_text"
                 />
 
-                <ImageView
-                    android:id="@+id/coupon_button_top"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center|end"
-                    android:layout_marginEnd="@dimen/ct_coupon_copy_margin_right"
-                    android:background="@drawable/content_copy_24" />
-
 
             <TextView
                 android:id="@+id/button_top"
-                android:layout_width="0dp"
-                android:layout_weight="1"
+                android:layout_width="200dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/ct_coupon_copy_to_button_margin"
+                android:layout_marginTop="60dp"
+                android:layout_weight="1"
                 android:background="@drawable/rounded_corner_countdown"
                 android:gravity="center"
                 android:padding="@dimen/ct_button_padding"
                 android:textSize="@dimen/ct_button_text_size"
                 android:textStyle="bold" />
-        </LinearLayout>
+
+        </RelativeLayout>
+
+
     </RelativeLayout>
 
     <RelativeLayout
@@ -461,4 +458,5 @@
             android:layout_marginTop="@dimen/ct_close_button_margin"
             android:layout_marginRight="@dimen/ct_close_button_margin" />
     </RelativeLayout>
+
 </RelativeLayout>
