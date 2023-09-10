@@ -4,6 +4,7 @@ import androidx.fragment.app.Fragment
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -85,14 +86,17 @@ class CountdownTimerFragment : Fragment() {
 
     private fun adjustTop() {
         //TODO remove the code below when the actual data gets ready
-        binding.countdownTimerContainerTop.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.blue))
+        binding.countdownTimerContainerTop.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.dark_gray))
         binding.titleTop.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
         binding.titleTop.text = "Sana Özel Fırsatı Kaçırma!".replace("\\n", "\n")
         binding.bodyTextTop.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
         binding.bodyTextTop.text = "Bugün sana özel indirim kodu için geri sayım başladı.".replace("\\n", "\n")
-        binding.buttonTop.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.white))
+        val buttonT = binding.buttonTop.background as GradientDrawable
+        //binding.buttonTop.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.white))
+        buttonT.cornerRadius = 30f
+        buttonT.setColor(resources.getColor(R.color.blue))
         binding.buttonTop.text = "Alışverişe Başla"
-        binding.buttonTop.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
+        binding.buttonTop.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
         binding.countdownTimerContainerBot.visibility = View.GONE
         adjustCouponViewTop()
         adjustTimerViewTop()
@@ -101,7 +105,7 @@ class CountdownTimerFragment : Fragment() {
 
     private fun adjustBottom() {
         //TODO remove the code below when the actual data gets ready
-        binding.countdownTimerContainerBot.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.blue))
+        binding.countdownTimerContainerBot.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.dark_gray))
         binding.titleBot.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
         binding.titleBot.text = "Sana Özel Fırsatı Kaçırma!".replace("\\n", "\n")
         binding.bodyTextBot.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
@@ -117,10 +121,10 @@ class CountdownTimerFragment : Fragment() {
 
     private fun adjustCouponViewTop() {
         //TODO if there is coupon code
-        binding.couponTop.visibility = View.VISIBLE
+        //binding.couponTop.visibility = View.VISIBLE
         binding.couponTextTop.text = "1D48KNSDF92A"
         binding.couponTextTop.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
-        binding.couponTop.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.white))
+        //binding.couponTop.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.white))
         binding.couponButtonTop.setOnClickListener {
             //TODO: send click report here
             val clipboard = requireActivity().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager

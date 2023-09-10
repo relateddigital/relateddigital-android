@@ -90,6 +90,9 @@ class ActionData : Serializable {
     @SerializedName("promocode_copybutton_color")
     var mPromocodeCopyButtonColor: String? = null
 
+    @SerializedName("promocode_copybutton_function")
+    var mPromoCodeCopyButtonFunction: String? = null
+
     @SerializedName("number_colors")
     var mNumberColors: Array<String?>? = null
 

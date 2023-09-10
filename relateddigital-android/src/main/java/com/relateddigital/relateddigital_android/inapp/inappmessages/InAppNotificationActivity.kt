@@ -1047,6 +1047,13 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
                         getString(R.string.copied_to_clipboard),
                         Toast.LENGTH_LONG
                     ).show()
+/*
+                    if(mInAppMessage!!.mActionData!!.mPromoCodeCopyButtonFunction?.isNotEmpty() == true)
+                    {
+                        if(mInAppMessage!!.mActionData!!.mPromoCodeCopyButtonFunction.equals("copy_close")) {
+                            finish()
+                        }
+                    } */
                 }
             } else {
                 binding.copyButton.visibility = View.GONE
@@ -1065,6 +1072,13 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
                     getString(R.string.copied_to_clipboard),
                     Toast.LENGTH_LONG
                 ).show()
+/*
+                if(mInAppMessage!!.mActionData!!.mPromoCodeCopyButtonFunction?.isNotEmpty() == true)
+                {
+                    if(mInAppMessage!!.mActionData!!.mPromoCodeCopyButtonFunction.equals("copy_close")) {
+                        finish()
+                    }
+                } */
             }
         } else {
             binding.llCouponContainer.visibility = View.GONE

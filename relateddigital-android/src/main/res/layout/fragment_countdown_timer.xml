@@ -6,7 +6,8 @@
         android:id="@+id/countdown_timer_container_top"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingBottom="@dimen/ct_main_container_bottom_padding" >
+        android:paddingBottom="@dimen/ct_main_container_bottom_padding"
+        android:background="@drawable/carousel_rounded_corner"> >
 
         <TextView
             android:id="@+id/title_top"
@@ -196,20 +197,15 @@
             android:gravity="center"
             android:orientation="horizontal">
 
-            <FrameLayout
-                android:id="@+id/coupon_top"
-                android:layout_width="0dp"
-                android:layout_weight="1"
+            <TextView
+                android:id="@+id/coupon_text_top"
+                android:layout_width="200dp"
                 android:layout_height="wrap_content"
-                android:gravity="center" >
-
-                <TextView
-                    android:id="@+id/coupon_text_top"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="@dimen/ct_coupon_code_margin_right"
-                    android:padding="@dimen/ct_button_padding"
-                    android:textSize="@dimen/ct_coupon_code_text_size" />
+                android:gravity="center"
+                android:padding="@dimen/ct_button_padding"
+                android:textSize="@dimen/ct_coupon_code_text_size"
+                android:background="@drawable/rounded_corner_countdown_text"
+                />
 
                 <ImageView
                     android:id="@+id/coupon_button_top"
@@ -218,7 +214,7 @@
                     android:layout_gravity="center|end"
                     android:layout_marginEnd="@dimen/ct_coupon_copy_margin_right"
                     android:background="@drawable/content_copy_24" />
-            </FrameLayout>
+
 
             <TextView
                 android:id="@+id/button_top"
@@ -226,6 +222,7 @@
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/ct_coupon_copy_to_button_margin"
+                android:background="@drawable/rounded_corner_countdown"
                 android:gravity="center"
                 android:padding="@dimen/ct_button_padding"
                 android:textSize="@dimen/ct_button_text_size"
