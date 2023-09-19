@@ -80,7 +80,7 @@ class SwipeCarouselView @JvmOverloads constructor(
         }
 
         expandableView.visibility = View.VISIBLE
-        expandableView.alpha = 0f
+        expandableView.alpha = 1f
         expandableView.translationY = -targetHeight.toFloat()
 
         val slideDownAnimation = AnimationUtils.loadAnimation(context, R.anim.slide_down)
@@ -99,8 +99,6 @@ class SwipeCarouselView @JvmOverloads constructor(
             })
 
         imageView.isEnabled = false
-        //val rotateAnimation = AnimationUtils.loadAnimation(context, R.anim.rotate_down)
-        //imageView.startAnimation(rotateAnimation)
         imageView.visibility = GONE
     }
 
@@ -119,7 +117,7 @@ class SwipeCarouselView @JvmOverloads constructor(
         expandableView.startAnimation(slideUpAnimation)
 
         expandableView.animate()
-            .alpha(0f)
+            .alpha(1f)
             .translationY(-initialHeight.toFloat())
             .setDuration(1200)
             .setInterpolator(AccelerateDecelerateInterpolator())
