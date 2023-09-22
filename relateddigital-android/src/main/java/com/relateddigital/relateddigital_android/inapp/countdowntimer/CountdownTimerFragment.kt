@@ -10,6 +10,8 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
@@ -54,6 +56,9 @@ class CountdownTimerFragment : Fragment() {
                               savedInstanceState: Bundle?): View {
         binding = FragmentCountdownTimerBinding.inflate(inflater, container, false)
         val view: View = binding.root
+
+        val slideDownAnimation = AnimationUtils.loadAnimation(requireContext(), R.anim.slide_down)
+        view.startAnimation(slideDownAnimation)
 
         hideStatusBar()
 
@@ -124,16 +129,16 @@ class CountdownTimerFragment : Fragment() {
         //binding.couponTop.visibility = View.VISIBLE
         binding.couponTextTop.text = "1D48KNSDF92A"
         binding.couponTextTop.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
-        //binding.couponTop.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.white))
-        /*binding.couponButtonTop.setOnClickListener {
-            //TODO: send click report here
-            val clipboard = requireActivity().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-            //TODO: get coupon text from the response instead of view here
-            val clip = ClipData.newPlainText(getString(R.string.coupon_code), binding.couponTextTop.text.toString())
-            clipboard.setPrimaryClip(clip)
-            Toast.makeText(requireActivity(), getString(R.string.copied_to_clipboard), Toast.LENGTH_LONG).show()
-            //TODO track this click later
-        } */
+        // binding.couponTop.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.white))
+        /* binding.couponButtonTop.setOnClickListener {
+             //TODO: send click report here
+             val clipboard = requireActivity().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+             //TODO: get coupon text from the response instead of view here
+             val clip = ClipData.newPlainText(getString(R.string.coupon_code), binding.couponTextTop.text.toString())
+             clipboard.setPrimaryClip(clip)
+             Toast.makeText(requireActivity(), getString(R.string.copied_to_clipboard), Toast.LENGTH_LONG).show()
+             //TODO track this click later
+         } */
     }
 
     private fun adjustCouponViewBot() {
@@ -388,9 +393,22 @@ class CountdownTimerFragment : Fragment() {
         if (mTimer != null) {
             mTimer!!.cancel()
         }
-        if (activity != null) {
-            requireActivity().supportFragmentManager.beginTransaction().remove(this@CountdownTimerFragment).commit()
-        }
+
+        val slideUpAnimation = AnimationUtils.loadAnimation(requireContext(), R.anim.slide_up)
+        binding.root.startAnimation(slideUpAnimation)
+
+
+        slideUpAnimation.setAnimationListener(object : Animation.AnimationListener {
+            override fun onAnimationStart(animation: Animation?) {}
+
+            override fun onAnimationEnd(animation: Animation?) {
+                if (activity != null) {
+                    requireActivity().supportFragmentManager.beginTransaction().remove(this@CountdownTimerFragment).commit()
+                }
+            }
+
+            override fun onAnimationRepeat(animation: Animation?) {}
+        })
     }
 
     private fun hideStatusBar() {
