@@ -57,8 +57,16 @@ class CountdownTimerFragment : Fragment() {
         binding = FragmentCountdownTimerBinding.inflate(inflater, container, false)
         val view: View = binding.root
 
-        val slideDownAnimation = AnimationUtils.loadAnimation(requireContext(), R.anim.slide_down)
-        view.startAnimation(slideDownAnimation)
+        mIsTop = true
+        if(mIsTop) {
+            val slideDownAnimation = AnimationUtils.loadAnimation(requireContext(), R.anim.slide_down)
+       view.startAnimation(slideDownAnimation)
+        }
+        else{
+            val slideDownAnimation = AnimationUtils.loadAnimation(requireContext(), R.anim.slide_down_bottom)
+            view.startAnimation(slideDownAnimation)
+        }
+
 
         hideStatusBar()
 
@@ -394,21 +402,41 @@ class CountdownTimerFragment : Fragment() {
             mTimer!!.cancel()
         }
 
-        val slideUpAnimation = AnimationUtils.loadAnimation(requireContext(), R.anim.slide_up)
-        binding.root.startAnimation(slideUpAnimation)
+        mIsTop = true
+        if (mIsTop) {
+            val slideUpAnimation = AnimationUtils.loadAnimation(requireContext(), R.anim.slide_up)
+            binding.root.startAnimation(slideUpAnimation)
+            slideUpAnimation.setAnimationListener(object : Animation.AnimationListener {
+                override fun onAnimationStart(animation: Animation?) {}
 
-
-        slideUpAnimation.setAnimationListener(object : Animation.AnimationListener {
-            override fun onAnimationStart(animation: Animation?) {}
-
-            override fun onAnimationEnd(animation: Animation?) {
-                if (activity != null) {
-                    requireActivity().supportFragmentManager.beginTransaction().remove(this@CountdownTimerFragment).commit()
+                override fun onAnimationEnd(animation: Animation?) {
+                    if (activity != null) {
+                        requireActivity().supportFragmentManager.beginTransaction().remove(this@CountdownTimerFragment).commit()
+                    }
                 }
-            }
 
-            override fun onAnimationRepeat(animation: Animation?) {}
+                override fun onAnimationRepeat(animation: Animation?) {}
+            })
+        }
+        else
+        {
+            val slideUpAnimation = AnimationUtils.loadAnimation(requireContext(), R.anim.slide_up_bottom)
+            binding.root.startAnimation(slideUpAnimation)
+            slideUpAnimation.setAnimationListener(object : Animation.AnimationListener {
+                override fun onAnimationStart(animation: Animation?) {}
+
+                override fun onAnimationEnd(animation: Animation?) {
+                    if (activity != null) {
+                        requireActivity().supportFragmentManager.beginTransaction().remove(this@CountdownTimerFragment).commit()
+                    }
+                }
+
+                override fun onAnimationRepeat(animation: Animation?) {}
         })
+        }
+
+
+
     }
 
     private fun hideStatusBar() {
