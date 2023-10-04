@@ -19,6 +19,7 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.relateddigital.relateddigital_android.R
 import com.relateddigital.relateddigital_android.constants.Constants
+import com.relateddigital.relateddigital_android.model.Actions
 import com.relateddigital.relateddigital_android.model.CarouselItem
 import com.relateddigital.relateddigital_android.model.Element
 import com.relateddigital.relateddigital_android.model.Message
@@ -204,26 +205,38 @@ class PushNotificationManager {
         }
         // TODO : When backend ready edit
 
-       /* val linkUri = Uri.parse("https://www.boun.edu.tr/") // Define target Url here
-        val actionIntent = PendingIntent.getActivity(
-            context,
-            0,
-            Intent(Intent.ACTION_VIEW, linkUri),
-            PendingIntent.FLAG_UPDATE_CURRENT
-        )
 
+       val actionList = ArrayList<NotificationCompat.Action>()
+        val actions: ArrayList<Actions>? = pushMessage.getActions()
 
+        if (actions != null && actions.isNotEmpty()) {
+            actions.forEach { actionItem ->
+                val linkUri = Uri.parse(actionItem?.Url)
+                val actionIntent = PendingIntent.getActivity(
+                    context,
+                    0,
+                    Intent(Intent.ACTION_VIEW, linkUri),
+                    PendingIntent.FLAG_UPDATE_CURRENT
+                )
 
-        val actionIcon = R.drawable.ic_carousel_icon// Icon to use in action button (drawable)
-        val actionTitle = "Title" // Title to show on action button
+                var actionIcon = R.drawable.ic_carousel_icon
+                    if (!actionItem.Icon.isNullOrEmpty()){
+                   actionIcon = actionItem.Icon!!.toInt()
+                }
+                var actionTitle = actionItem.Title ?: "Default Title"
+                if (!actionItem.Title.isNullOrEmpty()){
+                    actionTitle = actionItem.Title!!
+                }
 
+                val action = NotificationCompat.Action.Builder(
+                    actionIcon,
+                    actionTitle,
+                    actionIntent
+                ).build()
+                actionList.add(action)
+            }
+        }
 
-        val action = NotificationCompat.Action.Builder(
-            actionIcon,
-            actionTitle,
-            actionIntent
-        ).build()
-*/
         val style = if (pushImage == null) NotificationCompat.BigTextStyle()
             .bigText(pushMessage.message) else NotificationCompat.BigPictureStyle()
             .bigPicture(pushImage).setSummaryText(pushMessage.message)
@@ -239,7 +252,11 @@ class PushNotificationManager {
                 .setPriority(importance)
                 .setContentText(pushMessage.message)
                 // TODO !!
-                //.addAction(action)
+        if (actions != null && actions.isNotEmpty()) {
+            for (action in actionList) {
+                mBuilder.addAction(action)
+            }
+        }
         setNumber(mBuilder, context)
         setNotificationSmallIcon(mBuilder, context)
         if (pushMessage.sound != null) {

@@ -45,8 +45,7 @@ class Message : Serializable {
         private set
     private val params: MutableMap<String, String> = HashMap()
     private var elements: ArrayList<Element>? = null
-   // private var actions: ArrayList<Actions>? = null
-    @SerializedName("actions") var actions: ArrayList<Actions?>? = null
+    private var actions: ArrayList<Actions>? = null
     var loginID: String? = null
 
     constructor(context: Context, bundle: Map<String, String?>) {
@@ -83,6 +82,9 @@ class Message : Serializable {
         if (bundle["elements"] != null) {
             convertJsonStrToElementsArray(context, bundle["elements"])
         }
+        if (bundle["actions"] != null) {
+            convertJsonStrToActionsArray(context,bundle["actions"])
+        }
     }
 
     private fun convertJsonStrToElementsArray(context: Context, elementJsonStr: String?) {
@@ -111,7 +113,31 @@ class Message : Serializable {
             e.printStackTrace()
         }
     }
-
+    private fun convertJsonStrToActionsArray(context: Context, actionsJsonStr: String?) {
+        val jsonArr: JSONArray
+        try {
+            jsonArr = JSONArray(actionsJsonStr)
+            actions = ArrayList<Actions>()
+            for (i in 0 until jsonArr.length()) {
+                val jsonObj = jsonArr.getJSONObject(i)
+                val action = Actions()
+                action.Action = jsonObj.getString("action")
+                action.Title = jsonObj.getString("title")
+                action.Icon = jsonObj.getString("icon")
+                action.Url = jsonObj.getString("url")
+                actions!!.add(action)
+            }
+        } catch (e: JSONException) {
+            val action = Throwable().stackTrace[0]
+            LogUtils.formGraylogModel(
+                context,
+                "e",
+                "Converting JSON string to array list : " + e.message,
+                action.className + "/" + action.methodName + "/" + action.lineNumber
+            )
+            e.printStackTrace()
+        }
+    }
     constructor(bundle: Bundle) {
         for (key in bundle.keySet()) {
             val value = bundle[key]
@@ -142,6 +168,7 @@ class Message : Serializable {
         }
         collapseKey = bundle.getString("collapse_key")
         elements = bundle.getParcelable("elements")
+        actions = bundle.getParcelable("actions")
     }
 
     fun getPushType(): PushType? {
@@ -154,5 +181,10 @@ class Message : Serializable {
 
     fun getElements(): ArrayList<Element>? {
         return elements
+    }
+
+
+    fun getActions(): ArrayList<Actions>? {
+        return actions
     }
 }
