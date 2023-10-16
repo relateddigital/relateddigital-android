@@ -14,17 +14,17 @@ import androidx.fragment.app.Fragment
 import com.relateddigital.relateddigital_android.R
 import com.relateddigital.relateddigital_android.RelatedDigital
 import com.relateddigital.relateddigital_android.databinding.FragmentInAppMiniBinding
+import com.relateddigital.relateddigital_android.databinding.FragmentInAppMiniTopBinding
 import com.relateddigital.relateddigital_android.inapp.InAppButtonInterface
 import com.relateddigital.relateddigital_android.inapp.InAppNotificationState
 import com.relateddigital.relateddigital_android.inapp.InAppUpdateDisplayState
 import com.relateddigital.relateddigital_android.model.InAppMessage
 import com.relateddigital.relateddigital_android.util.AnimationManager
 import com.squareup.picasso.Picasso
-import com.relateddigital.relateddigital_android.network.RequestHandler
 import com.relateddigital.relateddigital_android.network.requestHandler.InAppNotificationClickRequest
 
 
-class InAppMiniFragment: Fragment() {
+class InAppMiniFragment : Fragment() {
     private var mParent: Activity? = null
     private var mDetector: GestureDetector? = null
     private var mHandler: Handler? = null
@@ -35,35 +35,104 @@ class InAppMiniFragment: Fragment() {
     private var mDisplayMini: Runnable? = null
     private var mCleanedUp = false
     private var binding: FragmentInAppMiniBinding? = null
+    private var bindingTop: FragmentInAppMiniTopBinding? = null
+    private var useBinding: Boolean = true
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mCleanedUp = false
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         super.onCreateView(inflater, container, savedInstanceState)
-        binding = FragmentInAppMiniBinding.inflate(inflater, container, false)
-        var view: View? = binding!!.root
-        if (mInAppNotificationState != null) {
-            if (mInAppMessage == null) {
-                remove()
-            } else {
-                binding!!.tvInAppTitleMini.text = mInAppMessage!!.mActionData!!.mMsgTitle!!.replace("\\n", "\n")
-                binding!!.tvInAppTitleMini.typeface = mInAppMessage!!.mActionData!!.getFontFamily(requireActivity())
-                if (!mInAppMessage!!.mActionData!!.mImg.equals("")) {
-                    binding!!.ivInAppImageMini.visibility = View.VISIBLE
-                    Picasso.get().load(mInAppMessage!!.mActionData!!.mImg).into(binding!!.ivInAppImageMini)
+        if (useBinding) {
+            binding = FragmentInAppMiniBinding.inflate(inflater, container, false)
+            var view: View? = binding!!.root
+            if (mInAppNotificationState != null) {
+
+                if (mInAppMessage == null) {
+                    remove()
                 } else {
-                    binding!!.ivInAppImageMini.visibility = View.GONE
+
+                    binding!!.tvInAppTitleMini.text =
+                        mInAppMessage!!.mActionData!!.mMsgTitle!!.replace("\\n", "\n")
+                    binding!!.tvInAppTitleMini.typeface =
+                        mInAppMessage!!.mActionData!!.getFontFamily(requireActivity())
+                    //TODO when backend ready setCloseButton()
+                    //setCloseButton()
+                    if (!mInAppMessage!!.mActionData!!.mImg.equals("")) {
+                        binding!!.ivInAppImageMini.visibility = View.VISIBLE
+                        Picasso.get().load(mInAppMessage!!.mActionData!!.mImg)
+                            .into(binding!!.ivInAppImageMini)
+                    } else {
+                        binding!!.ivInAppImageMini.visibility = View.GONE
+                    }
+                    mHandler!!.postDelayed(mRemover!!, MINI_REMOVE_TIME.toLong())
+                }
+            } else {
+                cleanUp()
+                view = null
+            }
+            return view
+        } else {
+            bindingTop = FragmentInAppMiniTopBinding.inflate(inflater, container, false)
+            var viewTop: View? = bindingTop!!.root
+            if (mInAppNotificationState != null) {
+                bindingTop!!.tvInAppTitleMini.text =
+                    mInAppMessage!!.mActionData!!.mMsgTitle!!.replace("\\n", "\n")
+                bindingTop!!.tvInAppTitleMini.typeface =
+                    mInAppMessage!!.mActionData!!.getFontFamily(requireActivity())
+                //TODO when backend ready setCloseButton()
+                setCloseButton()
+                if (!mInAppMessage!!.mActionData!!.mImg.equals("")) {
+                    bindingTop!!.ivInAppImageMini.visibility = View.VISIBLE
+                    Picasso.get().load(mInAppMessage!!.mActionData!!.mImg)
+                        .into(bindingTop!!.ivInAppImageMini)
+                } else {
+                    bindingTop!!.ivInAppImageMini.visibility = View.GONE
                 }
                 mHandler!!.postDelayed(mRemover!!, MINI_REMOVE_TIME.toLong())
+            } else {
+                cleanUp()
+                viewTop = null
             }
-        } else {
-            cleanUp()
-            view = null
+            return viewTop
         }
-        return view
     }
+
+    private val closeIcon: Int
+        get() {
+            when (mInAppMessage!!.mActionData!!.mCloseButtonColor) {
+                "white" -> return R.drawable.ic_close_white_24dp
+                "black" -> return R.drawable.ic_close_black_24dp
+            }
+            return R.drawable.ic_close_black_24dp
+        }
+
+    fun setCloseButton() {
+
+        //TODO up or bottom
+        /*  if(mInAppMessage!!.mActionData!!up) {
+          binding!!.ibClose.visibility = View.VISIBLE
+      binding!!.ibClose.setBackgroundResource(R.drawable.ic_close_white_24dp)
+      binding!!.ibClose.setOnClickListener {
+          remove()
+      }
+          }*/
+        // else
+        //   {
+        //bindingTop!!.ibClose.visibility = View.VISIBLE
+        //bindingTop!!.ibClose.setBackgroundResource(R.drawable.ic_close_white_24dp)
+        //bindingTop!!.ibClose.setOnClickListener {
+        //   remove()
+        //     }
+        // }      */
+
+    }
+
 
     fun setInAppState(stateId: Int, inAppState: InAppNotificationState?) {
         mInAppStateId = stateId
@@ -83,6 +152,7 @@ class InAppMiniFragment: Fragment() {
     override fun onResume() {
         super.onResume()
         if (mInAppMessage != null) {
+            //TODO when backend ready make arrangement for delay time here
             mHandler!!.postDelayed(mDisplayMini!!, 500)
         }
     }
@@ -112,8 +182,29 @@ class InAppMiniFragment: Fragment() {
             requireView().visibility = View.VISIBLE
             requireView().setBackgroundColor(mInAppNotificationState!!.getHighlightColor())
             requireView().setOnTouchListener { _, event -> mDetector!!.onTouchEvent(event) }
-            requireView().startAnimation(AnimationManager.getMiniTranslateAnimation(requireActivity()))
-            binding!!.ivInAppImageMini.startAnimation(AnimationManager.getMiniScaleAnimation(requireActivity()))
+            if (useBinding) {
+                requireView().startAnimation(
+                    AnimationManager.getMiniTranslateAnimation(
+                        requireActivity()
+                    )
+                )
+                binding!!.ivInAppImageMini.startAnimation(
+                    AnimationManager.getMiniScaleAnimation(
+                        requireActivity()
+                    )
+                )
+            } else {
+                requireView().startAnimation(
+                    AnimationManager.getMiniTranslateTopAnimation(
+                        requireActivity()
+                    )
+                )
+                bindingTop!!.ivInAppImageMini.startAnimation(
+                    AnimationManager.getMiniScaleAnimation(
+                        requireActivity()
+                    )
+                )
+            }
         }
     }
 
@@ -123,8 +214,10 @@ class InAppMiniFragment: Fragment() {
                 return true
             }
 
-            override fun onFling(e1: MotionEvent, e2: MotionEvent,
-                                 velocityX: Float, velocityY: Float): Boolean {
+            override fun onFling(
+                e1: MotionEvent, e2: MotionEvent,
+                velocityX: Float, velocityY: Float
+            ): Boolean {
                 if (velocityY > 0) {
                     remove()
                 }
@@ -132,16 +225,23 @@ class InAppMiniFragment: Fragment() {
             }
 
             override fun onLongPress(e: MotionEvent) {}
-            override fun onScroll(e1: MotionEvent, e2: MotionEvent,
-                                  distanceX: Float, distanceY: Float): Boolean {
+            override fun onScroll(
+                e1: MotionEvent, e2: MotionEvent,
+                distanceX: Float, distanceY: Float
+            ): Boolean {
                 return false
             }
 
             override fun onShowPress(e: MotionEvent) {}
             override fun onSingleTapUp(event: MotionEvent): Boolean {
                 val uriString: String? = mInAppMessage!!.mActionData!!.mAndroidLnk
-                val buttonInterface: InAppButtonInterface? = RelatedDigital.getInAppButtonInterface()
-                InAppNotificationClickRequest.createInAppNotificationClickRequest(activity, mInAppMessage, null)
+                val buttonInterface: InAppButtonInterface? =
+                    RelatedDigital.getInAppButtonInterface()
+                InAppNotificationClickRequest.createInAppNotificationClickRequest(
+                    activity,
+                    mInAppMessage,
+                    null
+                )
                 if (buttonInterface != null) {
                     RelatedDigital.setInAppButtonInterface(null)
                     buttonInterface.onPress(uriString)
@@ -152,7 +252,11 @@ class InAppMiniFragment: Fragment() {
                             val viewIntent = Intent(Intent.ACTION_VIEW, uri)
                             mParent!!.startActivity(viewIntent)
                         } catch (e: Exception) {
-                            Log.i(LOG_TAG, "Can't parse notification URI, will not take any action", e)
+                            Log.i(
+                                LOG_TAG,
+                                "Can't parse notification URI, will not take any action",
+                                e
+                            )
                             return true
                         }
                     }
@@ -193,8 +297,10 @@ class InAppMiniFragment: Fragment() {
             mHandler!!.removeCallbacks(mDisplayMini!!)
             val fragmentManager = requireActivity().supportFragmentManager
             try {
+                //TODO When backend ready arrange close animation
                 val transaction = requireActivity().supportFragmentManager.beginTransaction()
-                transaction.setCustomAnimations(0, R.anim.anim_slide_down).remove(this).commitAllowingStateLoss()
+                transaction.setCustomAnimations(0, R.anim.anim_slide_down).remove(this)
+                    .commitAllowingStateLoss()
                 InAppUpdateDisplayState.releaseDisplayState(mInAppStateId)
                 mCleanedUp = true
             } catch (e: Exception) {

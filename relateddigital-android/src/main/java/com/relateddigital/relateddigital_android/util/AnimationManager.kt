@@ -20,15 +20,30 @@ object AnimationManager {
     val scaleAnimation: Animation
         get() {
             val scale = ScaleAnimation(
-                    .95f, 1.0f, .95f, 1.0f, Animation.RELATIVE_TO_SELF,
-                    0.5f, Animation.RELATIVE_TO_SELF, 1.0f)
+                .95f, 1.0f, .95f, 1.0f, Animation.RELATIVE_TO_SELF,
+                0.5f, Animation.RELATIVE_TO_SELF, 1.0f
+            )
             scale.duration = 200
             return scale
         }
 
+    fun getMiniTranslateTopAnimation(context: Context, duration: Long = 200): TranslateAnimation {
+        val heightPx = TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_DIP,
+            75f,
+            context.resources.displayMetrics
+        )
+        val translate = TranslateAnimation(0f, 0f, -heightPx, 0f)
+        translate.interpolator = DecelerateInterpolator()
+        translate.duration = duration
+        return translate
+    }
+
     fun getMiniTranslateAnimation(context: Context): TranslateAnimation {
-        val heightPx = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 75f,
-                context.resources.displayMetrics)
+        val heightPx = TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_DIP, 75f,
+            context.resources.displayMetrics
+        )
         val translate = TranslateAnimation(0f, 0f, heightPx, 0f)
         translate.interpolator = DecelerateInterpolator()
         translate.duration = 200
@@ -38,10 +53,10 @@ object AnimationManager {
     val translateAnimation: TranslateAnimation
         get() {
             val translate = TranslateAnimation(
-                    Animation.RELATIVE_TO_SELF, 0.0f,
-                    Animation.RELATIVE_TO_SELF, 0.0f,
-                    Animation.RELATIVE_TO_SELF, 0.5f,
-                    Animation.RELATIVE_TO_SELF, 0.0f
+                Animation.RELATIVE_TO_SELF, 0.0f,
+                Animation.RELATIVE_TO_SELF, 0.0f,
+                Animation.RELATIVE_TO_SELF, 0.5f,
+                Animation.RELATIVE_TO_SELF, 0.0f
             )
             translate.interpolator = DecelerateInterpolator()
             translate.duration = 200
@@ -58,11 +73,18 @@ object AnimationManager {
         display.getSize(size)
         if (activity.resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
             val params = closeButtonWrapper.layoutParams as RelativeLayout.LayoutParams
-            params.setMargins(0, 0, 0, (size.y * 0.06f).toInt()) // make bottom margin 6% of screen height
+            params.setMargins(
+                0,
+                0,
+                0,
+                (size.y * 0.06f).toInt()
+            ) // make bottom margin 6% of screen height
             closeButtonWrapper.layoutParams = params
         }
         val gd = GradientDrawable(
-                GradientDrawable.Orientation.LEFT_RIGHT, intArrayOf(-0x1a9f9f84, -0x1ab7b7a3, -0x1ae7e7e1, -0x1ae7e7e1))
+            GradientDrawable.Orientation.LEFT_RIGHT,
+            intArrayOf(-0x1a9f9f84, -0x1ab7b7a3, -0x1ae7e7e1, -0x1ae7e7e1)
+        )
         gd.gradientType = GradientDrawable.RADIAL_GRADIENT
         if (activity.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
             gd.setGradientCenter(0.25f, 0.5f)
@@ -97,9 +119,15 @@ object AnimationManager {
     }
 
     fun getMiniScaleAnimation(context: Context): Animation {
-        val heightPx = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 75f, context.resources.displayMetrics)
-        val scale = ScaleAnimation(0.0f, 1.0f, 0.0f,
-                1.0f, heightPx / 2, heightPx / 2)
+        val heightPx = TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_DIP,
+            75f,
+            context.resources.displayMetrics
+        )
+        val scale = ScaleAnimation(
+            0.0f, 1.0f, 0.0f,
+            1.0f, heightPx / 2, heightPx / 2
+        )
         scale.interpolator = SineBounceInterpolator()
         scale.duration = 400
         scale.startOffset = 200
@@ -108,7 +136,10 @@ object AnimationManager {
 
     private class SineBounceInterpolator : Interpolator {
         override fun getInterpolation(t: Float): Float {
-            return (-(Math.pow(Math.E, (-8 * t).toDouble()) * Math.cos((12 * t).toDouble()))).toFloat() + 1
+            return (-(Math.pow(
+                Math.E,
+                (-8 * t).toDouble()
+            ) * Math.cos((12 * t).toDouble()))).toFloat() + 1
         }
     }
 }
