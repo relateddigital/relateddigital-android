@@ -3,6 +3,7 @@ package com.relateddigital.relateddigital_android.inapp.swipecarousel
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.content.Context
+import android.os.Handler
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
@@ -24,13 +25,11 @@ class SwipeCarouselView @JvmOverloads constructor(
 
     private lateinit var expandableView: ViewGroup
     private lateinit var imageView: ImageView
-    private lateinit var titleTextView: TextView
-    private lateinit var descriptionTextView: TextView
     private lateinit var closeButton: Button
     private var isExpanded = false
     private lateinit var rv : RecyclerView
     private var adapter : SwipeCarouselAdapter? = null
-
+    private val handler = Handler()
 
     init {
         orientation = VERTICAL
@@ -42,8 +41,6 @@ class SwipeCarouselView @JvmOverloads constructor(
 
         expandableView = findViewById(R.id.expandable_view)
         imageView = findViewById(R.id.image_view)
-        //titleTextView = findViewById(R.id.title_text_view)
-        //descriptionTextView = findViewById(R.id.description_text_view)
         closeButton = findViewById(R.id.close_button)
         rv = findViewById(R.id.rv)
 
@@ -92,14 +89,13 @@ class SwipeCarouselView @JvmOverloads constructor(
             .translationY(0f)
             .setDuration(1500)
             .setInterpolator(AccelerateDecelerateInterpolator())
-            .setListener(object : AnimatorListenerAdapter() {
-                override fun onAnimationEnd(animation: Animator?) {
-                    isExpanded = true
-                }
-            })
+
+        handler.postDelayed({
+            isExpanded = true
+        }, 1500) // Bu süreyi animasyonun süresine uygun olarak ayarlayın
 
         imageView.isEnabled = false
-        imageView.visibility = GONE
+        imageView.visibility = View.GONE
     }
 
     private fun collapseView() {
@@ -121,20 +117,13 @@ class SwipeCarouselView @JvmOverloads constructor(
             .translationY(-initialHeight.toFloat())
             .setDuration(1200)
             .setInterpolator(AccelerateDecelerateInterpolator())
-            .setListener(object : AnimatorListenerAdapter() {
-                override fun onAnimationEnd(animation: Animator?) {
-                    expandableView.visibility = View.GONE
-                    imageView.visibility = VISIBLE
-                    isExpanded = false
-                }
 
-            }
-            )
+        handler.postDelayed({
+            expandableView.visibility = View.GONE
+            imageView.visibility = View.VISIBLE
+            isExpanded = false
+        }, 1200) // Bu süreyi animasyonun süresine uygun olarak ayarlayın
 
         imageView.isEnabled = true
-        //val rotateAnimation = AnimationUtils.loadAnimation(context, R.anim.rotate_up)
-        //imageView.startAnimation(rotateAnimation)
-
-
     }
 }
