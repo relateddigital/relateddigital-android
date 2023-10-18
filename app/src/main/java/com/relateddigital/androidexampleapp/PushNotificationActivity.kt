@@ -48,6 +48,7 @@ class PushNotificationActivity : AppCompatActivity() {
     private fun setupUI() {
         showToken()
         createSpinners()
+        setupPermissionButton()
         setupPayloadButton()
         setupTemplatePushButtons()
         setupSyncButton()
@@ -80,6 +81,12 @@ class PushNotificationActivity : AppCompatActivity() {
             ArrayAdapter<Any?>(this, android.R.layout.simple_spinner_item, registerEmailPermitSpinnerItems)
         aa2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         binding.registeremailpermitSpinner.adapter = aa2
+    }
+
+    private fun setupPermissionButton() {
+        binding.btnPermission.setOnClickListener {
+            RelatedDigital.requestNotificationPermission(activity)
+        }
     }
 
     private fun setupPayloadButton() {
