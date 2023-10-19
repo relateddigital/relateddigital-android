@@ -162,6 +162,7 @@ class Constants {
         const val TWITTER_KEY = "twitter"
         const val FACEBOOK_KEY = "facebook"
         const val EMAIL_KEY = "email"
+        const val SET_ANONYMOUS_KEY = "setAnonymous"
         const val LOCATION_KEY = "location"
         const val RELATED_DIGITAL_USER_KEY = "keyID"
         const val MSISDN_KEY = "msisdn"
@@ -210,7 +211,7 @@ class Constants {
 
         const val BANNER_CAROUSEL_ACTION_TYPE_VAL = "AppBanner"
 
-        const val SUBSCRIPTION_ENDPOINT = "https://pushs.euromsg.com/"
+        const val SUBSCRIPTION_ENDPOINT = "http://testpushs.euromsg.com/"
         const val RETENTION_ENDPOINT = "https://pushr.euromsg.com/"
 
         const val LOGGER_ENDPOINT = "https://lgr.visilabs.net/"

@@ -1342,6 +1342,20 @@ object RelatedDigital {
     }
 
     @JvmStatic
+    fun setAnonymous(context: Context, permission: Boolean) {
+        if(model != null) {
+            if(permission) {
+                model!!.add(context, Constants.SET_ANONYMOUS_KEY, "true")
+            } else {
+                model!!.add(context, Constants.SET_ANONYMOUS_KEY, "false")
+            }
+        } else {
+            Log.e(LOG_TAG, "Call RelatedDigital.init() first")
+        }
+        sync(context)
+    }
+
+    @JvmStatic
     fun setFacebookId(context: Context, facebookId: String) {
         if(model != null) {
             model!!.add(context, Constants.FACEBOOK_KEY, facebookId)
