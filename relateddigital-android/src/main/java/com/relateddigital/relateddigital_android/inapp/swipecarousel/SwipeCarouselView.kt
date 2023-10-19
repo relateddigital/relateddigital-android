@@ -92,7 +92,7 @@ class SwipeCarouselView @JvmOverloads constructor(
 
         handler.postDelayed({
             isExpanded = true
-        }, 1500) // Bu süreyi animasyonun süresine uygun olarak ayarlayın
+        }, 1500)
 
         imageView.isEnabled = false
         imageView.visibility = View.GONE
@@ -122,7 +122,7 @@ class SwipeCarouselView @JvmOverloads constructor(
             expandableView.visibility = View.GONE
             imageView.visibility = View.VISIBLE
             isExpanded = false
-        }, 1200) // Bu süreyi animasyonun süresine uygun olarak ayarlayın
+        }, 1200)
 
         imageView.isEnabled = true
     }
