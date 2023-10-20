@@ -138,6 +138,9 @@ class ActionData : Serializable {
     @SerializedName("pos")
     var mPos: String? = null
 
+    @SerializedName("duration")
+    var mDuration: Int? = null
+
     @SerializedName("msg_title_textsize")
     var mMsgTitleTextSize: String? = null
 
