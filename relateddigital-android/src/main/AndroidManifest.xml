@@ -74,6 +74,11 @@
             android:noHistory="true"
             android:theme="@style/Theme.Transparent" />
 
+        <activity
+            android:name=".util.NotificationPermissionActivity"
+            android:noHistory="true"
+            android:theme="@style/Theme.Transparent" />
+
         <service
             android:name=".push.services.RelatedDigitalFirebaseMessagingService"
             android:exported="false">

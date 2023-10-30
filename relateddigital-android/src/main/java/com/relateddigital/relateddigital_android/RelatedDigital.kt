@@ -1,20 +1,16 @@
 package com.relateddigital.relateddigital_android
 
-import android.Manifest
 import android.app.Activity
 import android.app.ActivityManager
 import android.app.ActivityManager.RunningAppProcessInfo
 import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import androidx.annotation.RequiresApi
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import com.google.firebase.FirebaseApp
 import com.google.gson.Gson
 import com.relateddigital.relateddigital_android.appTracker.AppTracker
@@ -1691,19 +1687,23 @@ object RelatedDigital {
     }
 
     @JvmStatic
-    fun requestNotificationPermission(activity: Activity) {
+    fun requestNotificationPermission(context: Context) {
         if (Build.VERSION.SDK_INT >= 33) {
-            if (ContextCompat.checkSelfPermission(
-                    activity,
-                    Manifest.permission.POST_NOTIFICATIONS
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
-                ActivityCompat.requestPermissions(
-                    activity,
-                    arrayOf(Manifest.permission.POST_NOTIFICATIONS),
-                    101
-                )
+            val callback = object : NotificationPermissionCallback {
+                override fun onPermissionResult(granted: Boolean) {
+                    model?.setIsPushNotificationEnabled(context, granted)
+                    model?.setPushPermissionStatus(context, AppUtils.getNotificationPermissionStatus(context))
+                    if(model?.getPushPermissionStatus() == "granted") {
+                        model?.add(context, "pushPermit", "Y")
+                    } else {
+                        model?.add(context, "pushPermit", "N")
+                    }
+                    sync(context)
+                }
             }
+            NotificationPermissionActivity.callback = callback
+            val intent = Intent(context, NotificationPermissionActivity::class.java)
+            context.startActivity(intent)
         }
     }
 
