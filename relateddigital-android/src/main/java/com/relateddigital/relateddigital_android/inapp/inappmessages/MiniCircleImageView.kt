@@ -39,8 +39,8 @@ class MiniCircleImageView : AppCompatImageView {
         super.onDraw(canvas)
         val centerX = mCanvasWidth.toFloat() / 2.toFloat()
         val centerY = mCanvasHeight.toFloat() / 2.toFloat()
-        val radius = 0.7f * centerX.coerceAtMost(centerY)
-       // canvas.drawCircle(centerX, centerY, radius, mWhitePaint!!)
+        val radius = 0.75f * centerX.coerceAtMost(centerY)
+        canvas.drawCircle(centerX, centerY, radius, mWhitePaint!!)
     }
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {

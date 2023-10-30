@@ -64,9 +64,10 @@ class InAppMiniFragment : Fragment() {
                 if (!mInAppMessage!!.mActionData!!.mImg.equals("")) {
                     bindingTop!!.ivInAppImageMini.visibility = View.VISIBLE
                     Picasso.get().load(mInAppMessage!!.mActionData!!.mImg)
-                        .into(bindingTop!!.ivInAppImageMini)
+                        .into(bindingTop!!.imageViewMini)
                 } else {
                     bindingTop!!.ivInAppImageMini.visibility = View.GONE
+                    bindingTop!!.imageViewMini.visibility = View.GONE
                 }
                 delay()
                 mHandler!!.postDelayed(mRemover!!, MINI_REMOVE_TIME.toLong())
@@ -96,9 +97,10 @@ class InAppMiniFragment : Fragment() {
                     if (!mInAppMessage!!.mActionData!!.mImg.equals("")) {
                         binding!!.ivInAppImageMini.visibility = View.VISIBLE
                         Picasso.get().load(mInAppMessage!!.mActionData!!.mImg)
-                            .into(binding!!.ivInAppImageMini)
+                            .into(binding!!.imageViewMini)
                     } else {
                         binding!!.ivInAppImageMini.visibility = View.GONE
+                        binding!!.imageViewMini.visibility = View.GONE
                     }
                     if(!mInAppMessage!!.mActionData!!.mDuration.toString().isNullOrEmpty()) {
                             delay()
