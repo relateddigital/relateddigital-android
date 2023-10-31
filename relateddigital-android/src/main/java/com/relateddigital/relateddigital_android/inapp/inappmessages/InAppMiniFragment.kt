@@ -199,11 +199,11 @@ class InAppMiniFragment : Fragment() {
                         requireActivity()
                     )
                 )
-                bindingTop!!.ivInAppImageMini.startAnimation(
+               /* bindingTop!!.ivInAppImageMini.startAnimation(
                     AnimationManager.getMiniScaleAnimation(
                         requireActivity()
                     )
-                )
+                ) */
             } else {
 
                 requireView().startAnimation(
@@ -211,11 +211,11 @@ class InAppMiniFragment : Fragment() {
                         requireActivity()
                     )
                 )
-                binding!!.ivInAppImageMini.startAnimation(
+               /* binding!!.ivInAppImageMini.startAnimation(
                     AnimationManager.getMiniScaleAnimation(
                         requireActivity()
                     )
-                )
+                ) */
 
             }
         }
