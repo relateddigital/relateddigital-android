@@ -41,6 +41,7 @@ class CountdownTimerFragment : Fragment() {
         super.onCreate(savedInstanceState)
         mStateId = requireArguments().getInt(ARG_PARAM1)
         mInAppState = requireArguments().getParcelable(ARG_PARAM2)
+        mIsTop = false
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -57,7 +58,7 @@ class CountdownTimerFragment : Fragment() {
         binding = FragmentCountdownTimerBinding.inflate(inflater, container, false)
         val view: View = binding.root
 
-        mIsTop = true
+
         if(mIsTop) {
             val slideDownAnimation = AnimationUtils.loadAnimation(requireContext(), R.anim.slide_down)
        view.startAnimation(slideDownAnimation)
@@ -88,7 +89,7 @@ class CountdownTimerFragment : Fragment() {
 
         //Calculate the time remained to the end day
         //calculateTimeToEndDate();
-        mIsTop = true
+
         if (mIsTop) {
             adjustTop()
         } else {
@@ -119,13 +120,13 @@ class CountdownTimerFragment : Fragment() {
     private fun adjustBottom() {
         //TODO remove the code below when the actual data gets ready
         binding.countdownTimerContainerBot.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.dark_gray))
-        binding.titleBot.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
-        binding.titleBot.text = "Sana Özel Fırsatı Kaçırma!".replace("\\n", "\n")
-        binding.bodyTextBot.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
-        binding.bodyTextBot.text = "Bugün sana özel indirim kodu için geri sayım başladı.".replace("\\n", "\n")
-        binding.buttonBot.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.white))
-        binding.buttonBot.text = "Alışverişe Başla"
-        binding.buttonBot.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
+        binding.titleBottom.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+        binding.titleBottom.text = "Sana Özel Fırsatı Kaçırma!".replace("\\n", "\n")
+        binding.bodyTextBottom.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+        binding.bodyTextBottom.text = "Bugün sana özel indirim kodu için geri sayım başladı.".replace("\\n", "\n")
+        binding.buttonBottom.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.white))
+        binding.buttonBottom.text = "Alışverişe Başla"
+        binding.buttonBottom.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
         binding.countdownTimerContainerTop.visibility = View.GONE
         adjustCouponViewBot()
         adjustTimerViewBot()
@@ -151,19 +152,19 @@ class CountdownTimerFragment : Fragment() {
 
     private fun adjustCouponViewBot() {
         //TODO if there is coupon code
-        binding.couponBot.visibility = View.VISIBLE
-        binding.couponTextBot.text = "1D48KNSDF92A"
-        binding.couponTextBot.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
-        binding.couponBot.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.white))
-        binding.couponButtonBot.setOnClickListener {
+        //binding.couponBottom.visibility = View.VISIBLE
+        binding.couponTextBottom.text = "1D48KNSDF92A"
+        binding.couponTextBottom.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
+       // binding.couponBottom.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.white))
+       /* binding.couponButtonBottom.setOnClickListener {
             //TODO: send click report here
             val clipboard = requireActivity().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
             //TODO: get coupon text from the response instead of view here
-            val clip = ClipData.newPlainText(getString(R.string.coupon_code), binding.couponTextBot.text.toString())
+            val clip = ClipData.newPlainText(getString(R.string.coupon_code), binding.couponTextBottom.text.toString())
             clipboard.setPrimaryClip(clip)
             Toast.makeText(requireActivity(), getString(R.string.copied_to_clipboard), Toast.LENGTH_LONG).show()
             //TODO track this click later
-        }
+        } */
     }
 
     private fun adjustButtonTop() {
@@ -197,7 +198,7 @@ class CountdownTimerFragment : Fragment() {
 
     private fun adjustButtonBot() {
         //TODO this should direct to somewhere
-        binding.buttonBot.setOnClickListener { //TODO: send click report here
+        binding.buttonBottom.setOnClickListener { //TODO: send click report here
             //TODO: Remove Toast
             /*
             InAppButtonInterface buttonInterface = Visilabs.CallAPI().getInAppButtonInterface();
@@ -230,8 +231,8 @@ class CountdownTimerFragment : Fragment() {
             binding.closeButtonTop.setBackgroundResource(closeIcon)
             binding.closeButtonTop.setOnClickListener { endFragment() }
         } else {
-            binding.closeButtonBot.setBackgroundResource(closeIcon)
-            binding.closeButtonBot.setOnClickListener { endFragment() }
+            binding.closeButtonBottom.setBackgroundResource(closeIcon)
+            binding.closeButtonBottom.setOnClickListener { endFragment() }
         }
     }
 
@@ -279,16 +280,16 @@ class CountdownTimerFragment : Fragment() {
         setTimerValues()
         //TODO check the format here and set the visibilities of the views accordingly
         //TODO: convert bigger part like week to smaller parts like day if necessary according to the format
-        binding.weekNumBot.text = mWeekNum.toString()
-        binding.weekNumBot.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
-        binding.dayNumBot.text = mDayNum.toString()
-        binding.dayNumBot.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
-        binding.hourNumBot.text = mHourNum.toString()
-        binding.hourNumBot.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
-        binding.minuteNumBot.text = mMinuteNum.toString()
-        binding.minuteNumBot.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
-        binding.secNumBot.text = mSecondNum.toString()
-        binding.secNumBot.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+        binding.weekNumBottom.text = mWeekNum.toString()
+        binding.weekNumBottom.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+        binding.dayNumBottom.text = mDayNum.toString()
+        binding.dayNumBottom.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+        binding.hourNumBottom.text = mHourNum.toString()
+        binding.hourNumBottom.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+        binding.minuteNumBottom.text = mMinuteNum.toString()
+        binding.minuteNumBottom.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+        binding.secNumBottom.text = mSecondNum.toString()
+        binding.secNumBottom.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
         startTimer()
     }
 
@@ -332,20 +333,20 @@ class CountdownTimerFragment : Fragment() {
                         binding.secNumTop.text = mSecondNum.toString()
                     }
                 } else {
-                    if (binding.weekNumBot.visibility != View.GONE) {
-                        binding.weekNumBot.text = mWeekNum.toString()
+                    if (binding.weekNumBottom.visibility != View.GONE) {
+                        binding.weekNumBottom.text = mWeekNum.toString()
                     }
-                    if (binding.dayNumBot.visibility != View.GONE) {
-                        binding.dayNumBot.text = mDayNum.toString()
+                    if (binding.dayNumBottom.visibility != View.GONE) {
+                        binding.dayNumBottom.text = mDayNum.toString()
                     }
-                    if (binding.hourNumBot.visibility != View.GONE) {
-                        binding.hourNumBot.text = mHourNum.toString()
+                    if (binding.hourNumBottom.visibility != View.GONE) {
+                        binding.hourNumBottom.text = mHourNum.toString()
                     }
-                    if (binding.minuteNumBot.visibility != View.GONE) {
-                        binding.minuteNumBot.text = mMinuteNum.toString()
+                    if (binding.minuteNumBottom.visibility != View.GONE) {
+                        binding.minuteNumBottom.text = mMinuteNum.toString()
                     }
-                    if (binding.secNumBot.visibility != View.GONE) {
-                        binding.secNumBot.text = mSecondNum.toString()
+                    if (binding.secNumBottom.visibility != View.GONE) {
+                        binding.secNumBottom.text = mSecondNum.toString()
                     }
                 }
             } catch (e: Exception) {
@@ -402,7 +403,7 @@ class CountdownTimerFragment : Fragment() {
             mTimer!!.cancel()
         }
 
-        mIsTop = true
+
         if (mIsTop) {
             val slideUpAnimation = AnimationUtils.loadAnimation(requireContext(), R.anim.slide_up)
             binding.root.startAnimation(slideUpAnimation)
