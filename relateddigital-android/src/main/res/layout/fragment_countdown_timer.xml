@@ -232,7 +232,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingBottom="@dimen/ct_main_container_bottom_padding"
-        android:background="@drawable/carousel_rounded_corner"
+        android:background="@drawable/carousel_rounded_corner_bottom"
         android:layout_alignParentBottom="true">
 
         <TextView
