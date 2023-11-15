@@ -1,24 +1,8 @@
-package com.relateddigital.relateddigital_android.inapp.gamification
+package com.relateddigital.relateddigital_android.inapp.customactions
 
-import android.content.ClipData
-import android.content.ClipboardManager
-import android.graphics.Color
-import android.graphics.Typeface
-import android.os.Bundle
-import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.widget.Toast
-import androidx.core.content.ContextCompat
-import androidx.core.content.res.ResourcesCompat
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentActivity
-import java.util.*
 
-class GamificationCodeBannerFragment : Fragment() {
+class CustomActionsCodeBannerFragment : Fragment() {
     /* companion object {
         private const val LOG_TAG = "JackpotBanner"
 

@@ -1,4 +1,4 @@
-package com.relateddigital.relateddigital_android.inapp.gamification
+package com.relateddigital.relateddigital_android.inapp.customactions
 
 import android.util.Log
 import android.webkit.JavascriptInterface
@@ -13,8 +13,8 @@ import com.relateddigital.relateddigital_android.network.requestHandler.InAppAct
 import com.relateddigital.relateddigital_android.network.requestHandler.SubsJsonRequest
 
 
-class GamificationJavaScriptInterface internal constructor(webViewDialogFragment: SlotMachineWebDialogFragment,
-                                                           @get:JavascriptInterface val response: String)  {
+class CustomActionsJavaScriptInterface internal constructor(webViewDialogFragment: SlotMachineWebDialogFragment,
+                                                            @get:JavascriptInterface val response: String)  {
     var mWebViewDialogFragment: SlotMachineWebDialogFragment = webViewDialogFragment
     private lateinit var mListener: SlotMachineCompleteInterface
     private lateinit var mCopyToClipboardInterface: SlotMachineCopyToClipboardInterface

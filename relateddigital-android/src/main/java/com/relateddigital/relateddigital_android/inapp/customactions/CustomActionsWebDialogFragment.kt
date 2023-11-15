@@ -1,20 +1,9 @@
-package com.relateddigital.relateddigital_android.inapp.gamification
+package com.relateddigital.relateddigital_android.inapp.customactions
 
 
-import android.annotation.SuppressLint
-import android.os.Build
-import android.os.Bundle
-import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.webkit.ConsoleMessage
-import android.webkit.WebChromeClient
-import android.webkit.WebView
 import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.FragmentManager
 
-class GamificationWebDialogFragment : DialogFragment() {
+class CustomActionsWebDialogFragment : DialogFragment() {
     /*  private var webView: WebView? = null
       private var mResponse: String? = null
       private var baseUrl: String? = ""

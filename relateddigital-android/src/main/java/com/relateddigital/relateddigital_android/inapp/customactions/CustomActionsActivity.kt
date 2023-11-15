@@ -1,26 +1,9 @@
-package com.relateddigital.relateddigital_android.inapp.gamification
+package com.relateddigital.relateddigital_android.inapp.customactions
 
-import android.content.ClipData
-import android.content.ClipboardManager
-import android.content.Intent
-import android.net.Uri
-import android.os.Build
-import android.os.Bundle
-import android.util.Log
-import android.widget.Toast
-import androidx.annotation.RequiresApi
 import androidx.fragment.app.FragmentActivity
-import androidx.fragment.app.FragmentTransaction
-import com.google.gson.Gson
-import okhttp3.ResponseBody
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import java.net.URI
-import java.util.HashMap
 
-/*class GamificationActivity : FragmentActivity(), GamificationCompleteInterface,
-   GamificationCopyToClipboardInterface, GamificationShowCodeInterface {
+/*class CustomActionsActivity : FragmentActivity(), CustomActionsCompleteInterface,
+   CustomActionsCopyToClipboardInterface, CustomActionsShowCodeInterface {
    private var jsonStr: String? = ""
    private var response: Jackpot? = null
    private var jackpotPromotionCode = ""
@@ -180,4 +163,4 @@ import java.util.HashMap
    override fun onCodeShown(code: String) {
        jackpotPromotionCode = code
    }
-}*/
+} */
