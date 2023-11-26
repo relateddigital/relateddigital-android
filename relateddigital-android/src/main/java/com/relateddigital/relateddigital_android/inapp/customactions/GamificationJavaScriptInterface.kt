@@ -6,16 +6,15 @@ import com.google.gson.Gson
 import com.relateddigital.relateddigital_android.inapp.slotmachine.SlotMachineCompleteInterface
 import com.relateddigital.relateddigital_android.inapp.slotmachine.SlotMachineCopyToClipboardInterface
 import com.relateddigital.relateddigital_android.inapp.slotmachine.SlotMachineShowCodeInterface
-import com.relateddigital.relateddigital_android.inapp.slotmachine.SlotMachineWebDialogFragment
 import com.relateddigital.relateddigital_android.model.SlotMachine
 import com.relateddigital.relateddigital_android.model.MailSubReport
 import com.relateddigital.relateddigital_android.network.requestHandler.InAppActionClickRequest
 import com.relateddigital.relateddigital_android.network.requestHandler.SubsJsonRequest
 
 
-class CustomActionsJavaScriptInterface internal constructor(webViewDialogFragment: SlotMachineWebDialogFragment,
+class CustomActionsJavaScriptInterface internal constructor(webViewDialogFragment: CustomActionsWebDialogFragment,
                                                             @get:JavascriptInterface val response: String)  {
-    var mWebViewDialogFragment: SlotMachineWebDialogFragment = webViewDialogFragment
+    var mWebViewDialogFragment: CustomActionsWebDialogFragment = webViewDialogFragment
     private lateinit var mListener: SlotMachineCompleteInterface
     private lateinit var mCopyToClipboardInterface: SlotMachineCopyToClipboardInterface
     private lateinit var mShowCodeInterface: SlotMachineShowCodeInterface

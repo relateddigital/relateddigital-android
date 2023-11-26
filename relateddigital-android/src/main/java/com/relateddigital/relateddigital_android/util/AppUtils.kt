@@ -956,6 +956,57 @@ object AppUtils {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    fun createCustomActionsCustomFontFiles(
+        context: Context,
+        jsonStr: String?,
+        jsStr: String
+    ): ArrayList<String?>? {
+        var result: ArrayList<String?>? = null
+        val customActionsModel: CustomActions?
+        val extendedProps: CustomActionsExtendedProps?
+        val baseUrlPath = "file://" + context.filesDir.absolutePath + "/"
+        try {
+            customActionsModel = Gson().fromJson(jsonStr, CustomActions::class.java)
+            extendedProps = Gson().fromJson(
+                URI(customActionsModel!!.actiondata!!.ExtendedProps).path,
+                CustomActionsExtendedProps::class.java
+            )
+        } catch (e: java.lang.Exception) {
+            Log.e("CustomActions", "Extended properties could not be parsed properly!")
+            return null
+        }
+        if (customActionsModel == null || extendedProps == null) {
+            return null
+        }
+        //val fontFamily: String = extendedProps.fontFamily ?: return null
+
+        val htmlStr: String = writeHtmlToFile(context, "giftbox", jsStr)
+
+        /* if (fontFamily == "custom") {
+            val fontExtension = getFontNameWithExtension(
+                context,
+                extendedProps.customFontFamilyAndroid!!
+            )
+            if (fontExtension.isNotEmpty()) {
+                writeFontToFile(
+                    context,
+                    extendedProps.customFontFamilyAndroid!!,
+                    fontExtension
+                )
+                customActionsModel.fontFiles.add(fontExtension)
+            }
+        } */
+
+        if (htmlStr.isNotEmpty()) {
+            result = ArrayList()
+            result.add(baseUrlPath)
+            result.add(htmlStr)
+            result.add(Gson().toJson(customActionsModel, CustomActions::class.java))
+        }
+        return result
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     fun createFindToWinCustomFontFiles(
         context: Context,
         jsonStr: String?,
