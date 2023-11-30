@@ -1,8 +1,9 @@
 package com.relateddigital.relateddigital_android.model
 
 import com.google.gson.annotations.SerializedName
+import java.io.Serializable
 
-class CustomActionsExtendedProps {
+class CustomActionsExtendedProps  : Serializable {
 
     @SerializedName("position"           ) var position         : String? = null
     @SerializedName("width"              ) var width            : Int?    = null

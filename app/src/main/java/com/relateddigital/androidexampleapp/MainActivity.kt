@@ -52,5 +52,10 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(this@MainActivity, SwipeCarouselActivity::class.java)
             startActivity(intent)
         }
+
+        binding.customWeb.setOnClickListener {
+            val intent = Intent(this@MainActivity, WebViewTryActivity::class.java)
+            startActivity(intent)
+        }
     }
 }

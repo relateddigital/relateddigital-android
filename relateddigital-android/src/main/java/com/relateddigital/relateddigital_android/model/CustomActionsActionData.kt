@@ -1,8 +1,9 @@
 package com.relateddigital.relateddigital_android.model
 
 import com.google.gson.annotations.SerializedName
+import java.io.Serializable
 
-class CustomActionsActionData {
+class CustomActionsActionData  : Serializable {
 
     @SerializedName("cid"                 ) var cid               : String? = null
     @SerializedName("courseofaction"      ) var courseofaction    : String? = null

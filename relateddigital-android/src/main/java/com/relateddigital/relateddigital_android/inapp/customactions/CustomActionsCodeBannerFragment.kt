@@ -1,10 +1,31 @@
 package com.relateddigital.relateddigital_android.inapp.customactions
 
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.graphics.Color
+import android.graphics.Typeface
+import android.graphics.fonts.FontFamily
+import android.os.Bundle
+import android.util.Log
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.Toast
+import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
+import com.relateddigital.relateddigital_android.R
+import com.relateddigital.relateddigital_android.databinding.FragmentCustomactionsCodeBannerBinding
+import com.relateddigital.relateddigital_android.model.CustomActionsExtendedProps
+import com.relateddigital.relateddigital_android.util.AppUtils
+import java.util.Locale
 
 class CustomActionsCodeBannerFragment : Fragment() {
-    /* companion object {
-        private const val LOG_TAG = "JackpotBanner"
+     companion object {
+        private const val LOG_TAG = "CustomActionsBanner"
 
         // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
         private const val ARG_PARAM1 = "banner_data"
@@ -16,13 +37,13 @@ class CustomActionsCodeBannerFragment : Fragment() {
          *
          * @param extendedProps Parameter 1.
          * @param code Parameter 2.
-         * @return A new instance of fragment JackpotCodeBannerFragment.
+         * @return A new instance of fragment CustomActionsCodeBannerFragment.
          */
         fun newInstance(
-            extendedProps: JackpotExtendedProps,
+            extendedProps: CustomActionsExtendedProps,
             code: String
-        ): JackpotCodeBannerFragment {
-            val fragment = JackpotCodeBannerFragment()
+        ): CustomActionsCodeBannerFragment {
+            val fragment = CustomActionsCodeBannerFragment()
             val args = Bundle()
             args.putSerializable(ARG_PARAM1, extendedProps)
             args.putString(ARG_PARAM2, code)
@@ -31,24 +52,24 @@ class CustomActionsCodeBannerFragment : Fragment() {
         }
     }
 
-    private var mExtendedProps: JackpotExtendedProps? = null
+    private var mExtendedProps: CustomActionsExtendedProps? = null
     private var bannerCode: String? = null
-    private lateinit var binding: FragmentJackpotCodeBannerBinding
+    private lateinit var binding: FragmentCustomactionsCodeBannerBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mExtendedProps = requireArguments().getSerializable(ARG_PARAM1) as JackpotExtendedProps
+        mExtendedProps = requireArguments().getSerializable(ARG_PARAM1) as CustomActionsExtendedProps
         bannerCode = requireArguments().getString(ARG_PARAM2)
         if (bannerCode.isNullOrEmpty()) {
             endFragment()
         }
     }
 
-    override fun onCreateView(
+   /* override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentJackpotCodeBannerBinding.inflate(inflater, container, false)
+        binding = FragmentCustomactionsCodeBannerBinding.inflate(inflater, container, false)
         val view: View = binding.root
 
         hideStatusBar()
@@ -60,9 +81,9 @@ class CustomActionsCodeBannerFragment : Fragment() {
             Log.e(LOG_TAG, "Could not get the data, closing in app")
         }
         return view
-    }
+    } */
 
-    private fun setupUi() {
+    /*private fun setupUi() {
         if (!mExtendedProps!!.promocodeBannerBackgroundColor.isNullOrEmpty()) {
             binding.container.setBackgroundColor(Color.parseColor(mExtendedProps!!.promocodeBannerBackgroundColor))
         } else {
@@ -105,7 +126,7 @@ class CustomActionsCodeBannerFragment : Fragment() {
         }
          */
 
-        if (mExtendedProps!!.fontFamily.isNullOrEmpty()) {
+         if (mExtendedProps!!.fontFamily.isNullOrEmpty()) {
             binding.bannerText.typeface = Typeface.DEFAULT
             binding.bannerLabel.typeface = Typeface.DEFAULT
         } else if (FontFamily.Monospace.toString() == mExtendedProps!!.fontFamily!!.lowercase(
@@ -157,7 +178,7 @@ class CustomActionsCodeBannerFragment : Fragment() {
             ).show()
         }
     }
-
+*/
     private fun getCloseIcon(): Int {
         when (mExtendedProps!!.closeButtonColor) {
             "white" -> return R.drawable.ic_close_white_24dp
@@ -169,7 +190,7 @@ class CustomActionsCodeBannerFragment : Fragment() {
     private fun endFragment() {
         if (activity != null) {
             requireActivity().supportFragmentManager.beginTransaction()
-                .remove(this@JackpotCodeBannerFragment).commit()
+                .remove(this@CustomActionsCodeBannerFragment).commit()
         }
     }
 
@@ -191,5 +212,5 @@ class CustomActionsCodeBannerFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         showStatusBar()
-    } */
+    }
 }

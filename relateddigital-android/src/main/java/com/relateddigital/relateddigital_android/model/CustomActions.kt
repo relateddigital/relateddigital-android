@@ -1,9 +1,10 @@
 package com.relateddigital.relateddigital_android.model
 
 import com.google.gson.annotations.SerializedName
+import java.io.Serializable
 import java.util.ArrayList
 
-class CustomActions {
+class CustomActions  : Serializable {
     var fontFiles = ArrayList<String>()
 
     @SerializedName("actid")
