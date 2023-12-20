@@ -474,6 +474,29 @@
                 android:padding="@dimen/in_app_button_padding"
                 android:text="@string/jackpot" />
 
+            <Button
+                android:id="@+id/customActionsButton"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="@dimen/in_app_button_left_right_margin"
+                android:layout_marginEnd="@dimen/in_app_button_left_right_margin"
+                android:layout_weight="1"
+                android:background="@drawable/rounded_corners_background"
+                android:padding="@dimen/in_app_button_padding"
+                android:text="@string/custom_actions" />
+
+            <Button
+                android:id="@+id/inAppReviewButton"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="@dimen/in_app_button_left_right_margin"
+                android:layout_marginEnd="@dimen/in_app_button_left_right_margin"
+                android:layout_weight="1"
+                android:background="@drawable/rounded_corners_background"
+                android:padding="@dimen/in_app_button_padding"
+                android:text="inAppReview" />
+
+
 
 
         </LinearLayout>

@@ -12,6 +12,7 @@ import com.relateddigital.relateddigital_android.constants.Constants
 import com.relateddigital.relateddigital_android.inapp.InAppManager
 import com.relateddigital.relateddigital_android.inapp.VisilabsResponse
 import com.relateddigital.relateddigital_android.inapp.choosefavorite.ChooseFavoriteActivity
+import com.relateddigital.relateddigital_android.inapp.customactions.CustomActionFragment
 import com.relateddigital.relateddigital_android.inapp.findtowin.FindToWinActivity
 import com.relateddigital.relateddigital_android.inapp.giftbox.GiftBoxActivity
 import com.relateddigital.relateddigital_android.inapp.giftcatch.GiftCatchActivity
@@ -310,6 +311,15 @@ object RequestSender {
 
                                             val transaction : FragmentTransaction= (currentRequest.parent!! as FragmentActivity).supportFragmentManager.beginTransaction()
                                             transaction.replace(android.R.id.content, inAppNotificationFragment)
+                                            transaction.commit()
+                                        }
+                                        !actionsResponse.mCustomActionList.isNullOrEmpty() -> {
+                                            val CustomActionFragment = CustomActionFragment.newInstance(
+                                                actionsResponse.mCustomActionList!![0]
+                                            )
+
+                                            val transaction : FragmentTransaction= (currentRequest.parent!! as FragmentActivity).supportFragmentManager.beginTransaction()
+                                            transaction.replace(android.R.id.content, CustomActionFragment)
                                             transaction.commit()
                                         }
                                         !actionsResponse.mGiftRain.isNullOrEmpty() -> {

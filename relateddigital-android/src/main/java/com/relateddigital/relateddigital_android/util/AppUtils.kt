@@ -968,7 +968,7 @@ object AppUtils {
         try {
             customActionsModel = Gson().fromJson(jsonStr, CustomActions::class.java)
             extendedProps = Gson().fromJson(
-                URI(customActionsModel!!.actiondata!!.ExtendedProps).path,
+                URI(customActionsModel!!.actiondata!!.extendedProps).path,
                 CustomActionsExtendedProps::class.java
             )
         } catch (e: java.lang.Exception) {

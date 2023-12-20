@@ -2,10 +2,9 @@ package com.relateddigital.relateddigital_android.model
 
 import com.google.gson.annotations.SerializedName
 import java.io.Serializable
-import java.util.ArrayList
 
-class CustomActions  : Serializable {
-    var fontFiles = ArrayList<String>()
+class CustomActions : Serializable {
+
 
     @SerializedName("actid")
     var actid: String? = null
@@ -19,5 +18,8 @@ class CustomActions  : Serializable {
     @SerializedName("actiondata")
     var actiondata: CustomActionsActionData? = null
 
-    @SerializedName("panelv2"    ) var panelv2    : Boolean?    = null
+    @SerializedName("panelv2"    ) var
+            panelv2    : Boolean?    = null
+
+
 }

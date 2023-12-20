@@ -9,7 +9,7 @@ class CustomActionsActionData  : Serializable {
     @SerializedName("courseofaction"      ) var courseofaction    : String? = null
     @SerializedName("javascript"          ) var javascript        : String? = null
     @SerializedName("content"             ) var content           : String? = null
-    @SerializedName("close_event_trigger" ) var closeEventTrigger : String? = null
-    @SerializedName("ExtendedProps"       ) var ExtendedProps     : String? = null
     @SerializedName("report"              ) var report            : CustomActionsReport? = null
+    @SerializedName("ExtendedProps"       ) var extendedProps       : String? = null
+
 }

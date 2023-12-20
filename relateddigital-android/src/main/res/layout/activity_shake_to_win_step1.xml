@@ -13,20 +13,17 @@
         <FrameLayout
             android:id="@+id/linear_layout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:orientation="vertical"
-            android:paddingBottom="20dp">
+            >
 
             <ImageView
                 android:id="@+id/image_view"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginStart="20dp"
-                android:layout_marginTop="20dp"
-                android:layout_marginEnd="20dp"
-                android:adjustViewBounds="true"
-                android:contentDescription="@string/image" />
+                android:contentDescription="@string/image"
+                android:scaleType="fitXY" />
 
 
             <LinearLayout
@@ -46,7 +43,8 @@
                     android:paddingLeft="16dp"
                     android:paddingTop="16dp"
                     android:paddingRight="16dp"
-                    android:paddingBottom="16dp" />
+                    android:paddingBottom="16dp"
+                    android:layout_marginBottom="26dp"/>
 
             </LinearLayout>
 
