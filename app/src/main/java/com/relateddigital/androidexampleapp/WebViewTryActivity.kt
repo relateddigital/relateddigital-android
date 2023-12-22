@@ -18,7 +18,7 @@ class WebViewTryActivity : AppCompatActivity() {
         setContentView(R.layout.activity_web_view_try)
 
         val myWebView: WebView = findViewById(R.id.myWebView)
-        /*val webSettings: WebSettings = myWebView.settings
+        val webSettings: WebSettings = myWebView.settings
 
         webSettings.javaScriptEnabled = true // JavaScript'i etkinleştir
         webSettings.domStorageEnabled = true
@@ -85,7 +85,7 @@ class WebViewTryActivity : AppCompatActivity() {
             ): Boolean {
                 return false
             }
-        } */
+        }
 
 
         val position = "topLeft"
@@ -117,11 +117,11 @@ class WebViewTryActivity : AppCompatActivity() {
 
         myWebView.layoutParams = params
 
-        /*myWebView.evaluateJavascript(gameCode) { result ->
+        myWebView.evaluateJavascript(gameCode) { result ->
             // JavaScript kodu çalıştıktan sonra yapılacak işlemler
             // result değişkeni, JavaScript kodunun çıktısını içerir
-        } */
-        myWebView.loadUrl("https://web.whatsapp.com/")
+        }
+       // myWebView.loadUrl("https://web.whatsapp.com/")
         myWebView.webViewClient = WebViewClient()
     }
 }

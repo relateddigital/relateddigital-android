@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.RelativeLayout
@@ -48,6 +49,8 @@ class CustomActionFragment : Fragment() {
                 endFragment()
             }
         }
+
+
     }
 
     override fun onCreateView(
@@ -59,6 +62,7 @@ class CustomActionFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
 
         val position = mExtendedProps!!.position
         val width = mExtendedProps!!.width
@@ -74,11 +78,37 @@ class CustomActionFragment : Fragment() {
                 params.addRule(RelativeLayout.ALIGN_PARENT_TOP)
                 params.addRule(RelativeLayout.ALIGN_PARENT_LEFT)
             }
+            "topCenter" -> {
+                params.addRule(RelativeLayout.ALIGN_PARENT_TOP)
+                params.addRule(RelativeLayout.CENTER_IN_PARENT)
+            }
+            "topRight" -> {
+                params.addRule(RelativeLayout.ALIGN_PARENT_TOP)
+                params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT)
+            }
+            "middleRight" -> {
+                params.addRule(RelativeLayout.CENTER_IN_PARENT)
+                params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT)
+            }
             "bottomRight" -> {
                 params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM)
                 params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT)
             }
-
+            "bottomCenter" -> {
+                params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM)
+                params.addRule(RelativeLayout.CENTER_IN_PARENT)
+            }
+            "bottomLeft" -> {
+                params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM)
+                params.addRule(RelativeLayout.ALIGN_PARENT_LEFT)
+            }
+            "middleLeft" -> {
+                params.addRule(RelativeLayout.CENTER_IN_PARENT)
+                params.addRule(RelativeLayout.ALIGN_PARENT_LEFT)
+            }
+            "middleCenter" -> {
+                params.addRule(RelativeLayout.CENTER_IN_PARENT)
+            }
             else -> {
                 params.addRule(RelativeLayout.CENTER_IN_PARENT)
             }
