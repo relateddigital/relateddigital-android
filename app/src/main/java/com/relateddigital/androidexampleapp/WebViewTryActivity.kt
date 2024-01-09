@@ -28,10 +28,10 @@ class WebViewTryActivity : AppCompatActivity() {
             function initGame() {
                 var score = 0;
 
-                // Hedef elementini seç
+               
                 var target = document.getElementById('target');
 
-                // Hedef tıklandığında skoru artır ve yeni bir konumda yerleştir
+              
                 target.addEventListener('click', function() {
                     score++;
                     document.getElementById('score').innerText = 'Score: ' + score;
