@@ -216,7 +216,7 @@ class Constants {
 
         const val LOGGER_ENDPOINT = "https://lgr.visilabs.net/"
         const val REALTIME_ENDPOINT = "https://lgr.visilabs.net/"
-        const val GRAYLOG_ENDPOINT = "https://gt.relateddigital.com/"
+        const val GRAYLOG_ENDPOINT = "https://rd-gateway.relateddigital.com/"
         const val REMOTE_CONFIG_ENDPOINT = "https://mbls.visilabs.net/"
 
         var ACTION_ENDPOINT = "https://s.visilabs.net/"
