@@ -14,12 +14,7 @@ import com.relateddigital.relateddigital_android.constants.Constants
 import com.relateddigital.relateddigital_android.inapp.VisilabsCallback
 import com.relateddigital.relateddigital_android.inapp.VisilabsResponse
 import com.relateddigital.relateddigital_android.inapp.countdowntimer.CountdownTimerFragment
-import com.relateddigital.relateddigital_android.inapp.customactions.CustomActionsActivity
-import com.relateddigital.relateddigital_android.inapp.findtowin.FindToWinActivity
-import com.relateddigital.relateddigital_android.inapp.giftcatch.GiftCatchActivity
-import com.relateddigital.relateddigital_android.inapp.shaketowin.ShakeToWinActivity
 import com.relateddigital.relateddigital_android.model.FavsResponse
-import com.relateddigital.relateddigital_android.util.ActivityUtils
 import java.util.*
 
 
