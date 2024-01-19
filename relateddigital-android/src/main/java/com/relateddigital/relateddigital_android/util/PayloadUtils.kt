@@ -167,6 +167,20 @@ object PayloadUtils {
                 ).format(Date())
             message.status = "D"
             message.openDate = ""
+            val userExVid: Map<String, Any?> =
+                RelatedDigital.getRelatedDigitalModel(context).getExtra()
+            if (userExVid.containsKey(Constants.RELATED_DIGITAL_USER_KEY) && userExVid[Constants.RELATED_DIGITAL_USER_KEY] != null) {
+                val keyID = userExVid[Constants.RELATED_DIGITAL_USER_KEY]
+                if (keyID is String) {
+                    message.keyID = keyID.toString()
+                }
+            }
+            if (userExVid.containsKey(Constants.EMAIL_KEY) && userExVid[Constants.EMAIL_KEY] != null) {
+                val email = userExVid[Constants.EMAIL_KEY]
+                if (email is String) {
+                    message.email= email.toString()
+                }
+            }
             jsonArray!!.put(JSONObject(Gson().toJson(message)))
             jsonArray
         } catch (e: Exception) {
@@ -194,6 +208,20 @@ object PayloadUtils {
                 ).format(Date())
             message.status = "D"
             message.openDate = ""
+            val userExVid: Map<String, Any?> =
+                RelatedDigital.getRelatedDigitalModel(context).getExtra()
+            if (userExVid.containsKey(Constants.RELATED_DIGITAL_USER_KEY) && userExVid[Constants.RELATED_DIGITAL_USER_KEY] != null) {
+                val keyID = userExVid[Constants.RELATED_DIGITAL_USER_KEY]
+                if (keyID is String) {
+                    message.keyID = keyID.toString()
+                }
+            }
+            if (userExVid.containsKey(Constants.EMAIL_KEY) && userExVid[Constants.EMAIL_KEY] != null) {
+                val email = userExVid[Constants.EMAIL_KEY]
+                if (email is String) {
+                    message.email= email.toString()
+                }
+            }
             jsonArray!!.put(JSONObject(Gson().toJson(message)))
             jsonArray
         } catch (e: Exception) {
@@ -274,6 +302,20 @@ object PayloadUtils {
                 ).format(Date())
             message.status = "D"
             message.openDate = ""
+            val userExVid: Map<String, Any?> =
+                RelatedDigital.getRelatedDigitalModel(context).getExtra()
+            if (userExVid.containsKey(Constants.RELATED_DIGITAL_USER_KEY) && userExVid[Constants.RELATED_DIGITAL_USER_KEY] != null) {
+                val keyID = userExVid[Constants.RELATED_DIGITAL_USER_KEY]
+                if (keyID is String) {
+                    message.keyID = keyID.toString()
+                }
+            }
+            if (userExVid.containsKey(Constants.EMAIL_KEY) && userExVid[Constants.EMAIL_KEY] != null) {
+                val email = userExVid[Constants.EMAIL_KEY]
+                if (email is String) {
+                    message.email= email.toString()
+                }
+            }
             jsonArray.put(JSONObject(Gson().toJson(message)))
             jsonObject.put(Constants.PAYLOAD_SP_ARRAY_KEY, jsonArray)
             SharedPref.writeString(context, Constants.PAYLOAD_SP_KEY, jsonObject.toString())
@@ -302,6 +344,20 @@ object PayloadUtils {
                 ).format(Date())
             message.status = "D"
             message.openDate = ""
+            val userExVid: Map<String, Any?> =
+                RelatedDigital.getRelatedDigitalModel(context).getExtra()
+            if (userExVid.containsKey(Constants.RELATED_DIGITAL_USER_KEY) && userExVid[Constants.RELATED_DIGITAL_USER_KEY] != null) {
+                val keyID = userExVid[Constants.RELATED_DIGITAL_USER_KEY]
+                if (keyID is String) {
+                    message.keyID = keyID.toString()
+                }
+            }
+            if (userExVid.containsKey(Constants.EMAIL_KEY) && userExVid[Constants.EMAIL_KEY] != null) {
+                val email = userExVid[Constants.EMAIL_KEY]
+                if (email is String) {
+                    message.email= email.toString()
+                }
+            }
             jsonArray.put(JSONObject(Gson().toJson(message)))
             jsonObject.put(Constants.PAYLOAD_SP_ARRAY_ID_KEY, jsonArray)
             SharedPref.writeString(context, Constants.PAYLOAD_SP_ID_KEY, jsonObject.toString())

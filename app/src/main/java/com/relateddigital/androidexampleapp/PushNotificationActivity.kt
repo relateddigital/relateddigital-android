@@ -103,8 +103,9 @@ class PushNotificationActivity : AppCompatActivity() {
                         pushMessages[i].date?.let { it2 -> Log.d("PushMesaj Date", it2) }
                         pushMessages[i].status?.let { it3 -> Log.d("PushMesaj Status", it3) }
                         pushMessages[i].openDate?.let { it4 -> Log.d("PushMesaj OpenDate", it4) }
+                        pushMessages[i].keyID?.let { it5 -> Log.d("PushMesaj KeyID", it5) }
+                        pushMessages[i].email?.let { it6 -> Log.d("PushMesaj Email", it6) }
                     }
-
                 }
 
                 override fun fail(errorMessage: String) {
@@ -170,7 +171,7 @@ class PushNotificationActivity : AppCompatActivity() {
                 RelatedDigital.setTwitterId(this, "testTwitterId")
                 RelatedDigital.setEmail(this, binding.autotext.text.toString())
                 RelatedDigital.setFacebookId(this, "testFacebookId")
-                RelatedDigital.setRelatedDigitalUserId(this, "testRelatedDigitalUserId")
+                RelatedDigital.setRelatedDigitalUserId(this, "12345")
                 RelatedDigital.setPhoneNumber(this, "testPhoneNumber")
                 RelatedDigital.setUserProperty(this, "instagram", "testInstagramId")
 

@@ -51,6 +51,10 @@ class Message : Serializable {
     var pushCategory: String?
         private set
 
+    var keyID: String?
+
+    var email: String?
+
     constructor(context: Context, bundle: Map<String, String?>) {
         for (key in bundle.keys) {
             val value: Any? = bundle[key]
@@ -89,6 +93,10 @@ class Message : Serializable {
             convertJsonStrToActionsArray(context,bundle["actions"])
         }
         pushCategory = bundle["pushCategory"]
+
+        keyID = bundle["keyID"]
+
+        email = bundle["email"]
     }
 
     private fun convertJsonStrToElementsArray(context: Context, elementJsonStr: String?) {
@@ -174,6 +182,8 @@ class Message : Serializable {
         elements = bundle.getParcelable("elements")
         actions = bundle.getParcelable("actions")
         pushCategory = bundle.getString("pushCategory")
+        keyID = bundle.getString("keyID")
+        email = bundle.getString("email")
     }
 
     fun getPushType(): PushType? {
