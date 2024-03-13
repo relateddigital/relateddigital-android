@@ -19,6 +19,9 @@ class ActionResponse : Serializable {
     @SerializedName("MobileCustomActions")
     var mCustomActionList: List<CustomActions>? = null
 
+    @SerializedName("MobileAppRating")
+    var mAppRatingList: List<AppRating>? = null
+
     @SerializedName("ScratchToWin")
     var mScratchToWinList: List<ScratchToWin>? = null
 
@@ -84,6 +87,12 @@ class ActionResponse : Serializable {
         get() = mCustomActionList
         set(customActionsList) {
             mCustomActionList = customActionsList
+        }
+
+    var appRatingList: List<AppRating>?
+        get() = mAppRatingList
+        set(appRatingList) {
+            mAppRatingList = appRatingList
         }
     var scratchToWinList: List<ScratchToWin>?
         get() = mScratchToWinList

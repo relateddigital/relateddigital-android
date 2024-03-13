@@ -5,6 +5,11 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import androidx.fragment.app.FragmentActivity
+import com.google.android.play.core.review.ReviewInfo
+import com.google.android.play.core.review.ReviewManager
+import com.google.android.play.core.review.ReviewManagerFactory
+import com.google.android.play.core.tasks.OnCompleteListener
+import com.google.android.play.core.tasks.Task
 import com.google.gson.Gson
 import com.relateddigital.relateddigital_android.RelatedDigital
 import com.relateddigital.relateddigital_android.api.*
@@ -321,6 +326,14 @@ object RequestSender {
                                             val transaction : FragmentTransaction= (currentRequest.parent!! as FragmentActivity).supportFragmentManager.beginTransaction()
                                             transaction.replace(android.R.id.content, CustomActionFragment)
                                             transaction.commit()
+                                        }
+                                        !actionsResponse.mAppRatingList.isNullOrEmpty() -> {
+                                            val reviewManager = ReviewManagerFactory.create(currentRequest.parent!!)
+                                            reviewManager.requestReviewFlow().addOnCompleteListener{
+                                                if(it.isSuccessful) {
+                                                    reviewManager.launchReviewFlow(currentRequest.parent!!, it.result)
+                                                }
+                                            }
                                         }
                                         !actionsResponse.mGiftRain.isNullOrEmpty() -> {
                                             ActivityUtils.parentActivity = currentRequest.parent

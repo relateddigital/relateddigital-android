@@ -242,6 +242,10 @@ class InAppNotificationActivity : AppCompatActivity() {
             sendInAppRequest("mobileCustomActions")
 
         }
+        binding.inAppReviewButton.setOnClickListener{
+            sendInAppRequest("apprating")
+
+        }
 
     }
 
