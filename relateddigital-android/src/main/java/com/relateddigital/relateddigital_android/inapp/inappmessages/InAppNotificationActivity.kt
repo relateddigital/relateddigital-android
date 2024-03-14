@@ -269,6 +269,16 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
                 setNpsSecondPopUpButton()
                 showNps()
             }
+            //TODO When backend ready connect it with video pop up
+            /*InAppNotificationType.VIDEO_POP_UP.toString() -> {
+                npsType = NpsType.VIDEO_POP_UP
+                setTitle()
+                setBody()
+                setVideo()
+
+            }
+
+             */
         }
     }
 
@@ -625,6 +635,68 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
                 }
             }
         }
+    }
+    private fun setVideo() {
+        /*  val webSettings: WebSettings = webView.settings
+          webSettings.javaScriptEnabled = true
+          webSettings.domStorageEnabled = true
+          webSettings.setSupportZoom(false)
+          webSettings.builtInZoomControls = false
+          webSettings.cacheMode = WebSettings.LOAD_NO_CACHE
+          webView.settings.mediaPlaybackRequiresUserGesture = false
+          webView.settings.allowContentAccess = true
+          webView.settings.allowFileAccess = true
+          webView.settings.allowFileAccessFromFileURLs = true
+          webView.settings.allowUniversalAccessFromFileURLs = true
+
+          webView.webChromeClient = WebChromeClient()
+          var urlString ="https://www.youtube.com/watch?v=pwNv6g-otB0&list=RDBWUR1e6fMtw&index=11"
+          val html = """
+          <style>
+            .iframe-container iframe {
+              top: 0;
+              left: 0;
+              width: 100%;
+              height: 100%;
+            }
+          </style>
+          <div class="iframe-container">
+            <div id="player"></div>
+          </div>
+          <script>
+            var tag = document.createElement('script');
+            tag.src = "https://www.youtube.com/iframe_api";
+            var firstScriptTag = document.getElementsByTagName('script')[0];
+            firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+            var player;
+            var isPlaying = true;
+            function onYouTubeIframeAPIReady() {
+              player = new YT.Player('player', {
+                width: '100%',
+                videoId: '$urlString',
+                playerVars: { 'autoplay': 1, 'playsinline': 1 },
+                events: {
+                  'onReady': function(event) {
+                    event.target.playVideo();
+                  }
+                }
+              });
+            }
+            function watchPlayingState() {
+              if (isPlaying) {
+                player.playVideo();
+              } else {
+                player.pauseVideo();
+              }
+            }
+          </script>
+      """
+
+
+          webView.loadDataWithBaseURL("https://www.youtube.com", html, "text/html", "UTF-8", null)
+
+      */
+
     }
 
     private fun setupSecondButton() {
