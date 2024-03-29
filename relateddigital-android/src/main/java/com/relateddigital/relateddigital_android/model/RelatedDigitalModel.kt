@@ -58,6 +58,8 @@ class RelatedDigitalModel(
 
     companion object {
         private const val LOG_TAG = "RelatedDigitalModel"
+        private val googleAppAliasLock = Any()
+        private val huaweiAppAliasLock = Any()
     }
 
     fun setIsPushNotificationEnabled(context: Context, isPushNotificationEnabled: Boolean) {
@@ -391,13 +393,13 @@ fun setUtmTerm(context: Context, utmTerm: String) {
     }
 
     fun getGoogleAppAlias(): String {
-        synchronized(this) {
+        synchronized(googleAppAliasLock) {
             return googleAppAlias
         }
     }
 
     fun getHuaweiAppAlias(): String {
-        synchronized(this) {
+        synchronized(huaweiAppAliasLock) {
             return huaweiAppAlias
         }
     }
