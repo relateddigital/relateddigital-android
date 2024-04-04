@@ -66,6 +66,7 @@ class BannerRecyclerView : RecyclerView {
                     adapter = bannerCarouselAdapter
                     val snapHelper: SnapHelper = PagerSnapHelper()
                     snapHelper.attachToRecyclerView(this@BannerRecyclerView)
+                    adapter?.notifyDataSetChanged()
 
                 } catch (ex: Exception) {
                     Log.e(LOG_TAG, ex.message, ex)
