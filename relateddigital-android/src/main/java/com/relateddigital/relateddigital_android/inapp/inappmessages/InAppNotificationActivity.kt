@@ -15,6 +15,8 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
+import android.webkit.WebChromeClient
+import android.webkit.WebSettings
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.Toast
@@ -144,8 +146,13 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
         } else {
             binding.ivTemplate.visibility = View.GONE
             if (!mInAppMessage!!.mActionData!!.mVideoUrl.isNullOrEmpty()) {
-                binding.videoView.visibility = View.VISIBLE
-                startPlayer()
+                if (mInAppMessage!!.mActionData!!.mVideoUrl!!.toLowerCase().contains("youtube.com") || mInAppMessage!!.mActionData!!.mVideoUrl!!.toLowerCase().contains("youtu.be")) {
+                    binding.webViewInapp.visibility = View.VISIBLE
+                }
+                else {
+                    binding.videoView.visibility = View.VISIBLE
+                    startPlayer()
+                }
             } else {
                 binding.videoView.visibility = View.GONE
                 releasePlayer()
@@ -636,67 +643,92 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
             }
         }
     }
-    private fun setVideo() {
-        /*  val webSettings: WebSettings = webView.settings
-          webSettings.javaScriptEnabled = true
-          webSettings.domStorageEnabled = true
-          webSettings.setSupportZoom(false)
-          webSettings.builtInZoomControls = false
-          webSettings.cacheMode = WebSettings.LOAD_NO_CACHE
-          webView.settings.mediaPlaybackRequiresUserGesture = false
-          webView.settings.allowContentAccess = true
-          webView.settings.allowFileAccess = true
-          webView.settings.allowFileAccessFromFileURLs = true
-          webView.settings.allowUniversalAccessFromFileURLs = true
+    private fun setYoutubeVideo() {
 
-          webView.webChromeClient = WebChromeClient()
-          var urlString ="https://www.youtube.com/watch?v=pwNv6g-otB0&list=RDBWUR1e6fMtw&index=11"
-          val html = """
-          <style>
-            .iframe-container iframe {
-              top: 0;
-              left: 0;
-              width: 100%;
-              height: 100%;
-            }
-          </style>
-          <div class="iframe-container">
-            <div id="player"></div>
-          </div>
-          <script>
-            var tag = document.createElement('script');
-            tag.src = "https://www.youtube.com/iframe_api";
-            var firstScriptTag = document.getElementsByTagName('script')[0];
-            firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-            var player;
-            var isPlaying = true;
-            function onYouTubeIframeAPIReady() {
-              player = new YT.Player('player', {
-                width: '100%',
-                videoId: '$urlString',
-                playerVars: { 'autoplay': 1, 'playsinline': 1 },
-                events: {
-                  'onReady': function(event) {
-                    event.target.playVideo();
-                  }
+        val webSettings: WebSettings = binding.webViewInapp.settings
+        if(!mInAppMessage!!.mActionData!!.mBackground.isNullOrEmpty()) {
+            binding.webViewInapp.setBackgroundColor(Color.parseColor(mInAppMessage!!.mActionData!!.mBackground))
+
+        }
+        else {
+            binding.webViewInapp.setBackgroundColor(resources.getColor(R.color.black))
+        }
+        webSettings.javaScriptEnabled = true
+        webSettings.domStorageEnabled = true
+        webSettings.setSupportZoom(false)
+        webSettings.builtInZoomControls = false
+        webSettings.cacheMode = WebSettings.LOAD_NO_CACHE
+        binding.webViewInapp.settings.mediaPlaybackRequiresUserGesture = false
+        binding.webViewInapp.settings.allowContentAccess = true
+        binding.webViewInapp.settings.allowFileAccess = true
+        binding.webViewInapp.settings.allowFileAccessFromFileURLs = true
+        binding.webViewInapp.settings.allowUniversalAccessFromFileURLs = true
+
+        binding.webViewInapp.webChromeClient = WebChromeClient()
+        var urlString =mInAppMessage!!.mActionData!!.mVideoUrl
+        var videoId = extractVideoId(urlString)
+        val html = """
+        <style>
+          .iframe-container iframe {
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+          }
+        </style>
+        <div class="iframe-container">
+          <div id="player"></div>
+        </div>
+        <script>
+          var tag = document.createElement('script');
+          tag.src = "https://www.youtube.com/iframe_api";
+          var firstScriptTag = document.getElementsByTagName('script')[0];
+          firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+          var player;
+          var isPlaying = true;
+          function onYouTubeIframeAPIReady() {
+            player = new YT.Player('player', {
+              width: '100%',
+              videoId: '$videoId',
+              playerVars: { 'autoplay': 1, 'playsinline': 1, 'rel': 0  },
+              events: {
+                'onReady': function(event) {
+                  event.target.playVideo();
                 }
-              });
-            }
-            function watchPlayingState() {
-              if (isPlaying) {
-                player.playVideo();
-              } else {
-                player.pauseVideo();
               }
+            });
+          }
+          function watchPlayingState() {
+            if (isPlaying) {
+              player.playVideo();
+            } else {
+              player.pauseVideo();
             }
-          </script>
-      """
+          }
+        </script>
+    """
 
 
-          webView.loadDataWithBaseURL("https://www.youtube.com", html, "text/html", "UTF-8", null)
+        binding.webViewInapp.loadDataWithBaseURL("https://www.youtube.com", html, "text/html", "UTF-8", null)
 
-      */
 
+
+    }
+
+    private fun extractVideoId(videoUrl: String?): String? {
+        var videoId: String? = null
+        if (videoUrl != null && videoUrl.trim { it <= ' ' }.length > 0) {
+            val split = videoUrl.split("v=".toRegex()).dropLastWhile { it.isEmpty() }
+                .toTypedArray()
+            if (split.size > 1) {
+                videoId = split[1]
+                val ampersandPosition = videoId.indexOf('&')
+                if (ampersandPosition != -1) {
+                    videoId = videoId.substring(0, ampersandPosition)
+                }
+            }
+        }
+        return videoId
     }
 
     private fun setupSecondButton() {
@@ -1352,7 +1384,13 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
         }
 
         if (!mInAppMessage!!.mActionData!!.mVideoUrl.isNullOrEmpty()) {
-            initializePlayer()
+            if (mInAppMessage!!.mActionData!!.mVideoUrl!!.toLowerCase().contains("youtube.com") || mInAppMessage!!.mActionData!!.mVideoUrl!!.toLowerCase().contains("youtu.be")) {
+                setYoutubeVideo()
+
+            } else {
+                initializePlayer()
+            }
+
         }
     }
 

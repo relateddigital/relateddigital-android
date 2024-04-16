@@ -11,6 +11,8 @@ import android.os.Bundle
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
+import android.webkit.WebChromeClient
+import android.webkit.WebSettings
 import android.widget.Toast
 import com.bumptech.glide.Glide
 import com.google.android.exoplayer2.ExoPlayer
@@ -98,6 +100,7 @@ class InAppFullActivity : Activity(), IVisilabs {
         if (!mInApp!!.mActionData!!.mImg.isNullOrEmpty()) {
             binding.fivInAppImage.visibility = View.VISIBLE
             binding.fullVideoView.visibility = View.GONE
+            binding.webViewFull?.visibility = View.GONE
             if (AppUtils.isAnImage(mInApp!!.mActionData!!.mImg)) {
                 Picasso.get().load(mInApp!!.mActionData!!.mImg).into(binding.fivInAppImage)
             } else {
@@ -108,14 +111,107 @@ class InAppFullActivity : Activity(), IVisilabs {
         } else {
             binding.fivInAppImage.visibility = View.GONE
             if (!mInApp!!.mActionData!!.mVideoUrl.isNullOrEmpty()) {
-                binding.fullVideoView.visibility = View.VISIBLE
-                initializePlayer()
-                startPlayer()
+                if (mInApp!!.mActionData!!.mVideoUrl!!.toLowerCase().contains("youtube.com") || mInApp!!.mActionData!!.mVideoUrl!!.toLowerCase().contains("youtu.be")) {
+                    binding.fullVideoView.visibility = View.GONE
+                    binding.webViewFull!!.visibility = View.VISIBLE
+                    setYoutubeVideo()
+                }
+                else {
+                    binding.webViewFull!!.visibility = View.GONE
+                    binding.fullVideoView.visibility = View.VISIBLE
+                    initializePlayer()
+                    startPlayer()
+                }
             } else {
                 binding.fullVideoView.visibility = View.GONE
                 releasePlayer()
             }
         }
+    }
+    private fun setYoutubeVideo() {
+
+        val webSettings: WebSettings = binding.webViewFull!!.settings
+        if (!mInApp!!.mActionData!!.mBackground.isNullOrEmpty()) {
+            binding.webViewFull!!.setBackgroundColor(Color.parseColor(mInApp!!.mActionData!!.mBackground))
+
+        }
+        else binding.webViewFull!!.setBackgroundColor(getResources().getColor(R.color.black))
+        webSettings.javaScriptEnabled = true
+        webSettings.domStorageEnabled = true
+        webSettings.setSupportZoom(false)
+        webSettings.builtInZoomControls = false
+        webSettings.cacheMode = WebSettings.LOAD_NO_CACHE
+        binding.webViewFull!!.settings.mediaPlaybackRequiresUserGesture = false
+        binding.webViewFull!!.settings.allowContentAccess = true
+        binding.webViewFull!!.settings.allowFileAccess = true
+        binding.webViewFull!!.settings.allowFileAccessFromFileURLs = true
+        binding.webViewFull!!.settings.allowUniversalAccessFromFileURLs = true
+
+        binding.webViewFull!!.webChromeClient = WebChromeClient()
+        var urlString =mInApp!!.mActionData!!.mVideoUrl
+        var videoId = extractVideoId(urlString)
+        val html = """
+        <style>
+          .iframe-container iframe {
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+          }
+        </style>
+        <div class="iframe-container">
+          <div id="player"></div>
+        </div>
+        <script>
+          var tag = document.createElement('script');
+          tag.src = "https://www.youtube.com/iframe_api";
+          var firstScriptTag = document.getElementsByTagName('script')[0];
+          firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+          var player;
+          var isPlaying = true;
+          function onYouTubeIframeAPIReady() {
+            player = new YT.Player('player', {
+              width: '100%',
+              videoId: '$videoId',
+              playerVars: { 'autoplay': 1, 'playsinline': 1 , 'rel': 0  },
+              events: {
+                'onReady': function(event) {
+                  event.target.playVideo();
+                }
+              }
+            });
+          }
+          function watchPlayingState() {
+            if (isPlaying) {
+              player.playVideo();
+            } else {
+              player.pauseVideo();
+            }
+          }
+        </script>
+    """
+
+
+        binding.webViewFull!!.loadDataWithBaseURL("https://www.youtube.com", html, "text/html", "UTF-8", null)
+
+
+
+    }
+
+    private fun extractVideoId(videoUrl: String?): String? {
+        var videoId: String? = null
+        if (videoUrl != null && videoUrl.trim { it <= ' ' }.length > 0) {
+            val split = videoUrl.split("v=".toRegex()).dropLastWhile { it.isEmpty() }
+                .toTypedArray()
+            if (split.size > 1) {
+                videoId = split[1]
+                val ampersandPosition = videoId.indexOf('&')
+                if (ampersandPosition != -1) {
+                    videoId = videoId.substring(0, ampersandPosition)
+                }
+            }
+        }
+        return videoId
     }
 
     private fun setPromotionCode() {
