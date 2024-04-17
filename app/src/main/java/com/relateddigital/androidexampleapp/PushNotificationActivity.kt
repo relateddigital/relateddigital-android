@@ -53,6 +53,8 @@ class PushNotificationActivity : AppCompatActivity() {
         setupTemplatePushButtons()
         setupSyncButton()
         setupRegisterEmailButton()
+        setupDeleteAllPushButton()
+        setupDeletePushWithIdButton()
     }
 
     private fun showToken() {
@@ -319,5 +321,23 @@ class PushNotificationActivity : AppCompatActivity() {
             payloadStr.append(param.key).append(" : ").append(param.value).append("\n\n")
         }
         binding.payloadView.text = payloadStr.toString()
-    }
+      }
+
+        private fun setupDeleteAllPushButton() {
+            binding.btnTextDeleteAllPush.setOnClickListener{
+
+            RelatedDigital.deleteAllPushNotifications(this)
+            }
+        }
+
+
+
+        private fun setupDeletePushWithIdButton() {
+            binding.btnTextDeletePushWithId.setOnClickListener{
+
+                RelatedDigital.deletePushNotificationWithId(this)
+                }
+        }
+
 }
+
