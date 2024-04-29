@@ -464,6 +464,47 @@ object PayloadUtils {
         }
     }
 
+    fun readPushMessagesWithPushId(context: Context, pushId: String? = null) {
+        try {
+            val jsonString = SharedPref.readString(context, Constants.PAYLOAD_SP_KEY, "")
+            val jsonObject = JSONObject(jsonString)
+
+            val payloadsArray = jsonObject.optJSONArray(Constants.PAYLOAD_SP_ARRAY_KEY)
+
+            if (payloadsArray != null) {
+                for (i in 0 until payloadsArray.length()) {
+                    val payloadObject = payloadsArray.getJSONObject(i)
+                    val existingPushId = payloadObject.optString("pushId", "")
+                    if (!pushId.isNullOrEmpty()){
+                        if (existingPushId == pushId) {
+
+                            payloadObject.put("status", "O")
+                            payloadObject.put("openDate", SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date()))
+
+
+                            SharedPref.writeString(context, Constants.PAYLOAD_SP_KEY, jsonObject.toString())
+                            return
+                        }
+                    }
+                }
+
+                Log.e(LOG_TAG, "Payload with pushId $pushId not found!")
+            } else {
+                Log.e(LOG_TAG, "Payload array is null or empty!")
+            }
+        } catch (e: Exception) {
+            val element = Throwable().stackTrace[0]
+            LogUtils.formGraylogModel(
+                context,
+                "e",
+                "Updating push message string : " + e.message,
+                element.className + "/" + element.methodName + "/" + element.lineNumber
+            )
+            Log.e(LOG_TAG, "Could not update the push message!")
+            Log.e(LOG_TAG, e.message!!)
+        }
+    }
+
 
     private fun compareDates(context: Context, str1: String, str2: String): Boolean {
         var res = false
