@@ -211,7 +211,7 @@ class Constants {
 
         const val BANNER_CAROUSEL_ACTION_TYPE_VAL = "AppBanner"
 
-        const val SUBSCRIPTION_ENDPOINT = "http://testpushs.euromsg.com/"
+        const val SUBSCRIPTION_ENDPOINT = "http://pushs.euromsg.com/"
         const val RETENTION_ENDPOINT = "https://pushr.euromsg.com/"
 
         const val LOGGER_ENDPOINT = "https://lgr.visilabs.net/"
