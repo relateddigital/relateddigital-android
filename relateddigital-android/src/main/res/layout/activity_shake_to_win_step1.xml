@@ -23,7 +23,7 @@
                 android:layout_height="match_parent"
                 android:layout_gravity="center_horizontal"
                 android:contentDescription="@string/image"
-                android:scaleType="fitXY" />
+                android:scaleType="centerCrop" />
 
 
             <LinearLayout
