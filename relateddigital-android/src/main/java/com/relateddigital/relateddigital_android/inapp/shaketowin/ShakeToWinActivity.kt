@@ -300,41 +300,39 @@ class ShakeToWinActivity : Activity(), SensorEventListener {
         val isRuleScreen = true
         if (isRuleScreen) {
             setupCloseButtonStep1()
-            if (mExtendedProps!!.backgroundColor!!.isNotEmpty()) {
-                bindingStep1.container.setBackgroundColor(Color.parseColor(mExtendedProps!!.backgroundColor))
-            } else if (mExtendedProps!!.backgroundImage!!.isNotEmpty()) {
-                Picasso.get()
-                    .load(mExtendedProps!!.backgroundImage)
-                    .into(backgroundImageTarget)
-            }
-
-
             if (mShakeToWinMessage!!.actiondata!!.gamificationRules!!.backgroundImage!!.isNotEmpty()) {
                 Picasso.get()
                     .load(mShakeToWinMessage!!.actiondata!!.gamificationRules!!.backgroundImage)
-                    .into(object : com.squareup.picasso.Target {
-                        override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {
-                            Log.i(LOG_TAG, "Could not background Image entered!")
+                    .into(bindingStep1.imageView, object : com.squareup.picasso.Callback {
+                        override fun onSuccess() {
+                            if (mExtendedProps!!.backgroundColor!!.isNotEmpty()) {
+                                bindingStep1.container.setBackgroundColor(Color.parseColor(mExtendedProps!!.backgroundColor))
+                            } else if (mExtendedProps!!.backgroundImage!!.isNotEmpty()) {
+                                Picasso.get()
+                                    .load(mExtendedProps!!.backgroundImage)
+                                    .into(backgroundImageTarget)
+                            }
+                            bindingStep1.buttonView.text =
+                                mShakeToWinMessage!!.actiondata!!.gamificationRules!!.buttonLabel
+                            bindingStep1.buttonView.setBackgroundColor(Color.parseColor(mExtendedProps!!.gamificationRules!!.buttonColor))
+                            bindingStep1.buttonView.setTextColor(Color.parseColor(mExtendedProps!!.gamificationRules!!.buttonTextColor))
+                            bindingStep1.buttonView.textSize =
+                                mExtendedProps!!.gamificationRules!!.buttonTextSize!!.toFloat() + 10
+                            bindingStep1.buttonView.setOnClickListener {
+                                setContentView(bindingStep2.root)
+                                setupStep2View()
+                            }
+
+
                         }
 
-                        override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
-                            bindingStep1.imageView.setImageBitmap(bitmap)
+                        override fun onError(e: Exception?) {
+
                         }
 
-                        override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}
                     })
             }
 
-            bindingStep1.buttonView.text =
-                mShakeToWinMessage!!.actiondata!!.gamificationRules!!.buttonLabel
-            bindingStep1.buttonView.setBackgroundColor(Color.parseColor(mExtendedProps!!.gamificationRules!!.buttonColor))
-            bindingStep1.buttonView.setTextColor(Color.parseColor(mExtendedProps!!.gamificationRules!!.buttonTextColor))
-            bindingStep1.buttonView.textSize =
-                mExtendedProps!!.gamificationRules!!.buttonTextSize!!.toFloat() + 10
-            bindingStep1.buttonView.setOnClickListener {
-                setContentView(bindingStep2.root)
-                setupStep2View()
-            }
         } else {
             setContentView(bindingStep2.root)
             setupStep2View()
