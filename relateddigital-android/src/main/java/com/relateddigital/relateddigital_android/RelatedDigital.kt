@@ -13,6 +13,7 @@ import android.util.Log
 import androidx.annotation.RequiresApi
 import com.google.firebase.FirebaseApp
 import com.google.gson.Gson
+import com.google.gson.JsonSyntaxException
 import com.relateddigital.relateddigital_android.appTracker.AppTracker
 import com.relateddigital.relateddigital_android.constants.Constants
 import com.relateddigital.relateddigital_android.geofence.GeofenceStarter
@@ -100,13 +101,20 @@ object RelatedDigital {
     }
 
     fun getRelatedDigitalModel(context: Context): RelatedDigitalModel {
-        if(model == null) {
+        if (model == null) {
             model = createInitialModel(context)
 
             val modelStr = SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY, "")
 
             if (modelStr.isNotEmpty()) {
-                model!!.fill(Gson().fromJson(modelStr, RelatedDigitalModel::class.java))
+                try {
+                    val parsedModel = Gson().fromJson(modelStr, RelatedDigitalModel::class.java)
+                    model!!.fill(parsedModel)
+                } catch (e: JsonSyntaxException) {
+                    Log.e("RelatedDigitalModel", "JSON parsing error: ${e.message}")
+                } catch (e: Exception) {
+                    Log.e("RelatedDigitalModel", "Unexpected error: ${e.message}")
+                }
             }
         }
         return model!!
