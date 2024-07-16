@@ -29,6 +29,7 @@ import com.relateddigital.relateddigital_android.push.RetentionType
 import com.relateddigital.relateddigital_android.recommendation.VisilabsTargetFilter
 import com.relateddigital.relateddigital_android.remoteConfig.RemoteConfigHelper
 import com.relateddigital.relateddigital_android.util.*
+import org.json.JSONArray
 import org.json.JSONObject
 
 
@@ -1613,6 +1614,65 @@ object RelatedDigital {
         }) {}.start()
     }
 
+    @JvmStatic
+    fun deletePushMessageByIdFromLSPM(activity: Activity , messageId: String?): Boolean {
+        val payloads: String = SharedPref.readString(activity.applicationContext, Constants.PAYLOAD_SP_KEY)
+        return if (!payloads.isEmpty()) {
+            try {
+                val jsonObject = JSONObject(payloads)
+                val jsonArray = jsonObject.getJSONArray(Constants.PAYLOAD_SP_ARRAY_KEY)
+                val newJsonArray = JSONArray()
+                var messageFound = false
+                for (i in 0 until jsonArray.length()) {
+                    val currentObject = jsonArray.getJSONObject(i)
+                    val currentMessage =
+                        Gson().fromJson(currentObject.toString(), Message::class.java)
+                    if (currentMessage.pushId != messageId) {
+                        newJsonArray.put(currentObject)
+                    } else {
+                        messageFound = true
+                    }
+                }
+                if (messageFound) {
+                    jsonObject.put(Constants.PAYLOAD_SP_ARRAY_KEY, newJsonArray)
+                    SharedPref.writeString(
+                        activity.applicationContext,
+                        Constants.PAYLOAD_SP_KEY,
+                        jsonObject.toString()
+                    )
+                    true
+                } else {
+                    false
+                }
+            } catch (e: java.lang.Exception) {
+                e.printStackTrace()
+                false
+            }
+        } else {
+            false
+        }
+    }
+    @JvmStatic
+    fun deleteAllPushMessagesFromLSPM(activity: Activity ): Boolean {
+        val payloads: String = SharedPref.readString(activity.applicationContext, Constants.PAYLOAD_SP_KEY)
+        return if (!payloads.isEmpty()) {
+            try {
+                val jsonObject = JSONObject(payloads)
+                jsonObject.put(Constants.PAYLOAD_SP_ARRAY_KEY, JSONArray())
+                SharedPref.writeString(
+                    activity.applicationContext,
+                    Constants.PAYLOAD_SP_KEY,
+                    jsonObject.toString()
+                )
+                true
+            } catch (e: java.lang.Exception) {
+                e.printStackTrace()
+                false
+            }
+        } else {
+            false
+        }
+    }
     /**
      * This method is used to send the list of the
      * applications installed from a store in the device to the server.

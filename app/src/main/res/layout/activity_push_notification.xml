@@ -105,6 +105,28 @@
 
         <Button
 
+            android:id="@+id/btn_text_delete_all_push_from_gpm"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/rounded_corners_background"
+            android:layout_margin="20dp"
+            android:layout_marginBottom="5dp"
+            android:text="Delete All Push From GetPushMessage"
+            android:textColor="@android:color/white" />
+
+        <Button
+
+            android:id="@+id/btn_text_delete_push_with_id_from_gpm"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/rounded_corners_background"
+            android:layout_margin="20dp"
+            android:layout_marginBottom="5dp"
+            android:text="Delete Push With Id From GetPushMessage"
+            android:textColor="@android:color/white" />
+
+        <Button
+
         android:id="@+id/btn_text_delete_push_with_id"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

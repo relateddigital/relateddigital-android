@@ -65,6 +65,18 @@ class PushNotificationActivity : AppCompatActivity() {
         }
     }
 
+    private fun deletefromGpm() {
+
+        binding.btnTextDeletePushWithIdFromGpm.setOnClickListener {
+            RelatedDigital.deletePushMessageByIdFromLSPM(this,"75d7ed18-0bac-433d-a1ff-21395a5c5679")
+        }
+
+        binding.btnTextDeleteAllPushFromGpm.setOnClickListener {
+            RelatedDigital.deleteAllPushMessagesFromLSPM(this)
+        }
+
+    }
+
     private fun createSpinners() {
         val registerEmailCommercialSpinnerItems = arrayOf(
             Constants.EURO_RECIPIENT_TYPE_BIREYSEL,
