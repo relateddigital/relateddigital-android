@@ -5,5 +5,5 @@ import java.io.Serializable
 
 class ShakeToWinGamificationRules : Serializable {
     @SerializedName("background_image" ) var backgroundImage : String? = null
-    @SerializedName("button_label"     ) var buttonLabel     : String? = null
+    @SerializedName("button_label") var buttonLabel     : String? = null
 }
