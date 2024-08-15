@@ -3,16 +3,17 @@ package com.relateddigital.relateddigital_android.inapp.clawmachine
 import android.util.Log
 import android.webkit.JavascriptInterface
 import com.google.gson.Gson
+import com.relateddigital.relateddigital_android.model.ClawMachine
 
 import com.relateddigital.relateddigital_android.network.requestHandler.SubsJsonRequest
-/*
+
 class ClawMachineJavaScriptInterface internal constructor(webViewDialogFragment: ClawMachineWebDialogFragment,
                                                           @get:JavascriptInterface val response: String) {
     var mWebViewDialogFragment: ClawMachineWebDialogFragment = webViewDialogFragment
     private lateinit var mListener: ClawMachineCompleteInterface
     private lateinit var mCopyToClipboardInterface: ClawMachineCopyToClipboardInterface
     private lateinit var mShowCodeInterface: ClawMachineShowCodeInterface
-    private val giftboxModel: ClawMachine = Gson().fromJson(this.response, ClawMachine::class.java)
+    private val clawmachineModel: ClawMachine = Gson().fromJson(this.response, ClawMachine::class.java)
 
     private var subEmail = ""
 
@@ -46,8 +47,8 @@ class ClawMachineJavaScriptInterface internal constructor(webViewDialogFragment:
     fun subscribeEmail(email: String?) {
         if (!email.isNullOrEmpty()) {
             subEmail = email
-            SubsJsonRequest.createSubsJsonRequest(mWebViewDialogFragment.requireContext(), giftboxModel.actiondata!!.type!!,
-                giftboxModel.actid.toString(), giftboxModel.actiondata!!.auth!!,
+            SubsJsonRequest.createSubsJsonRequest(mWebViewDialogFragment.requireContext(), clawmachineModel.actiondata!!.type!!,
+                clawmachineModel.actid.toString(), clawmachineModel.actiondata!!.auth!!,
                 email)
         } else {
             Log.e("ClawMachine : ", "Email entered is not valid!")
@@ -63,8 +64,8 @@ class ClawMachineJavaScriptInterface internal constructor(webViewDialogFragment:
         var report: MailSubReport?
         try {
             report = MailSubReport()
-            report.impression = giftboxModel.actiondata!!.!!.impression
-            report.click = giftboxModel.actiondata!!.report!!.click
+            report.impression = clawmachineModel.actiondata!!.!!.impression
+            report.click = clawmachineModel.actiondata!!.report!!.click
         } catch (e: Exception) {
             Log.e("ClawMachine : ", "There is no report to send!")
             e.printStackTrace()
@@ -94,4 +95,4 @@ class ClawMachineJavaScriptInterface internal constructor(webViewDialogFragment:
         mCopyToClipboardInterface = copyToClipboardInterface
         mShowCodeInterface = showCodeInterface
     }
-} */
+}

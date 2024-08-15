@@ -17,6 +17,8 @@ import com.relateddigital.relateddigital_android.RelatedDigital
 import com.relateddigital.relateddigital_android.api.ApiMethods
 import com.relateddigital.relateddigital_android.api.JSApiClient
 import com.relateddigital.relateddigital_android.constants.Constants
+import com.relateddigital.relateddigital_android.model.ClawMachine
+import com.relateddigital.relateddigital_android.model.ClawMachineExtendedProps
 import com.relateddigital.relateddigital_android.util.ActivityUtils
 import com.relateddigital.relateddigital_android.util.AppUtils
 import okhttp3.ResponseBody
@@ -25,8 +27,8 @@ import retrofit2.Callback
 import retrofit2.Response
 import java.net.URI
 import java.util.HashMap
-/*
-class ClawMachineActivity : FragmentActivity(), ClawMachineCompleteInterface,
+
+/*class ClawMachineActivity : FragmentActivity(), ClawMachineCompleteInterface,
     ClawMachineCopyToClipboardInterface, ClawMachineShowCodeInterface {
     private var jsonStr: String? = ""
     private var response: ClawMachine? = null

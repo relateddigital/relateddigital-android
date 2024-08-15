@@ -19,15 +19,16 @@ import androidx.fragment.app.FragmentActivity
 import com.relateddigital.relateddigital_android.R
 
 import com.relateddigital.relateddigital_android.inapp.FontFamily
+import com.relateddigital.relateddigital_android.model.ClawMachineExtendedProps
 import com.relateddigital.relateddigital_android.util.AppUtils
 import java.util.Locale
-/*
+
 /**
  * A simple [Fragment] subclass.
  * Use the [ClawMachineCodeBannerFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
-class ClawMachineCodeBannerFragment : Fragment() {
+/*class ClawMachineCodeBannerFragment : Fragment() {
     companion object {
         private const val LOG_TAG = "ClawMachineBanner"
 
