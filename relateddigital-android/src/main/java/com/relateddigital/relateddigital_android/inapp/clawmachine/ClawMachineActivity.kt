@@ -28,7 +28,7 @@ import retrofit2.Response
 import java.net.URI
 import java.util.HashMap
 
-/*class ClawMachineActivity : FragmentActivity(), ClawMachineCompleteInterface,
+class ClawMachineActivity : FragmentActivity(), ClawMachineCompleteInterface,
     ClawMachineCopyToClipboardInterface, ClawMachineShowCodeInterface {
     private var jsonStr: String? = ""
     private var response: ClawMachine? = null
@@ -189,4 +189,4 @@ import java.util.HashMap
     override fun onCodeShown(code: String) {
         clawmachinePromotionCode = code
     }
-} */
+}

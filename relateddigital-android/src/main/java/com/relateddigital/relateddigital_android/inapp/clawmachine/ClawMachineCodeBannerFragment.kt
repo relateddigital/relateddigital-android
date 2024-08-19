@@ -17,6 +17,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import com.relateddigital.relateddigital_android.R
+import com.relateddigital.relateddigital_android.databinding.FragmentClawMachineCodeBannerBinding
 
 import com.relateddigital.relateddigital_android.inapp.FontFamily
 import com.relateddigital.relateddigital_android.model.ClawMachineExtendedProps
@@ -28,7 +29,7 @@ import java.util.Locale
  * Use the [ClawMachineCodeBannerFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
-/*class ClawMachineCodeBannerFragment : Fragment() {
+class ClawMachineCodeBannerFragment : Fragment() {
     companion object {
         private const val LOG_TAG = "ClawMachineBanner"
 
@@ -218,4 +219,4 @@ import java.util.Locale
         super.onDestroyView()
         showStatusBar()
     }
-} */
+}

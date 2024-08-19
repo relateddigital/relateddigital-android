@@ -907,6 +907,57 @@ object AppUtils {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    fun createClawMachineCustomFontFiles(
+        context: Context,
+        jsonStr: String?,
+        jsStr: String
+    ): ArrayList<String?>? {
+        var result: ArrayList<String?>? = null
+        val clawMachineModel: ClawMachine?
+        val extendedProps: ClawMachineExtendedProps?
+        val baseUrlPath = "file://" + context.filesDir.absolutePath + "/"
+        try {
+            clawMachineModel = Gson().fromJson(jsonStr, ClawMachine::class.java)
+            extendedProps = Gson().fromJson(
+                URI(clawMachineModel!!.actiondata!!.ExtendedProps).path,
+                ClawMachineExtendedProps::class.java
+            )
+        } catch (e: java.lang.Exception) {
+            Log.e("ClawMachine", "Extended properties could not be parsed properly!")
+            return null
+        }
+        if (clawMachineModel == null || extendedProps == null) {
+            return null
+        }
+        val fontFamily: String = extendedProps.fontFamily ?: return null
+
+        val htmlStr: String = writeHtmlToFile(context, "clawMachine", jsStr)
+
+        if (fontFamily == "custom") {
+            val fontExtension = getFontNameWithExtension(
+                context,
+                extendedProps.customFontFamilyAndroid!!
+            )
+            if (fontExtension.isNotEmpty()) {
+                writeFontToFile(
+                    context,
+                    extendedProps.customFontFamilyAndroid!!,
+                    fontExtension
+                )
+                clawMachineModel.fontFiles.add(fontExtension)
+            }
+        }
+
+        if (htmlStr.isNotEmpty()) {
+            result = ArrayList()
+            result.add(baseUrlPath)
+            result.add(htmlStr)
+            result.add(Gson().toJson(clawMachineModel, ClawMachine::class.java))
+        }
+        return result
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     fun createGiftBoxCustomFontFiles(
         context: Context,
         jsonStr: String?,

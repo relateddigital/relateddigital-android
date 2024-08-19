@@ -1,8 +1,9 @@
 package com.relateddigital.relateddigital_android.model
 
 import com.google.gson.annotations.SerializedName
+import java.io.Serializable
 
-class ClawMachineActionData {
+class ClawMachineActionData : Serializable {
     @SerializedName("mail_subscription"      ) var mailSubscription     : Boolean?              = null
     @SerializedName("mail_subscription_form" ) var mailSubscriptionForm : MailSubscriptionForm? = MailSubscriptionForm()
     @SerializedName("gamification_rules"     ) var gamificationRules    : ClawMachineGamificationRules?    = ClawMachineGamificationRules()

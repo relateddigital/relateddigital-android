@@ -1,8 +1,9 @@
 package com.relateddigital.relateddigital_android.model
 
 import com.google.gson.annotations.SerializedName
+import java.io.Serializable
 
-class ClawMachineGameElements {
+class ClawMachineGameElements : Serializable {
 
     @SerializedName("toy_images"           ) var toyImages           : ArrayList<ClawMachineToyImages> = arrayListOf()
     @SerializedName("clawmachine_image"    ) var clawmachineImage    : String?              = null

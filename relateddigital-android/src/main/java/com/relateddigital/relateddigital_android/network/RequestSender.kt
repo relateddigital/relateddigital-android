@@ -19,6 +19,7 @@ import com.relateddigital.relateddigital_android.constants.Constants
 import com.relateddigital.relateddigital_android.inapp.InAppManager
 import com.relateddigital.relateddigital_android.inapp.VisilabsResponse
 import com.relateddigital.relateddigital_android.inapp.choosefavorite.ChooseFavoriteActivity
+import com.relateddigital.relateddigital_android.inapp.clawmachine.ClawMachineActivity
 import com.relateddigital.relateddigital_android.inapp.customactions.CustomActionFragment
 import com.relateddigital.relateddigital_android.inapp.findtowin.FindToWinActivity
 import com.relateddigital.relateddigital_android.inapp.giftbox.GiftBoxActivity
@@ -373,6 +374,18 @@ object RequestSender {
                                             val giftBoxModel: GiftBox =
                                                 actionsResponse.mGiftBox!![0]
                                             intent.putExtra("gift-box-data", giftBoxModel)
+                                            currentRequest.parent!!.startActivity(intent)
+                                        }
+                                        !actionsResponse.mClawMachineList.isNullOrEmpty() -> {
+                                            ActivityUtils.parentActivity = currentRequest.parent
+                                            val intent =
+                                                Intent(
+                                                    currentRequest.parent,
+                                                    ClawMachineActivity::class.java
+                                                )
+                                            val clawMachineModel: ClawMachine =
+                                                actionsResponse.mClawMachineList!![0]
+                                            intent.putExtra("claw-machine-data", clawMachineModel)
                                             currentRequest.parent!!.startActivity(intent)
                                         }
                                         !actionsResponse.mChooseFavoriteList.isNullOrEmpty() -> {

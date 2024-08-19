@@ -221,6 +221,10 @@ class InAppNotificationActivity : AppCompatActivity() {
             sendInAppRequest("giftBox")
         }
 
+        binding.clawMachineButton.setOnClickListener {
+            sendInAppRequest("ClawMachine")
+        }
+
         binding.findToWinButton.setOnClickListener {
             sendInAppRequest("findtowin")
         }

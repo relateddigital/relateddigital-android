@@ -1,8 +1,9 @@
 package com.relateddigital.relateddigital_android.model
 
 import com.google.gson.annotations.SerializedName
+import java.io.Serializable
 
-class ClawMachineExtendedPropsMailSubscriptionForm {
+class ClawMachineExtendedPropsMailSubscriptionForm : Serializable {
 
     @SerializedName("title_text_color"      ) var titleTextColor      : String? = null
     @SerializedName("title_text_size"       ) var titleTextSize       : String? = null

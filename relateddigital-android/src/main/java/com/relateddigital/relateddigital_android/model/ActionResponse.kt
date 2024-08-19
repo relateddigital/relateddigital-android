@@ -25,6 +25,9 @@ class ActionResponse : Serializable {
     @SerializedName("ScratchToWin")
     var mScratchToWinList: List<ScratchToWin>? = null
 
+    @SerializedName("ClawMachine")
+    var mClawMachineList: List<ClawMachine>? = null
+
     @SerializedName("ProductStatNotifier")
     var mProductStatNotifierList: List<ProductStatNotifier>? = null
 
@@ -98,6 +101,11 @@ class ActionResponse : Serializable {
         get() = mScratchToWinList
         set(scratchToWinList) {
             mScratchToWinList = scratchToWinList
+        }
+    var clawMachineList: List<ClawMachine>?
+        get() = mClawMachineList
+        set(clawMachineList) {
+            mClawMachineList = clawMachineList
         }
 
     var productStatNotifierList: List<ProductStatNotifier>?

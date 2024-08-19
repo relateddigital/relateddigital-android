@@ -1,8 +1,9 @@
 package com.relateddigital.relateddigital_android.model
 
 import com.google.gson.annotations.SerializedName
+import java.io.Serializable
 
-class ClawMachineExtendedPropsGameElements {
+class ClawMachineExtendedPropsGameElements : Serializable {
 
 
     @SerializedName("catchbutton_color"      ) var catchbuttonColor     : String? = null
