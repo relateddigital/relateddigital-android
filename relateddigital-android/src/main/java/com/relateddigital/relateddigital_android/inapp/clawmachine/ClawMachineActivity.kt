@@ -73,8 +73,8 @@ class ClawMachineActivity : FragmentActivity(), ClawMachineCompleteInterface,
                             jsonStr = savedInstanceState.getString("clawmachine-json-str", "")
                         } else {
                             val intent = intent
-                            if (intent != null && intent.hasExtra("gift-box-data")) {
-                                response = intent.getSerializableExtra("gift-box-data") as ClawMachine?
+                            if (intent != null && intent.hasExtra("claw-machine-data")) {
+                                response = intent.getSerializableExtra("claw-machine-data") as ClawMachine?
                                 if (response != null) {
                                     jsonStr = Gson().toJson(response)
                                 } else {

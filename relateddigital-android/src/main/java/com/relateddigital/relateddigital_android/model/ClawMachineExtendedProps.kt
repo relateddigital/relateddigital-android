@@ -11,10 +11,10 @@ class ClawMachineExtendedProps : Serializable{
     @SerializedName("custom_font_family_ios"            ) var customFontFamilyIos            : String?               = null
     @SerializedName("custom_font_family_android"        ) var customFontFamilyAndroid        : String?               = null
     @SerializedName("close_button_color"                ) var closeButtonColor               : String?               = null
-    @SerializedName("mail_subscription_form"            ) var mailSubscriptionForm           : ClawMachineExtendedPropsMailSubscriptionForm? = ClawMachineExtendedPropsMailSubscriptionForm()
-    @SerializedName("gamification_rules"                ) var gamificationRules              : ClawMachineExtendedPropsGamificationRules?    = ClawMachineExtendedPropsGamificationRules()
-    @SerializedName("game_elements"                     ) var gameElements                   : ClawMachineExtendedPropsGameElements?         = ClawMachineExtendedPropsGameElements()
-    @SerializedName("game_result_elements"              ) var gameResultElements             : ClawMachineExtendedPropsGameResultElements?   = ClawMachineExtendedPropsGameResultElements()
+    @SerializedName("mail_subscription_form"            ) var mailSubscriptionForm           : ClawMachineExtendedPropsMailSubscriptionForm? = null
+    @SerializedName("gamification_rules"                ) var gamificationRules              : ClawMachineExtendedPropsGamificationRules? = null
+    @SerializedName("game_elements"                     ) var gameElements                   : ClawMachineExtendedPropsGameElements?       = null
+    @SerializedName("game_result_elements"              ) var gameResultElements             : ClawMachineExtendedPropsGameResultElements?  = null
     @SerializedName("promocode_background_color"        ) var promocodeBackgroundColor       : String?               = null
     @SerializedName("promocode_text_color"              ) var promocodeTextColor             : String?               = null
     @SerializedName("copybutton_color"                  ) var copybuttonColor                : String?               = null

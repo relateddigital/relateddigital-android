@@ -944,7 +944,7 @@ object AppUtils {
                     extendedProps.customFontFamilyAndroid!!,
                     fontExtension
                 )
-                clawMachineModel.fontFiles.add(fontExtension)
+               // clawMachineModel.fontFiles.add(fontExtension)
             }
         }
 

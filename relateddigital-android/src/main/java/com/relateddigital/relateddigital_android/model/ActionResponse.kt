@@ -102,11 +102,7 @@ class ActionResponse : Serializable {
         set(scratchToWinList) {
             mScratchToWinList = scratchToWinList
         }
-    var clawMachineList: List<ClawMachine>?
-        get() = mClawMachineList
-        set(clawMachineList) {
-            mClawMachineList = clawMachineList
-        }
+
 
     var productStatNotifierList: List<ProductStatNotifier>?
         get() = mProductStatNotifierList
