@@ -130,7 +130,7 @@ interface ApiMethods {
         @HeaderMap headers: Map<String, String>
     ): Call<ResponseBody>
 
-    @GET("/ClawMachine.js")
+    @GET("/clawmachine.js")
     fun getClawMachineJsFile(
         @HeaderMap headers: Map<String, String>
     ): Call<ResponseBody>

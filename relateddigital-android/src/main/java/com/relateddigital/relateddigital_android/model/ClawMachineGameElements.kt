@@ -5,7 +5,7 @@ import java.io.Serializable
 
 class ClawMachineGameElements : Serializable {
 
-    @SerializedName("toy_images"           ) var toyImages           : List<ClawMachineToyImages>? = null
+    @SerializedName("toy_images"           ) var toyImages           : ArrayList<ClawMachineToyImages>? = null
     @SerializedName("clawmachine_image"    ) var clawmachineImage    : String?              = null
     @SerializedName("toysbackground_image" ) var toysbackgroundImage : String?              = null
     @SerializedName("catchbutton_label"    ) var catchbuttonLabel    : String?              = null

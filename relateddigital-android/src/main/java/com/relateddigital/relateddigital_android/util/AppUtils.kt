@@ -931,7 +931,7 @@ object AppUtils {
         }
         val fontFamily: String = extendedProps.fontFamily ?: return null
 
-        val htmlStr: String = writeHtmlToFile(context, "clawMachine", jsStr)
+        val htmlStr: String = writeHtmlToFile(context, "clawmachine", jsStr)
 
         if (fontFamily == "custom") {
             val fontExtension = getFontNameWithExtension(
@@ -944,7 +944,7 @@ object AppUtils {
                     extendedProps.customFontFamilyAndroid!!,
                     fontExtension
                 )
-               // clawMachineModel.fontFiles.add(fontExtension)
+                clawMachineModel.fontFiles.add(fontExtension)
             }
         }
 

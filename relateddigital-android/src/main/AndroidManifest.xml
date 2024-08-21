@@ -43,12 +43,12 @@
             android:noHistory="true"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".inapp.customactions.CustomActionsActivity"
+            android:name=".inapp.giftbox.GiftBoxActivity"
             android:configChanges="orientation"
             android:noHistory="true"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".inapp.giftbox.GiftBoxActivity"
+            android:name=".inapp.clawmachine.ClawMachineActivity"
             android:configChanges="orientation"
             android:noHistory="true"
             android:screenOrientation="portrait" />
