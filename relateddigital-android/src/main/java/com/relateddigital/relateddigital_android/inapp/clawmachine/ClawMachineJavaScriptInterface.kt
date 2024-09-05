@@ -4,6 +4,9 @@ import android.util.Log
 import android.webkit.JavascriptInterface
 import com.google.gson.Gson
 import com.relateddigital.relateddigital_android.model.ClawMachine
+import com.relateddigital.relateddigital_android.model.MailSubReport
+import com.relateddigital.relateddigital_android.network.RequestHandler
+import com.relateddigital.relateddigital_android.network.requestHandler.InAppActionClickRequest
 
 import com.relateddigital.relateddigital_android.network.requestHandler.SubsJsonRequest
 
@@ -58,13 +61,13 @@ class ClawMachineJavaScriptInterface internal constructor(webViewDialogFragment:
     /**
      * This method sends the report to the server
      */
-    /*
+
     @JavascriptInterface
     fun sendReport() {
         var report: MailSubReport?
         try {
             report = MailSubReport()
-            report.impression = clawmachineModel.actiondata!!.!!.impression
+            report.impression = clawmachineModel.actiondata!!.report!!.impression
             report.click = clawmachineModel.actiondata!!.report!!.click
         } catch (e: Exception) {
             Log.e("ClawMachine : ", "There is no report to send!")
@@ -72,11 +75,11 @@ class ClawMachineJavaScriptInterface internal constructor(webViewDialogFragment:
             report = null
         }
         if (report != null) {
-            RequestHandler.createInAppActionClickRequest(mWebViewDialogFragment.requireContext(), report)
+            InAppActionClickRequest.createInAppActionClickRequest(mWebViewDialogFragment.requireContext(), report)
         }
     }
 
-    */
+
 
     /**
      * This method saves the promotion code shown

@@ -21,7 +21,7 @@ class GiftBoxWebDialogFragment : DialogFragment() {
     private var baseUrl: String? = ""
     private var htmlString: String? = ""
     private var mIsRotation = false
-    private lateinit var mListener: GiftBoxCompleteInterface
+    private var mListener: GiftBoxCompleteInterface? = null
     private lateinit var mCopyToClipboardInterface: GiftBoxCopyToClipboardInterface
     private lateinit var mShowCodeInterface: GiftBoxShowCodeInterface
 
@@ -50,7 +50,7 @@ class GiftBoxWebDialogFragment : DialogFragment() {
             htmlString = requireArguments().getString("htmlString")
             mResponse = requireArguments().getString("response")
             mJavaScriptInterface = GiftBoxJavaScriptInterface(this, mResponse!!)
-            mJavaScriptInterface!!.setGiftBoxListeners(mListener, mCopyToClipboardInterface, mShowCodeInterface)
+            mListener?.let { mJavaScriptInterface!!.setGiftBoxListeners(it, mCopyToClipboardInterface, mShowCodeInterface) }
         }
     }
 

@@ -21,7 +21,7 @@ class GiftCatchWebDialogFragment : DialogFragment() {
     private var baseUrl: String? = ""
     private var htmlString: String? = ""
     private var mIsRotation = false
-    private lateinit var mListener: GiftCatchCompleteInterface
+    private var mListener: GiftCatchCompleteInterface? = null
     private lateinit var mCopyToClipboardInterface: GiftCatchCopyToClipboardInterface
     private lateinit var mShowCodeInterface: GiftCatchShowCodeInterface
 
@@ -50,7 +50,7 @@ class GiftCatchWebDialogFragment : DialogFragment() {
             htmlString = requireArguments().getString("htmlString")
             mResponse = requireArguments().getString("response")
             mJavaScriptInterface = GiftCatchJavaScriptInterface(this, mResponse!!)
-            mJavaScriptInterface!!.setGiftCatchListeners(mListener, mCopyToClipboardInterface, mShowCodeInterface)
+            mListener?.let { mJavaScriptInterface!!.setGiftCatchListeners(it, mCopyToClipboardInterface, mShowCodeInterface) }
         }
     }
 
