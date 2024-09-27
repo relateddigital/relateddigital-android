@@ -36,9 +36,9 @@ class ClawMachineJavaScriptInterface internal constructor(webViewDialogFragment:
      * @param couponCode - String: coupon code
      */
     @JavascriptInterface
-    fun copyToClipboard(couponCode: String?, link: String?) {
+    fun copyToClipboard(couponCode: String?) {
         mWebViewDialogFragment.dismiss()
-        mCopyToClipboardInterface.copyToClipboard(couponCode, link)
+        mCopyToClipboardInterface.copyToClipboard(couponCode)
     }
 
     /**

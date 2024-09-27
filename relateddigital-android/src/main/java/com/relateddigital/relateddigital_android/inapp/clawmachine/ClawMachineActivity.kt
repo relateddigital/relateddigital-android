@@ -169,7 +169,7 @@ class ClawMachineActivity : FragmentActivity(), ClawMachineCompleteInterface,
         finish()
     }
 
-    override fun copyToClipboard(couponCode: String?, link: String?) {
+    override fun copyToClipboard(couponCode: String?) {
         if(!couponCode.isNullOrEmpty()) {
             val clipboard = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
             val clip = ClipData.newPlainText("Coupon Code", couponCode)
@@ -179,9 +179,6 @@ class ClawMachineActivity : FragmentActivity(), ClawMachineCompleteInterface,
                 getString(R.string.copied_to_clipboard),
                 Toast.LENGTH_LONG
             ).show()
-        }
-        if(!link.isNullOrEmpty()) {
-            this.link = link
         }
         finish()
     }
