@@ -139,8 +139,23 @@ class SpinToWinActivity : FragmentActivity(), SpinToWinCompleteInterface,
 
         if(!link.isNullOrEmpty()) {
             sliceLink = link
+            sendDeeplinkToApp(link)
         }
         finish()
+    }
+
+    private fun sendDeeplinkToApp(deeplink: String) {
+
+        val intent = Intent()
+        intent.also { intent ->
+
+            intent.setAction("InAppLink")
+            intent.putExtra("link",deeplink)
+            sendBroadcast(intent)
+        }
+        Log.i(LOG_TAG, "Link sent successfully!")
+
+
     }
 
     companion object {

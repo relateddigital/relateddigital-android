@@ -1,13 +1,31 @@
 package com.relateddigital.androidexampleapp
 
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.os.Bundle
+import android.util.Log
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.relateddigital.androidexampleapp.databinding.ActivityMainBinding
 import java.util.*
 
-class MainActivity : AppCompatActivity() {
+class
+MainActivity : AppCompatActivity() {
+
+    private val broad = object :BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            when(intent?.action) {
+                "InAppLink" -> {
+                    val string = intent.getStringExtra("link")
+                    Toast.makeText(context,"Receiver received >${string} ",Toast.LENGTH_LONG).show()
+                    Log.e("Deeplink5", "Received deeplink: $string")
+                }
+            }
+        }
+    }
     companion object{
         private const val LOG_TAG = "MainActivity"
     }
@@ -20,6 +38,17 @@ class MainActivity : AppCompatActivity() {
         setContentView(view)
 
         setupUi()
+        val intentFilter = IntentFilter("InAppLink")
+        registerReceiver(broad,intentFilter)
+
+
+
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+        unregisterReceiver(broad)
     }
 
     private fun setupUi() {
