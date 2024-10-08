@@ -11,7 +11,7 @@ import com.relateddigital.relateddigital_android.network.requestHandler.SubsJson
 class GiftBoxJavaScriptInterface internal constructor(webViewDialogFragment: GiftBoxWebDialogFragment,
                                                       @get:JavascriptInterface val response: String) {
     var mWebViewDialogFragment: GiftBoxWebDialogFragment = webViewDialogFragment
-    private lateinit var mListener: GiftBoxCompleteInterface
+    private  var mListener: GiftBoxCompleteInterface? = null
     private lateinit var mCopyToClipboardInterface: GiftBoxCopyToClipboardInterface
     private lateinit var mShowCodeInterface: GiftBoxShowCodeInterface
     private val giftboxModel: GiftBox = Gson().fromJson(this.response, GiftBox::class.java)
@@ -24,7 +24,7 @@ class GiftBoxJavaScriptInterface internal constructor(webViewDialogFragment: Gif
     @JavascriptInterface
     fun close() {
         mWebViewDialogFragment.dismiss()
-        mListener.onCompleted()
+        mListener?.onCompleted()
     }
 
     /**

@@ -16,7 +16,7 @@ import java.util.HashMap
 class GiftCatchJavaScriptInterface internal constructor(webViewDialogFragment: GiftCatchWebDialogFragment,
                                                         @get:JavascriptInterface val response: String) {
     var mWebViewDialogFragment: GiftCatchWebDialogFragment = webViewDialogFragment
-    private lateinit var mListener: GiftCatchCompleteInterface
+    private  var mListener: GiftCatchCompleteInterface? = null
     private lateinit var mCopyToClipboardInterface: GiftCatchCopyToClipboardInterface
     private lateinit var mShowCodeInterface: GiftCatchShowCodeInterface
     private val giftRainModel: GiftRain = Gson().fromJson(this.response, GiftRain::class.java)
@@ -29,7 +29,7 @@ class GiftCatchJavaScriptInterface internal constructor(webViewDialogFragment: G
     @JavascriptInterface
     fun close() {
         mWebViewDialogFragment.dismiss()
-        mListener.onCompleted()
+        mListener?.onCompleted()
     }
 
     /**
