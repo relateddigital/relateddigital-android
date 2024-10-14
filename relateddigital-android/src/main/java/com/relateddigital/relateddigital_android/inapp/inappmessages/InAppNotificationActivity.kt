@@ -1281,10 +1281,11 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
         }
     private val isShowingNpsInApp: Boolean
         get() {
-            if(mInAppMessage!!.mActionData!!.mMsgType!!.equals("nps_with_numbers")) {
-                if (mInAppMessage!!.mActionData!!.mDisplayType!!.equals("inline")) {
+            var result = true
+            if(mInAppMessage?.mActionData?.mMsgType.equals("nps_with_numbers")) {
+                if (mInAppMessage?.mActionData?.mDisplayType.equals("inline")) {
                     result = false
-                } else if (mInAppMessage!!.mActionData!!.mDisplayType == null && mInAppMessage!!.mActionData!!.mDisplayType!!.equals(
+                } else if (mInAppMessage?.mActionData?.mDisplayType == null || mInAppMessage?.mActionData?.mDisplayType.equals(
                         "popup"
                     )
                 ) {
