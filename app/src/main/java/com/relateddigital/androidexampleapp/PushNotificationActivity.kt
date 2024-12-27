@@ -68,11 +68,11 @@ class PushNotificationActivity : AppCompatActivity() {
     private fun deletefromGpm() {
 
         binding.btnTextDeletePushWithIdFromGpm.setOnClickListener {
-            RelatedDigital.deletePushMessageByIdFromLSPM(this,"75d7ed18-0bac-433d-a1ff-21395a5c5679")
+            RelatedDigital.deletePushMessagesWithId(this,"")
         }
 
         binding.btnTextDeleteAllPushFromGpm.setOnClickListener {
-            RelatedDigital.deleteAllPushMessagesFromLSPM(this)
+            RelatedDigital.deletePushMessages(this)
         }
 
     }

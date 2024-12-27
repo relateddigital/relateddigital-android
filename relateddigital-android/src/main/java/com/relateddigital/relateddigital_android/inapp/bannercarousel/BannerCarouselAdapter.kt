@@ -56,7 +56,7 @@ class BannerCarouselAdapter(private val mContext: Context,
                 .transform(
                     MultiTransformation(
                         CenterCrop(),
-                        GranularRoundedCorners(30f, 30f, 30f, 30f)
+                        GranularRoundedCorners(0f, 0f, 0f, 0f)
                     )
                 )
                 .load(mAppBanner!!.actionData!!.appBanners!![position].image)
@@ -112,7 +112,7 @@ class BannerCarouselAdapter(private val mContext: Context,
                 .transform(
                     MultiTransformation(
                         CenterCrop(),
-                        GranularRoundedCorners(30f, 30f, 30f, 30f)
+                        GranularRoundedCorners(0f, 0f, 0f, 0f)
                     )
                 )
                 .load(mAppBanner!!.actionData!!.appBanners!![position].image)

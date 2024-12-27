@@ -1615,14 +1615,15 @@ object RelatedDigital {
     }
 
     @JvmStatic
-    fun deletePushMessageByIdFromLSPM(activity: Activity , messageId: String?): Boolean {
-        val payloads: String = SharedPref.readString(activity.applicationContext, Constants.PAYLOAD_SP_KEY)
-        return if (!payloads.isEmpty()) {
+    fun  deletePushMessagesWithId(activity: Activity , messageId: String?): Boolean {
+        val payloads: String = SharedPref.readString(activity.applicationContext, Constants.PAYLOAD_SP_ID_KEY)
+         if (!payloads.isEmpty()) {
             try {
                 val jsonObject = JSONObject(payloads)
-                val jsonArray = jsonObject.getJSONArray(Constants.PAYLOAD_SP_ARRAY_KEY)
+                val jsonArray = jsonObject.getJSONArray(Constants.PAYLOAD_SP_ARRAY_ID_KEY)
                 val newJsonArray = JSONArray()
                 var messageFound = false
+                if (messageId != null && !messageId.isEmpty()) {
                 for (i in 0 until jsonArray.length()) {
                     val currentObject = jsonArray.getJSONObject(i)
                     val currentMessage =
@@ -1633,28 +1634,51 @@ object RelatedDigital {
                         messageFound = true
                     }
                 }
+
                 if (messageFound) {
-                    jsonObject.put(Constants.PAYLOAD_SP_ARRAY_KEY, newJsonArray)
+                    jsonObject.put(Constants.PAYLOAD_SP_ARRAY_ID_KEY, newJsonArray)
                     SharedPref.writeString(
                         activity.applicationContext,
-                        Constants.PAYLOAD_SP_KEY,
+                        Constants.PAYLOAD_SP_ID_KEY,
                         jsonObject.toString()
                     )
-                    true
+                    return true
+                }
+                else {
+
+
+                    jsonObject.put(Constants.PAYLOAD_SP_ARRAY_ID_KEY, newJsonArray)
+                    SharedPref.writeString(
+                        activity.applicationContext,
+                        Constants.PAYLOAD_SP_ID_KEY,
+                        jsonObject.toString()
+                    )
+                    return true
+                }
                 } else {
-                    false
+                    // messageId sağlanmamışsa, tüm mesajları sil
+                    jsonObject.put(Constants.PAYLOAD_SP_ARRAY_ID_KEY, newJsonArray)
+                    SharedPref.writeString(
+                        activity.applicationContext,
+                        Constants.PAYLOAD_SP_ID_KEY,
+                        jsonObject.toString()
+                    )
+                    return true
                 }
             } catch (e: java.lang.Exception) {
                 e.printStackTrace()
-                false
+                return false
             }
         } else {
-            false
+            return false
         }
     }
+
+
+
     @JvmStatic
-    fun deleteAllPushMessagesFromLSPM(activity: Activity ): Boolean {
-        val payloads: String = SharedPref.readString(activity.applicationContext, Constants.PAYLOAD_SP_KEY)
+    fun deletePushMessages(activity: Activity ): Boolean {
+        val payloads: String = SharedPref.readString(activity.applicationContext, Constants.PAYLOAD_SP_ID_KEY)
         return if (!payloads.isEmpty()) {
             try {
                 val jsonObject = JSONObject(payloads)
