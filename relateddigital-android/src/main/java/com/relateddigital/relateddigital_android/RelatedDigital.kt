@@ -1532,7 +1532,8 @@ object RelatedDigital {
                         "De-serializing JSON string of push message : " + e.message,
                         element.className + "/" + element.methodName + "/" + element.lineNumber
                     )
-                    activity.runOnUiThread { callback.fail(e.message!!) }
+                    val errorMessage = e.message ?: "An unknown error occurred while processing push messages."
+                    activity.runOnUiThread { callback.fail(errorMessage) }
                 }
             } else {
                 activity.runOnUiThread {
@@ -1556,9 +1557,10 @@ object RelatedDigital {
         val loginID: String =
             SharedPref.readString(activity, Constants.NOTIFICATION_LOGIN_ID_KEY)
 
-        if(loginID.isEmpty()) {
-            Log.e("getPushMessagesID() : ", "login ID is empty!");
-            return;
+        if (loginID.isEmpty()) {
+            Log.e("getPushMessagesID() : ", "login ID is empty!")
+            callback.fail("Login ID is empty") // Callback ile bilgilendirme de yapalım.
+            return
         }
 
         object : Thread(Runnable {
@@ -1577,9 +1579,9 @@ object RelatedDigital {
                             currentObject.toString(),
                             Message::class.java
                         )
-                        if(!currentMessage.loginID.isNullOrEmpty()) {
-                            if(loginID == currentMessage.loginID) {
-                                pushMessages.add(currentMessage);
+                        if (!currentMessage.loginID.isNullOrEmpty()) {
+                            if (loginID == currentMessage.loginID) {
+                                pushMessages.add(currentMessage)
                             }
                         }
                     }
@@ -1601,7 +1603,9 @@ object RelatedDigital {
                         "De-serializing JSON string of push message : " + e.message,
                         element.className + "/" + element.methodName + "/" + element.lineNumber
                     )
-                    activity.runOnUiThread { callback.fail(e.message!!) }
+                    // Null kontrolü ekleyerek NullPointerException'ı engelliyoruz
+                    val errorMessage = e.message ?: "An unknown error occurred while processing push messages with ID."
+                    activity.runOnUiThread { callback.fail(errorMessage) }
                 }
             } else {
                 activity.runOnUiThread {

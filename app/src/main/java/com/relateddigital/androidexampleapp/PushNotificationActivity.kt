@@ -103,37 +103,40 @@ class PushNotificationActivity : AppCompatActivity() {
         }
     }
 
+    private val PUSH_LOG_TAG = "PushMessageLog"
+
     private fun setupPayloadButton() {
         binding.btnPayload.setOnClickListener {
-            val pushMessageInterface: PushMessageInterface = object : PushMessageInterface {
+            val pushMessageInterface = object : PushMessageInterface {
                 override fun success(pushMessages: List<Message>) {
-                    Toast.makeText(
-                        applicationContext,
-                        "Successful",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    for (i in 0 until pushMessages.count()) {
-                        pushMessages[i].pushId?.let { it1 -> Log.d("PushMesaj PushId", it1) }
-                        pushMessages[i].date?.let { it2 -> Log.d("PushMesaj Date", it2) }
-                        pushMessages[i].status?.let { it3 -> Log.d("PushMesaj Status", it3) }
-                        pushMessages[i].openDate?.let { it4 -> Log.d("PushMesaj OpenDate", it4) }
-                        pushMessages[i].keyID?.let { it5 -> Log.d("PushMesaj KeyID", it5) }
-                        pushMessages[i].email?.let { it6 -> Log.d("PushMesaj Email", it6) }
+                    Toast.makeText(applicationContext, "Successful", Toast.LENGTH_SHORT).show()
+
+                    if (pushMessages.isEmpty()) {
+                        Log.d(PUSH_LOG_TAG, "No push messages found.")
+                    } else {
+                        pushMessages.forEachIndexed { index, message ->
+                            try {
+                                val jsonMessage = Gson().toJson(message)
+                                Log.d(PUSH_LOG_TAG, "Push Message #$index: $jsonMessage")
+                            } catch (e: Exception) {
+                                Log.e(PUSH_LOG_TAG, "Error converting message to JSON", e)
+                            }
+                        }
                     }
                 }
 
                 override fun fail(errorMessage: String) {
-                    Toast.makeText(
-                        applicationContext,
-                        "Failure",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    // Something went wrong. You may consider warning the user:
+                    Toast.makeText(applicationContext, "Failure", Toast.LENGTH_SHORT).show()
+                    Log.e(PUSH_LOG_TAG, "Failed to retrieve push messages: $errorMessage")
                 }
             }
 
-            val loginID = SharedPref.readString(applicationContext, com.relateddigital.relateddigital_android.constants.Constants.NOTIFICATION_LOGIN_ID_KEY)
-            if(loginID.isEmpty()) {
+            val loginID = SharedPref.readString(
+                applicationContext,
+                com.relateddigital.relateddigital_android.constants.Constants.NOTIFICATION_LOGIN_ID_KEY
+            )
+
+            if (loginID.isEmpty()) {
                 RelatedDigital.getPushMessages(activity, pushMessageInterface)
             } else {
                 RelatedDigital.getPushMessagesWithID(activity, pushMessageInterface)

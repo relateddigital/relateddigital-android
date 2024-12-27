@@ -49,11 +49,11 @@ class RelatedDigitalModel(
         private var visitData: String,
         private var cookie: LoadBalanceCookie? = null,
         private var extra: HashMap<String, Any> = HashMap(),
-        private var utmCampaign: String?,
-        private var utmContent: String?,
-        private var utmMedium: String?,
-        private var utmSource: String?,
-        private var utmTerm: String?
+        private var utmCampaign: String? = "",
+        private var utmContent: String? = "",
+        private var utmMedium: String? = "",
+        private var utmSource: String? = "",
+        private var utmTerm: String? = ""
 ) : Serializable {
 
     companion object {
@@ -618,70 +618,36 @@ fun setUtmTerm(context: Context, utmTerm: String) {
     }
 
     fun fill(model: RelatedDigitalModel) {
-        synchronized(this) {
-            if (model.getIsPushNotificationEnabled() != null) {
-                this.isPushNotificationEnabled = model.getIsPushNotificationEnabled()
-            }
-            if (model.getIsInAppNotificationEnabled() != null) {
-                this.isInAppNotificationEnabled = model.getIsInAppNotificationEnabled()
-            }
-            if (model.getIsGeofenceEnabled() != null) {
-                this.isGeofenceEnabled = model.getIsGeofenceEnabled()
-            }
-            if (model.getGoogleAppAlias() != null) {
-                this.googleAppAlias = model.getGoogleAppAlias()
-            }
-            if (model.getHuaweiAppAlias() != null) {
-                this.huaweiAppAlias = model.getHuaweiAppAlias()
-            }
-            if (model.getOrganizationId() != null) {
-                this.organizationId = model.getOrganizationId()
-            }
-            if (model.getProfileId() != null) {
-                this.profileId = model.getProfileId()
-            }
-            if (model.getDataSource() != null) {
-                this.dataSource = model.getDataSource()
-            }
-            if (model.getRequestTimeoutInSecond() != null) {
-                this.requestTimeoutInSecond = model.getRequestTimeoutInSecond()
-            }
-            if (model.getMaxGeofenceCount() != null) {
-                this.maxGeofenceCount = model.getMaxGeofenceCount()
-            }
-            if (model.getGeofencingIntervalInMinute() != null) {
-                this.geofencingIntervalInMinute = model.getGeofencingIntervalInMinute()
-            }
-            if (model.getAdvertisingIdentifier() != null) {
-                this.advertisingIdentifier = model.getAdvertisingIdentifier()
-            }
-            if (model.getExVisitorId() != null) {
-                this.exVisitorId = model.getExVisitorId()
-            }
-            if (model.getUtmCampaign() != null) {
-                this.utmCampaign = model.getUtmCampaign()
-            }
-            if (model.getUtmContent() != null) {
-                this.utmContent = model.getUtmContent()
-            }
-            if (model.getUtmSource() != null) {
-                this.utmSource= model.getUtmSource()
-            }
-            if (model.getUtmMedium() != null) {
-                this.utmMedium = model.getUtmMedium()
-            }
-            if (model.getUtmTerm() != null) {
-                this.utmTerm = model.getUtmTerm()
-            }
-            if (model.getToken() != null) {
-                this.token = model.getToken()
-            }
-            if (model.getVisitorData() != null) {
-                this.visitorData = model.getVisitorData()
-            }
-            if (!model.getExtra().isNullOrEmpty()) {
-                this.extra.clear()
-                this.extra.putAll(model.getExtra())
+        synchronized(this){
+            model.also {
+                isPushNotificationEnabled = it.isPushNotificationEnabled
+                isInAppNotificationEnabled = it.isInAppNotificationEnabled
+                isGeofenceEnabled = it.isGeofenceEnabled
+                googleAppAlias = it.googleAppAlias
+                huaweiAppAlias = it.huaweiAppAlias
+                organizationId = it.organizationId
+                profileId = it.profileId
+                dataSource = it.dataSource
+                requestTimeoutInSecond = it.requestTimeoutInSecond
+                maxGeofenceCount = it.maxGeofenceCount
+                geofencingIntervalInMinute = it.geofencingIntervalInMinute
+                advertisingIdentifier = it.advertisingIdentifier
+                exVisitorId = it.exVisitorId
+                utmCampaign = it.utmCampaign
+                utmContent = it.utmContent
+                utmSource = it.utmSource
+                utmMedium = it.utmMedium
+                utmTerm = it.utmTerm
+                token = it.token
+                visitorData = it.visitorData
+                visitData = it.visitData
+                cookieId = it.cookieId
+                cookie = it.cookie
+                userAgent = it.userAgent
+                extra.clear()
+                it.extra.forEach{
+                        (key, value) -> extra[key] = value
+                }
             }
         }
     }
@@ -812,128 +778,47 @@ fun setUtmTerm(context: Context, utmTerm: String) {
 
     fun copyFrom(context: Context, fromModel: RelatedDigitalModel) {
         synchronized(this) {
-            isPushNotificationEnabled = fromModel.getIsPushNotificationEnabled()
-            isInAppNotificationEnabled = fromModel.getIsInAppNotificationEnabled()
-            isGeofenceEnabled = fromModel.getIsGeofenceEnabled()
-            googleAppAlias = fromModel.getGoogleAppAlias()
-            huaweiAppAlias = fromModel.getHuaweiAppAlias()
-            organizationId = fromModel.getOrganizationId()
-            profileId = fromModel.getProfileId()
-            dataSource = fromModel.getDataSource()
-            requestTimeoutInSecond = fromModel.getRequestTimeoutInSecond()
-            maxGeofenceCount = fromModel.getMaxGeofenceCount()
-            geofencingIntervalInMinute = fromModel.getGeofencingIntervalInMinute()
-            appVersion = if (fromModel.getAppVersion().isNullOrEmpty()) {
-                AppUtils.getAppVersion(context)
-            } else {
-                fromModel.getAppVersion()
-            }
-            pushPermissionStatus = if (fromModel.getPushPermissionStatus().isNullOrEmpty()) {
-                AppUtils.getNotificationPermissionStatus(context)
-            } else {
-                fromModel.getPushPermissionStatus()
-            }
-            apiVersion = fromModel.getApiVersion()
-            osType = fromModel.getOsType()
-            osVersion = if (fromModel.getOsVersion().isNullOrEmpty()) {
-                AppUtils.getOsVersion()
-            } else {
-                fromModel.getOsVersion()
-            }
-            sdkVersion = if (fromModel.getSdkVersion().isNullOrEmpty()) {
-                AppUtils.getSdkVersion()
-            } else {
-                fromModel.getSdkVersion()
+            isPushNotificationEnabled = fromModel.isPushNotificationEnabled
+            isInAppNotificationEnabled = fromModel.isInAppNotificationEnabled
+            isGeofenceEnabled = fromModel.isGeofenceEnabled
+            googleAppAlias = fromModel.googleAppAlias
+            huaweiAppAlias = fromModel.huaweiAppAlias
+            organizationId = fromModel.organizationId
+            profileId = fromModel.profileId
+            dataSource = fromModel.dataSource
+            requestTimeoutInSecond = fromModel.requestTimeoutInSecond
+            maxGeofenceCount = fromModel.maxGeofenceCount
+            geofencingIntervalInMinute = fromModel.geofencingIntervalInMinute
+            appVersion = fromModel.appVersion ?: AppUtils.getAppVersion(context)
+            pushPermissionStatus = fromModel.pushPermissionStatus ?: AppUtils.getNotificationPermissionStatus(context)
+            osType = fromModel.osType
+            osVersion = fromModel.osVersion ?: AppUtils.getOsVersion()
+            sdkVersion = fromModel.sdkVersion ?: AppUtils.getSdkVersion()
+
+            sdkType = fromModel.sdkType ?: AppUtils.getSdkType()
+            deviceType = fromModel.deviceType ?: AppUtils.getDeviceType()
+            deviceName = fromModel.deviceName ?: AppUtils.getDeviceName()
+            carrier = fromModel.carrier ?: AppUtils.getCarrier(context)
+            identifierForVendor = fromModel.identifierForVendor ?: AppUtils.getIdentifierForVendor(context)
+            advertisingIdentifier = fromModel.advertisingIdentifier
+            local = fromModel.local ?: AppUtils.getLocal(context)
+            exVisitorId = fromModel.exVisitorId
+            token = fromModel.token
+            cookieId = fromModel.cookieId ?: AppUtils.getCookieId(context)
+            userAgent = fromModel.userAgent ?: AppUtils.getUserAgent()
+            visitorData = fromModel.visitorData ?: ""
+            visitData = fromModel.visitData ?: ""
+            cookie = fromModel.cookie
+            utmCampaign = fromModel.utmCampaign
+            utmContent = fromModel.utmContent
+            utmMedium = fromModel.utmMedium
+            utmTerm = fromModel.utmTerm
+            utmSource = fromModel.utmSource
+            extra.clear()
+            fromModel.extra.forEach {
+                    (key, value) -> extra[key] = value
             }
 
-            sdkType = if (fromModel.getSdkType().isNullOrEmpty()) {
-                AppUtils.getSdkType()
-            } else {
-                fromModel.getSdkType()
-            }
-            deviceType = if (fromModel.getDeviceType().isNullOrEmpty()) {
-                AppUtils.getDeviceType()
-            } else {
-                fromModel.getDeviceType()
-            }
-            deviceName = if (fromModel.getDeviceName().isNullOrEmpty()) {
-                AppUtils.getDeviceName()
-            } else {
-                fromModel.getDeviceName()
-            }
-            carrier = if (fromModel.getCarrier().isNullOrEmpty()) {
-                AppUtils.getCarrier(context)
-            } else {
-                fromModel.getCarrier()
-            }
-            identifierForVendor = if (fromModel.getIdentifierForVendor().isNullOrEmpty()) {
-                AppUtils.getIdentifierForVendor(context)
-            } else {
-                fromModel.getIdentifierForVendor()
-            }
-            advertisingIdentifier = fromModel.getAdvertisingIdentifier()
-            local = if (fromModel.getLocal().isNullOrEmpty()) {
-                AppUtils.getLocal(context)
-            } else {
-                fromModel.getLocal()
-            }
-            exVisitorId = fromModel.getExVisitorId()
-            token = fromModel.getToken()
-            cookieId = if (fromModel.getCookieId().isNullOrEmpty()) {
-                AppUtils.getCookieId(context)
-            } else {
-                fromModel.getCookieId()
-            }
-            userAgent = if (fromModel.getUserAgent().isNullOrEmpty()) {
-                AppUtils.getUserAgent()
-            } else {
-                fromModel.getUserAgent()
-            }
-            visitorData = if (fromModel.getVisitorData().isNullOrEmpty()) {
-                ""
-            } else {
-                fromModel.getVisitorData()
-            }
-            visitData = if (fromModel.getVisitData().isNullOrEmpty()) {
-                ""
-            } else {
-                fromModel.getVisitData()
-            }
-            cookie = if (fromModel.getCookie() == null) {
-                null
-            } else {
-                fromModel.getCookie()
-            }
-            utmCampaign = if (fromModel.getUtmCampaign() == null) {
-                null
-            } else {
-                fromModel.getUtmCampaign()
-            }
-            utmContent = if (fromModel.getUtmContent() == null) {
-                null
-            } else {
-                fromModel.getUtmContent()
-            }
-            utmMedium = if (fromModel.getUtmMedium() == null) {
-                null
-            } else {
-                fromModel.getUtmMedium()
-            }
-            utmTerm = if (fromModel.getUtmTerm() == null) {
-                null
-            } else {
-                fromModel.getUtmTerm()
-            }
-            utmSource = if (fromModel.getUtmSource() == null) {
-                null
-            } else {
-                fromModel.getUtmSource()
-            }
-            extra = HashMap()
-            for (i in fromModel.getExtra().keys.toTypedArray().indices) {
-                val key = fromModel.getExtra().keys.toTypedArray()[i]
-                extra[key] = fromModel.getExtra()[key]!!
-            }
         }
     }
 }

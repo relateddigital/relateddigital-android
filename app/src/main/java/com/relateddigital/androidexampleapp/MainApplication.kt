@@ -57,7 +57,7 @@ class MainApplication : Application() {
                     googleAppAlias = Constants.GOOGLE_APP_ALIAS,
                     huaweiAppAlias = Constants.HUAWEI_APP_ALIAS,
                     token = token,
-                    notificationSmallIcon = R.drawable.text_icon,
+                    notificationSmallIcon = R.drawable.ic_stat_developer_mode,
                     notificationSmallIconDarkMode = R.drawable.text_icon_dark_mode,
                     isNotificationLargeIcon = true,
                     notificationLargeIcon = R.mipmap.ic_launcher,
