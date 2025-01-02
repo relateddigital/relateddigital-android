@@ -4,6 +4,7 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.graphics.Color
 import android.graphics.Typeface
+import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -90,41 +91,49 @@ class SpinToWinCodeBannerFragment : Fragment() {
         }
 
         binding.bannerText.text = mExtendedProps!!.promocode_banner_text!!.replace("\\n", "\n")
-        binding.bannerLabel.text = mExtendedProps!!.promocode_banner_button_label
+        //binding.bannerLabel.text = mExtendedProps!!.promocode_banner_button_label
         binding.bannerCode.text = bannerCode
 
         if (!mExtendedProps!!.promocode_banner_text_color.isNullOrEmpty()) {
             binding.bannerText.setTextColor(Color.parseColor(mExtendedProps!!.promocode_banner_text_color))
-            binding.bannerLabel.setTextColor(Color.parseColor(mExtendedProps!!.promocode_banner_text_color))
+            //binding.bannerLabel.setTextColor(Color.parseColor(mExtendedProps!!.promocode_banner_text_color))
             binding.bannerCode.setTextColor(Color.parseColor(mExtendedProps!!.promocode_banner_text_color))
+            val drawable = ContextCompat.getDrawable(requireContext(), R.drawable.dotted_border) as GradientDrawable
+            drawable.setStroke(
+                3,
+                Color.parseColor(mExtendedProps!!.promocode_banner_text_color),
+                6f, // Noktaların uzunluğu (dp)
+                6f
+            )
+            binding.bannerCodeBorder.background = drawable
         } else {
             binding.bannerText.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
-            binding.bannerLabel.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+            //binding.bannerLabel.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
             binding.bannerCode.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
         }
 
         if (!mExtendedProps!!.textSize.isNullOrEmpty()) {
             binding.bannerText.textSize = mExtendedProps!!.textSize!!.toFloat() + 10
-            binding.bannerLabel.textSize = mExtendedProps!!.textSize!!.toFloat() + 12
+            //binding.bannerLabel.textSize = mExtendedProps!!.textSize!!.toFloat() + 12
             binding.bannerCode.textSize = mExtendedProps!!.textSize!!.toFloat() + 10
         } else {
             binding.bannerText.textSize = 14f
-            binding.bannerLabel.textSize = 16f
+            //binding.bannerLabel.textSize = 16f
             binding.bannerCode.textSize = 14f
         }
 
         if (mExtendedProps!!.textFontFamily.isNullOrEmpty()) {
             binding.bannerText.typeface = Typeface.DEFAULT
-            binding.bannerLabel.typeface = Typeface.DEFAULT
+            //binding.bannerLabel.typeface = Typeface.DEFAULT
         } else if (FontFamily.Monospace.toString() == mExtendedProps!!.textFontFamily!!.lowercase(Locale.getDefault())) {
             binding.bannerText.typeface = Typeface.MONOSPACE
-            binding.bannerLabel.typeface = Typeface.MONOSPACE
+            //binding.bannerLabel.typeface = Typeface.MONOSPACE
         } else if (FontFamily.SansSerif.toString() == mExtendedProps!!.textFontFamily!!.lowercase(Locale.getDefault())) {
             binding.bannerText.typeface = Typeface.SANS_SERIF
-            binding.bannerLabel.typeface = Typeface.SANS_SERIF
+            //binding.bannerLabel.typeface = Typeface.SANS_SERIF
         } else if (FontFamily.Serif.toString() == mExtendedProps!!.textFontFamily!!.lowercase(Locale.getDefault())) {
             binding.bannerText.typeface = Typeface.SERIF
-            binding.bannerLabel.typeface = Typeface.SERIF
+            //binding.bannerLabel.typeface = Typeface.SERIF
         } else if (!mExtendedProps!!.textCustomFontFamilyAndroid.isNullOrEmpty()) {
             if (AppUtils.isFontResourceAvailable(requireContext(), mExtendedProps!!.textCustomFontFamilyAndroid)) {
                 val id = requireActivity().resources.getIdentifier(
@@ -133,11 +142,11 @@ class SpinToWinCodeBannerFragment : Fragment() {
                     requireActivity().packageName
                 )
                 binding.bannerText.typeface = ResourcesCompat.getFont(requireActivity(), id)
-                binding.bannerLabel.typeface = ResourcesCompat.getFont(requireActivity(), id)
+                //binding.bannerLabel.typeface = ResourcesCompat.getFont(requireActivity(), id)
             }
         } else {
             binding.bannerText.typeface = Typeface.DEFAULT
-            binding.bannerLabel.typeface = Typeface.DEFAULT
+            //binding.bannerLabel.typeface = Typeface.DEFAULT
         }
 
         binding.closeButton.setBackgroundResource(getCloseIcon())
