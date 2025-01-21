@@ -203,7 +203,7 @@ class PushNotificationManager {
         } else {
             NotificationCompat.PRIORITY_DEFAULT
         }
-        // TODO : When backend ready edit
+
 
 
        val actionList = ArrayList<NotificationCompat.Action>()
@@ -273,13 +273,7 @@ class PushNotificationManager {
             mBuilder.setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
         }
         mBuilder.setContentIntent(contentIntent)
-
-        // TODO : Check the number of buttons and related
-        // pending intents here when BE gets ready and
-        // set them accordingly.
-        /*
-        mBuilder.addAction(R.drawable.notification_button, "Open" , contentIntent);
-        */return mBuilder
+        return mBuilder
     }
 
     private fun setNumber(mBuilder: NotificationCompat.Builder, context: Context) {
@@ -365,7 +359,12 @@ class PushNotificationManager {
         fun getChannelDescription(context: Context): String {
             return AppUtils.getApplicationName(context)
         }
+        /*
+        fun tryPush(context: Context) {
 
+
+        }
+        */
         fun getChannelName(context: Context): String {
             return if (SharedPref.readString(context, Constants.CHANNEL_NAME) != "") {
                 SharedPref.readString(context, Constants.CHANNEL_NAME)

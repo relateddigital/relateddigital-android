@@ -107,7 +107,7 @@ class PushNotificationActivity : AppCompatActivity() {
 
     private fun setupPayloadButton() {
         binding.btnPayload.setOnClickListener {
-            val pushMessageInterface = object : PushMessageInterface {
+            val pushMessageInterface :PushMessageInterface= object : PushMessageInterface {
                 override fun success(pushMessages: List<Message>) {
                     Toast.makeText(applicationContext, "Successful", Toast.LENGTH_SHORT).show()
 
