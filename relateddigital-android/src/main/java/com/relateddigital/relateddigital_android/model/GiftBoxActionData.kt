@@ -19,6 +19,7 @@ class GiftBoxActionData: Serializable {
     @SerializedName("report"                 ) var report               : GiftBoxReport?                = GiftBoxReport()
     @SerializedName("auth"                   ) var auth                 : String?               = null
     @SerializedName("type"                   ) var type                 : String?               = null
-
+    @SerializedName("waiting_time")
+    var waitingTime: Int? = null
 
 }

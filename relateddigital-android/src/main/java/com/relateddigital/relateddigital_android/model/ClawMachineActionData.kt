@@ -17,4 +17,6 @@ class ClawMachineActionData : Serializable {
     @SerializedName("report"                 ) var report               : ClawMachineReport?               =  null
     @SerializedName("auth"                   ) var auth                 : String?               = null
     @SerializedName("type"                   ) var type                 : String?               = null
+    @SerializedName("waiting_time")
+    var waitingTime: Int? = null
 }

@@ -18,6 +18,7 @@ class SlotMachineActionData : Serializable {
     @SerializedName("report"                 ) var report               : SlotMachineReport?                = SlotMachineReport()
     @SerializedName("auth"                   ) var auth                 : String?               = null
     @SerializedName("type"                   ) var type                 : String?               = null
-
+    @SerializedName("waiting_time")
+    var waitingTime: Int? = null
 
 }

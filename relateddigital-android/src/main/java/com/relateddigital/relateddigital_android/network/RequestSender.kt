@@ -259,33 +259,47 @@ object RequestSender {
                                             }, waitTime * 1000L)
                                         }
                                         !actionsResponse.mScratchToWinList.isNullOrEmpty() -> {
+                                            val scratchToWinModel: ScratchToWin =
+                                                actionsResponse.mScratchToWinList!![0]
+                                            var waitTime = 0L
+                                            if(!scratchToWinModel!!.actiondata!!.waitingTime.toString().isNullOrEmpty()) {
+                                                waitTime = scratchToWinModel!!.actiondata!!.waitingTime!!.toLong()
+                                            }
+                                            ActivityUtils.parentActivity = currentRequest.parent
                                             val intent =
                                                     Intent(
                                                             currentRequest.parent,
                                                             ScratchToWinActivity::class.java
                                                     )
-                                            val scratchToWinModel: ScratchToWin =
-                                                    actionsResponse.mScratchToWinList!![0]
+
                                             intent.putExtra(
                                                     "scratch-to-win-data",
                                                     scratchToWinModel
                                             )
-                                            currentRequest.parent!!.startActivity(intent)
+                                            Handler(Looper.getMainLooper()).postDelayed({
+                                                currentRequest.parent!!.startActivity(intent)
+                                            }, waitTime * 1000L)
                                         }
                                         !actionsResponse.mShakeToWinList.isNullOrEmpty() -> {
+                                            val shakeToWinModel: ShakeToWin =
+                                                actionsResponse.mShakeToWinList!![0]
+                                            var waitTime = 0L
+                                            if(!shakeToWinModel!!.actiondata!!.waitingTime.toString().isNullOrEmpty()) {
+                                                waitTime = shakeToWinModel!!.actiondata!!.waitingTime!!.toLong()
+                                            }
                                             ActivityUtils.parentActivity = currentRequest.parent
                                             val intent =
                                                 Intent(
                                                     currentRequest.parent,
                                                     ShakeToWinActivity::class.java
                                                 )
-                                            val shakeToWinModel: ShakeToWin =
-                                                actionsResponse.mShakeToWinList!![0]
                                             intent.putExtra(
                                                 "shake-to-win-data",
                                                 shakeToWinModel
                                             )
-                                            currentRequest.parent!!.startActivity(intent)
+                                            Handler(Looper.getMainLooper()).postDelayed({
+                                                currentRequest.parent!!.startActivity(intent)
+                                            }, waitTime * 1000L)
                                         }
                                         !actionsResponse.mMailSubscriptionForm.isNullOrEmpty() -> {
 
@@ -361,28 +375,43 @@ object RequestSender {
 
                                         }
                                         !actionsResponse.mGiftBox.isNullOrEmpty() -> {
+                                            val giftBoxModel: GiftBox =
+                                                actionsResponse.mGiftBox!![0]
+                                            var waitTime = 0L
+                                            if(!giftBoxModel!!.actiondata!!.waitingTime.toString().isNullOrEmpty()) {
+                                                waitTime = giftBoxModel!!.actiondata!!.waitingTime!!.toLong()
+                                            }
                                             ActivityUtils.parentActivity = currentRequest.parent
                                             val intent =
                                                 Intent(
                                                     currentRequest.parent,
                                                     GiftBoxActivity::class.java
                                                 )
-                                            val giftBoxModel: GiftBox =
-                                                actionsResponse.mGiftBox!![0]
+
                                             intent.putExtra("gift-box-data", giftBoxModel)
-                                            currentRequest.parent!!.startActivity(intent)
+                                            Handler(Looper.getMainLooper()).postDelayed({
+                                                currentRequest.parent!!.startActivity(intent)
+                                            }, waitTime * 1000L)
                                         }
                                         !actionsResponse.mClawMachineList.isNullOrEmpty() -> {
+                                            val clawMachineModel: ClawMachine =
+                                                actionsResponse.mClawMachineList!![0]
+
+                                            var waitTime = 0L
+                                            if(!clawMachineModel!!.actiondata!!.waitingTime.toString().isNullOrEmpty()) {
+                                                waitTime = clawMachineModel!!.actiondata!!.waitingTime!!.toLong()
+                                            }
                                             ActivityUtils.parentActivity = currentRequest.parent
                                             val intent =
                                                 Intent(
                                                     currentRequest.parent,
                                                     ClawMachineActivity::class.java
                                                 )
-                                            val clawMachineModel: ClawMachine =
-                                                actionsResponse.mClawMachineList!![0]
+
                                             intent.putExtra("claw-machine-data", clawMachineModel)
-                                            currentRequest.parent!!.startActivity(intent)
+                                            Handler(Looper.getMainLooper()).postDelayed({
+                                                currentRequest.parent!!.startActivity(intent)
+                                            }, waitTime * 1000L)
                                         }
                                         !actionsResponse.mChooseFavoriteList.isNullOrEmpty() -> {
                                             ActivityUtils.parentActivity = currentRequest.parent
@@ -397,28 +426,42 @@ object RequestSender {
                                             currentRequest.parent!!.startActivity(intent)
                                         }
                                         !actionsResponse.mFindToWin.isNullOrEmpty() -> {
+                                            val findToWinModel: FindToWin =
+                                                actionsResponse.mFindToWin!![0]
+                                            var waitTime = 0L
+                                            if(!findToWinModel!!.actiondata!!.waitingTime.toString().isNullOrEmpty()) {
+                                                waitTime = findToWinModel!!.actiondata!!.waitingTime!!.toLong()
+                                            }
                                             ActivityUtils.parentActivity = currentRequest.parent
                                             val intent =
                                                 Intent(
                                                     currentRequest.parent,
                                                     FindToWinActivity::class.java
                                                 )
-                                            val findToWinModel: FindToWin =
-                                                actionsResponse.mFindToWin!![0]
+
                                             intent.putExtra("find-to-win-data", findToWinModel)
-                                            currentRequest.parent!!.startActivity(intent)
+                                            Handler(Looper.getMainLooper()).postDelayed({
+                                                currentRequest.parent!!.startActivity(intent)
+                                            }, waitTime * 1000L)
                                         }
                                         !actionsResponse.mSlotMachine.isNullOrEmpty() -> {
+                                            val slotMachineModel: SlotMachine =
+                                                actionsResponse.mSlotMachine!![0]
+                                            var waitTime = 0L
+                                            if(!slotMachineModel!!.actiondata!!.waitingTime.toString().isNullOrEmpty()) {
+                                                waitTime = slotMachineModel!!.actiondata!!.waitingTime!!.toLong()
+                                            }
                                             ActivityUtils.parentActivity = currentRequest.parent
                                             val intent =
                                                 Intent(
                                                     currentRequest.parent,
                                                     SlotMachineActivity::class.java
                                                 )
-                                            val slotMachineModel: SlotMachine =
-                                                actionsResponse.mSlotMachine!![0]
+
                                             intent.putExtra("slotMachine-data", slotMachineModel)
-                                            currentRequest.parent!!.startActivity(intent)
+                                            Handler(Looper.getMainLooper()).postDelayed({
+                                                currentRequest.parent!!.startActivity(intent)
+                                            }, waitTime * 1000L)
                                         }
                                         !actionsResponse.mAppBanner.isNullOrEmpty() -> {
                                             val visilabsResponse = VisilabsResponse(

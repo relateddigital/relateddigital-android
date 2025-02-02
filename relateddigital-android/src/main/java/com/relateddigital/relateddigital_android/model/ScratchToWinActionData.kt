@@ -51,4 +51,5 @@ class ScratchToWinActionData : Serializable {
 
     @SerializedName("content_body")
     var contentBody: String? = null
+
 }
