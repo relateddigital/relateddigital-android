@@ -173,6 +173,11 @@ object RequestFormer {
                 } else {
                     mLvt = lastEventTime
                 }
+                SharedPref.writeString(context, Constants.UTM_CAMPAIGN, "")
+                SharedPref.writeString(context, Constants.UTM_CONTENT, "")
+                SharedPref.writeString(context, Constants.UTM_MEDIUM, "")
+                SharedPref.writeString(context, Constants.UTM_SOURCE, "")
+                SharedPref.writeString(context, Constants.UTM_TERM, "")
             } else {
                 if (pageName != "/OM_evt.gif") {
                     val prevPviv: Int = SharedPref.readString(
