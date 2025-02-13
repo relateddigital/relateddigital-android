@@ -43,6 +43,10 @@ class ScratchToWinActionData : Serializable {
     @SerializedName("promotion_code")
     var promotionCode: String? = null
 
+    @SerializedName("copybutton_function"    ) var copybuttonFunction   : String?               = null
+    @SerializedName("ios_lnk"                ) var iosLnk               : String?               = null
+    @SerializedName("android_lnk"            ) var androidLnk           : String?               = null
+
     @SerializedName("img")
     var img: String? = null
 
