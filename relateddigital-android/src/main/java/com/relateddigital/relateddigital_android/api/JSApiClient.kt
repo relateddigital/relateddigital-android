@@ -20,7 +20,7 @@ object JSApiClient {
             val interceptor = HttpLoggingInterceptor()
             interceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
             val httpClient = OkHttpClient.Builder()
-                .addInterceptor(interceptor)
+                .addInterceptor(SafeInterceptor())
                 .connectTimeout(connectTimeOutInSec.toLong(), TimeUnit.SECONDS)
                 .readTimeout(30, TimeUnit.SECONDS)
             synchronized(SApiClient::class.java) {
@@ -35,4 +35,6 @@ object JSApiClient {
         }
         return retrofit
     }
+
+
 }
