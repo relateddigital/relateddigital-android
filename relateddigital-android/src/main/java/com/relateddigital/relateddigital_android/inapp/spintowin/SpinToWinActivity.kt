@@ -2,7 +2,9 @@ package com.relateddigital.relateddigital_android.inapp.spintowin
 
 import android.content.ClipData
 import android.content.ClipboardManager
+import android.content.Context
 import android.content.Intent
+import android.content.pm.ActivityInfo
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -49,6 +51,12 @@ class SpinToWinActivity : FragmentActivity(), SpinToWinCompleteInterface,
         completeListener = this
         copyToClipboardListener = this
         showCodeListener = this
+
+        if (!isAndroidTV(this)) {
+            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        } else {
+            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+        }
         val jsApi = JSApiClient.getClient(RelatedDigital.getRelatedDigitalModel(this).getRequestTimeoutInSecond())
             ?.create(ApiMethods::class.java)
         val headers = HashMap<String, String>()
@@ -125,6 +133,10 @@ class SpinToWinActivity : FragmentActivity(), SpinToWinCompleteInterface,
     override fun onSaveInstanceState(outState: Bundle) {
         outState.putString("spin-to-win-json-str", jsonStr)
         super.onSaveInstanceState(outState)
+    }
+
+    private fun isAndroidTV(context: Context): Boolean {
+        return context.packageManager.hasSystemFeature("android.software.leanback")
     }
 
     override fun onCompleted() {

@@ -22,7 +22,7 @@
             android:name=".inapp.shaketowin.ShakeToWinActivity"
             android:configChanges="orientation"
             android:noHistory="true"
-            android:screenOrientation="portrait" />
+            />
         <activity
             android:name=".inapp.scratchtowin.ScratchToWinActivity"
             android:noHistory="true"
@@ -31,37 +31,37 @@
             android:name=".inapp.spintowin.SpinToWinActivity"
             android:configChanges="orientation"
             android:noHistory="true"
-            android:screenOrientation="portrait" />
+             />
         <activity
             android:name=".inapp.giftcatch.GiftCatchActivity"
             android:configChanges="orientation"
             android:noHistory="true"
-            android:screenOrientation="portrait" />
+             />
         <activity
             android:name=".inapp.findtowin.FindToWinActivity"
             android:configChanges="orientation"
             android:noHistory="true"
-            android:screenOrientation="portrait" />
+             />
         <activity
             android:name=".inapp.giftbox.GiftBoxActivity"
             android:configChanges="orientation"
             android:noHistory="true"
-            android:screenOrientation="portrait" />
+             />
         <activity
             android:name=".inapp.clawmachine.ClawMachineActivity"
             android:configChanges="orientation"
             android:noHistory="true"
-            android:screenOrientation="portrait" />
+             />
         <activity
             android:name=".inapp.slotmachine.SlotMachineActivity"
             android:configChanges="orientation"
             android:noHistory="true"
-            android:screenOrientation="portrait" />
+             />
         <activity
             android:name=".inapp.choosefavorite.ChooseFavoriteActivity"
             android:configChanges="orientation"
             android:noHistory="true"
-            android:screenOrientation="portrait" />
+             />
         <activity
             android:name=".inapp.inappmessages.InAppFullActivity"
             android:noHistory="true"

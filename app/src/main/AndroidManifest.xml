@@ -39,28 +39,28 @@
         <activity
             android:name=".InAppNotificationActivity"
             android:label="@string/in_app_notification_page_label"
-            android:screenOrientation="portrait" />
+             />
         <activity
             android:name=".StoryDemoActivity"
             android:label="@string/story_page_label"
-            android:screenOrientation="portrait" />
+             />
         <activity
             android:name=".BannerCarouselDemoActivity"
             android:label="@string/banner_carousel"
-            android:screenOrientation="portrait" />
+             />
         <activity
             android:name=".EventActivity"
             android:label="@string/event_page_label"
-            android:screenOrientation="portrait" />
+            />
         <activity
             android:name=".PushNotificationActivity"
             android:label="@string/push_notification_page_label"
-            android:screenOrientation="portrait" />
+             />
         <activity
             android:name=".MainActivity"
             android:exported="true"
             android:label="@string/main_page_label"
-            android:screenOrientation="portrait">
+           >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

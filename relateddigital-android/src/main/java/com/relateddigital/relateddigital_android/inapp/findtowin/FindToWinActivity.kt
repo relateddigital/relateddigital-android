@@ -2,7 +2,9 @@ package com.relateddigital.relateddigital_android.inapp.findtowin
 
 import android.content.ClipData
 import android.content.ClipboardManager
+import android.content.Context
 import android.content.Intent
+import android.content.pm.ActivityInfo
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -51,6 +53,12 @@ class FindToWinActivity : FragmentActivity(), FindToWinCompleteInterface,
         completeListener = this
         copyToClipboardListener = this
         showCodeListener = this
+
+        if (!isAndroidTV(this)) {
+            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        } else {
+            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+        }
         val jsApi = JSApiClient.getClient(RelatedDigital.getRelatedDigitalModel(this).getRequestTimeoutInSecond())
             ?.create(ApiMethods::class.java)
         val headers = HashMap<String, String>()
@@ -127,6 +135,9 @@ class FindToWinActivity : FragmentActivity(), FindToWinCompleteInterface,
         super.onSaveInstanceState(outState)
     }
 
+    private fun isAndroidTV(context: Context): Boolean {
+        return context.packageManager.hasSystemFeature("android.software.leanback")
+    }
     override fun onDestroy() {
         super.onDestroy()
         if (findToWinPromotionCode.isNotEmpty()) {
