@@ -117,6 +117,8 @@ class MainApplication : Application() {
             profileId = "75763259366A3345686E303D"
             dataSource = "mrhp"
             SdkConstants.ACTION_ENDPOINT = "http://tests.visilabs.net/"
+
+            // ="@xml/network_security_config" make true
         }
 
         // Initialize RelatedDigital with mandatory information
