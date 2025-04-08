@@ -169,7 +169,7 @@ open class RelatedDigitalFirebaseMessagingService : FirebaseMessagingService() {
                         )
                     }
 
-                    PayloadUtils.sendUtmParametersEvent(this, pushMessage)
+                    //PayloadUtils.sendUtmParametersEvent(this, pushMessage)
 
                     val notificationLoginId: String =
                         SharedPref.readString(this, Constants.NOTIFICATION_LOGIN_ID_KEY)
