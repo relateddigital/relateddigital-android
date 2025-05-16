@@ -35,8 +35,14 @@ object LogUtils {
 
             val config = response?.body() ?: return true // Config yoksa default true
             if (!config.isLoggingEnabled) return false
+            var customerId = ""
+            val googleAppAlias = RelatedDigital.getRelatedDigitalModel(context).getGoogleAppAlias()
+            if (googleAppAlias.isNullOrEmpty()) {
+                customerId = RelatedDigital.getRelatedDigitalModel(context).getHuaweiAppAlias()
+            } else {
+                customerId = googleAppAlias
+            }
 
-            val customerId = RelatedDigital.getRelatedDigitalModel(context).getDataSource()
                 ?: return true // customerId yoksa log gönder
             Log.i(LOG_TAG, "Customer ID: $customerId")
 
