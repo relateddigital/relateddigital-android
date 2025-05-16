@@ -39,13 +39,6 @@ object PayloadUtils {
                     finalObject.toString()
                 )
             } catch (e: Exception) {
-                val element = Throwable().stackTrace[0]
-                LogUtils.formGraylogModel(
-                    context,
-                    "e",
-                    "Serializing push message : " + e.message,
-                    element.className + "/" + element.methodName + "/" + element.lineNumber
-                )
                 Log.e(
                     LOG_TAG,
                     "Something went wrong when adding the push message to shared preferences!"
@@ -80,13 +73,6 @@ object PayloadUtils {
                     finalObject.toString()
                 )
             } catch (e: Exception) {
-                val element = Throwable().stackTrace[0]
-                LogUtils.formGraylogModel(
-                    context,
-                    "e",
-                    "Serializing push message : " + e.message,
-                    element.className + "/" + element.methodName + "/" + element.lineNumber
-                )
                 Log.e(
                     LOG_TAG,
                     "Something went wrong when adding the push message to shared preferences!"
@@ -145,13 +131,6 @@ object PayloadUtils {
                     break
                 }
             } catch (e: Exception) {
-                val element = Throwable().stackTrace[0]
-                LogUtils.formGraylogModel(
-                    context,
-                    "e",
-                    "Getting pushId from JSONArray : " + e.message,
-                    element.className + "/" + element.methodName + "/" + element.lineNumber
-                )
                 Log.e(LOG_TAG, e.message!!)
             }
         }
@@ -184,13 +163,6 @@ object PayloadUtils {
             jsonArray!!.put(JSONObject(Gson().toJson(message)))
             jsonArray
         } catch (e: Exception) {
-            val element = Throwable().stackTrace[0]
-            LogUtils.formGraylogModel(
-                context,
-                "e",
-                "Serializing push message : " + e.message,
-                element.className + "/" + element.methodName + "/" + element.lineNumber
-            )
             Log.e(LOG_TAG, "Could not save the push message!")
             Log.e(LOG_TAG, e.message!!)
             null
@@ -225,13 +197,6 @@ object PayloadUtils {
             jsonArray!!.put(JSONObject(Gson().toJson(message)))
             jsonArray
         } catch (e: Exception) {
-            val element = Throwable().stackTrace[0]
-            LogUtils.formGraylogModel(
-                context,
-                "e",
-                "Serializing push message : " + e.message,
-                element.className + "/" + element.methodName + "/" + element.lineNumber
-            )
             Log.e(LOG_TAG, "Could not save the push message!")
             Log.e(LOG_TAG, e.message!!)
             null
@@ -253,13 +218,6 @@ object PayloadUtils {
                     i--
                 }
             } catch (e: Exception) {
-                val element = Throwable().stackTrace[0]
-                LogUtils.formGraylogModel(
-                    context,
-                    "e",
-                    "Removing push message from JSONArray : " + e.message,
-                    element.className + "/" + element.methodName + "/" + element.lineNumber
-                )
                 Log.e(LOG_TAG, e.message!!)
             }
             i++
@@ -278,13 +236,6 @@ object PayloadUtils {
                 res = true
             }
         } catch (e: Exception) {
-            val element = Throwable().stackTrace[0]
-            LogUtils.formGraylogModel(
-                context,
-                "e",
-                "Comparing 2 dates : " + e.message,
-                element.className + "/" + element.methodName + "/" + element.lineNumber
-            )
             Log.e(LOG_TAG, "Could not parse date!")
             Log.e(LOG_TAG, e.message!!)
         }
@@ -320,15 +271,7 @@ object PayloadUtils {
             jsonObject.put(Constants.PAYLOAD_SP_ARRAY_KEY, jsonArray)
             SharedPref.writeString(context, Constants.PAYLOAD_SP_KEY, jsonObject.toString())
         } catch (e: Exception) {
-            val element = Throwable().stackTrace[0]
-            LogUtils.formGraylogModel(
-                context,
-                "e",
-                "Forming and serializing push message string : " + e.message,
-                element.className + "/" + element.methodName + "/" + element.lineNumber
-            )
-            Log.e(LOG_TAG, "Could not save the push message!")
-            Log.e(LOG_TAG, e.message!!)
+            Log.e(LOG_TAG, "Could not save the push message!" + e.message)
         }
     }
 
@@ -362,15 +305,7 @@ object PayloadUtils {
             jsonObject.put(Constants.PAYLOAD_SP_ARRAY_ID_KEY, jsonArray)
             SharedPref.writeString(context, Constants.PAYLOAD_SP_ID_KEY, jsonObject.toString())
         } catch (e: Exception) {
-            val element = Throwable().stackTrace[0]
-            LogUtils.formGraylogModel(
-                context,
-                "e",
-                "Forming and serializing push message string : " + e.message,
-                element.className + "/" + element.methodName + "/" + element.lineNumber
-            )
-            Log.e(LOG_TAG, "Could not save the push message!")
-            Log.e(LOG_TAG, e.message!!)
+            Log.e(LOG_TAG, "Could not save the push message!" + e.message)
         }
     }
 
@@ -403,15 +338,7 @@ object PayloadUtils {
                 Log.e(LOG_TAG, "Payload array is null or empty!")
             }
         } catch (e: Exception) {
-            val element = Throwable().stackTrace[0]
-            LogUtils.formGraylogModel(
-                context,
-                "e",
-                "Updating push message string : " + e.message,
-                element.className + "/" + element.methodName + "/" + element.lineNumber
-            )
-            Log.e(LOG_TAG, "Could not update the push message!")
-            Log.e(LOG_TAG, e.message!!)
+            Log.e(LOG_TAG, "Could not update the push message!" + e.message)
         }
     }
 
@@ -452,15 +379,7 @@ object PayloadUtils {
                 Log.e(LOG_TAG, "Payload array is null or empty!")
             }
         } catch (e: Exception) {
-            val element = Throwable().stackTrace[0]
-            LogUtils.formGraylogModel(
-                context,
-                "e",
-                "Updating push message string : " + e.message,
-                element.className + "/" + element.methodName + "/" + element.lineNumber
-            )
-            Log.e(LOG_TAG, "Could not update the push message!")
-            Log.e(LOG_TAG, e.message!!)
+            Log.e(LOG_TAG, "Could not update the push message!" + e.message)
         }
     }
 
@@ -493,15 +412,7 @@ object PayloadUtils {
                 Log.e(LOG_TAG, "Payload array is null or empty!")
             }
         } catch (e: Exception) {
-            val element = Throwable().stackTrace[0]
-            LogUtils.formGraylogModel(
-                context,
-                "e",
-                "Updating push message string : " + e.message,
-                element.className + "/" + element.methodName + "/" + element.lineNumber
-            )
-            Log.e(LOG_TAG, "Could not update the push message!")
-            Log.e(LOG_TAG, e.message!!)
+            Log.e(LOG_TAG, "Could not update the push message!" + e.message)
         }
     }
 
@@ -516,15 +427,7 @@ object PayloadUtils {
                 res = true
             }
         } catch (e: Exception) {
-            val element = Throwable().stackTrace[0]
-            LogUtils.formGraylogModel(
-                context,
-                "e",
-                "Comparing 2 dates : " + e.message,
-                element.className + "/" + element.methodName + "/" + element.lineNumber
-            )
-            Log.e(LOG_TAG, "Could not parse date!")
-            Log.e(LOG_TAG, e.message!!)
+            Log.e(LOG_TAG, "Could not parse date!" + e.message)
         }
         return res
     }

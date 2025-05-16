@@ -9,6 +9,7 @@ import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
+import android.util.Log
 import android.util.TypedValue
 import androidx.annotation.AttrRes
 import androidx.annotation.ColorInt
@@ -59,25 +60,14 @@ object ImageUtils {
             bitmapImage.compress(Bitmap.CompressFormat.PNG, 100, fos)
             fileSaved = true
         } catch (e: Exception) {
-            val element = Throwable().stackTrace[0]
-            LogUtils.formGraylogModel(
-                context,
-                "e",
-                "Saving bitmap to storage : " + e.message,
-                element.className + "/" + element.methodName + "/" + element.lineNumber
-            )
+            Log.e("SaveBitMap", "Error writing bitmap")
             e.printStackTrace()
         } finally {
             try {
                 fos?.close()
             } catch (e: IOException) {
-                val element = Throwable().stackTrace[0]
-                LogUtils.formGraylogModel(
-                    context,
-                    "e",
-                    "Closing a file : " + e.message,
-                    element.className + "/" + element.methodName + "/" + element.lineNumber
-                )
+                Log.e("SaveBitMap", "Error closing output stream")
+
                 e.printStackTrace()
             }
         }
@@ -90,13 +80,8 @@ object ImageUtils {
             val f = File(path, "$fileName.jpg")
             b = BitmapFactory.decodeStream(FileInputStream(f))
         } catch (e: FileNotFoundException) {
-            val element = Throwable().stackTrace[0]
-            LogUtils.formGraylogModel(
-                context!!,
-                "e",
-                "Loading image from file : " + e.message,
-                element.className + "/" + element.methodName + "/" + element.lineNumber
-            )
+            Log.e("Loading image", "File not found")
+
             e.printStackTrace()
         }
         return b
@@ -128,13 +113,8 @@ object ImageUtils {
                 packageManager.getApplicationInfo(context.packageName, PackageManager.GET_META_DATA)
             appIconResId = applicationInfo.icon
         } catch (e: PackageManager.NameNotFoundException) {
-            val element = Throwable().stackTrace[0]
-            LogUtils.formGraylogModel(
-                context,
-                "e",
-                "Getting app icon : " + e.message,
-                element.className + "/" + element.methodName + "/" + element.lineNumber
-            )
+            Log.e("AppIcon", "Getting app icon : " + e.message)
+
             e.printStackTrace()
         }
         return appIconResId

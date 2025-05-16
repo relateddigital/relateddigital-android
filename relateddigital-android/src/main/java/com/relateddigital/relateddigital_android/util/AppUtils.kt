@@ -452,13 +452,7 @@ object AppUtils {
             try {
                 return context.resources.getResourceName(resId) != null
             } catch (ignore: NotFoundException) {
-                val element = Throwable().stackTrace[0]
-                LogUtils.formGraylogModel(
-                    context,
-                    "e",
-                    "Checking if a resource is available : " + ignore.message,
-                    element.className + "/" + element.methodName + "/" + element.lineNumber
-                )
+                Log.e("IconResource : ", "Checking if a resource is available : " + ignore.message)
             }
         }
         return false
@@ -520,13 +514,7 @@ object AppUtils {
             connection.readTimeout = 30000 // 30 sec
             image = BitmapFactory.decodeStream(connection.getInputStream())
         } catch (e: IOException) {
-            val element = Throwable().stackTrace[0]
-            LogUtils.formGraylogModel(
-                context,
-                "e",
-                "Getting bitmap from uri : " + e.message,
-                element.className + "/" + element.methodName + "/" + element.lineNumber
-            )
+            Log.e("GetBitmapFromUri : ", "Could not get bitmap from uri : " + e.message)
             e.printStackTrace()
         }
         return image
@@ -572,13 +560,6 @@ object AppUtils {
                 intent = Intent(context, Class.forName(intentStr))
                 intent.putExtra("message", pushMessage)
             } catch (e: java.lang.Exception) {
-                val element = Throwable().stackTrace[0]
-                LogUtils.formGraylogModel(
-                    context,
-                    "e",
-                    "Navigating to the activity of the customer : " + e.message,
-                    element.className + "/" + element.methodName + "/" + element.lineNumber
-                )
                 Log.e("PushClick : ", "The class could not be found!")
                 intent = getLaunchIntent(context, pushMessage)
                 return intent
@@ -597,13 +578,7 @@ object AppUtils {
             try {
                 return context.resources.getResourceName(resId) != null
             } catch (ignore: NotFoundException) {
-                val element = Throwable().stackTrace[0]
-                LogUtils.formGraylogModel(
-                    context,
-                    "e",
-                    "Checking if a resource is available : " + ignore.message,
-                    element.className + "/" + element.methodName + "/" + element.lineNumber
-                )
+                Log.e("Resource : ", "Checking if a resource is available : " + ignore.message)
             }
         }
         return false
@@ -616,13 +591,7 @@ object AppUtils {
             lApplicationInfo =
                 lPackageManager.getApplicationInfo(pContext.applicationInfo.packageName, 0)
         } catch (e: PackageManager.NameNotFoundException) {
-            val element = Throwable().stackTrace[0]
-            LogUtils.formGraylogModel(
-                pContext,
-                "e",
-                "Getting application info : " + e.message,
-                element.className + "/" + element.methodName + "/" + element.lineNumber
-            )
+            Log.e("AppLabel", "Could not get the app label!")
             e.printStackTrace()
         }
         return (if (lApplicationInfo != null) lPackageManager.getApplicationLabel(lApplicationInfo) else defaultText) as String

@@ -1535,13 +1535,6 @@ object RelatedDigital {
                         Constants.PAYLOAD_SP_KEY,
                         ""
                     )
-                    val element = Throwable().stackTrace[0]
-                    LogUtils.formGraylogModel(
-                        activity.applicationContext,
-                        "e",
-                        "De-serializing JSON string of push message : " + e.message,
-                        element.className + "/" + element.methodName + "/" + element.lineNumber
-                    )
                     val errorMessage = e.message ?: "An unknown error occurred while processing push messages."
                     activity.runOnUiThread { callback.fail(errorMessage) }
                 }
@@ -1607,13 +1600,6 @@ object RelatedDigital {
                         activity.applicationContext,
                         Constants.PAYLOAD_SP_ID_KEY,
                         ""
-                    )
-                    val element = Throwable().stackTrace[0]
-                    LogUtils.formGraylogModel(
-                        activity.applicationContext,
-                        "e",
-                        "De-serializing JSON string of push message : " + e.message,
-                        element.className + "/" + element.methodName + "/" + element.lineNumber
                     )
 
                     val errorMessage = e.message ?: "An unknown error occurred while processing push messages with ID."

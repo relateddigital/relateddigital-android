@@ -211,12 +211,12 @@ class Constants {
 
         const val BANNER_CAROUSEL_ACTION_TYPE_VAL = "AppBanner"
 
-        const val SUBSCRIPTION_ENDPOINT = "https://pushs.euromsg.com/"
+        const val SUBSCRIPTION_ENDPOINT = "http://testpushs.euromsg.com/"
         const val RETENTION_ENDPOINT = "https://pushr.euromsg.com/"
 
         const val LOGGER_ENDPOINT = "https://lgr.visilabs.net/"
         const val REALTIME_ENDPOINT = "https://rt.visilabs.net/"
-        const val GRAYLOG_ENDPOINT = "https://rd-gateway.relateddigital.com/"
+        const val GRAYLOG_ENDPOINT = "https://rd-gateway-log.relateddigital.com/"
         const val REMOTE_CONFIG_ENDPOINT = "https://mbls.visilabs.net/"
 
         var ACTION_ENDPOINT = "https://s.visilabs.net/"

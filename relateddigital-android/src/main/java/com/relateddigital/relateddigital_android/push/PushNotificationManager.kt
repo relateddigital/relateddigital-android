@@ -73,13 +73,6 @@ class PushNotificationManager {
             mNotificationManager?.notify(notificationId, mBuilder.build())
         } catch (e: Exception) {
             Log.d(LOG_TAG, "Generate notification : " + e.message)
-            val element = Throwable().stackTrace[0]
-            LogUtils.formGraylogModel(
-                context,
-                "e",
-                "Creating notification : " + e.message,
-                element.className + "/" + element.methodName + "/" + element.lineNumber
-            )
         }
     }
 
