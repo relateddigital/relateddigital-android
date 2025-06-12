@@ -1,5 +1,8 @@
 package com.relateddigital.relateddigital_android.inapp.notification
 
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
@@ -9,6 +12,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
@@ -18,12 +22,16 @@ import com.bumptech.glide.load.resource.bitmap.GranularRoundedCorners
 import com.google.gson.Gson
 import com.relateddigital.relateddigital_android.R
 import com.relateddigital.relateddigital_android.RelatedDigital
-import com.relateddigital.relateddigital_android.databinding.*
+import com.relateddigital.relateddigital_android.databinding.FragmentInAppNotificationLbBinding
+import com.relateddigital.relateddigital_android.databinding.FragmentInAppNotificationLmBinding
+import com.relateddigital.relateddigital_android.databinding.FragmentInAppNotificationLtBinding
+import com.relateddigital.relateddigital_android.databinding.FragmentInAppNotificationRbBinding
+import com.relateddigital.relateddigital_android.databinding.FragmentInAppNotificationRmBinding
+import com.relateddigital.relateddigital_android.databinding.FragmentInAppNotificationRtBinding
 import com.relateddigital.relateddigital_android.inapp.InAppButtonInterface
 import com.relateddigital.relateddigital_android.model.Drawer
 import com.relateddigital.relateddigital_android.model.DrawerExtendedProps
 import com.relateddigital.relateddigital_android.model.MailSubReport
-import com.relateddigital.relateddigital_android.network.RequestHandler
 import com.relateddigital.relateddigital_android.network.requestHandler.InAppActionClickRequest
 import com.squareup.picasso.Picasso
 import java.net.URI
@@ -41,6 +49,10 @@ class InAppNotificationFragment : Fragment() {
 
     internal enum class Shape {
         CIRCLE, SHARP_EDGE, SOFT_EDGE
+    }
+
+    internal enum class ButtonFunction {
+        COPY, REDIRECT, COPY_REDIRECT
     }
 
     private lateinit var bindingLt: FragmentInAppNotificationLtBinding
@@ -61,6 +73,8 @@ class InAppNotificationFragment : Fragment() {
     private var isArrow = false
     private var isMiniBackgroundImage = false
     private var isMaxiBackgroundImage = false
+    private var staticCode = ""
+    private var buttonFunction: ButtonFunction = ButtonFunction.COPY
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -124,6 +138,10 @@ class InAppNotificationFragment : Fragment() {
                 Shape.SHARP_EDGE
             }
         }
+
+        buttonFunction = getButtonFunctionFromString(response!!.getActionData()!!.getButtonFunction())
+
+        staticCode = response!!.getActionData()!!.getStaticCode().toString()
 
         isArrow = !mExtendedProps!!.getArrowColor().isNullOrEmpty()
 
@@ -189,6 +207,21 @@ class InAppNotificationFragment : Fragment() {
         }
     }
 
+    private fun getButtonFunctionFromString(functionName: String?): ButtonFunction {
+        return when (functionName?.uppercase()) {
+            "copy" -> ButtonFunction.COPY
+            "redirect" -> ButtonFunction.REDIRECT
+            else -> ButtonFunction.COPY_REDIRECT
+        }
+    }
+
+    private fun copyStaticCodeToClipboard(staticCode: String?) {
+        val clipboard = requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        val clip = ClipData.newPlainText("staticCode", staticCode)
+        clipboard.setPrimaryClip(clip)
+        Toast.makeText(requireContext(), "Kod kopyalandı!", Toast.LENGTH_SHORT).show()
+    }
+
     private fun adjustRt() {
         bindingRt.smallSquareContainerRt.visibility = View.VISIBLE
         bindingRt.smallCircleContainerRt.visibility = View.VISIBLE
@@ -201,6 +234,8 @@ class InAppNotificationFragment : Fragment() {
         bindingRt.smallCircleBackgroundImageRt.visibility = View.VISIBLE
         bindingRt.smallSquareBackgroundImageRt.visibility = View.VISIBLE
         bindingRt.bigContainerRt.visibility = View.GONE
+        bindingRt.closeFrameLayoutRt.visibility = View.GONE
+        bindingRt.closeButtonRt.setOnClickListener { v -> endFragment() }
 
         when (shape) {
             Shape.SHARP_EDGE -> {
@@ -350,10 +385,14 @@ class InAppNotificationFragment : Fragment() {
             bindingRt.smallCircleContainerRt.setOnClickListener {
                 if (isExpanded) {
                     isExpanded = false
+                    bindingRt.closeFrameLayoutRt.visibility = View.GONE
+                    bindingRt.closeButtonRt.visibility = View.GONE
                     bindingRt.bigContainerRt.visibility = View.GONE
                     bindingRt.arrowCircleRt.text = getString(R.string.notification_right_arrow)
                 } else {
                     isExpanded = true
+                    bindingRt.closeFrameLayoutRt.visibility = View.VISIBLE
+                    bindingRt.closeButtonRt.visibility = View.VISIBLE
                     bindingRt.bigContainerRt.visibility = View.VISIBLE
                     bindingRt.arrowCircleRt.text = getString(R.string.notification_left_arrow)
                 }
@@ -410,12 +449,16 @@ class InAppNotificationFragment : Fragment() {
             bindingRt.smallSquareContainerRt.setOnClickListener {
                 if (isExpanded) {
                     isExpanded = false
+                    bindingRt.closeFrameLayoutRt.visibility = View.GONE
+                    bindingRt.closeButtonRt.visibility = View.GONE
                     bindingRt.bigContainerRt.visibility = View.GONE
-                    bindingRt.arrowSquareRt.text = getString(R.string.notification_right_arrow)
+                    bindingRt.arrowSquareRt.text = getString(R.string.notification_left_arrow)
                 } else {
                     isExpanded = true
+                    bindingRt.closeFrameLayoutRt.visibility = View.VISIBLE
+                    bindingRt.closeButtonRt.visibility = View.VISIBLE
                     bindingRt.bigContainerRt.visibility = View.VISIBLE
-                    bindingRt.arrowSquareRt.text = getString(R.string.notification_left_arrow)
+                    bindingRt.arrowSquareRt.text = getString(R.string.notification_right_arrow)
                 }
             }
         }
@@ -438,41 +481,7 @@ class InAppNotificationFragment : Fragment() {
         }
 
         bindingRt.bigContainerRt.setOnClickListener {
-            val uriString = response!!.getActionData()!!.getAndroidLnk()
-            val buttonInterface: InAppButtonInterface? =
-                RelatedDigital.getInAppButtonInterface()
-            var report: MailSubReport?
-            try {
-                report = MailSubReport()
-                report.impression = response!!.getActionData()!!.getReport()!!.getImpression()
-                report.click = response!!.getActionData()!!.getReport()!!.getClick()
-            } catch (e: Exception) {
-                Log.e(LOG_TAG, "There is no report to send!")
-                e.printStackTrace()
-                report = null
-            }
-            if (report != null) {
-                InAppActionClickRequest.createInAppActionClickRequest(requireActivity(), report)
-            }
-            if (buttonInterface != null) {
-                RelatedDigital.setInAppButtonInterface(null)
-                buttonInterface.onPress(uriString)
-            } else {
-                if (!uriString.isNullOrEmpty()) {
-                    val uri: Uri
-                    try {
-                        uri = Uri.parse(uriString)
-                        val viewIntent = Intent(Intent.ACTION_VIEW, uri)
-                        requireActivity().startActivity(viewIntent)
-                    } catch (e: Exception) {
-                        Log.i(
-                            LOG_TAG,
-                            "Can't parse notification URI, will not take any action",
-                            e
-                        )
-                    }
-                }
-            }
+            handleBigContainerClick()
         }
     }
 
@@ -488,6 +497,9 @@ class InAppNotificationFragment : Fragment() {
         bindingRm.smallCircleBackgroundImageRm.visibility = View.VISIBLE
         bindingRm.smallSquareBackgroundImageRm.visibility = View.VISIBLE
         bindingRm.bigContainerRm.visibility = View.GONE
+        bindingRm.closeFrameLayoutRm.visibility = View.GONE
+        bindingRm.closeButtonRm.setOnClickListener { v -> endFragment() }
+
 
         when (shape) {
             Shape.SHARP_EDGE -> {
@@ -637,10 +649,14 @@ class InAppNotificationFragment : Fragment() {
             bindingRm.smallCircleContainerRm.setOnClickListener {
                 if (isExpanded) {
                     isExpanded = false
+                    bindingRm.closeFrameLayoutRm.visibility = View.GONE
+                    bindingRm.closeButtonRm.visibility = View.GONE
                     bindingRm.bigContainerRm.visibility = View.GONE
                     bindingRm.arrowCircleRm.text = getString(R.string.notification_right_arrow)
                 } else {
                     isExpanded = true
+                    bindingRm.closeFrameLayoutRm.visibility = View.VISIBLE
+                    bindingRm.closeButtonRm.visibility = View.VISIBLE
                     bindingRm.bigContainerRm.visibility = View.VISIBLE
                     bindingRm.arrowCircleRm.text = getString(R.string.notification_left_arrow)
                 }
@@ -697,12 +713,16 @@ class InAppNotificationFragment : Fragment() {
             bindingRm.smallSquareContainerRm.setOnClickListener {
                 if (isExpanded) {
                     isExpanded = false
+                    bindingRm.closeFrameLayoutRm.visibility = View.GONE
+                    bindingRm.closeButtonRm.visibility = View.GONE
                     bindingRm.bigContainerRm.visibility = View.GONE
-                    bindingRm.arrowSquareRm.text = getString(R.string.notification_right_arrow)
+                    bindingRm.arrowSquareRm.text = getString(R.string.notification_left_arrow)
                 } else {
                     isExpanded = true
+                    bindingRm.closeFrameLayoutRm.visibility = View.VISIBLE
+                    bindingRm.closeButtonRm.visibility = View.VISIBLE
                     bindingRm.bigContainerRm.visibility = View.VISIBLE
-                    bindingRm.arrowSquareRm.text = getString(R.string.notification_left_arrow)
+                    bindingRm.arrowSquareRm.text = getString(R.string.notification_right_arrow)
                 }
             }
         }
@@ -725,41 +745,7 @@ class InAppNotificationFragment : Fragment() {
         }
 
         bindingRm.bigContainerRm.setOnClickListener {
-            val uriString = response!!.getActionData()!!.getAndroidLnk()
-            val buttonInterface: InAppButtonInterface? =
-                RelatedDigital.getInAppButtonInterface()
-            var report: MailSubReport?
-            try {
-                report = MailSubReport()
-                report.impression = response!!.getActionData()!!.getReport()!!.getImpression()
-                report.click = response!!.getActionData()!!.getReport()!!.getClick()
-            } catch (e: Exception) {
-                Log.e(LOG_TAG, "There is no report to send!")
-                e.printStackTrace()
-                report = null
-            }
-            if (report != null) {
-                InAppActionClickRequest.createInAppActionClickRequest(requireActivity(), report)
-            }
-            if (buttonInterface != null) {
-                RelatedDigital.setInAppButtonInterface(null)
-                buttonInterface.onPress(uriString)
-            } else {
-                if (!uriString.isNullOrEmpty()) {
-                    val uri: Uri
-                    try {
-                        uri = Uri.parse(uriString)
-                        val viewIntent = Intent(Intent.ACTION_VIEW, uri)
-                        requireActivity().startActivity(viewIntent)
-                    } catch (e: Exception) {
-                        Log.i(
-                            LOG_TAG,
-                            "Can't parse notification URI, will not take any action",
-                            e
-                        )
-                    }
-                }
-            }
+            handleBigContainerClick()
         }
     }
 
@@ -775,6 +761,8 @@ class InAppNotificationFragment : Fragment() {
         bindingRb.smallCircleBackgroundImageRb.visibility = View.VISIBLE
         bindingRb.smallSquareBackgroundImageRb.visibility = View.VISIBLE
         bindingRb.bigContainerRb.visibility = View.GONE
+        bindingRb.closeFrameLayoutRb.visibility = View.GONE
+        bindingRb.closeButtonRb.setOnClickListener { v -> endFragment() }
 
         when (shape) {
             Shape.SHARP_EDGE -> {
@@ -924,10 +912,14 @@ class InAppNotificationFragment : Fragment() {
             bindingRb.smallCircleContainerRb.setOnClickListener {
                 if (isExpanded) {
                     isExpanded = false
+                    bindingRb.closeFrameLayoutRb.visibility = View.GONE
+                    bindingRb.closeButtonRb.visibility = View.GONE
                     bindingRb.bigContainerRb.visibility = View.GONE
                     bindingRb.arrowCircleRb.text = getString(R.string.notification_right_arrow)
                 } else {
                     isExpanded = true
+                    bindingRb.closeFrameLayoutRb.visibility = View.VISIBLE
+                    bindingRb.closeButtonRb.visibility = View.VISIBLE
                     bindingRb.bigContainerRb.visibility = View.VISIBLE
                     bindingRb.arrowCircleRb.text = getString(R.string.notification_left_arrow)
                 }
@@ -984,12 +976,16 @@ class InAppNotificationFragment : Fragment() {
             bindingRb.smallSquareContainerRb.setOnClickListener {
                 if (isExpanded) {
                     isExpanded = false
+                    bindingRb.closeFrameLayoutRb.visibility = View.GONE
+                    bindingRb.closeButtonRb.visibility = View.GONE
                     bindingRb.bigContainerRb.visibility = View.GONE
-                    bindingRb.arrowSquareRb.text = getString(R.string.notification_right_arrow)
+                    bindingRb.arrowSquareRb.text = getString(R.string.notification_left_arrow)
                 } else {
                     isExpanded = true
+                    bindingRb.closeFrameLayoutRb.visibility = View.VISIBLE
+                    bindingRb.closeButtonRb.visibility = View.VISIBLE
                     bindingRb.bigContainerRb.visibility = View.VISIBLE
-                    bindingRb.arrowSquareRb.text = getString(R.string.notification_left_arrow)
+                    bindingRb.arrowSquareRb.text = getString(R.string.notification_right_arrow)
                 }
             }
         }
@@ -1012,41 +1008,7 @@ class InAppNotificationFragment : Fragment() {
         }
 
         bindingRb.bigContainerRb.setOnClickListener {
-            val uriString = response!!.getActionData()!!.getAndroidLnk()
-            val buttonInterface: InAppButtonInterface? =
-                RelatedDigital.getInAppButtonInterface()
-            var report: MailSubReport?
-            try {
-                report = MailSubReport()
-                report.impression = response!!.getActionData()!!.getReport()!!.getImpression()
-                report.click = response!!.getActionData()!!.getReport()!!.getClick()
-            } catch (e: Exception) {
-                Log.e(LOG_TAG, "There is no report to send!")
-                e.printStackTrace()
-                report = null
-            }
-            if (report != null) {
-                InAppActionClickRequest.createInAppActionClickRequest(requireActivity(), report)
-            }
-            if (buttonInterface != null) {
-                RelatedDigital.setInAppButtonInterface(null)
-                buttonInterface.onPress(uriString)
-            } else {
-                if (!uriString.isNullOrEmpty()) {
-                    val uri: Uri
-                    try {
-                        uri = Uri.parse(uriString)
-                        val viewIntent = Intent(Intent.ACTION_VIEW, uri)
-                        requireActivity().startActivity(viewIntent)
-                    } catch (e: Exception) {
-                        Log.i(
-                            LOG_TAG,
-                            "Can't parse notification URI, will not take any action",
-                            e
-                        )
-                    }
-                }
-            }
+            handleBigContainerClick()
         }
     }
 
@@ -1062,6 +1024,8 @@ class InAppNotificationFragment : Fragment() {
         bindingLt.smallCircleBackgroundImageLt.visibility = View.VISIBLE
         bindingLt.smallSquareBackgroundImageLt.visibility = View.VISIBLE
         bindingLt.bigContainerLt.visibility = View.GONE
+        bindingLt.closeFrameLayoutLt.visibility = View.GONE
+        bindingLt.closeButtonLt.setOnClickListener { v -> endFragment() }
 
         when (shape) {
             Shape.SHARP_EDGE -> {
@@ -1213,12 +1177,16 @@ class InAppNotificationFragment : Fragment() {
             bindingLt.smallCircleContainerLt.setOnClickListener {
                 if (isExpanded) {
                     isExpanded = false
+                    bindingLt.closeFrameLayoutLt.visibility = View.GONE
+                    bindingLt.closeButtonLt.visibility = View.GONE
                     bindingLt.bigContainerLt.visibility = View.GONE
-                    bindingLt.arrowCircleLt.text = getString(R.string.notification_left_arrow)
+                    bindingLt.arrowCircleLt.text = getString(R.string.notification_right_arrow)
                 } else {
                     isExpanded = true
+                    bindingLt.closeFrameLayoutLt.visibility = View.VISIBLE
+                    bindingLt.closeButtonLt.visibility = View.VISIBLE
                     bindingLt.bigContainerLt.visibility = View.VISIBLE
-                    bindingLt.arrowCircleLt.text = getString(R.string.notification_right_arrow)
+                    bindingLt.arrowCircleLt.text = getString(R.string.notification_left_arrow)
                 }
             }
         } else {
@@ -1273,10 +1241,14 @@ class InAppNotificationFragment : Fragment() {
             bindingLt.smallSquareContainerLt.setOnClickListener {
                 if (isExpanded) {
                     isExpanded = false
+                    bindingLt.closeFrameLayoutLt.visibility = View.GONE
+                    bindingLt.closeButtonLt.visibility = View.GONE
                     bindingLt.bigContainerLt.visibility = View.GONE
                     bindingLt.arrowSquareLt.text = getString(R.string.notification_left_arrow)
                 } else {
                     isExpanded = true
+                    bindingLt.closeFrameLayoutLt.visibility = View.VISIBLE
+                    bindingLt.closeButtonLt.visibility = View.VISIBLE
                     bindingLt.bigContainerLt.visibility = View.VISIBLE
                     bindingLt.arrowSquareLt.text = getString(R.string.notification_right_arrow)
                 }
@@ -1301,41 +1273,7 @@ class InAppNotificationFragment : Fragment() {
         }
 
         bindingLt.bigContainerLt.setOnClickListener {
-            val uriString = response!!.getActionData()!!.getAndroidLnk()
-            val buttonInterface: InAppButtonInterface? =
-                RelatedDigital.getInAppButtonInterface()
-            var report: MailSubReport?
-            try {
-                report = MailSubReport()
-                report.impression = response!!.getActionData()!!.getReport()!!.getImpression()
-                report.click = response!!.getActionData()!!.getReport()!!.getClick()
-            } catch (e: Exception) {
-                Log.e(LOG_TAG, "There is no report to send!")
-                e.printStackTrace()
-                report = null
-            }
-            if (report != null) {
-                InAppActionClickRequest.createInAppActionClickRequest(requireActivity(), report)
-            }
-            if (buttonInterface != null) {
-                RelatedDigital.setInAppButtonInterface(null)
-                buttonInterface.onPress(uriString)
-            } else {
-                if (!uriString.isNullOrEmpty()) {
-                    val uri: Uri
-                    try {
-                        uri = Uri.parse(uriString)
-                        val viewIntent = Intent(Intent.ACTION_VIEW, uri)
-                        requireActivity().startActivity(viewIntent)
-                    } catch (e: Exception) {
-                        Log.i(
-                            LOG_TAG,
-                            "Can't parse notification URI, will not take any action",
-                            e
-                        )
-                    }
-                }
-            }
+            handleBigContainerClick()
         }
     }
 
@@ -1351,6 +1289,8 @@ class InAppNotificationFragment : Fragment() {
         bindingLm.smallCircleBackgroundImageLm.visibility = View.VISIBLE
         bindingLm.smallSquareBackgroundImageLm.visibility = View.VISIBLE
         bindingLm.bigContainerLm.visibility = View.GONE
+        bindingLm.closeFrameLayoutLm.visibility = View.GONE
+        bindingLm.closeButtonLm.setOnClickListener { v -> endFragment() }
 
         when (shape) {
             Shape.SHARP_EDGE -> {
@@ -1502,12 +1442,16 @@ class InAppNotificationFragment : Fragment() {
             bindingLm.smallCircleContainerLm.setOnClickListener {
                 if (isExpanded) {
                     isExpanded = false
+                    bindingLm.closeFrameLayoutLm.visibility = View.GONE
+                    bindingLm.closeButtonLm.visibility = View.GONE
                     bindingLm.bigContainerLm.visibility = View.GONE
-                    bindingLm.arrowCircleLm.text = getString(R.string.notification_left_arrow)
+                    bindingLm.arrowCircleLm.text = getString(R.string.notification_right_arrow)
                 } else {
                     isExpanded = true
+                    bindingLm.closeFrameLayoutLm.visibility = View.VISIBLE
+                    bindingLm.closeButtonLm.visibility = View.VISIBLE
                     bindingLm.bigContainerLm.visibility = View.VISIBLE
-                    bindingLm.arrowCircleLm.text = getString(R.string.notification_right_arrow)
+                    bindingLm.arrowCircleLm.text = getString(R.string.notification_left_arrow)
                 }
             }
         } else {
@@ -1562,10 +1506,14 @@ class InAppNotificationFragment : Fragment() {
             bindingLm.smallSquareContainerLm.setOnClickListener {
                 if (isExpanded) {
                     isExpanded = false
+                    bindingLm.closeFrameLayoutLm.visibility = View.GONE
+                    bindingLm.closeButtonLm.visibility = View.GONE
                     bindingLm.bigContainerLm.visibility = View.GONE
                     bindingLm.arrowSquareLm.text = getString(R.string.notification_left_arrow)
                 } else {
                     isExpanded = true
+                    bindingLm.closeFrameLayoutLm.visibility = View.VISIBLE
+                    bindingLm.closeButtonLm.visibility = View.VISIBLE
                     bindingLm.bigContainerLm.visibility = View.VISIBLE
                     bindingLm.arrowSquareLm.text = getString(R.string.notification_right_arrow)
                 }
@@ -1590,41 +1538,7 @@ class InAppNotificationFragment : Fragment() {
         }
 
         bindingLm.bigContainerLm.setOnClickListener {
-            val uriString = response!!.getActionData()!!.getAndroidLnk()
-            val buttonInterface: InAppButtonInterface? =
-                RelatedDigital.getInAppButtonInterface()
-            var report: MailSubReport?
-            try {
-                report = MailSubReport()
-                report.impression = response!!.getActionData()!!.getReport()!!.getImpression()
-                report.click = response!!.getActionData()!!.getReport()!!.getClick()
-            } catch (e: Exception) {
-                Log.e(LOG_TAG, "There is no report to send!")
-                e.printStackTrace()
-                report = null
-            }
-            if (report != null) {
-                InAppActionClickRequest.createInAppActionClickRequest(requireActivity(), report)
-            }
-            if (buttonInterface != null) {
-                RelatedDigital.setInAppButtonInterface(null)
-                buttonInterface.onPress(uriString)
-            } else {
-                if (!uriString.isNullOrEmpty()) {
-                    val uri: Uri
-                    try {
-                        uri = Uri.parse(uriString)
-                        val viewIntent = Intent(Intent.ACTION_VIEW, uri)
-                        requireActivity().startActivity(viewIntent)
-                    } catch (e: Exception) {
-                        Log.i(
-                            LOG_TAG,
-                            "Can't parse notification URI, will not take any action",
-                            e
-                        )
-                    }
-                }
-            }
+            handleBigContainerClick()
         }
     }
 
@@ -1640,6 +1554,8 @@ class InAppNotificationFragment : Fragment() {
         bindingLb.smallCircleBackgroundImageLb.visibility = View.VISIBLE
         bindingLb.smallSquareBackgroundImageLb.visibility = View.VISIBLE
         bindingLb.bigContainerLb.visibility = View.GONE
+        bindingLb.closeFrameLayoutLb.visibility = View.GONE
+        bindingLb.closeButtonLb.setOnClickListener { v -> endFragment() }
 
         when (shape) {
             Shape.SHARP_EDGE -> {
@@ -1791,12 +1707,16 @@ class InAppNotificationFragment : Fragment() {
             bindingLb.smallCircleContainerLb.setOnClickListener {
                 if (isExpanded) {
                     isExpanded = false
+                    bindingLb.closeFrameLayoutLb.visibility = View.GONE
+                    bindingLb.closeButtonLb.visibility = View.GONE
                     bindingLb.bigContainerLb.visibility = View.GONE
-                    bindingLb.arrowCircleLb.text = getString(R.string.notification_left_arrow)
+                    bindingLb.arrowCircleLb.text = getString(R.string.notification_right_arrow)
                 } else {
                     isExpanded = true
+                    bindingLb.closeFrameLayoutLb.visibility = View.VISIBLE
+                    bindingLb.closeButtonLb.visibility = View.VISIBLE
                     bindingLb.bigContainerLb.visibility = View.VISIBLE
-                    bindingLb.arrowCircleLb.text = getString(R.string.notification_right_arrow)
+                    bindingLb.arrowCircleLb.text = getString(R.string.notification_left_arrow)
                 }
             }
         } else {
@@ -1851,10 +1771,14 @@ class InAppNotificationFragment : Fragment() {
             bindingLb.smallSquareContainerLb.setOnClickListener {
                 if (isExpanded) {
                     isExpanded = false
+                    bindingLb.closeFrameLayoutLb.visibility = View.GONE
+                    bindingLb.closeButtonLb.visibility = View.GONE
                     bindingLb.bigContainerLb.visibility = View.GONE
                     bindingLb.arrowSquareLb.text = getString(R.string.notification_left_arrow)
                 } else {
                     isExpanded = true
+                    bindingLb.closeFrameLayoutLb.visibility = View.VISIBLE
+                    bindingLb.closeButtonLb.visibility = View.VISIBLE
                     bindingLb.bigContainerLb.visibility = View.VISIBLE
                     bindingLb.arrowSquareLb.text = getString(R.string.notification_right_arrow)
                 }
@@ -1879,39 +1803,62 @@ class InAppNotificationFragment : Fragment() {
         }
 
         bindingLb.bigContainerLb.setOnClickListener {
-            val uriString = response!!.getActionData()!!.getAndroidLnk()
-            val buttonInterface: InAppButtonInterface? =
-                RelatedDigital.getInAppButtonInterface()
-            var report: MailSubReport?
-            try {
-                report = MailSubReport()
-                report.impression = response!!.getActionData()!!.getReport()!!.getImpression()
-                report.click = response!!.getActionData()!!.getReport()!!.getClick()
-            } catch (e: Exception) {
-                Log.e(LOG_TAG, "There is no report to send!")
-                e.printStackTrace()
-                report = null
+            handleBigContainerClick()
+        }
+    }
+
+    private fun handleBigContainerClick() {
+        // Önce raporu gönder
+        var report: MailSubReport?
+        try {
+            report = MailSubReport()
+            report.impression = response!!.getActionData()!!.getReport()!!.getImpression()
+            report.click = response!!.getActionData()!!.getReport()!!.getClick()
+        } catch (e: Exception) {
+            Log.e(LOG_TAG, "There is no report to send!")
+            e.printStackTrace()
+            report = null
+        }
+        if (report != null) {
+            InAppActionClickRequest.createInAppActionClickRequest(requireActivity(), report)
+        }
+
+        // Belirlenen but-on fonksiyonuna göre işlem yap
+        when (buttonFunction) {
+            ButtonFunction.COPY -> {
+                copyStaticCodeToClipboard(staticCode)
             }
-            if (report != null) {
-                InAppActionClickRequest.createInAppActionClickRequest(requireActivity(), report)
+            ButtonFunction.REDIRECT -> {
+                performRedirect()
             }
-            if (buttonInterface != null) {
-                RelatedDigital.setInAppButtonInterface(null)
-                buttonInterface.onPress(uriString)
-            } else {
-                if (!uriString.isNullOrEmpty()) {
-                    val uri: Uri
-                    try {
-                        uri = Uri.parse(uriString)
-                        val viewIntent = Intent(Intent.ACTION_VIEW, uri)
-                        requireActivity().startActivity(viewIntent)
-                    } catch (e: Exception) {
-                        Log.i(
-                            LOG_TAG,
-                            "Can't parse notification URI, will not take any action",
-                            e
-                        )
-                    }
+            ButtonFunction.COPY_REDIRECT -> {
+                copyStaticCodeToClipboard(staticCode)
+                performRedirect()
+            }
+        }
+    }
+
+    private fun performRedirect() {
+        val uriString = response!!.getActionData()!!.getAndroidLnk()
+        val buttonInterface: InAppButtonInterface? =
+            RelatedDigital.getInAppButtonInterface()
+
+        if (buttonInterface != null) {
+            RelatedDigital.setInAppButtonInterface(null)
+            buttonInterface.onPress(uriString)
+        } else {
+            if (!uriString.isNullOrEmpty()) {
+                val uri: Uri
+                try {
+                    uri = Uri.parse(uriString)
+                    val viewIntent = Intent(Intent.ACTION_VIEW, uri)
+                    requireActivity().startActivity(viewIntent)
+                } catch (e: Exception) {
+                    Log.i(
+                        LOG_TAG,
+                        "Can't parse notification URI, will not take any action",
+                        e
+                    )
                 }
             }
         }

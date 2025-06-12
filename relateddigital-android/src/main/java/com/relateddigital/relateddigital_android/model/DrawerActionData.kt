@@ -34,6 +34,12 @@ class DrawerActionData : Serializable{
     @SerializedName("report")
     private var report: DrawerReport? = null
 
+    @SerializedName("copybutton_function")
+    private var buttonFunction: String? = null
+
+    @SerializedName("staticcode")
+    private var staticCode: String? = null
+
     fun getShape(): String? {
         return shape
     }
@@ -112,5 +118,13 @@ class DrawerActionData : Serializable{
 
     fun setReport(report: DrawerReport?) {
         this.report = report
+    }
+
+    fun getButtonFunction(): String? {
+        return buttonFunction
+    }
+
+    fun getStaticCode(): String? {
+        return staticCode
     }
 }

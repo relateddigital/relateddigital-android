@@ -1530,11 +1530,7 @@ object RelatedDigital {
                     )
                     activity.runOnUiThread { callback.success(orderedPushMessages) }
                 } catch (e: Exception) {
-                    SharedPref.writeString(
-                        activity.applicationContext,
-                        Constants.PAYLOAD_SP_KEY,
-                        ""
-                    )
+                    Log.e(LOG_TAG, "Error processing push messages: ${e.message}", e) // Hatayı daha detaylı loglayın
                     val errorMessage = e.message ?: "An unknown error occurred while processing push messages."
                     activity.runOnUiThread { callback.fail(errorMessage) }
                 }

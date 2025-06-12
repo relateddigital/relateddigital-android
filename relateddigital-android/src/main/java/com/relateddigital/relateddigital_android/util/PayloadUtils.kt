@@ -163,8 +163,7 @@ object PayloadUtils {
             jsonArray!!.put(JSONObject(Gson().toJson(message)))
             jsonArray
         } catch (e: Exception) {
-            Log.e(LOG_TAG, "Could not save the push message!")
-            Log.e(LOG_TAG, e.message!!)
+            Log.e(LOG_TAG, "Error saving push messages: ${e.message}", e)
             null
         }
     }

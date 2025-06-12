@@ -11,6 +11,7 @@ import com.google.gson.Gson
 import com.relateddigital.androidexampleapp.databinding.ActivityInAppNotificationExampleBinding
 import com.relateddigital.relateddigital_android.RelatedDigital
 import com.relateddigital.relateddigital_android.constants.Constants
+import com.relateddigital.relateddigital_android.inapp.InAppButtonInterface
 import com.relateddigital.relateddigital_android.inapp.VisilabsCallback
 import com.relateddigital.relateddigital_android.inapp.VisilabsResponse
 import com.relateddigital.relateddigital_android.inapp.countdowntimer.CountdownTimerFragment
@@ -33,6 +34,18 @@ class InAppNotificationActivity : AppCompatActivity() {
         activity = this
 
         setupUi()
+
+        val buttonCallback = object : InAppButtonInterface {
+            override fun onPress(link: String?) {
+                // Gelen deeplink'i log'da göster veya istediğin gibi yönlendir.
+                // Müşteri tarafında bu kısım, deeplink'i handle edecek kodları içerecek.
+                link?.let {
+                    Log.i("DrawerLink", "Uygulama içinden gelen link: $it")
+                    Toast.makeText(applicationContext, "Gelen Link: $it", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+        RelatedDigital.setInAppButtonInterface(buttonCallback)
     }
 
     private fun setupUi() {
@@ -263,4 +276,5 @@ class InAppNotificationActivity : AppCompatActivity() {
                 parent = this@InAppNotificationActivity
         )
     }
+
 }
