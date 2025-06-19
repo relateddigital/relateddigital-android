@@ -353,20 +353,20 @@ class ShakeToWinActivity : Activity(), SensorEventListener {
             }
 
         } else {
-            // ==================== DÜZENLEME BURADA (ELSE BLOĞU İÇİN) ====================
+
             try {
-                // Bu blok da aynı riskli kodu içerdiği için try-catch ekliyoruz.
+
                 setContentView(bindingStep2.root)
                 setupStep2View()
             } catch (e: Exception) {
                 Log.e(
-                    "ShakeToWinActivity-Catch",
-                    "Adım 2 layout'u (else) yüklenemedi, muhtemelen kütüphane çakışması. Activity kapatılıyor.",
+                    "ShakeToWin",
+                    "2. Adım layoutu yüklenemedi. ShakeToWin Gösterilemiyor.",
                     e
                 )
                 finish()
             }
-            // ============================================================================
+
         }
     }
 
