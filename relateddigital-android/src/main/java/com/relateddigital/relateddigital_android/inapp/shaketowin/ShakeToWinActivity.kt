@@ -329,24 +329,44 @@ class ShakeToWinActivity : Activity(), SensorEventListener {
                             bindingStep1.buttonView.setTextColor(Color.parseColor(mExtendedProps!!.gamificationRules!!.buttonTextColor))
                             bindingStep1.buttonView.textSize =
                                 mExtendedProps!!.gamificationRules!!.buttonTextSize!!.toFloat() + 10
+
                             bindingStep1.buttonView.setOnClickListener {
-                                setContentView(bindingStep2.root)
-                                setupStep2View()
+                                try {
+                                    setContentView(bindingStep2.root)
+                                    setupStep2View()
+                                } catch (e: Exception) {
+                                    Log.e(
+                                        "ShakeToWin",
+                                        "2. Adım layoutu yüklenemedi. ShakeToWin Gösterilemiyor.",
+                                        e
+                                    )
+                                    finish()
+                                }
                             }
-
-
                         }
 
                         override fun onError(e: Exception?) {
-
+                            Log.e("ShakeToWin", "Resim yüklenirken hata oluştu.", e)
                         }
 
                     })
             }
 
         } else {
-            setContentView(bindingStep2.root)
-            setupStep2View()
+            // ==================== DÜZENLEME BURADA (ELSE BLOĞU İÇİN) ====================
+            try {
+                // Bu blok da aynı riskli kodu içerdiği için try-catch ekliyoruz.
+                setContentView(bindingStep2.root)
+                setupStep2View()
+            } catch (e: Exception) {
+                Log.e(
+                    "ShakeToWinActivity-Catch",
+                    "Adım 2 layout'u (else) yüklenemedi, muhtemelen kütüphane çakışması. Activity kapatılıyor.",
+                    e
+                )
+                finish()
+            }
+            // ============================================================================
         }
     }
 

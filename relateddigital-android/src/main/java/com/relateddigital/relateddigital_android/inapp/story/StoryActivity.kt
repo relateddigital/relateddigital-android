@@ -425,17 +425,31 @@ class StoryActivity : Activity(), StoriesProgressView.StoriesListener {
         }
     }
 
+
     private fun calculateDisplayTimeVideo() {
-        val items: List<StoryItems> = mStories!!.getItems()!!
-        for (i in items.indices) {
-            if (items[i].fileType.equals(Constants.STORY_VIDEO_KEY)) {
-                mRetriever!!.setDataSource(items[i].fileSrc, HashMap())
-                val time =
-                    mRetriever!!.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
-                val timeInMilliSec = time!!.toLong()
-                mStories!!.getItems()!![i]
-                    .displayTime = (timeInMilliSec + VIDEO_DURATION_OFFSET).toString()
+        try {
+            val items: List<StoryItems> = mStories!!.getItems()!!
+            for (i in items.indices) {
+                if (items[i].fileType.equals(Constants.STORY_VIDEO_KEY)) {
+                    try {
+                        mRetriever!!.setDataSource(items[i].fileSrc, HashMap())
+                        val time =
+                            mRetriever!!.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
+                        if(time != null) {
+                            val timeInMilliSec = time.toLong()
+                            mStories!!.getItems()!![i]
+                                .displayTime = (timeInMilliSec + VIDEO_DURATION_OFFSET).toString()
+                        } else {
+                            mStories!!.getItems()!![i].displayTime = "3000" // 3 saniye
+                        }
+                    } catch (e: Exception) {
+                        Log.e("StoryActivity-Catch", "Bir video işlenirken hata oluştu: " + items[i].fileSrc, e)
+                        mStories!!.getItems()!![i].displayTime = "3000"
+                    }
+                }
             }
+        } catch (e: Exception) {
+            Log.e("StoryActivity-Catch", "calculateDisplayTimeVideo fonksiyonunda genel bir hata oluştu.", e)
         }
     }
 
