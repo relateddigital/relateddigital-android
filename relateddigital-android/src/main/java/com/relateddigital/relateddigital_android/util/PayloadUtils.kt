@@ -15,37 +15,74 @@ import java.util.*
 
 object PayloadUtils {
     private const val LOG_TAG = "PayloadUtils"
+
     private const val DATE_THRESHOLD: Long = 30
+
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     fun addPushMessage(context: Context, message: Message) {
+        Log.d(LOG_TAG, "addPushMessage işlemi başlatıldı. Push ID: ${message.pushId}")
         val payloads: String = SharedPref.readString(context, Constants.PAYLOAD_SP_KEY)
+
         if (payloads.isNotEmpty()) {
+            Log.d(LOG_TAG, "Mevcut bir payload bulundu, içerik işlenecek.")
             try {
-                val jsonObject = JSONObject(payloads)
-                var jsonArray = jsonObject.optJSONArray(Constants.PAYLOAD_SP_ARRAY_KEY)
+                var jsonArray: JSONArray?
+
+
+                if (payloads.trim().startsWith("[")) {
+
+                    Log.w(LOG_TAG, "Payload doğrudan bir JSONArray olarak algılandı. Veri uyumluluk modunda işleniyor.")
+                    jsonArray = JSONArray(payloads)
+                } else {
+
+                    Log.d(LOG_TAG, "Payload bir JSONObject olarak algılandı.")
+                    val jsonObject = JSONObject(payloads)
+                    jsonArray = jsonObject.optJSONArray(Constants.PAYLOAD_SP_ARRAY_KEY)
+                }
+
+
+
+                if (jsonArray == null) {
+                    Log.w(LOG_TAG, "Payload içinden mesaj dizisi alınamadı. Yeni bir dizi oluşturuluyor.")
+                    jsonArray = JSONArray()
+                }
+
                 if (isPushIdAvailable(context, jsonArray, message)) {
+                    Log.w(LOG_TAG, "Bu Push ID (${message.pushId}) zaten kayıtlı. İşlem durduruldu.")
                     return
                 }
+
                 jsonArray = addNewOne(context, jsonArray, message)
                 if (jsonArray == null) {
+                    Log.e(LOG_TAG, "addNewOne fonksiyonu null döndürdü. Yeni mesaj eklenemedi. Push ID: ${message.pushId}")
                     return
                 }
+                Log.d(LOG_TAG, "Yeni mesaj başarıyla eklendi.")
+
                 jsonArray = removeOldOnes(context, jsonArray)
+                Log.d(LOG_TAG, "Eski mesajlar temizlendi.")
+
+
                 val finalObject = JSONObject()
                 finalObject.put(Constants.PAYLOAD_SP_ARRAY_KEY, jsonArray)
+                val finalPayloadString = finalObject.toString()
+
                 SharedPref.writeString(
                     context,
                     Constants.PAYLOAD_SP_KEY,
-                    finalObject.toString()
+                    finalPayloadString
                 )
+
+                Log.i(LOG_TAG, "Push mesajı başarıyla kaydedildi. Push ID: ${message.pushId}. Veri doğru formatta güncellendi.")
+
             } catch (e: Exception) {
-                Log.e(
-                    LOG_TAG,
-                    "Something went wrong when adding the push message to shared preferences!"
-                )
-                Log.e(LOG_TAG, e.message!!)
+                Log.e(LOG_TAG, "Push mesajı SharedPreferences'e kaydedilirken KRİTİK BİR HATA oluştu!", e)
+                Log.e(LOG_TAG, "Hata Detayları - Push ID: ${message.pushId}")
+                Log.e(LOG_TAG, "Hata Tipi: ${e.javaClass.simpleName}")
+                Log.e(LOG_TAG, "Hata Mesajı: ${e.message}")
             }
         } else {
+            Log.d(LOG_TAG, "Mevcut payload bulunamadı. Bu ilk kayıt, yeni bir payload oluşturuluyor.")
             createAndSaveNewOne(context, message)
         }
     }

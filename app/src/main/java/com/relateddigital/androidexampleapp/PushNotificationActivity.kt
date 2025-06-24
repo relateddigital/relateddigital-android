@@ -107,38 +107,69 @@ class PushNotificationActivity : AppCompatActivity() {
 
     private fun setupPayloadButton() {
         binding.btnPayload.setOnClickListener {
-            val pushMessageInterface :PushMessageInterface= object : PushMessageInterface {
-                override fun success(pushMessages: List<Message>) {
-                    Toast.makeText(applicationContext, "Successful", Toast.LENGTH_SHORT).show()
+            // 1. Operasyonun başlangıcını belirgin bir şekilde logla
+            Log.i(PUSH_LOG_TAG, "========== Payload Butonuna Tıklandı: Mesaj Çekme İşlemi Başlatılıyor... ==========")
 
-                    if (pushMessages.isEmpty()) {
-                        Log.d(PUSH_LOG_TAG, "No push messages found.")
-                    } else {
-                        pushMessages.forEachIndexed { index, message ->
-                            try {
-                                val jsonMessage = Gson().toJson(message)
-                                Log.d(PUSH_LOG_TAG, "Push Message #$index: $jsonMessage")
-                            } catch (e: Exception) {
-                                Log.e(PUSH_LOG_TAG, "Error converting message to JSON", e)
-                            }
-                        }
-                    }
-                }
-
-                override fun fail(errorMessage: String) {
-                    Toast.makeText(applicationContext, "Failure", Toast.LENGTH_SHORT).show()
-                    Log.e(PUSH_LOG_TAG, "Failed to retrieve push messages: $errorMessage")
-                }
-            }
-
+            // 2. Hangi kullanıcı tipi için işlem yapılacağını belirlemeden önce logla
+            Log.d(PUSH_LOG_TAG, "Cihazda kayıtlı Login ID kontrol ediliyor...")
             val loginID = SharedPref.readString(
                 applicationContext,
                 com.relateddigital.relateddigital_android.constants.Constants.NOTIFICATION_LOGIN_ID_KEY
             )
 
+            val pushMessageInterface: PushMessageInterface = object : PushMessageInterface {
+                override fun success(pushMessages: List<Message>) {
+                    // 4. Başarı durumunu ve gelen mesaj sayısını logla
+                    Log.i(PUSH_LOG_TAG, "[BAŞARILI] Push mesajları başarıyla çekildi. Toplam mesaj sayısı: ${pushMessages.size}")
+                    // Toast mesajını daha bilgilendirici yap
+                    Toast.makeText(applicationContext, "Başarılı (${pushMessages.size} mesaj bulundu)", Toast.LENGTH_SHORT).show()
+
+                    if (pushMessages.isEmpty()) {
+                        Log.d(PUSH_LOG_TAG, "Gösterilecek yeni push mesajı bulunmuyor.")
+                    } else {
+                        Log.d(PUSH_LOG_TAG, "--- Alınan Mesajların Detaylı İçeriği ---")
+                        pushMessages.forEachIndexed { index, message ->
+                            val messageNumber = index + 1
+                            Log.d(PUSH_LOG_TAG, "--- Mesaj #$messageNumber Başlangıç ---")
+                            try {
+                                // 5. Her mesajın önemli alanlarını ve tam JSON halini ayrı ayrı logla
+                                Log.d(PUSH_LOG_TAG, "  Push ID: ${message.pushId}")
+                                Log.d(PUSH_LOG_TAG, "  Başlık: ${message.title}")
+                                Log.d(PUSH_LOG_TAG, "  İçerik: ${message.message}")
+                                Log.d(PUSH_LOG_TAG, "  Tarih: ${message.date}") // Mesaj modelinde tarih varsa logla
+                                Log.d(PUSH_LOG_TAG, "  Medya URL: ${message.mediaUrl}")
+
+                                // Tam içeriği görmek için JSON log'u
+                                val jsonMessage = Gson().toJson(message)
+                                Log.d(PUSH_LOG_TAG, "  Tam JSON İçeriği: $jsonMessage")
+
+                            } catch (e: Exception) {
+                                Log.e(PUSH_LOG_TAG, "HATA: Mesaj #$messageNumber JSON'a dönüştürülürken bir hata oluştu.", e)
+                            } finally {
+                                Log.d(PUSH_LOG_TAG, "--- Mesaj #$messageNumber Bitiş ---")
+                            }
+                        }
+                    }
+                    // 7. Operasyonun bittiğini belirgin bir şekilde logla
+                    Log.i(PUSH_LOG_TAG, "========== Mesaj Çekme İşlemi Başarıyla Tamamlandı ==========")
+                }
+
+                override fun fail(errorMessage: String) {
+                    // 6. Hata durumunu ve sebebini detaylı logla
+                    Log.e(PUSH_LOG_TAG, "[BAŞARISIZ] Push mesajları çekilirken bir hata oluştu.")
+                    Toast.makeText(applicationContext, "Hata: Mesajlar alınamadı", Toast.LENGTH_LONG).show()
+                    Log.e(PUSH_LOG_TAG, "SDK'dan Gelen Hata Mesajı: $errorMessage")
+                    // 7. Operasyonun bittiğini belirgin bir şekilde logla
+                    Log.e(PUSH_LOG_TAG, "========== Mesaj Çekme İşlemi Hatayla Sonlandı ==========")
+                }
+            }
+
+            // 3. Hangi SDK fonksiyonunun çağrıldığını logla
             if (loginID.isEmpty()) {
+                Log.i(PUSH_LOG_TAG, "Login ID bulunamadı. Anonim kullanıcı için 'getPushMessages' çağrılıyor.")
                 RelatedDigital.getPushMessages(activity, pushMessageInterface)
             } else {
+                Log.i(PUSH_LOG_TAG, "Login ID bulundu: '$loginID'. Bu ID için 'getPushMessagesWithID' çağrılıyor.")
                 RelatedDigital.getPushMessagesWithID(activity, pushMessageInterface)
             }
         }
