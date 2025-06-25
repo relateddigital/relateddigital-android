@@ -2,6 +2,7 @@ package com.relateddigital.relateddigital_android.model
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import com.google.gson.annotations.SerializedName
 import com.relateddigital.relateddigital_android.util.LogUtils
 import org.json.JSONArray
@@ -80,11 +81,22 @@ class Message : Serializable {
         deliver = bundle["deliver"]
         silent = bundle["silent"]
         campaignId = bundle["cId"]
-        pushType = if (bundle["pushType"] != null) {
-            PushType.valueOf(bundle["pushType"]!!)
+
+        val pushTypeStr = bundle["pushType"]
+        pushType = if (pushTypeStr != null) {
+            try {
+
+                PushType.valueOf(pushTypeStr)
+            } catch (e: IllegalArgumentException) {
+
+                Log.w("RelatedDigital", "Bilinmeyen pushType değeri alındı: '$pushTypeStr'. Varsayılan olarak 'Text' ayarlandı.")
+                PushType.Text
+            }
         } else {
+
             PushType.Text
         }
+
         collapseKey = bundle["collapse_key"]
         if (bundle["elements"] != null) {
             convertJsonStrToElementsArray(context, bundle["elements"])
@@ -173,11 +185,19 @@ class Message : Serializable {
         deliver = bundle.getString("deliver")
         silent = bundle.getString("silent")
         campaignId = bundle.getString("cId")
-        pushType = if (bundle.getString("pushType") != null) {
-            PushType.valueOf(bundle.getString("pushType")!!)
+
+        val pushTypeStr = bundle.getString("pushType")
+        pushType = if (pushTypeStr != null) {
+            try {
+                PushType.valueOf(pushTypeStr)
+            } catch (e: IllegalArgumentException) {
+                Log.w("RelatedDigital", "Bilinmeyen pushType değeri alındı: '$pushTypeStr'. Varsayılan olarak 'Text' ayarlandı.")
+                PushType.Text
+            }
         } else {
             PushType.Text
         }
+
         collapseKey = bundle.getString("collapse_key")
         elements = bundle.getParcelable("elements")
         actions = bundle.getParcelable("actions")

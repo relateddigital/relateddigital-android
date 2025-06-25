@@ -3,10 +3,13 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/androidexampleapp.iml" filepath="$PROJECT_DIR$/.idea/modules/androidexampleapp.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/androidexampleapp.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/androidexampleapp.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/androidexampleapp.app.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/androidexampleapp.app.androidTest.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/androidexampleapp.app.main.iml" filepath="$PROJECT_DIR$/.idea/modules/app/androidexampleapp.app.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/androidexampleapp.app.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/androidexampleapp.app.unitTest.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/relateddigital-android/androidexampleapp.relateddigital-android.iml" filepath="$PROJECT_DIR$/.idea/modules/relateddigital-android/androidexampleapp.relateddigital-android.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/relateddigital-android/androidexampleapp.relateddigital-android.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/relateddigital-android/androidexampleapp.relateddigital-android.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/relateddigital-android/androidexampleapp.relateddigital-android.main.iml" filepath="$PROJECT_DIR$/.idea/modules/relateddigital-android/androidexampleapp.relateddigital-android.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/relateddigital-android/androidexampleapp.relateddigital-android.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/relateddigital-android/androidexampleapp.relateddigital-android.unitTest.iml" />
     </modules>
   </component>
