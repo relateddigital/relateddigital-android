@@ -23,7 +23,7 @@ project.afterEvaluate {
 
 ext {
     PUBLISH_GROUP_ID = 'com.github.relateddigital'
-    PUBLISH_VERSION = "1.5.6"
+    PUBLISH_VERSION = "1.5.7"
     PUBLISH_VERSION_CODE = "55"
     PUBLISH_ARTIFACT_ID = 'relateddigital-android'
 }
@@ -35,8 +35,8 @@ android {
         minSdkVersion 19
         targetSdkVersion 33
         versionCode 1
-        versionName "1.5.6"
-        buildConfigField 'String', 'VERSION_NAME', "\"1.5.6\""
+        versionName "1.5.7"
+        buildConfigField 'String', 'VERSION_NAME', "\"1.5.7\""
         buildConfigField 'String', 'SDK_TYPE', "\"native\""
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -73,7 +73,7 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     api 'com.google.android.gms:play-services-base:18.0.1'
     api 'com.google.firebase:firebase-messaging:23.0.5'
-    api 'com.google.android.gms:play-services-location:19.0.1'
+    api 'com.google.android.gms:play-services-location:21.0.1'
     api 'com.google.code.gson:gson:2.8.6'
     api 'com.squareup.picasso:picasso:2.71828'
     api 'com.github.bumptech.glide:glide:4.12.0'
