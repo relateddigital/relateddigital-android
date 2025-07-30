@@ -4,13 +4,13 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.relateddigital.androidexampleapp.databinding.ActivityMainBinding
-import java.util.*
 
 class
 MainActivity : AppCompatActivity() {
@@ -31,6 +31,7 @@ MainActivity : AppCompatActivity() {
     }
     private lateinit var binding: ActivityMainBinding
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -39,7 +40,12 @@ MainActivity : AppCompatActivity() {
 
         setupUi()
         val intentFilter = IntentFilter("InAppLink")
-        registerReceiver(broad,intentFilter)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            registerReceiver(broad,intentFilter, Context.RECEIVER_NOT_EXPORTED)
+        } else {
+            registerReceiver(broad,intentFilter)
+        }
+
 
 
 
