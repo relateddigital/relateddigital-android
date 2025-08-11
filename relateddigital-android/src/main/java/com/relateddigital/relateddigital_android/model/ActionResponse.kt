@@ -55,6 +55,9 @@ class ActionResponse : Serializable {
     @SerializedName("AppBanner")
     var mAppBanner: List<AppBanner>? = null
 
+    @SerializedName("NotificationBell")
+    var mNotificationBell: List<NotificationBell>? = null
+
     @SerializedName("VERSION")
     var version: Int? = null
 
@@ -120,5 +123,11 @@ class ActionResponse : Serializable {
         get() = mDrawer
         set(story) {
             mDrawer = drawer
+        }
+
+    var notificationBell: List<NotificationBell>?
+        get() = mNotificationBell
+        set(notificationBell) {
+            mNotificationBell = notificationBell
         }
 }

@@ -1,3 +1,20 @@
-include ':relateddigital-android'
+pluginManagement {
+    repositories {
+        google()
+        mavenCentral()
+        gradlePluginPortal() // Plugin'leri bulmak için eklendi
+        maven { url 'https://developer.huawei.com/repo/' }
+    }
+}
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+        maven { url 'https://developer.huawei.com/repo/' }
+        maven { url 'https://jitpack.io' }
+    }
+}
+rootProject.name = "Android Example App" // Proje adınızı buraya yazabilirsiniz
 include ':app'
-rootProject.name = "androidexampleapp"
+include ':relateddigital-android'

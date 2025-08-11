@@ -23,6 +23,7 @@ import com.relateddigital.relateddigital_android.inapp.giftcatch.GiftCatchActivi
 import com.relateddigital.relateddigital_android.inapp.slotmachine.SlotMachineActivity
 import com.relateddigital.relateddigital_android.inapp.mailsubsform.MailSubscriptionFormHalfFragment
 import com.relateddigital.relateddigital_android.inapp.notification.InAppNotificationFragment
+import com.relateddigital.relateddigital_android.inapp.notificationbell.NotificationBellFragment
 import com.relateddigital.relateddigital_android.inapp.scratchtowin.ScratchToWinActivity
 import com.relateddigital.relateddigital_android.inapp.shaketowin.ShakeToWinActivity
 import com.relateddigital.relateddigital_android.inapp.socialproof.SocialProofFragment
@@ -472,6 +473,13 @@ object RequestSender {
                                                 null
                                             )
                                             currentRequest.visilabsCallback?.success(visilabsResponse)
+                                        }
+                                        !actionsResponse.mNotificationBell.isNullOrEmpty() -> {
+                                            val notificationBellFragment: NotificationBellFragment = NotificationBellFragment.newInstance(actionsResponse.mNotificationBell!![0])
+
+                                            val transaction : FragmentTransaction= (currentRequest.parent!! as FragmentActivity).supportFragmentManager.beginTransaction()
+                                            transaction.replace(android.R.id.content, notificationBellFragment)
+                                            transaction.commit()
                                         }
                                         else -> {
                                             Log.e(

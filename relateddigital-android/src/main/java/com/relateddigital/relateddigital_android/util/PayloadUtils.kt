@@ -28,9 +28,7 @@ object PayloadUtils {
             try {
                 var jsonArray: JSONArray?
 
-
                 if (payloads.trim().startsWith("[")) {
-
                     Log.w(LOG_TAG, "Payload doğrudan bir JSONArray olarak algılandı. Veri uyumluluk modunda işleniyor.")
                     jsonArray = JSONArray(payloads)
                 } else {
@@ -39,8 +37,6 @@ object PayloadUtils {
                     val jsonObject = JSONObject(payloads)
                     jsonArray = jsonObject.optJSONArray(Constants.PAYLOAD_SP_ARRAY_KEY)
                 }
-
-
 
                 if (jsonArray == null) {
                     Log.w(LOG_TAG, "Payload içinden mesaj dizisi alınamadı. Yeni bir dizi oluşturuluyor.")
@@ -67,7 +63,7 @@ object PayloadUtils {
                 finalObject.put(Constants.PAYLOAD_SP_ARRAY_KEY, jsonArray)
                 val finalPayloadString = finalObject.toString()
 
-                SharedPref.writeString(
+                SharedPref.writeStringPayload(
                     context,
                     Constants.PAYLOAD_SP_KEY,
                     finalPayloadString
@@ -104,7 +100,7 @@ object PayloadUtils {
                 jsonArray = removeOldOnes(context, jsonArray)
                 val finalObject = JSONObject()
                 finalObject.put(Constants.PAYLOAD_SP_ARRAY_ID_KEY, jsonArray)
-                SharedPref.writeString(
+                SharedPref.writeStringPayload(
                     context,
                     Constants.PAYLOAD_SP_ID_KEY,
                     finalObject.toString()
@@ -241,24 +237,25 @@ object PayloadUtils {
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     private fun removeOldOnes(context: Context, jsonArray: JSONArray): JSONArray {
-        var i = 0
-        while (i < jsonArray.length()) {
+        val newJsonArray = JSONArray()
+
+        for (i in 0 until jsonArray.length()) {
             try {
                 val jsonObject = jsonArray.getJSONObject(i)
-                if (!jsonObject.has("date") || ((jsonObject.has("date") && isOld(context, jsonObject.getString("date"))))) {
-                    jsonArray.remove(i)
-                    i--
+
+                val hasValidDate = jsonObject.has("date") && !isOld(context, jsonObject.getString("date"))
+                val hasPushId = jsonObject.has("pushId")
+
+                if (hasValidDate && hasPushId) {
+                    newJsonArray.put(jsonObject)
                 }
-                if (!jsonObject.has("pushId")) {
-                    jsonArray.remove(i)
-                    i--
-                }
+
             } catch (e: Exception) {
-                Log.e(LOG_TAG, e.message!!)
+                Log.e(LOG_TAG, "Eski mesajlar temizlenirken bir öğe işlenemedi: ${e.message}")
             }
-            i++
         }
-        return jsonArray
+
+        return newJsonArray
     }
 
     private fun isOld(context: Context, date: String): Boolean {
@@ -305,7 +302,7 @@ object PayloadUtils {
             }
             jsonArray.put(JSONObject(Gson().toJson(message)))
             jsonObject.put(Constants.PAYLOAD_SP_ARRAY_KEY, jsonArray)
-            SharedPref.writeString(context, Constants.PAYLOAD_SP_KEY, jsonObject.toString())
+            SharedPref.writeStringPayload(context, Constants.PAYLOAD_SP_KEY, jsonObject.toString())
         } catch (e: Exception) {
             Log.e(LOG_TAG, "Could not save the push message!" + e.message)
         }
@@ -339,7 +336,7 @@ object PayloadUtils {
             }
             jsonArray.put(JSONObject(Gson().toJson(message)))
             jsonObject.put(Constants.PAYLOAD_SP_ARRAY_ID_KEY, jsonArray)
-            SharedPref.writeString(context, Constants.PAYLOAD_SP_ID_KEY, jsonObject.toString())
+            SharedPref.writeStringPayload(context, Constants.PAYLOAD_SP_ID_KEY, jsonObject.toString())
         } catch (e: Exception) {
             Log.e(LOG_TAG, "Could not save the push message!" + e.message)
         }
@@ -363,7 +360,7 @@ object PayloadUtils {
                         payloadObject.put("openDate", SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date()))
 
                         // Güncellenmiş JSON'ı kaydet
-                        SharedPref.writeString(context, Constants.PAYLOAD_SP_KEY, jsonObject.toString())
+                        SharedPref.writeStringPayload(context, Constants.PAYLOAD_SP_KEY, jsonObject.toString())
                         return // Güncelleme işlemi tamamlandı, fonksiyondan çık
                     }
                 }
@@ -396,7 +393,7 @@ object PayloadUtils {
                             payloadObject.put("openDate", SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date()))
 
 
-                            SharedPref.writeString(context, Constants.PAYLOAD_SP_KEY, jsonObject.toString())
+                            SharedPref.writeStringPayload(context, Constants.PAYLOAD_SP_KEY, jsonObject.toString())
                             return
                         }
                     }
@@ -405,7 +402,7 @@ object PayloadUtils {
                         payloadObject.put("status", "O")
                         payloadObject.put("openDate", SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date()))
 
-                        SharedPref.writeString(context, Constants.PAYLOAD_SP_KEY, jsonObject.toString())
+                        SharedPref.writeStringPayload(context, Constants.PAYLOAD_SP_KEY, jsonObject.toString())
                         return
                     }
                 }
@@ -437,7 +434,7 @@ object PayloadUtils {
                             payloadObject.put("openDate", SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date()))
 
 
-                            SharedPref.writeString(context, Constants.PAYLOAD_SP_KEY, jsonObject.toString())
+                            SharedPref.writeStringPayload(context, Constants.PAYLOAD_SP_KEY, jsonObject.toString())
                             return
                         }
                     }

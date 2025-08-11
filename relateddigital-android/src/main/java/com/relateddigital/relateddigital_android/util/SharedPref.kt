@@ -4,6 +4,14 @@ import android.content.Context
 
 class SharedPref {
     companion object {
+        fun writeStringPayload(context: Context, key: String, value: String) {
+            val appName = context.packageName
+            val sp = context.getSharedPreferences(appName, Context.MODE_PRIVATE)
+            val spEditor = sp.edit()
+            spEditor.putString(key, value)
+            spEditor.commit()
+        }
+
         fun writeString(context: Context, key: String, value: String) {
             val appName = context.packageName
             val sp = context.getSharedPreferences(appName, Context.MODE_PRIVATE)

@@ -253,14 +253,16 @@ class InAppNotificationActivity : AppCompatActivity() {
         binding.inlineNpsButton.setOnClickListener{
             val intent = Intent(this, InlineNpsWithNumbersActivity::class.java)
              startActivity(intent)
-
         }
         binding.customActionsButton.setOnClickListener{
             sendInAppRequest("mobileCustomActions")
-
         }
         binding.inAppReviewButton.setOnClickListener{
             sendInAppRequest("apprating")
+        }
+
+        binding.notificationBellButton.setOnClickListener {
+            sendInAppRequest("notification_bell")
 
         }
 

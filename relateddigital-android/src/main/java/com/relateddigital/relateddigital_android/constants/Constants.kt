@@ -57,7 +57,7 @@ class Constants {
         const val REQUEST_SUBS_EMAIL_KEY = "OM.subsemail"
         const val REQUEST_ACTION_ID_KEY = "action_id"
         const val REQUEST_ACTION_TYPE_KEY = "action_type"
-        const val REQUEST_ACTION_TYPE_VAL = "MailSubscriptionForm~SpinToWin~ScratchToWin~ProductStatNotifier~drawer~GiftRain~FindToWin~AppBanner~ShakeToWin~GiftBox~ChooseFavorite~SlotMachine~MobileCustomActions~MobileAppRating~ClawMachine"
+        const val REQUEST_ACTION_TYPE_VAL = "MailSubscriptionForm~SpinToWin~ScratchToWin~ProductStatNotifier~drawer~GiftRain~FindToWin~AppBanner~ShakeToWin~GiftBox~ChooseFavorite~SlotMachine~MobileCustomActions~MobileAppRating~ClawMachine~NotificationBell"
 
 
         var VISILABS_PARAMETERS: List<VisilabsParameter>? = null
@@ -219,7 +219,7 @@ class Constants {
         const val GRAYLOG_ENDPOINT = "https://rd-gateway-log.relateddigital.com/"
         const val REMOTE_CONFIG_ENDPOINT = "https://mbls.visilabs.net/"
 
-        var ACTION_ENDPOINT = "https://s.visilabs.net/"
+        var ACTION_ENDPOINT = "https://tests.visilabs.net/"
 
         const val PUSH_REGISTER_EVENT = "com.relateddigital.relateddigital_android.push.intent.REGISTER"
         const val PUSH_RECEIVE_EVENT = "com.relateddigital.relateddigital_android.push.intent.RECEIVE"
