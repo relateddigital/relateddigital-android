@@ -8,12 +8,12 @@ plugins {
 
 android {
     namespace 'com.relateddigital.androidexampleapp' // namespace zaten vardı, doğru yerde
-    compileSdk 34
+    compileSdk 35
 
     defaultConfig {
         applicationId "com.relateddigital.androidexampleapp"
         minSdkVersion 21
-        targetSdkVersion 34
+        targetSdkVersion 35
         versionCode 1
         versionName "1.5.9"
 
