@@ -33,6 +33,11 @@
             android:noHistory="true"
              />
         <activity
+            android:name=".inapp.survey.SurveyActivity"
+            android:configChanges="orientation"
+            android:noHistory="true"
+            />
+        <activity
             android:name=".inapp.giftcatch.GiftCatchActivity"
             android:configChanges="orientation"
             android:noHistory="true"

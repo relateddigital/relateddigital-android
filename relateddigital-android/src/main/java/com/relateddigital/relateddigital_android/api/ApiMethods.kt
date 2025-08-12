@@ -145,6 +145,11 @@ interface ApiMethods {
         @HeaderMap headers: Map<String, String>
     ): Call<ResponseBody>
 
+    @GET("/survey.js")
+    fun getSurveyJsFile(
+        @HeaderMap headers: Map<String, String>
+    ): Call<ResponseBody>
+
 
     //Methods for remote config
     @GET("rc.json")

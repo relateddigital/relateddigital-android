@@ -28,6 +28,7 @@ import com.relateddigital.relateddigital_android.inapp.scratchtowin.ScratchToWin
 import com.relateddigital.relateddigital_android.inapp.shaketowin.ShakeToWinActivity
 import com.relateddigital.relateddigital_android.inapp.socialproof.SocialProofFragment
 import com.relateddigital.relateddigital_android.inapp.spintowin.SpinToWinActivity
+import com.relateddigital.relateddigital_android.inapp.survey.SurveyActivity
 import com.relateddigital.relateddigital_android.model.*
 import com.relateddigital.relateddigital_android.model.Retention
 import com.relateddigital.relateddigital_android.push.EuromessageCallback
@@ -258,6 +259,22 @@ object RequestSender {
                                             Handler(Looper.getMainLooper()).postDelayed({
                                                 currentRequest.parent!!.startActivity(intent)
                                             }, waitTime * 1000L)
+                                        }
+                                        !actionsResponse.mSurveyList.isNullOrEmpty() -> {
+                                            val surveyModel: SurveyModel =
+                                                actionsResponse.mSurveyList!![0]
+                                            var waitTime = 0L
+                                            ActivityUtils.parentActivity = currentRequest.parent
+                                            val intent =
+                                                Intent(
+                                                    currentRequest.parent,
+                                                    SurveyActivity::class.java
+                                                )
+
+                                            intent.putExtra("survey-data", surveyModel)
+                                            Handler(Looper.getMainLooper()).postDelayed({
+                                                currentRequest.parent!!.startActivity(intent)
+                                            }, waitTime)
                                         }
                                         !actionsResponse.mScratchToWinList.isNullOrEmpty() -> {
                                             val scratchToWinModel: ScratchToWin =

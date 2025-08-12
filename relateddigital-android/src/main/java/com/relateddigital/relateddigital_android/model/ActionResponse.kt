@@ -13,6 +13,9 @@ class ActionResponse : Serializable {
     @SerializedName("SpinToWin")
     var mSpinToWinList: List<SpinToWin>? = null
 
+    @SerializedName("MultipleChoiceSurvey")
+    var mSurveyList: List<SurveyModel>? = null
+
     @SerializedName("ShakeToWin")
     var mShakeToWinList: List<ShakeToWin>? = null
 

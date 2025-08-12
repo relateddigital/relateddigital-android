@@ -266,6 +266,11 @@ class InAppNotificationActivity : AppCompatActivity() {
 
         }
 
+        binding.multipleChoiceSurveyButton.setOnClickListener {
+            sendInAppRequest("MultipleChoiceSurvey")
+
+        }
+
     }
 
     private fun sendInAppRequest(type: String) {
