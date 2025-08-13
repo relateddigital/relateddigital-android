@@ -1,5 +1,3 @@
-// relateddigital-android/build.gradle (Kütüphane modülü - SON HALİ)
-
 plugins {
     id 'com.android.library'
     id 'org.jetbrains.kotlin.android'
@@ -17,10 +15,9 @@ android {
         minSdkVersion 21
         targetSdkVersion 35
         versionCode 1
-        versionName "1.6.3"
-        buildConfigField 'String', 'VERSION_NAME', "\"1.6.3\""
+        versionName "1.6.4"
+        buildConfigField 'String', 'VERSION_NAME', "\"1.6.4\""
         buildConfigField 'String', 'SDK_TYPE', "\"native\""
-
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
     }
@@ -31,6 +28,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
@@ -43,27 +41,18 @@ android {
         buildConfig true
         viewBinding true
     }
+
     lint {
         abortOnError false
     }
-}
 
-// DİKKAT: Bu görevdeki yazım şekli güncellendi
-task androidSourcesJar(type: Jar) {
-    archiveClassifier.set('sources') // <-- DOĞRU VE MODERN KULLANIM BU ŞEKİLDE
-    from android.sourceSets.main.java.srcDirs
-}
-
-project.afterEvaluate {
     publishing {
-        publications {
-            release(MavenPublication) {
-                from components.release
-                artifact androidSourcesJar
-            }
+        singleVariant('release') {
+            withSourcesJar()
         }
     }
 }
+
 
 dependencies {
     // Bağımlılıklarınızda değişiklik yok
@@ -90,4 +79,19 @@ dependencies {
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.2.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.6.1'
+}
+
+publishing {
+    publications {
+
+        release(MavenPublication) {
+            groupId = 'com.github.relateddigital'
+            artifactId = 'relateddigital-android'
+            version = android.defaultConfig.versionName
+
+            afterEvaluate {
+                from components.release
+            }
+        }
+    }
 }
