@@ -17,8 +17,8 @@ android {
         minSdkVersion 21
         targetSdkVersion 34
         versionCode 1
-        versionName "1.6.0"
-        buildConfigField 'String', 'VERSION_NAME', "\"1.6.0\""
+        versionName "1.6.1"
+        buildConfigField 'String', 'VERSION_NAME', "\"1.6.1\""
         buildConfigField 'String', 'SDK_TYPE', "\"native\""
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
