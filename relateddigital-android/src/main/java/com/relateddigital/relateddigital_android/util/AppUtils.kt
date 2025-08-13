@@ -152,7 +152,7 @@ object AppUtils {
     fun getAppVersion(context: Context): String {
         try {
             val pInfo = context.packageManager.getPackageInfo(context.packageName, 0)
-            return pInfo.versionName
+            return pInfo.versionName ?: ""
         } catch (e: Exception) {
             Log.d("AppVersion", "Version Name Error : $e")
         }

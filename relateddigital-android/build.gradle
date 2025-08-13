@@ -11,14 +11,14 @@ group = 'com.github.relateddigital'
 
 android {
     namespace 'com.relateddigital.relateddigital_android'
-    compileSdk 34
+    compileSdk 35
 
     defaultConfig {
         minSdkVersion 21
-        targetSdkVersion 34
+        targetSdkVersion 35
         versionCode 1
-        versionName "1.6.1"
-        buildConfigField 'String', 'VERSION_NAME', "\"1.6.1\""
+        versionName "1.6.2"
+        buildConfigField 'String', 'VERSION_NAME', "\"1.6.2\""
         buildConfigField 'String', 'SDK_TYPE', "\"native\""
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"

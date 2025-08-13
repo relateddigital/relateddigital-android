@@ -55,7 +55,9 @@ object AppTracker {
      */
     private fun getInstalledApplications(packageManager: PackageManager): List<ApplicationInfo> {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            packageManager.getInstalledPackages(PackageManager.GET_META_DATA).map { it.applicationInfo }
+            packageManager.getInstalledPackages(PackageManager.GET_META_DATA)
+                .map { it.applicationInfo }
+                .filterNotNull() // EKLENDİ - Null olabilecek değerleri listeden kaldırır
         } else {
             @Suppress("DEPRECATION")
             packageManager.getInstalledApplications(PackageManager.GET_META_DATA)
