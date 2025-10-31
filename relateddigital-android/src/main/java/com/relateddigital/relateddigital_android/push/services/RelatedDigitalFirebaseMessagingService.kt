@@ -17,6 +17,7 @@ import com.relateddigital.relateddigital_android.network.requestHandler.Retentio
 import com.relateddigital.relateddigital_android.push.PushNotificationManager
 import com.relateddigital.relateddigital_android.push.RetentionType
 import com.relateddigital.relateddigital_android.util.*
+import kotlinx.coroutines.launch
 import java.util.*
 
 open class RelatedDigitalFirebaseMessagingService : FirebaseMessagingService() {
@@ -187,10 +188,12 @@ open class RelatedDigitalFirebaseMessagingService : FirebaseMessagingService() {
                             SharedPref.readString(context, Constants.NOTIFICATION_LOGIN_ID_KEY)
 
                         // PayloadUtils metotları 'this' yerine 'context' alacak
-                        if (notificationLoginId.isEmpty()) {
-                            PayloadUtils.addPushMessage(context, pushMessage)
-                        } else {
-                            PayloadUtils.addPushMessageWithId(context, pushMessage, notificationLoginId)
+                        LibraryCoroutineScope.scope.launch {
+                            if (notificationLoginId.isEmpty()) {
+                                PayloadUtils.addPushMessage(context, pushMessage)
+                            } else {
+                                PayloadUtils.addPushMessageWithId(context, pushMessage, notificationLoginId)
+                            }
                         }
                     } else {
                         Log.d(LOG_TAG, "remoteMessageData transform problem")

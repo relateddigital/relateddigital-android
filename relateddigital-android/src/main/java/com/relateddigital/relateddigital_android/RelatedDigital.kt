@@ -11,6 +11,8 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import com.google.firebase.FirebaseApp
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
@@ -29,6 +31,11 @@ import com.relateddigital.relateddigital_android.push.RetentionType
 import com.relateddigital.relateddigital_android.recommendation.VisilabsTargetFilter
 import com.relateddigital.relateddigital_android.remoteConfig.RemoteConfigHelper
 import com.relateddigital.relateddigital_android.util.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -1207,12 +1214,26 @@ object RelatedDigital {
 
     @JvmStatic
     fun sendPushNotificationOpenReport(context: Context, message: Message) {
-        if (model!!.getIsPushNotificationEnabled()) {
+        // model değişkeninin null olup olmadığını güvenli bir şekilde kontrol edelim
+        val currentModel = model ?: run {
+            Log.e(LOG_TAG, "Model is not initialized.")
+            return
+        }
+        if (currentModel.getIsPushNotificationEnabled()) {
             RetentionRequest.createRetentionRequest(
                 context, RetentionType.OPEN,
                 message.pushId, message.emPushSp
             )
-            PayloadUtils.updatePayload(context, message.pushId)
+            (context as? androidx.appcompat.app.AppCompatActivity)?.lifecycleScope?.launch(Dispatchers.IO) {
+                PayloadUtils.updatePayload(context, message.pushId)
+            } ?: run {
+                // Eğer context bir Activity değilse (örn. Application context), GlobalScope kullanabiliriz.
+                // Bu genellikle son çaredir.
+                GlobalScope.launch(Dispatchers.IO) {
+                    PayloadUtils.updatePayload(context, message.pushId)
+                }
+                Log.w(LOG_TAG, "Context bir Activity değil. GlobalScope kullanıldı.")
+            }
         } else {
             Log.e(LOG_TAG, "Push notification is not enabled." +
                     "Call RelatedDigital.setIsPushNotificationEnabled() first")
@@ -1501,198 +1522,161 @@ object RelatedDigital {
      * callback : PushMessageInterface
      */
     @JvmStatic
-    fun getPushMessages(activity: Activity, callback: PushMessageInterface) {
-        object : Thread(Runnable {
-            val payloads: String = SharedPref.readString(
-                activity.applicationContext,
-                Constants.PAYLOAD_SP_KEY
-            )
-            if (payloads.isNotEmpty()) {
-                try {
-                    val pushMessages: MutableList<Message> = ArrayList<Message>()
-                    val jsonObject = JSONObject(payloads)
-                    val jsonArray = jsonObject.getJSONArray(Constants.PAYLOAD_SP_ARRAY_KEY)
-                    for (i in 0 until jsonArray.length()) {
-                        val currentObject = jsonArray.getJSONObject(i)
-                        try {
-                            val currentMessage: Message = Gson().fromJson(
-                                currentObject.toString(),
-                                Message::class.java
-                            )
-                            pushMessages.add(currentMessage)
-                        } catch (e: JsonSyntaxException) {
-                            Log.e(LOG_TAG, "JSON parsing error in getPushMessages: ${e.message}")
+    fun getPushMessages(activity: AppCompatActivity, callback: PushMessageInterface) {
+
+        activity.lifecycleScope.launch {
+            try {
+                // Flow'un ilk değerini toplayana kadar coroutine askıya alınacak.
+                // Bu, verinin hazır olmasını beklemek için en güvenilir yoldur.
+                val payloads = DataStoreManager.getPayloadsFlow(activity.applicationContext).first()
+
+                if (payloads.isEmpty()) {
+                    callback.fail("Kaydedilmiş bir push bildirimi bulunamadı.")
+                    return@launch
+                }
+
+                val orderedPushMessages = withContext(Dispatchers.IO) {
+                    try {
+                        val pushMessages = mutableListOf<Message>()
+                        val jsonObject = JSONObject(payloads)
+                        val jsonArray = jsonObject.getJSONArray(Constants.PAYLOAD_SP_ARRAY_KEY)
+
+                        for (i in 0 until jsonArray.length()) {
+                            val currentObject = jsonArray.getJSONObject(i)
+                            try {
+                                val currentMessage = Gson().fromJson(currentObject.toString(), Message::class.java)
+                                pushMessages.add(currentMessage)
+                            } catch (e: JsonSyntaxException) {
+                            }
                         }
+
+                        PayloadUtils.orderPushMessages(pushMessages)
+                    } catch (e: Exception) {
+                        // Hatalı/bozuk veriyi temizleyelim.
+                        throw Exception("Push mesajları işlenirken hata: ${e.message}")
                     }
-                    val orderedPushMessages: List<Message> = PayloadUtils.orderPushMessages(
-                        activity.applicationContext,
-                        pushMessages
-                    )
-                    activity.runOnUiThread { callback.success(orderedPushMessages) }
-                } catch (e: Exception) {
-                    Log.e(LOG_TAG, "Error processing push messages: ${e.message}", e) // Hatayı daha detaylı loglayın
-                    val errorMessage = e.message ?: "An unknown error occurred while processing push messages."
-                    activity.runOnUiThread { callback.fail(errorMessage) }
                 }
-            } else {
-                activity.runOnUiThread {
-                    callback.fail(
-                        "There is not any push notification sent " +
-                                "(or saved) in the last 30 days"
-                    )
-                }
+                callback.success(orderedPushMessages)
+            } catch (e: Exception) {
+                callback.fail(e.message ?: "Bilinmeyen bir hata oluştu.")
             }
-        }) {}.start()
+        }
     }
 
     /**
-     * This method returns the list of push messages sent to the user logged-in in the last 30 days.
-     * The messages are ordered in terms of their timestamps e.g. most recent one is at index 0.
-     * activity : Activity
-     * callback : PushMessageInterface
+     * Belirli bir loginID'ye ait push mesajlarını DataStore'dan asenkron olarak alır.
      */
     @JvmStatic
-    fun getPushMessagesWithID(activity: Activity, callback: PushMessageInterface) {
-        val loginID: String =
-            SharedPref.readString(activity, Constants.NOTIFICATION_LOGIN_ID_KEY)
+    fun getPushMessagesWithID(activity: AppCompatActivity, callback: PushMessageInterface) {
+        activity.lifecycleScope.launch {
+            try {
+                val orderedPushMessages = withContext(Dispatchers.IO) {
+                    val loginID = DataStoreManager.getLoginId(activity.applicationContext)
+                    if (loginID.isEmpty()) {
+                        throw Exception("Login ID bulunamadı.")
+                    }
 
-        if (loginID.isEmpty()) {
-            Log.e("getPushMessagesID() : ", "login ID is empty!")
-            callback.fail("Login ID is empty")
+                    val payloads = DataStoreManager.getPayloadsById(activity.applicationContext)
+                    if (payloads.isEmpty()) {
+                        throw Exception("Kaydedilmiş bir push bildirimi bulunamadı.")
+                    }
+
+                    try {
+                        val pushMessages = mutableListOf<Message>()
+                        val jsonObject = JSONObject(payloads)
+                        val jsonArray = jsonObject.getJSONArray(Constants.PAYLOAD_SP_ARRAY_ID_KEY)
+                        for (i in 0 until jsonArray.length()) {
+                            val currentObject = jsonArray.getJSONObject(i)
+                            try {
+                                val currentMessage = Gson().fromJson(currentObject.toString(), Message::class.java)
+                                if (currentMessage.loginID == loginID) {
+                                    pushMessages.add(currentMessage)
+                                }
+                            } catch (e: JsonSyntaxException) {
+                                Log.e(LOG_TAG, "JSON parse hatası: ${e.message}")
+                            }
+                        }
+                        PayloadUtils.orderPushMessages(pushMessages)
+                    } catch (e: Exception) {
+                        throw Exception("Push mesajları (ID ile) işlenirken hata: ${e.message}")
+                    }
+                }
+                callback.success(orderedPushMessages)
+            } catch (e: Exception) {
+                callback.fail(e.message ?: "Bilinmeyen bir hata oluştu.")
+            }
+        }
+    }
+
+    /**
+     * Belirtilen ID'ye sahip push mesajını asenkron olarak siler.
+     * UYGULAMAYI KİLİTLEMEZ. Sonucu bir callback ile döndürür.
+     * @param callback İşlem sonucunu döndüren lambda. `true` başarılı, `false` başarısız.
+     */
+    @JvmStatic
+    fun deletePushMessageByIdFromLSPM(activity: AppCompatActivity, messageId: String?, callback: (Boolean) -> Unit) {
+        if (messageId.isNullOrEmpty()) {
+            callback(false)
             return
         }
+        activity.lifecycleScope.launch(Dispatchers.IO) { // İşi doğrudan arka planda başlat
+            var messageFound = false
+            DataStoreManager.updatePayloads(activity.applicationContext) { currentPayload ->
+                if (currentPayload.isEmpty()) return@updatePayloads ""
 
-        object : Thread(Runnable {
-            val payloads: String = SharedPref.readString(
-                activity.applicationContext,
-                Constants.PAYLOAD_SP_ID_KEY
-            )
-            if (payloads.isNotEmpty()) {
                 try {
-                    val pushMessages: MutableList<Message> = ArrayList<Message>()
-                    val jsonObject = JSONObject(payloads)
-                    val jsonArray = jsonObject.getJSONArray(Constants.PAYLOAD_SP_ARRAY_ID_KEY)
+                    val jsonObject = JSONObject(currentPayload)
+                    val jsonArray = jsonObject.getJSONArray(Constants.PAYLOAD_SP_ARRAY_KEY)
+                    val newJsonArray = JSONArray()
+
                     for (i in 0 until jsonArray.length()) {
                         val currentObject = jsonArray.getJSONObject(i)
-                        try {
-                            val currentMessage: Message = Gson().fromJson(
-                                currentObject.toString(),
-                                Message::class.java
-                            )
-                            if (!currentMessage.loginID.isNullOrEmpty() && loginID == currentMessage.loginID) {
-                                pushMessages.add(currentMessage)
-                            }
-                        } catch (e: JsonSyntaxException) {
-                            Log.e(LOG_TAG, "JSON parsing error in getPushMessagesWithID: ${e.message}")
+                        if (currentObject.optString("pushId") != messageId) {
+                            newJsonArray.put(currentObject)
+                        } else {
+                            messageFound = true
                         }
                     }
-                    val orderedPushMessages: List<Message> = PayloadUtils.orderPushMessages(
-                        activity.applicationContext,
-                        pushMessages
-                    )
-                    activity.runOnUiThread { callback.success(orderedPushMessages) }
+                    jsonObject.put(Constants.PAYLOAD_SP_ARRAY_KEY, newJsonArray).toString()
                 } catch (e: Exception) {
-                    SharedPref.writeString(
-                        activity.applicationContext,
-                        Constants.PAYLOAD_SP_ID_KEY,
-                        ""
-                    )
-
-                    val errorMessage = e.message ?: "An unknown error occurred while processing push messages with ID."
-                    activity.runOnUiThread { callback.fail(errorMessage) }
-                }
-            } else {
-                activity.runOnUiThread {
-                    callback.fail(
-                        "There is not any push notification sent " +
-                                "(or saved) in the last 30 days"
-                    )
+                    Log.e(LOG_TAG, "Mesaj silinirken hata oluştu", e)
+                    currentPayload // Hata durumunda eski veriyi koru
                 }
             }
-        }) {}.start()
-    }
-
-    @JvmStatic
-    fun  deletePushMessagesWithId(activity: Activity , messageId: String?): Boolean {
-        val payloads: String = SharedPref.readString(activity.applicationContext, Constants.PAYLOAD_SP_ID_KEY)
-         if (!payloads.isEmpty()) {
-            try {
-                val jsonObject = JSONObject(payloads)
-                val jsonArray = jsonObject.getJSONArray(Constants.PAYLOAD_SP_ARRAY_ID_KEY)
-                val newJsonArray = JSONArray()
-                var messageFound = false
-                if (messageId != null && !messageId.isEmpty()) {
-                for (i in 0 until jsonArray.length()) {
-                    val currentObject = jsonArray.getJSONObject(i)
-                    val currentMessage =
-                        Gson().fromJson(currentObject.toString(), Message::class.java)
-                    if (currentMessage.pushId != messageId) {
-                        newJsonArray.put(currentObject)
-                    } else {
-                        messageFound = true
-                    }
-                }
-
-                if (messageFound) {
-                    jsonObject.put(Constants.PAYLOAD_SP_ARRAY_ID_KEY, newJsonArray)
-                    SharedPref.writeString(
-                        activity.applicationContext,
-                        Constants.PAYLOAD_SP_ID_KEY,
-                        jsonObject.toString()
-                    )
-                    return true
-                }
-                else {
-
-
-                    jsonObject.put(Constants.PAYLOAD_SP_ARRAY_ID_KEY, newJsonArray)
-                    SharedPref.writeString(
-                        activity.applicationContext,
-                        Constants.PAYLOAD_SP_ID_KEY,
-                        jsonObject.toString()
-                    )
-                    return true
-                }
-                } else {
-                    // messageId sağlanmamışsa, tüm mesajları sil
-                    jsonObject.put(Constants.PAYLOAD_SP_ARRAY_ID_KEY, newJsonArray)
-                    SharedPref.writeString(
-                        activity.applicationContext,
-                        Constants.PAYLOAD_SP_ID_KEY,
-                        jsonObject.toString()
-                    )
-                    return true
-                }
-            } catch (e: java.lang.Exception) {
-                e.printStackTrace()
-                return false
+            // Sonucu Main thread'e geri taşıyıp callback'i çağır
+            withContext(Dispatchers.Main) {
+                callback(messageFound)
             }
-        } else {
-            return false
         }
     }
 
-
-
+    /**
+     * Tüm push mesajlarını asenkron olarak siler.
+     * UYGULAMAYI KİLİTLEMEZ. Sonucu bir callback ile döndürür.
+     */
     @JvmStatic
-    fun deletePushMessages(activity: Activity ): Boolean {
-        val payloads: String = SharedPref.readString(activity.applicationContext, Constants.PAYLOAD_SP_ID_KEY)
-        return if (!payloads.isEmpty()) {
+    fun deleteAllPushMessagesFromLSPM(activity: AppCompatActivity, callback: (Boolean) -> Unit) {
+        activity.lifecycleScope.launch(Dispatchers.IO) {
+            var success = true
             try {
-                val jsonObject = JSONObject(payloads)
-                jsonObject.put(Constants.PAYLOAD_SP_ARRAY_KEY, JSONArray())
-                SharedPref.writeString(
-                    activity.applicationContext,
-                    Constants.PAYLOAD_SP_KEY,
-                    jsonObject.toString()
-                )
-                true
-            } catch (e: java.lang.Exception) {
-                e.printStackTrace()
-                false
+                DataStoreManager.updatePayloads(activity.applicationContext) { currentPayload ->
+                    if (currentPayload.isEmpty()) return@updatePayloads ""
+                    try {
+                        val jsonObject = JSONObject(currentPayload)
+                        jsonObject.put(Constants.PAYLOAD_SP_ARRAY_KEY, JSONArray())
+                        jsonObject.toString()
+                    } catch (e: Exception) {
+                        Log.e(LOG_TAG, "Tüm mesajlar silinirken hata oluştu", e)
+                        currentPayload
+                    }
+                }
+            } catch (e: Exception) {
+                success = false
+                Log.e("RelatedDigital", "deleteAllPushMessagesFromLSPM başarısız oldu", e)
             }
-        } else {
-            false
+            withContext(Dispatchers.Main) {
+                callback(success)
+            }
         }
     }
     /**

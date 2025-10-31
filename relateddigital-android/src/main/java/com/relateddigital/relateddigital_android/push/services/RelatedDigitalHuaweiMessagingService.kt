@@ -1,6 +1,7 @@
 package com.relateddigital.relateddigital_android.push.services
 
 import android.app.NotificationManager
+import android.content.Context
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
@@ -16,6 +17,7 @@ import com.relateddigital.relateddigital_android.network.requestHandler.Retentio
 import com.relateddigital.relateddigital_android.push.PushNotificationManager
 import com.relateddigital.relateddigital_android.push.RetentionType
 import com.relateddigital.relateddigital_android.util.*
+import kotlinx.coroutines.launch
 import java.util.*
 
 open class RelatedDigitalHuaweiMessagingService : HmsMessageService() {
@@ -173,16 +175,23 @@ open class RelatedDigitalHuaweiMessagingService : HmsMessageService() {
                     )
                 }
 
-                val notificationLoginId: String =
-                    SharedPref.readString(this, Constants.NOTIFICATION_LOGIN_ID_KEY)
+                handleAddPushMessage(this, pushMessage)
 
-                if (notificationLoginId.isEmpty()) {
-                    PayloadUtils.addPushMessage(this, pushMessage)
-                } else {
-                    PayloadUtils.addPushMessageWithId(this, pushMessage, notificationLoginId)
-                }
+
             } else {
                 Log.d(LOG_TAG, "remoteMessageData transform problem")
+            }
+        }
+    }
+
+    private fun handleAddPushMessage(context: Context, pushMessage: Message) {
+        val notificationLoginId: String =
+            SharedPref.readString(this, Constants.NOTIFICATION_LOGIN_ID_KEY)
+        LibraryCoroutineScope.scope.launch {
+            if (notificationLoginId.isEmpty()) {
+                PayloadUtils.addPushMessage(context, pushMessage)
+            } else {
+                PayloadUtils.addPushMessageWithId(context, pushMessage, notificationLoginId)
             }
         }
     }

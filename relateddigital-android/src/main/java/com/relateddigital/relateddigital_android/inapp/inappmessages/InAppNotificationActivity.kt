@@ -290,7 +290,7 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
     }
 
     private fun setNpsSecondPopUpCloseButton() {
-        binding.ibClose.visibility = View.GONE
+
         when (mInAppMessage!!.mActionData!!.mSecondPopupType) {
             "image_text_button" -> {
                 secondPopUpType = NpsSecondPopUpType.IMAGE_TEXT_BUTTON
@@ -1031,6 +1031,7 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
                 bindingSecondPopUp.couponContainer.visibility = View.GONE
             }
         }
+        binding.ibClose.visibility = View.GONE
         if (mInAppMessage!!.mActionData!!.mCloseEventTrigger.equals("backgroundclick")) {
             bindingSecondPopUp.closeButton.visibility = View.GONE
             setFinishOnTouchOutside(true)

@@ -1,9 +1,7 @@
 package com.relateddigital.relateddigital_android.util
 
 import android.content.Context
-import android.os.Build
 import android.util.Log
-import androidx.annotation.RequiresApi
 import com.google.gson.Gson
 import com.relateddigital.relateddigital_android.RelatedDigital
 import com.relateddigital.relateddigital_android.constants.Constants
@@ -13,119 +11,101 @@ import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.*
 
+
 object PayloadUtils {
     private const val LOG_TAG = "PayloadUtils"
-
     private const val DATE_THRESHOLD: Long = 30
 
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-    fun addPushMessage(context: Context, message: Message) {
-        Log.d(LOG_TAG, "addPushMessage işlemi başlatıldı. Push ID: ${message.pushId}")
-        val payloads: String = SharedPref.readString(context, Constants.PAYLOAD_SP_KEY)
+    private val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).apply {
+        timeZone = TimeZone.getDefault() // cihaz saat dilimi
+    }
 
-        if (payloads.isNotEmpty()) {
-            Log.d(LOG_TAG, "Mevcut bir payload bulundu, içerik işlenecek.")
+    suspend fun addPushMessage(context: Context, message: Message) {
+        Log.w(LOG_TAG, "addPushMessage işlemi başlatıldı. Push ID: ${message.pushId}")
+
+        DataStoreManager.updatePayloads(context) { currentPayload ->
+            var finalPayloadString = currentPayload
+
+            Log.d(LOG_TAG, "updatePayloads lambda'sı çalıştırıldı.")
             try {
-                var jsonArray: JSONArray?
-
-                if (payloads.trim().startsWith("[")) {
-                    Log.w(LOG_TAG, "Payload doğrudan bir JSONArray olarak algılandı. Veri uyumluluk modunda işleniyor.")
-                    jsonArray = JSONArray(payloads)
+                // Her zaman JSONObject formatı bekleniyor
+                Log.w(LOG_TAG, "Mevcut payload verisi kontrol ediliyor. Boyut: ${currentPayload.length}")
+                val jsonObject = if (currentPayload.isNotEmpty()) {
+                    JSONObject(currentPayload)
                 } else {
-
-                    Log.d(LOG_TAG, "Payload bir JSONObject olarak algılandı.")
-                    val jsonObject = JSONObject(payloads)
-                    jsonArray = jsonObject.optJSONArray(Constants.PAYLOAD_SP_ARRAY_KEY)
+                    JSONObject()
                 }
+                Log.w(LOG_TAG, "Payload JSONObject'e dönüştürüldü veya yeni bir obje oluşturuldu.")
 
+                var jsonArray = jsonObject.optJSONArray(Constants.PAYLOAD_SP_ARRAY_KEY)
                 if (jsonArray == null) {
-                    Log.w(LOG_TAG, "Payload içinden mesaj dizisi alınamadı. Yeni bir dizi oluşturuluyor.")
                     jsonArray = JSONArray()
+                    Log.w(LOG_TAG, "Payload içinde array bulunamadı, yeni bir JSONArray oluşturuldu.")
+                } else {
+                    Log.w(LOG_TAG, "Mevcut JSONArray bulundu, boyutu: ${jsonArray.length()}")
                 }
 
-                if (isPushIdAvailable(context, jsonArray, message)) {
+                // Aynı pushId varsa ekleme
+                if (isPushIdAvailable(jsonArray, message)) {
                     Log.w(LOG_TAG, "Bu Push ID (${message.pushId}) zaten kayıtlı. İşlem durduruldu.")
-                    return
+                    return@updatePayloads currentPayload
                 }
+                Log.w(LOG_TAG, "Yeni bir mesaj olduğu onaylandı.")
 
+                // Yeni mesajı ekle
                 jsonArray = addNewOne(context, jsonArray, message)
-                if (jsonArray == null) {
-                    Log.e(LOG_TAG, "addNewOne fonksiyonu null döndürdü. Yeni mesaj eklenemedi. Push ID: ${message.pushId}")
-                    return
-                }
-                Log.d(LOG_TAG, "Yeni mesaj başarıyla eklendi.")
+                Log.w(LOG_TAG, "Yeni mesaj başarıyla eklendi.")
 
-                jsonArray = removeOldOnes(context, jsonArray)
-                Log.d(LOG_TAG, "Eski mesajlar temizlendi.")
+                // Eski mesajları temizle (30 günden eski olanları)
+                Log.w(LOG_TAG, "Eski mesajlar temizleniyor...")
+                jsonArray = removeOldOnes(jsonArray)
+                Log.w(LOG_TAG, "Eski mesajları temizleme işlemi tamamlandı. Yeni array boyutu: ${jsonArray.length()}")
 
 
-                val finalObject = JSONObject()
-                finalObject.put(Constants.PAYLOAD_SP_ARRAY_KEY, jsonArray)
-                val finalPayloadString = finalObject.toString()
+                // Güncellenmiş array’i tekrar JSONObject içine koy
+                jsonObject.put(Constants.PAYLOAD_SP_ARRAY_KEY, jsonArray)
+                Log.w(LOG_TAG, "Güncellenmiş array JSONObject içine eklendi.")
 
-                SharedPref.writeStringPayload(
-                    context,
-                    Constants.PAYLOAD_SP_KEY,
-                    finalPayloadString
-                )
-
-                Log.i(LOG_TAG, "Push mesajı başarıyla kaydedildi. Push ID: ${message.pushId}. Veri doğru formatta güncellendi.")
+                finalPayloadString = jsonObject.toString()
+                Log.w(LOG_TAG, "Push mesajı başarıyla kaydedildi. Push ID: ${message.pushId}")
 
             } catch (e: Exception) {
-                Log.e(LOG_TAG, "Push mesajı SharedPreferences'e kaydedilirken KRİTİK BİR HATA oluştu!", e)
-                Log.e(LOG_TAG, "Hata Detayları - Push ID: ${message.pushId}")
-                Log.e(LOG_TAG, "Hata Tipi: ${e.javaClass.simpleName}")
-                Log.e(LOG_TAG, "Hata Mesajı: ${e.message}")
+                Log.e(LOG_TAG, "Push mesajı işlenirken KRİTİK BİR HATA oluştu!", e)
             }
-        } else {
-            Log.d(LOG_TAG, "Mevcut payload bulunamadı. Bu ilk kayıt, yeni bir payload oluşturuluyor.")
-            createAndSaveNewOne(context, message)
+
+            finalPayloadString
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-    fun addPushMessageWithId(context: Context, message: Message, loginID: String) {
-        val payloads: String = SharedPref.readString(context, Constants.PAYLOAD_SP_ID_KEY)
-        if (payloads.isNotEmpty()) {
+    suspend fun addPushMessageWithId(context: Context, message: Message, loginID: String) {
+        DataStoreManager.updatePayloadsById(context) { currentPayload ->
+            var finalPayloadString: String
             try {
-                val jsonObject = JSONObject(payloads)
-                var jsonArray = jsonObject.optJSONArray(Constants.PAYLOAD_SP_ARRAY_ID_KEY)
-                if (isPushIdAvailable(context, jsonArray, message)) {
-                    return
+                if (currentPayload.isNotEmpty()) {
+                    val jsonObject = JSONObject(currentPayload)
+                    var jsonArray = jsonObject.optJSONArray(Constants.PAYLOAD_SP_ARRAY_ID_KEY)
+                    if (isPushIdAvailable(jsonArray, message)) {
+                        return@updatePayloadsById currentPayload
+                    }
+                    jsonArray = addNewOneWithID(context, jsonArray, message, loginID)
+                    //jsonArray = removeOldOnes(jsonArray)
+                    val finalObject = JSONObject()
+                    finalObject.put(Constants.PAYLOAD_SP_ARRAY_ID_KEY, jsonArray)
+                    finalPayloadString = finalObject.toString()
+                } else {
+                    finalPayloadString = createNewPayloadStringWithID(context, message, loginID)
                 }
-                jsonArray = addNewOneWithID(context, jsonArray, message, loginID)
-                if (jsonArray == null) {
-                    return
-                }
-                jsonArray = removeOldOnes(context, jsonArray)
-                val finalObject = JSONObject()
-                finalObject.put(Constants.PAYLOAD_SP_ARRAY_ID_KEY, jsonArray)
-                SharedPref.writeStringPayload(
-                    context,
-                    Constants.PAYLOAD_SP_ID_KEY,
-                    finalObject.toString()
-                )
             } catch (e: Exception) {
-                Log.e(
-                    LOG_TAG,
-                    "Something went wrong when adding the push message to shared preferences!"
-                )
-                Log.e(LOG_TAG, e.message!!)
+                Log.e(LOG_TAG, "Push mesajı (ID ile) işlenirken hata oluştu!", e)
+                finalPayloadString = currentPayload
             }
-        } else {
-            createAndSaveNewOneWithID(context, message, loginID)
+            finalPayloadString
         }
     }
 
-    fun orderPushMessages(context: Context, messages: MutableList<Message>): List<Message> {
-        for (i in messages.indices) {
-            for (j in 0 until messages.size - 1 - i) {
-                if (compareDates(context, messages[j].date!!, messages[j + 1].date!!)) {
-                    val temp: Message = messages[j]
-                    messages[j] = messages[j + 1]
-                    messages[j + 1] = temp
-                }
-            }
+    fun orderPushMessages(messages: MutableList<Message>): List<Message> {
+        messages.sortWith { msg1, msg2 ->
+            compareDates(msg1.date!!, msg2.date!!)
         }
         return messages
     }
@@ -134,334 +114,218 @@ object PayloadUtils {
         val params = message.getParams()
         val properties = HashMap<String, String>()
 
-        if(params.isNotEmpty()) {
+        if (params.isNotEmpty()) {
             for (param in params.entries) {
-                if (param.key == Constants.UTM_SOURCE || param.key == Constants.UTM_MEDIUM ||
-                    param.key == Constants.UTM_CAMPAIGN || param.key == Constants.UTM_CONTENT ||
-                    param.key == Constants.UTM_TERM
-                ) {
+                if (param.key in listOf(Constants.UTM_SOURCE, Constants.UTM_MEDIUM, Constants.UTM_CAMPAIGN, Constants.UTM_CONTENT, Constants.UTM_TERM)) {
                     properties[param.key] = param.value
                 }
             }
-
             if (properties.isNotEmpty()) {
                 RelatedDigital.sendCampaignParameters(context, properties)
             }
         }
     }
 
-    private fun isPushIdAvailable(
-        context: Context,
-        jsonArray: JSONArray?,
-        message: Message
-    ): Boolean {
-        var res = false
-        for (i in 0 until jsonArray!!.length()) {
+    private fun isPushIdAvailable(jsonArray: JSONArray?, message: Message): Boolean {
+        jsonArray ?: return false
+        for (i in 0 until jsonArray.length()) {
             try {
-                if (jsonArray.getJSONObject(i).has("pushId")&&
-                    jsonArray.getJSONObject(i).getString("pushId") == message.pushId) {
-                    res = true
-                    break
+                if (jsonArray.getJSONObject(i).optString("pushId") == message.pushId) {
+                    return true
                 }
             } catch (e: Exception) {
-                Log.e(LOG_TAG, e.message!!)
+                Log.e(LOG_TAG, "isPushIdAvailable kontrolünde hata", e)
             }
         }
-        return res
+        return false
     }
 
-    private fun addNewOne(context: Context, jsonArray: JSONArray?, message: Message): JSONArray? {
-        return try {
-            message.date =
-                SimpleDateFormat(
-                    "yyyy-MM-dd HH:mm:ss",
-                    Locale.getDefault()
-                ).format(Date())
+    private fun addNewOne(context: Context, jsonArray: JSONArray, message: Message): JSONArray {
+        try {
+            message.date = dateFormat.format(Date())
             message.status = "D"
             message.openDate = ""
-            val userExVid: Map<String, Any?> =
-                RelatedDigital.getRelatedDigitalModel(context).getExtra()
-            if (userExVid.containsKey(Constants.RELATED_DIGITAL_USER_KEY) && userExVid[Constants.RELATED_DIGITAL_USER_KEY] != null) {
-                val keyID = userExVid[Constants.RELATED_DIGITAL_USER_KEY]
-                if (keyID is String) {
-                    message.keyID = keyID.toString()
-                }
-            }
-            if (userExVid.containsKey(Constants.EMAIL_KEY) && userExVid[Constants.EMAIL_KEY] != null) {
-                val email = userExVid[Constants.EMAIL_KEY]
-                if (email is String) {
-                    message.email= email.toString()
-                }
-            }
-            jsonArray!!.put(JSONObject(Gson().toJson(message)))
-            jsonArray
+            val userExVid: Map<String, Any?> = RelatedDigital.getRelatedDigitalModel(context).getExtra()
+            message.keyID = userExVid[Constants.RELATED_DIGITAL_USER_KEY]?.toString()
+            message.email = userExVid[Constants.EMAIL_KEY]?.toString()
+            jsonArray.put(JSONObject(Gson().toJson(message)))
         } catch (e: Exception) {
-            Log.e(LOG_TAG, "Error saving push messages: ${e.message}", e)
-            null
+            Log.e(LOG_TAG, "Mesaj JSON'a eklenemedi!", e)
         }
+        return jsonArray
     }
 
-    private fun addNewOneWithID(context: Context, jsonArray: JSONArray?, message: Message,
-    loginID: String): JSONArray? {
-        return try {
+    private fun addNewOneWithID(context: Context, jsonArray: JSONArray?, message: Message, loginID: String): JSONArray {
+        val finalJsonArray = jsonArray ?: JSONArray()
+        try {
             message.loginID = loginID
-            message.date =
-                SimpleDateFormat(
-                    "yyyy-MM-dd HH:mm:ss",
-                    Locale.getDefault()
-                ).format(Date())
+            message.date = dateFormat.format(Date())
             message.status = "D"
             message.openDate = ""
-            val userExVid: Map<String, Any?> =
-                RelatedDigital.getRelatedDigitalModel(context).getExtra()
-            if (userExVid.containsKey(Constants.RELATED_DIGITAL_USER_KEY) && userExVid[Constants.RELATED_DIGITAL_USER_KEY] != null) {
-                val keyID = userExVid[Constants.RELATED_DIGITAL_USER_KEY]
-                if (keyID is String) {
-                    message.keyID = keyID.toString()
-                }
-            }
-            if (userExVid.containsKey(Constants.EMAIL_KEY) && userExVid[Constants.EMAIL_KEY] != null) {
-                val email = userExVid[Constants.EMAIL_KEY]
-                if (email is String) {
-                    message.email= email.toString()
-                }
-            }
-            jsonArray!!.put(JSONObject(Gson().toJson(message)))
-            jsonArray
+            val userExVid: Map<String, Any?> = RelatedDigital.getRelatedDigitalModel(context).getExtra()
+            message.keyID = userExVid[Constants.RELATED_DIGITAL_USER_KEY]?.toString()
+            message.email = userExVid[Constants.EMAIL_KEY]?.toString()
+            finalJsonArray.put(JSONObject(Gson().toJson(message)))
         } catch (e: Exception) {
-            Log.e(LOG_TAG, "Could not save the push message!")
-            Log.e(LOG_TAG, e.message!!)
-            null
+            Log.e(LOG_TAG, "Mesaj JSON'a (ID ile) eklenemedi!", e)
         }
+        return finalJsonArray
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-    private fun removeOldOnes(context: Context, jsonArray: JSONArray): JSONArray {
+    private fun removeOldOnes(jsonArray: JSONArray): JSONArray {
         val newJsonArray = JSONArray()
+        var discardedCount = 0
 
         for (i in 0 until jsonArray.length()) {
             try {
                 val jsonObject = jsonArray.getJSONObject(i)
 
-                val hasValidDate = jsonObject.has("date") && !isOld(context, jsonObject.getString("date"))
+                val hasDate = jsonObject.has("date")
+                val isDateValid = hasDate && !isOld(jsonObject.getString("date"))
                 val hasPushId = jsonObject.has("pushId")
 
-                if (hasValidDate && hasPushId) {
+                if (isDateValid && hasPushId) {
                     newJsonArray.put(jsonObject)
+                } else {
+                    discardedCount++
+                    when {
+                        !hasDate -> {
+                            Log.w(LOG_TAG, "Mesaj atıldı (date yok): $jsonObject")
+                        }
+                        hasDate && !isDateValid -> {
+                            Log.w(LOG_TAG, "Mesaj atıldı (eski tarih): $jsonObject")
+                        }
+                        !hasPushId -> {
+                            Log.w(LOG_TAG, "Mesaj atıldı (pushId yok): $jsonObject")
+                        }
+                    }
                 }
 
             } catch (e: Exception) {
-                Log.e(LOG_TAG, "Eski mesajlar temizlenirken bir öğe işlenemedi: ${e.message}")
+                discardedCount++
+                Log.e(LOG_TAG, "JSON işlenirken hata oluştu, öğe atıldı", e)
             }
         }
+
+        // Özet log
+        Log.i(
+            LOG_TAG,
+            "removeOldOnes özeti -> toplam: ${jsonArray.length()}, tutuldu: ${newJsonArray.length()}, atıldı: $discardedCount"
+        )
 
         return newJsonArray
     }
 
-    private fun isOld(context: Context, date: String): Boolean {
-        var res = false
-        val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+    private fun isOld(date: String): Boolean {
         try {
-            val messageDate = dateFormat.parse(date)
+            val messageDate = dateFormat.parse(date) ?: return true
             val now = Date()
-            val difference = now.time - messageDate!!.time
-            if (difference / (1000 * 60 * 60 * 24) > DATE_THRESHOLD) { //30 days
-                res = true
-            }
+            val difference = now.time - messageDate.time
+            return (difference / (1000 * 60 * 60 * 24)) > DATE_THRESHOLD
         } catch (e: Exception) {
-            Log.e(LOG_TAG, "Could not parse date!")
-            Log.e(LOG_TAG, e.message!!)
+            Log.e(LOG_TAG, "Tarih parse edilemedi: $date", e)
+            return true
         }
-        return res
     }
 
-    private fun createAndSaveNewOne(context: Context, message: Message) {
-        try {
+    private fun createNewPayloadString(context: Context, message: Message): String {
+        return try {
             val jsonObject = JSONObject()
             val jsonArray = JSONArray()
-            message.date =
-                SimpleDateFormat(
-                    "yyyy-MM-dd HH:mm:ss",
-                    Locale.getDefault()
-                ).format(Date())
+            message.date = dateFormat.format(Date())
             message.status = "D"
             message.openDate = ""
-            val userExVid: Map<String, Any?> =
-                RelatedDigital.getRelatedDigitalModel(context).getExtra()
-            if (userExVid.containsKey(Constants.RELATED_DIGITAL_USER_KEY) && userExVid[Constants.RELATED_DIGITAL_USER_KEY] != null) {
-                val keyID = userExVid[Constants.RELATED_DIGITAL_USER_KEY]
-                if (keyID is String) {
-                    message.keyID = keyID.toString()
-                }
-            }
-            if (userExVid.containsKey(Constants.EMAIL_KEY) && userExVid[Constants.EMAIL_KEY] != null) {
-                val email = userExVid[Constants.EMAIL_KEY]
-                if (email is String) {
-                    message.email= email.toString()
-                }
-            }
+            val userExVid: Map<String, Any?> = RelatedDigital.getRelatedDigitalModel(context).getExtra()
+            message.keyID = userExVid[Constants.RELATED_DIGITAL_USER_KEY]?.toString()
+            message.email = userExVid[Constants.EMAIL_KEY]?.toString()
             jsonArray.put(JSONObject(Gson().toJson(message)))
             jsonObject.put(Constants.PAYLOAD_SP_ARRAY_KEY, jsonArray)
-            SharedPref.writeStringPayload(context, Constants.PAYLOAD_SP_KEY, jsonObject.toString())
+            jsonObject.toString()
         } catch (e: Exception) {
-            Log.e(LOG_TAG, "Could not save the push message!" + e.message)
+            Log.e(LOG_TAG, "Yeni payload oluşturulamadı!", e)
+            ""
         }
     }
 
-    private fun createAndSaveNewOneWithID(context: Context, message: Message, loginID: String) {
-        try {
+    private fun createNewPayloadStringWithID(context: Context, message: Message, loginID: String): String {
+        return try {
             val jsonObject = JSONObject()
             val jsonArray = JSONArray()
             message.loginID = loginID
-            message.date =
-                SimpleDateFormat(
-                    "yyyy-MM-dd HH:mm:ss",
-                    Locale.getDefault()
-                ).format(Date())
+            message.date = dateFormat.format(Date())
             message.status = "D"
             message.openDate = ""
-            val userExVid: Map<String, Any?> =
-                RelatedDigital.getRelatedDigitalModel(context).getExtra()
-            if (userExVid.containsKey(Constants.RELATED_DIGITAL_USER_KEY) && userExVid[Constants.RELATED_DIGITAL_USER_KEY] != null) {
-                val keyID = userExVid[Constants.RELATED_DIGITAL_USER_KEY]
-                if (keyID is String) {
-                    message.keyID = keyID.toString()
-                }
-            }
-            if (userExVid.containsKey(Constants.EMAIL_KEY) && userExVid[Constants.EMAIL_KEY] != null) {
-                val email = userExVid[Constants.EMAIL_KEY]
-                if (email is String) {
-                    message.email= email.toString()
-                }
-            }
+            val userExVid: Map<String, Any?> = RelatedDigital.getRelatedDigitalModel(context).getExtra()
+            message.keyID = userExVid[Constants.RELATED_DIGITAL_USER_KEY]?.toString()
+            message.email = userExVid[Constants.EMAIL_KEY]?.toString()
             jsonArray.put(JSONObject(Gson().toJson(message)))
             jsonObject.put(Constants.PAYLOAD_SP_ARRAY_ID_KEY, jsonArray)
-            SharedPref.writeStringPayload(context, Constants.PAYLOAD_SP_ID_KEY, jsonObject.toString())
+            jsonObject.toString()
         } catch (e: Exception) {
-            Log.e(LOG_TAG, "Could not save the push message!" + e.message)
+            Log.e(LOG_TAG, "Yeni payload (ID ile) oluşturulamadı!", e)
+            ""
         }
     }
 
-    fun updatePayload(context: Context, pushId: String?) {
-        try {
-            val jsonString = SharedPref.readString(context, Constants.PAYLOAD_SP_KEY, "")
-            val jsonObject = JSONObject(jsonString)
-
-            val payloadsArray = jsonObject.optJSONArray(Constants.PAYLOAD_SP_ARRAY_KEY)
-
-            if (payloadsArray != null) {
-                for (i in 0 until payloadsArray.length()) {
-                    val payloadObject = payloadsArray.getJSONObject(i)
-                    val existingPushId = payloadObject.optString("pushId", "")
-
-                    if (existingPushId == pushId) {
-                        // Güncelleme işlemlerini yap
-                        payloadObject.put("status", "O")
-                        payloadObject.put("openDate", SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date()))
-
-                        // Güncellenmiş JSON'ı kaydet
-                        SharedPref.writeStringPayload(context, Constants.PAYLOAD_SP_KEY, jsonObject.toString())
-                        return // Güncelleme işlemi tamamlandı, fonksiyondan çık
-                    }
-                }
-
-                // Eğer bu noktaya gelinirse, belirtilen pushId ile bir payload bulunamamıştır.
-                Log.e(LOG_TAG, "Payload with pushId $pushId not found!")
-            } else {
-                Log.e(LOG_TAG, "Payload array is null or empty!")
-            }
-        } catch (e: Exception) {
-            Log.e(LOG_TAG, "Could not update the push message!" + e.message)
-        }
-    }
-
-    fun readAllPushMessages(context: Context, pushId: String? = null) {
-        try {
-            val jsonString = SharedPref.readString(context, Constants.PAYLOAD_SP_KEY, "")
-            val jsonObject = JSONObject(jsonString)
-
-            val payloadsArray = jsonObject.optJSONArray(Constants.PAYLOAD_SP_ARRAY_KEY)
-
-            if (payloadsArray != null) {
-                for (i in 0 until payloadsArray.length()) {
-                    val payloadObject = payloadsArray.getJSONObject(i)
-                    val existingPushId = payloadObject.optString("pushId", "")
-                    if (!pushId.isNullOrEmpty()){
-                        if (existingPushId == pushId) {
-
+    suspend fun updatePayload(context: Context, pushId: String?) {
+        pushId ?: return
+        DataStoreManager.updatePayloads(context) { currentPayload ->
+            try {
+                val jsonObject = JSONObject(currentPayload)
+                val payloadsArray = jsonObject.optJSONArray(Constants.PAYLOAD_SP_ARRAY_KEY)
+                payloadsArray?.let {
+                    for (i in 0 until it.length()) {
+                        val payloadObject = it.getJSONObject(i)
+                        if (payloadObject.optString("pushId") == pushId) {
                             payloadObject.put("status", "O")
-                            payloadObject.put("openDate", SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date()))
-
-
-                            SharedPref.writeStringPayload(context, Constants.PAYLOAD_SP_KEY, jsonObject.toString())
-                            return
-                        }
-                    }
-
-                    else if (pushId.isNullOrEmpty()) {
-                        payloadObject.put("status", "O")
-                        payloadObject.put("openDate", SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date()))
-
-                        SharedPref.writeStringPayload(context, Constants.PAYLOAD_SP_KEY, jsonObject.toString())
-                        return
-                    }
-                }
-
-                Log.e(LOG_TAG, "Payload with pushId $pushId not found!")
-            } else {
-                Log.e(LOG_TAG, "Payload array is null or empty!")
-            }
-        } catch (e: Exception) {
-            Log.e(LOG_TAG, "Could not update the push message!" + e.message)
-        }
-    }
-
-    fun readPushMessagesWithPushId(context: Context, pushId: String? = null) {
-        try {
-            val jsonString = SharedPref.readString(context, Constants.PAYLOAD_SP_KEY, "")
-            val jsonObject = JSONObject(jsonString)
-
-            val payloadsArray = jsonObject.optJSONArray(Constants.PAYLOAD_SP_ARRAY_KEY)
-
-            if (payloadsArray != null) {
-                for (i in 0 until payloadsArray.length()) {
-                    val payloadObject = payloadsArray.getJSONObject(i)
-                    val existingPushId = payloadObject.optString("pushId", "")
-                    if (!pushId.isNullOrEmpty()){
-                        if (existingPushId == pushId) {
-
-                            payloadObject.put("status", "O")
-                            payloadObject.put("openDate", SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date()))
-
-
-                            SharedPref.writeStringPayload(context, Constants.PAYLOAD_SP_KEY, jsonObject.toString())
-                            return
+                            payloadObject.put("openDate", dateFormat.format(Date()))
+                            return@updatePayloads jsonObject.toString()
                         }
                     }
                 }
-
-                Log.e(LOG_TAG, "Payload with pushId $pushId not found!")
-            } else {
-                Log.e(LOG_TAG, "Payload array is null or empty!")
+            } catch (e: Exception) {
+                Log.e(LOG_TAG, "Payload güncellenemedi!", e)
             }
-        } catch (e: Exception) {
-            Log.e(LOG_TAG, "Could not update the push message!" + e.message)
+            currentPayload
         }
     }
 
+    suspend fun readAllPushMessages(context: Context, pushId: String? = null) {
+        DataStoreManager.updatePayloads(context) { currentPayload ->
+            try {
+                val jsonObject = JSONObject(currentPayload)
+                val payloadsArray = jsonObject.optJSONArray(Constants.PAYLOAD_SP_ARRAY_KEY)
+                payloadsArray?.let {
+                    for (i in 0 until it.length()) {
+                        val payloadObject = it.getJSONObject(i)
+                        val updateTime = dateFormat.format(Date())
+                        if (pushId.isNullOrEmpty() || payloadObject.optString("pushId") == pushId) {
+                            payloadObject.put("status", "O")
+                            payloadObject.put("openDate", updateTime)
+                            if (!pushId.isNullOrEmpty()) {
+                                return@updatePayloads jsonObject.toString()
+                            }
+                        }
+                    }
+                    if (pushId.isNullOrEmpty()) {
+                        return@updatePayloads jsonObject.toString()
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e(LOG_TAG, "Tüm mesajlar okunmuş olarak işaretlenemedi!", e)
+            }
+            currentPayload
+        }
+    }
 
-    private fun compareDates(context: Context, str1: String, str2: String): Boolean {
-        var res = false
-        val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
-        try {
+    private fun compareDates(str1: String, str2: String): Int {
+        return try {
             val date1 = dateFormat.parse(str1)
             val date2 = dateFormat.parse(str2)
-            if (date1!!.time - date2!!.time < 0) {
-                res = true
-            }
+            date2!!.compareTo(date1)
         } catch (e: Exception) {
-            Log.e(LOG_TAG, "Could not parse date!" + e.message)
+            Log.e(LOG_TAG, "Tarih karşılaştırılamadı!", e)
+            0
         }
-        return res
     }
 }
