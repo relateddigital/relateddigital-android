@@ -31,6 +31,8 @@ import com.relateddigital.relateddigital_android.push.RetentionType
 import com.relateddigital.relateddigital_android.recommendation.VisilabsTargetFilter
 import com.relateddigital.relateddigital_android.remoteConfig.RemoteConfigHelper
 import com.relateddigital.relateddigital_android.util.*
+import com.relateddigital.relateddigital_android.inapp.countdowntimerbanner.CountdownTimerBannerClickCallback
+import com.relateddigital.relateddigital_android.inapp.notificationbell.NotificationBellClickCallback
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.first
@@ -41,12 +43,16 @@ import org.json.JSONObject
 
 
 object RelatedDigital {
+
     private var model: RelatedDigitalModel? = null
     private var inAppButtonInterface: InAppButtonInterface? = null
     private var mHandler: Handler? = null
     private var mRunnable: Runnable? = null
     private const val LOG_TAG: String = "RelatedDigital"
     private var previousModel: RelatedDigitalModel? = null
+    private var countdownCallback: CountdownTimerBannerClickCallback? = null
+    private var notificationBellCallback: NotificationBellClickCallback? = null
+
 
     @JvmStatic
     fun init(context: Context,
@@ -1773,6 +1779,22 @@ object RelatedDigital {
         } else {
             Log.e(LOG_TAG, "Call RelatedDigital.init() first")
         }
+    }
+
+    fun getCountdownTimerBannerClickCallback(callback: CountdownTimerBannerClickCallback) {
+        this.countdownCallback = callback
+    }
+
+    fun setCountdownTimerBannerClickCallback(): CountdownTimerBannerClickCallback? {
+        return this.countdownCallback
+    }
+
+    fun getNotificationBellClickCallback(callback: NotificationBellClickCallback) {
+        this.notificationBellCallback = callback
+    }
+
+    fun setNotificationBellClickCallback(): NotificationBellClickCallback? {
+        return this.notificationBellCallback
     }
 
     @JvmStatic

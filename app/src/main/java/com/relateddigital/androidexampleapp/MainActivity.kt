@@ -11,6 +11,7 @@ import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.relateddigital.androidexampleapp.databinding.ActivityMainBinding
+import com.relateddigital.relateddigital_android.RelatedDigital
 
 class
 MainActivity : AppCompatActivity() {
@@ -46,6 +47,19 @@ MainActivity : AppCompatActivity() {
             registerReceiver(broad,intentFilter)
         }
 
+        RelatedDigital.getCountdownTimerBannerClickCallback { link ->
+            // Bu kod bloğu, kullanıcı banner'a tıkladığında çalışacak.
+
+            Log.d("RDExampleAndroid", "Countdown Banner tıklandı! Yönlendirilen link: $link")
+
+        }
+
+        RelatedDigital.getNotificationBellClickCallback { link ->
+            // Bu kod bloğu, kullanıcı banner'a tıkladığında çalışacak.
+
+            Log.d("RDExampleAndroid", "Notification Bell tıklandı! Yönlendirilen link: $link")
+
+        }
 
 
 

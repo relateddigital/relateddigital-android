@@ -14,11 +14,14 @@ import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import com.google.gson.Gson
 import com.relateddigital.relateddigital_android.R
+import com.relateddigital.relateddigital_android.RelatedDigital
 import com.relateddigital.relateddigital_android.databinding.FragmentNotificationBellBinding
 import com.relateddigital.relateddigital_android.inapp.FontFamily
+import com.relateddigital.relateddigital_android.model.MailSubReport
 import com.relateddigital.relateddigital_android.model.NotificationBell // YENİ: Doğru modeli import ettiğinizden emin olun
 import com.relateddigital.relateddigital_android.model.NotificationBellExtendedProps // YENİ: Doğru modeli import ettiğinizden emin olun
 import com.relateddigital.relateddigital_android.model.NotificationBellTexts // YENİ: Doğru modeli import ettiğinizden emin olun
+import com.relateddigital.relateddigital_android.network.requestHandler.InAppActionClickRequest
 import java.net.URI
 import java.util.*
 
@@ -114,7 +117,7 @@ class NotificationBellFragment : Fragment() {
 
         binding.tvTitle.text = notificationBell?.actiondata?.title
         binding.ivClose.setOnClickListener {
-            hideDialog()
+            endFragment()
         }
 
         // Tıklama dışındaki alanların tıklanabilir olmasını engelle
@@ -125,19 +128,36 @@ class NotificationBellFragment : Fragment() {
         val notificationTexts = notificationBell?.actiondata?.notification_texts ?: emptyList()
         if (notificationTexts.isNotEmpty()) {
             val adapter = NotificationBellAdapter(requireContext(), notificationTexts, extendedProps) { link ->
-                // Linke tıklama olayı
-                link?.let {
-                    try {
-                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(it))
-                        startActivity(intent)
-                        // TODO: Raporlama kodunu buraya ekle (click report)
-                    } catch (e: Exception) {
-                        Log.e(LOG_TAG, "Could not open the link: $it", e)
+                if (link != null) {
+                    val callback = RelatedDigital.setNotificationBellClickCallback()
+                    callback?.onNotificationBellClickCallbackClick(link)
+                    link.let {
+                        try {
+                            sendReport()
+                        } catch (e: Exception) {
+                            Log.e(LOG_TAG, "Could not open the link: $it", e)
+                        }
                     }
+                    hideDialog()
                 }
-                hideDialog() // Linke tıklanınca diyaloğu kapat
+
             }
             binding.rvNotifications.adapter = adapter
+        }
+    }
+
+    private fun sendReport() {
+        var report: MailSubReport?
+        try {
+            report = MailSubReport()
+            report.click = notificationBell?.actiondata?.report?.click
+        } catch (e: Exception) {
+            Log.e("Notification Bell : ", "There is no click report to send!")
+            e.printStackTrace()
+            report = null
+        }
+        if (report != null) {
+            InAppActionClickRequest.createInAppActionClickRequest(requireContext(), report)
         }
     }
 

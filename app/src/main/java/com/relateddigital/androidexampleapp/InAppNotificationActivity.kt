@@ -113,13 +113,7 @@ class InAppNotificationActivity : AppCompatActivity() {
         }
 
         binding.countdownTimerButton.setOnClickListener {
-            val countdownTimerFragment: CountdownTimerFragment = CountdownTimerFragment.newInstance(0, null)
-
-            val transaction = supportFragmentManager.beginTransaction()
-            transaction.replace(android.R.id.content, countdownTimerFragment)
-            transaction.commit()
-            //TODO when backend side gets ready, check below
-            //sendInAppRequest("countdowntimer");
+            sendInAppRequest("CountdownTimerBanner");
         }
 
         binding.inAppCarouselButton.setOnClickListener {
@@ -262,7 +256,7 @@ class InAppNotificationActivity : AppCompatActivity() {
         }
 
         binding.notificationBellButton.setOnClickListener {
-            sendInAppRequest("notification_bell")
+            sendInAppRequest("NotificationBell")
 
         }
 

@@ -16,6 +16,7 @@ import com.relateddigital.relateddigital_android.inapp.InAppManager
 import com.relateddigital.relateddigital_android.inapp.VisilabsResponse
 import com.relateddigital.relateddigital_android.inapp.choosefavorite.ChooseFavoriteActivity
 import com.relateddigital.relateddigital_android.inapp.clawmachine.ClawMachineActivity
+import com.relateddigital.relateddigital_android.inapp.countdowntimerbanner.CountdownTimerBannerFragment
 import com.relateddigital.relateddigital_android.inapp.customactions.CustomActionFragment
 import com.relateddigital.relateddigital_android.inapp.findtowin.FindToWinActivity
 import com.relateddigital.relateddigital_android.inapp.giftbox.GiftBoxActivity
@@ -497,6 +498,21 @@ object RequestSender {
                                             val transaction : FragmentTransaction= (currentRequest.parent!! as FragmentActivity).supportFragmentManager.beginTransaction()
                                             transaction.replace(android.R.id.content, notificationBellFragment)
                                             transaction.commit()
+                                        }
+                                        !actionsResponse.mCountdownTimerBanner.isNullOrEmpty() -> {
+                                            var waitTime = 0L
+
+
+                                            if (!actionsResponse.mCountdownTimerBanner!!.get(0).actiondata!!.waiting_time.toString().isNullOrEmpty()) {
+                                                waitTime = actionsResponse.mCountdownTimerBanner!!.get(0).actiondata!!.waiting_time!!.toLong()
+                                            }
+
+                                            Handler(Looper.getMainLooper()).postDelayed({
+                                                val countdownTimerBannerFragment: CountdownTimerBannerFragment = CountdownTimerBannerFragment.newInstance(actionsResponse.mCountdownTimerBanner!![0])
+                                                val transaction : FragmentTransaction= (currentRequest.parent!! as FragmentActivity).supportFragmentManager.beginTransaction()
+                                                transaction.replace(android.R.id.content, countdownTimerBannerFragment)
+                                                transaction.commit()
+                                            }, waitTime * 1000L)
                                         }
                                         else -> {
                                             Log.e(

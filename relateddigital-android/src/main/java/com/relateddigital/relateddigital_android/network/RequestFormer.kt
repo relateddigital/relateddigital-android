@@ -56,6 +56,15 @@ object RequestFormer {
         addInAppNotificationClickExtraParameters(model, queryMap)
     }
 
+    fun formInAppNotificationImpressionRequest(
+        context: Context, model: RelatedDigitalModel?, pageName: String,
+        properties: HashMap<String, String>?,
+        queryMap: HashMap<String, String>, headerMap: HashMap<String, String>
+    ) {
+        fillCommonParameters(context, model, pageName, properties, queryMap, headerMap)
+        addInAppNotificationClickExtraParameters(model, queryMap)
+    }
+
     fun formStoryImpressionClickRequest(
         context: Context, model: RelatedDigitalModel?, pageName: String,
         properties: HashMap<String, String>?,
