@@ -92,27 +92,42 @@ class StoryLookingBannerAdapter(var mContext: Context, var mStoryItemClickListen
         }
         storyHolder.tvStoryName.setTextColor(Color.parseColor(bannerExtendedProps.storylb_label_color))
         val borderRadius: String? = bannerExtendedProps.storylb_img_borderRadius
-        if (borderRadius != null) {
-            when (borderRadius) {
-                Constants.STORY_CIRCLE -> if (moveShownToEnd) {
-                    storyHolder.setCircleViewProperties(shown)
+        if (borderRadius != null || bannerExtendedProps.shape != null) {
+            if (bannerExtendedProps.shape.equals("rectangle", ignoreCase = true)) {
+                val rectangleBorderRadius = floatArrayOf(0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f)
+                storyHolder.ivStory.layoutParams.width = (160 * mContext.resources.displayMetrics.density).toInt()
+                storyHolder.ivStory.layoutParams.height = (284 * mContext.resources.displayMetrics.density).toInt()
+                storyHolder.flRectangleShadow.layoutParams.width = ViewGroup.LayoutParams.WRAP_CONTENT
+                storyHolder.flRectangleShadow.layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
+                if (moveShownToEnd) {
+                    storyHolder.setRectangleViewProperties(rectangleBorderRadius, shown)
                 } else {
-                    storyHolder.setCircleViewProperties(isItShown(position))
+                    storyHolder.setRectangleViewProperties(rectangleBorderRadius, isItShown(position))
                 }
-                Constants.STORY_ROUNDED_RECTANGLE -> {
-                    val roundedRectangleBorderRadius = floatArrayOf(15f, 15f, 15f, 15f, 15f, 15f, 15f, 15f)
-                    if (moveShownToEnd) {
-                        storyHolder.setRectangleViewProperties(roundedRectangleBorderRadius, shown)
+            } else if (borderRadius != null) {
+                when (borderRadius) {
+                    Constants.STORY_CIRCLE -> if (moveShownToEnd) {
+                        storyHolder.setCircleViewProperties(shown)
                     } else {
-                        storyHolder.setRectangleViewProperties(roundedRectangleBorderRadius, isItShown(position))
+                        storyHolder.setCircleViewProperties(isItShown(position))
                     }
-                }
-                Constants.STORY_RECTANGLE -> {
-                    val rectangleBorderRadius = floatArrayOf(0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f)
-                    if (moveShownToEnd) {
-                        storyHolder.setRectangleViewProperties(rectangleBorderRadius, shown)
-                    } else {
-                        storyHolder.setRectangleViewProperties(rectangleBorderRadius, isItShown(position))
+
+                    Constants.STORY_ROUNDED_RECTANGLE -> {
+                        val roundedRectangleBorderRadius = floatArrayOf(15f, 15f, 15f, 15f, 15f, 15f, 15f, 15f)
+                        if (moveShownToEnd) {
+                            storyHolder.setRectangleViewProperties(roundedRectangleBorderRadius, shown)
+                        } else {
+                            storyHolder.setRectangleViewProperties(roundedRectangleBorderRadius, isItShown(position))
+                        }
+                    }
+
+                    Constants.STORY_RECTANGLE -> {
+                        val rectangleBorderRadius = floatArrayOf(0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f)
+                        if (moveShownToEnd) {
+                            storyHolder.setRectangleViewProperties(rectangleBorderRadius, shown)
+                        } else {
+                            storyHolder.setRectangleViewProperties(rectangleBorderRadius, isItShown(position))
+                        }
                     }
                 }
             }
@@ -161,7 +176,7 @@ class StoryLookingBannerAdapter(var mContext: Context, var mStoryItemClickListen
         var llStoryContainer: LinearLayout = itemView.findViewById(R.id.ll_story)
         private var bannerExtendedProps: StoryBannerExtendedProps? = null
         var flCircleShadow: FrameLayout = itemView.findViewById(R.id.fl_circle)
-        private var flRectangleShadow: FrameLayout = itemView.findViewById(R.id.fl_rect)
+        var flRectangleShadow: FrameLayout = itemView.findViewById(R.id.fl_rect)
         fun setRectangleViewProperties(borderRadius: FloatArray, shown: Boolean) {
             val borderColor = if (shown) Color.rgb(127, 127, 127) else Color.parseColor(bannerExtendedProps!!.storylb_img_borderColor)
             ivStory.visibility = View.VISIBLE

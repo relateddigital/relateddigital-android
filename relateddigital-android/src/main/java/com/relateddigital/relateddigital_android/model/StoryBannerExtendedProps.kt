@@ -12,6 +12,7 @@ class StoryBannerExtendedProps : Serializable {
     var custom_font_family_ios: String? = null
     var custom_font_family_android: String? = null
     var moveShownToEnd = false
+    var shape: String? = null
 
 
     override fun toString(): String {

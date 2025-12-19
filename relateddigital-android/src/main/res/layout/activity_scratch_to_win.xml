@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.relateddigital.relateddigital_android.inapp.scratchtowin.ContainerScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/scratch_to_win_container"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
@@ -78,6 +79,19 @@
                 android:layout_marginBottom="20dp" />
 
         </FrameLayout>
+
+        <TextView
+            android:id="@+id/down_content_body"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginBottom="10dp"
+            android:gravity="center"
+            android:textColor="#000000"
+            android:textSize="15sp"
+            android:visibility="gone"
+            tools:visibility="visible" />
 
         <EditText
             android:id="@+id/emailEdit"

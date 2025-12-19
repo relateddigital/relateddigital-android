@@ -40,6 +40,21 @@ class ScratchToWinExtendedProps : Serializable {
     @SerializedName("content_body_text_size")
     var contentBodyTextSize: String? = null
 
+    @SerializedName("down_content_body_text_color")
+    var downContentBodyTextColor: String? = null
+
+    @SerializedName("down_content_body_font_family")
+    private var down_content_body_font_family: String? = null
+
+    @SerializedName("down_content_body_custom_font_family_ios")
+    private val down_content_body_custom_font_family_ios: String? = null
+
+    @SerializedName("down_content_body_custom_font_family_android")
+    private val down_content_body_custom_font_family_android: String? = null
+
+    @SerializedName("down_content_body_text_size")
+    var downContentBodyTextSize: String? = null
+
     @SerializedName("button_color")
     var buttonColor: String? = null
 
@@ -250,6 +265,36 @@ class ScratchToWinExtendedProps : Serializable {
             if (AppUtils.isFontResourceAvailable(context, copybutton_custom_font_family_android)) {
                 val id = context.resources.getIdentifier(
                     copybutton_custom_font_family_android,
+                    "font",
+                    context.packageName
+                )
+                return ResourcesCompat.getFont(context, id)
+            }
+        }
+        return Typeface.DEFAULT
+    }
+
+    fun setDownContentBodyFontFamily(downContentBodyFontFamily: String?) {
+        down_content_body_font_family = downContentBodyFontFamily
+    }
+
+    fun getDownContentBodyFontFamily(context: Context): Typeface? {
+        if (down_content_body_font_family.isNullOrEmpty()) {
+            return Typeface.DEFAULT
+        }
+        if (FontFamily.Monospace.toString() == down_content_body_font_family!!.lowercase(Locale.getDefault())) {
+            return Typeface.MONOSPACE
+        }
+        if (FontFamily.SansSerif.toString() == down_content_body_font_family!!.lowercase(Locale.getDefault())) {
+            return Typeface.SANS_SERIF
+        }
+        if (FontFamily.Serif.toString() == down_content_body_font_family!!.lowercase(Locale.getDefault())) {
+            return Typeface.SERIF
+        }
+        if (!down_content_body_custom_font_family_android.isNullOrEmpty()) {
+            if (AppUtils.isFontResourceAvailable(context, down_content_body_custom_font_family_android)) {
+                val id = context.resources.getIdentifier(
+                    down_content_body_custom_font_family_android,
                     "font",
                     context.packageName
                 )

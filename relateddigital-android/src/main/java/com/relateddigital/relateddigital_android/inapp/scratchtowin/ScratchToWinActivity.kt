@@ -146,6 +146,16 @@ class ScratchToWinActivity : Activity(), ScratchToWinInterface {
 
             finish()
         }
+
+        if (mScratchToWinMessage!!.actiondata!!.downContentBody.isNullOrEmpty()) {
+            binding.downContentBody.visibility = View.GONE
+        } else {
+            binding.downContentBody.text = mScratchToWinMessage!!.actiondata!!.downContentBody!!.replace("\\n", "\n")
+            binding.downContentBody.setTextColor(Color.parseColor(mExtendedProps!!.downContentBodyTextColor))
+            binding.downContentBody.textSize = mExtendedProps!!.downContentBodyTextSize!!.toFloat() + 8
+            binding.downContentBody.typeface = mExtendedProps!!.getDownContentBodyFontFamily(this)
+            binding.downContentBody.visibility = View.VISIBLE
+        }
     }
 
     private fun setupEmail() {
