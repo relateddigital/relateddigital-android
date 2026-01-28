@@ -43,6 +43,8 @@ class NotificationBellFragment : Fragment() {
             Log.e(LOG_TAG, "NotificationBell data is null. Closing fragment.")
             endFragment()
             return binding.root
+        } else {
+             Log.d(LOG_TAG, "NotificationBell data received: " + notificationBell!!.title)
         }
 
         parseExtendedProps()
@@ -63,18 +65,120 @@ class NotificationBellFragment : Fragment() {
 
     private fun setupInitialView() {
         // Zil ikonunu ayarla
-        loadBellAnimation()
+        loadStaticBellIcon()
 
         // Diyalog penceresinin içeriğini ayarla
         setupDialogContent()
 
-        binding.fabBell.setOnClickListener {
-            if (binding.dialogContainer.visibility == View.VISIBLE) {
-                hideDialog()
-            } else {
-                showDialog()
+        var dX = 0f
+        var dY = 0f
+        var lastAction = 0
+
+        binding.fabBell.setOnTouchListener { view, event ->
+            when (event.actionMasked) {
+                android.view.MotionEvent.ACTION_DOWN -> {
+                    dX = view.x - event.rawX
+                    dY = view.y - event.rawY
+                    lastAction = android.view.MotionEvent.ACTION_DOWN
+                    true
+                }
+                android.view.MotionEvent.ACTION_MOVE -> {
+                    val newX = event.rawX + dX
+                    val newY = event.rawY + dY
+                    
+                    // Update LayoutParams to move the view AND its anchors
+                    val layoutParams = view.layoutParams as androidx.constraintlayout.widget.ConstraintLayout.LayoutParams
+                    layoutParams.topToTop = androidx.constraintlayout.widget.ConstraintLayout.LayoutParams.PARENT_ID
+                    layoutParams.startToStart = androidx.constraintlayout.widget.ConstraintLayout.LayoutParams.PARENT_ID
+                    layoutParams.bottomToBottom = androidx.constraintlayout.widget.ConstraintLayout.LayoutParams.UNSET
+                    layoutParams.endToEnd = androidx.constraintlayout.widget.ConstraintLayout.LayoutParams.UNSET
+                    
+                    layoutParams.leftMargin = newX.toInt()
+                    layoutParams.topMargin = newY.toInt()
+                    view.layoutParams = layoutParams
+                    
+                    lastAction = android.view.MotionEvent.ACTION_MOVE
+                    true
+                }
+                android.view.MotionEvent.ACTION_UP -> {
+                    if (lastAction == android.view.MotionEvent.ACTION_DOWN) {
+                        // Click event
+                        if (binding.dialogContainer.visibility == View.VISIBLE) {
+                            hideDialog()
+                        } else {
+                            showDialog()
+                        }
+                    } else {
+                        // Snap logic with LayoutParams
+                        val displayMetrics = resources.displayMetrics
+                        val screenWidth = displayMetrics.widthPixels
+                        val viewWidth = view.width
+                        val padding = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 16f, displayMetrics).toInt()
+                        
+                        val currentX = (view.layoutParams as androidx.constraintlayout.widget.ConstraintLayout.LayoutParams).leftMargin
+                        
+                        val targetX = if (currentX + viewWidth / 2 < screenWidth / 2) {
+                            // Snap Left
+                            padding
+                        } else {
+                            // Snap Right
+                            screenWidth - viewWidth - padding
+                        }
+                        
+                        val animator = android.animation.ValueAnimator.ofInt(currentX, targetX)
+                        animator.duration = 300
+                        animator.addUpdateListener { animation ->
+                            val value = animation.animatedValue as Int
+                            val params = view.layoutParams as androidx.constraintlayout.widget.ConstraintLayout.LayoutParams
+                            params.leftMargin = value
+                            view.layoutParams = params
+                        }
+                        animator.start()
+                    }
+                    true
+                }
+                else -> false
             }
         }
+    }
+    
+    private fun updateDialogPosition() {
+        // Bell position check
+        val bellY = binding.fabBell.y
+        val bellHeight = binding.fabBell.height
+        val displayMetrics = resources.displayMetrics
+        val screenHeight = displayMetrics.heightPixels
+        
+        val layoutParams = binding.dialogContainer.layoutParams as androidx.constraintlayout.widget.ConstraintLayout.LayoutParams
+        
+        // Remove old constraints
+        layoutParams.topToBottom = androidx.constraintlayout.widget.ConstraintLayout.LayoutParams.UNSET
+        layoutParams.bottomToTop = androidx.constraintlayout.widget.ConstraintLayout.LayoutParams.UNSET
+        
+        if (bellY < screenHeight / 2) {
+            // Top half: Show dialog BELOW the bell
+            layoutParams.topToBottom = binding.fabBell.id
+            binding.ivPointer.rotation = 180f // Point up
+            
+            // Adjust pointer constraint to be at the TOP of the card
+             val pointerParams = binding.ivPointer.layoutParams as androidx.constraintlayout.widget.ConstraintLayout.LayoutParams
+             pointerParams.topToBottom = androidx.constraintlayout.widget.ConstraintLayout.LayoutParams.UNSET
+             pointerParams.bottomToTop = binding.dialogCard.id
+             binding.ivPointer.layoutParams = pointerParams
+             
+        } else {
+            // Bottom half: Show dialog ABOVE the bell
+            layoutParams.bottomToTop = binding.fabBell.id
+             binding.ivPointer.rotation = 0f // Point down
+             
+             // Adjust pointer constraint to be at the BOTTOM of the card
+             val pointerParams = binding.ivPointer.layoutParams as androidx.constraintlayout.widget.ConstraintLayout.LayoutParams
+             pointerParams.bottomToTop = androidx.constraintlayout.widget.ConstraintLayout.LayoutParams.UNSET
+             pointerParams.topToBottom = binding.dialogCard.id
+             binding.ivPointer.layoutParams = pointerParams
+        }
+        
+        binding.dialogContainer.layoutParams = layoutParams
     }
 
     private fun loadStaticBellIcon() {
@@ -89,7 +193,6 @@ class NotificationBellFragment : Fragment() {
         }
     }
 
-    // YENİ: Animasyonlu ikonu yüklemek için yardımcı fonksiyon
     private fun loadBellAnimation() {
         val animationUrl = notificationBell?.actiondata?.bell_animation
         if (!animationUrl.isNullOrEmpty()) {
@@ -171,13 +274,13 @@ class NotificationBellFragment : Fragment() {
     }
 
     private fun showDialog() {
-        loadStaticBellIcon()
-        // TODO: Raporlama kodunu buraya ekle (impression report)
+        loadBellAnimation()
+        updateDialogPosition()
         binding.dialogContainer.visibility = View.VISIBLE
     }
 
     private fun hideDialog() {
-        loadBellAnimation()
+        loadStaticBellIcon()
         binding.dialogContainer.visibility = View.GONE
     }
 

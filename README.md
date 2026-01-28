@@ -37,7 +37,7 @@ allprojects {
 Please, add the dependency of `relateddigital-android` library into your module-level build.gradle file as shown below:
 
  ```gradle
-implementation 'com.github.relateddigital:relateddigital-android:1.7.7'
+implementation 'com.github.relateddigital:relateddigital-android:1.7.8'
  ```
 
 # Licences

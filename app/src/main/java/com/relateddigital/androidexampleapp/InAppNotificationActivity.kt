@@ -37,8 +37,6 @@ class InAppNotificationActivity : AppCompatActivity() {
 
         val buttonCallback = object : InAppButtonInterface {
             override fun onPress(link: String?) {
-                // Gelen deeplink'i log'da göster veya istediğin gibi yönlendir.
-                // Müşteri tarafında bu kısım, deeplink'i handle edecek kodları içerecek.
                 link?.let {
                     Log.i("DrawerLink", "Uygulama içinden gelen link: $it")
                     Toast.makeText(applicationContext, "Gelen Link: $it", Toast.LENGTH_SHORT).show()

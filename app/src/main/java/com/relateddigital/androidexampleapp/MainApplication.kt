@@ -116,7 +116,7 @@ class MainApplication : Application() {
             organizationId = "394A48556A2F76466136733D"
             profileId = "75763259366A3345686E303D"
             dataSource = "mrhp"
-            SdkConstants.ACTION_ENDPOINT = "http://s.visilabs.net/"
+            SdkConstants.ACTION_ENDPOINT = "http://tests.visilabs.net/"
 
             // ="@xml/network_security_config" make true
         }

@@ -36,7 +36,7 @@ class SpinToWinActivity : FragmentActivity(), SpinToWinCompleteInterface,
     private var jsonStr: String? = ""
     private var response: SpinToWin? = null
     private var spinToWinPromotionCode = ""
-    private var sliceLink = ""
+
     private lateinit var activity: FragmentActivity
     private lateinit var completeListener: SpinToWinCompleteInterface
     private lateinit var copyToClipboardListener: SpinToWinCopyToClipboardInterface
@@ -143,6 +143,7 @@ class SpinToWinActivity : FragmentActivity(), SpinToWinCompleteInterface,
         finish()
     }
 
+
     override fun copyToClipboard(couponCode: String?, link: String?) {
         val clipboard = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
         val clip = ClipData.newPlainText("Coupon Code", couponCode)
@@ -150,24 +151,21 @@ class SpinToWinActivity : FragmentActivity(), SpinToWinCompleteInterface,
         Toast.makeText(applicationContext, getString(R.string.copied_to_clipboard), Toast.LENGTH_LONG).show()
 
         if(!link.isNullOrEmpty()) {
-            sliceLink = link
-            sendDeeplinkToApp(link)
+            val buttonInterface = RelatedDigital.getInAppButtonInterface()
+            if (buttonInterface != null) {
+                RelatedDigital.setInAppButtonInterface(null)
+                buttonInterface.onPress(link)
+            } else {
+                try {
+                    val uri = Uri.parse(link)
+                    val viewIntent = Intent(Intent.ACTION_VIEW, uri)
+                    startActivity(viewIntent)
+                } catch (e: Exception) {
+                    Log.w(LOG_TAG, "Can't parse notification URI, will not take any action", e)
+                }
+            }
         }
         finish()
-    }
-
-    private fun sendDeeplinkToApp(deeplink: String) {
-
-        val intent = Intent()
-        intent.also { intent ->
-
-            intent.setAction("InAppLink")
-            intent.putExtra("link",deeplink)
-            sendBroadcast(intent)
-        }
-        Log.i(LOG_TAG, "Link sent successfully!")
-
-
     }
 
     companion object {
@@ -196,16 +194,6 @@ class SpinToWinActivity : FragmentActivity(), SpinToWinCompleteInterface,
                 }
             } catch (e: Exception) {
                 Log.e(LOG_TAG, "SpinToWinCodeBanner : " + e.message)
-            }
-        }
-        if (sliceLink.isNotEmpty()) {
-            val uri: Uri
-            try {
-                uri = Uri.parse(sliceLink)
-                val viewIntent = Intent(Intent.ACTION_VIEW, uri)
-                startActivity(viewIntent)
-            } catch (e: Exception) {
-                Log.w(LOG_TAG, "Can't parse notification URI, will not take any action", e)
             }
         }
     }
