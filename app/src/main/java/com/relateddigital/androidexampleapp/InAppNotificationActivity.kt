@@ -38,8 +38,7 @@ class InAppNotificationActivity : AppCompatActivity() {
         val buttonCallback = object : InAppButtonInterface {
             override fun onPress(link: String?) {
                 link?.let {
-                    Log.i("DrawerLink", "Uygulama içinden gelen link: $it")
-                    Toast.makeText(applicationContext, "Gelen Link: $it", Toast.LENGTH_SHORT).show()
+                    Log.i("Link", "Uygulama içinden gelen link: $it")
                 }
             }
         }

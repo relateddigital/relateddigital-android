@@ -55,27 +55,30 @@ object RequestSender {
     private var isSendingARequest = false
     private var retryCounter = 0
     fun addToQueue(request: Request, model: RelatedDigitalModel, context: Context) {
-        requestQueue.add(request)
-        send(model, context)
+        synchronized(requestQueue) {
+            requestQueue.add(request)
+            send(model, context)
+        }
     }
 
     private fun send(model: RelatedDigitalModel, context: Context) {
-        if (isSendingARequest || requestQueue.isEmpty()) {
-            return
+        val currentRequest: Request
+        synchronized(requestQueue) {
+            if (isSendingARequest || requestQueue.isEmpty()) {
+                return
+            }
+            isSendingARequest = true
+            currentRequest = requestQueue[0]
         }
-
-        isSendingARequest = true
-
-        val currentRequest = requestQueue[0]
 
         when (currentRequest.domain) {
             Domain.LOG_LOGGER -> {
                 val loggerApiInterface =
-                        LoggerApiClient.getClient(model.getRequestTimeoutInSecond())
-                                ?.create(ApiMethods::class.java)
+                    LoggerApiClient.getClient(model.getRequestTimeoutInSecond())
+                        ?.create(ApiMethods::class.java)
                 val call: Call<Void> = loggerApiInterface?.sendToLogger(
-                        model.getDataSource(),
-                        currentRequest.headerMap, currentRequest.queryMap
+                    model.getDataSource(),
+                    currentRequest.headerMap, currentRequest.queryMap
                 )!!
                 call.enqueue(object : Callback<Void?> {
                     override fun onResponse(call: Call<Void?>, response: Response<Void?>) {
@@ -1374,31 +1377,35 @@ object RequestSender {
         }
     }
 
-    private fun removeFromQueue() {
-        requestQueue.removeAt(0)
-    }
-
     private fun applySuccessConditions(
-            headers: Headers, url: String, model: RelatedDigitalModel,
-            type: Domain, context: Context
+        headers: Headers, url: String, model: RelatedDigitalModel,
+        type: Domain, context: Context
     ) {
         Log.i(LOG_TAG, "Successful Request : $url")
         parseAndSetResponseHeaders(headers, type, model)
-        removeFromQueue()
-        isSendingARequest = false
-        retryCounter = 0
-        send(model, context)
+        synchronized(requestQueue) {
+            if (requestQueue.isNotEmpty()) {
+                requestQueue.removeAt(0)
+            }
+            isSendingARequest = false
+            retryCounter = 0
+            send(model, context)
+        }
     }
 
     private fun applyFailConditions(url: String, model: RelatedDigitalModel, context: Context) {
         Log.e(LOG_TAG, "Fail Request : $url")
-        isSendingARequest = false
-        retryCounter++
-        if (retryCounter >= 3) {
-            Log.w(LOG_TAG, "Could not send the request after 3 attempts!!!")
-            removeFromQueue()
-            retryCounter = 0
+        synchronized(requestQueue) {
+            isSendingARequest = false
+            retryCounter++
+            if (retryCounter >= 3) {
+                Log.w(LOG_TAG, "Could not send the request after 3 attempts!!!")
+                if (requestQueue.isNotEmpty()) {
+                    requestQueue.removeAt(0)
+                }
+                retryCounter = 0
+            }
+            send(model, context)
         }
-        send(model, context)
     }
 }
