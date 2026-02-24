@@ -37,9 +37,8 @@ class InAppNotificationActivity : AppCompatActivity() {
 
         val buttonCallback = object : InAppButtonInterface {
             override fun onPress(link: String?) {
-                link?.let {
-                    Log.i("Link", "Uygulama içinden gelen link: $it")
-                }
+                val intent = Intent(this@InAppNotificationActivity, PushNotificationActivity::class.java)
+                startActivity(intent)
             }
         }
         RelatedDigital.setInAppButtonInterface(buttonCallback)

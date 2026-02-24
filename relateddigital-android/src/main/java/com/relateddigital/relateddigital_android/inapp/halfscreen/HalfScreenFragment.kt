@@ -1,14 +1,21 @@
 package com.relateddigital.relateddigital_android.inapp.halfscreen
 
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import androidx.fragment.app.Fragment
 import android.content.Intent
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
+import android.widget.Toast
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.bumptech.glide.Glide
@@ -105,6 +112,69 @@ class HalfScreenFragment : Fragment() {
             adjustBottom()
         }
         setupCloseButton()
+        setupPromotionCode()
+    }
+
+    private fun setupPromotionCode() {
+        val promoCode = mInAppMessage!!.mActionData!!.mPromotionCode
+        if (!promoCode.isNullOrEmpty()) {
+            val bgColor = mInAppMessage!!.mActionData!!.mPromotionBackgroundColor ?: mInAppMessage!!.mActionData!!.mPromoCodeBackgroundColor
+            val textColor = mInAppMessage!!.mActionData!!.mPromotionTextColor ?: mInAppMessage!!.mActionData!!.mPromoCodeTextColor
+
+            if (mIsTop) {
+                binding.topPromotionContainer.visibility = View.VISIBLE
+                try {
+                    if (!bgColor.isNullOrEmpty()) {
+                        binding.topPromotionContainer.setBackgroundColor(Color.parseColor(bgColor))
+                    }
+                } catch (e: Exception) {}
+                binding.topPromotionCodeText.text = promoCode
+                try {
+                    if (!textColor.isNullOrEmpty()) {
+                        binding.topPromotionCodeText.setTextColor(Color.parseColor(textColor))
+                    }
+                } catch (e: Exception) {}
+                binding.topPromotionCodeText.textSize = mInAppMessage!!.mActionData!!.mMsgTitleTextSize!!.toFloat() * 2 + 8
+                binding.topPromotionCodeText.typeface = mInAppMessage!!.mActionData!!.getFontFamily(requireActivity())
+                
+                binding.topPromotionCopyButton.setOnClickListener {
+                    copyToClipboard(promoCode, binding.topPromotionCopyButton)
+                }
+            } else {
+                binding.botPromotionContainer.visibility = View.VISIBLE
+                try {
+                    if (!bgColor.isNullOrEmpty()) {
+                        binding.botPromotionContainer.setBackgroundColor(Color.parseColor(bgColor))
+                    }
+                } catch (e: Exception) {}
+                binding.botPromotionCodeText.text = promoCode
+                try {
+                    if (!textColor.isNullOrEmpty()) {
+                        binding.botPromotionCodeText.setTextColor(Color.parseColor(textColor))
+                    }
+                } catch (e: Exception) {}
+                binding.botPromotionCodeText.textSize = mInAppMessage!!.mActionData!!.mMsgTitleTextSize!!.toFloat() * 2 + 8
+                binding.botPromotionCodeText.typeface = mInAppMessage!!.mActionData!!.getFontFamily(requireActivity())
+                
+                binding.botPromotionCopyButton.setOnClickListener {
+                    copyToClipboard(promoCode, binding.botPromotionCopyButton)
+                }
+            }
+        }
+    }
+
+    private fun copyToClipboard(text: String, button: ImageButton) {
+        if (activity != null) {
+            val clipboard = requireActivity().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+            val clip = ClipData.newPlainText("Promotion Code", text)
+            clipboard.setPrimaryClip(clip)
+            Toast.makeText(requireActivity(), getString(R.string.copied_to_clipboard), Toast.LENGTH_SHORT).show()
+
+            button.setImageResource(R.drawable.checked_mark)
+            Handler(Looper.getMainLooper()).postDelayed({
+                button.setImageResource(R.drawable.content_copy_24)
+            }, 2000)
+        }
     }
 
     private fun adjustTop() {
@@ -132,7 +202,7 @@ class HalfScreenFragment : Fragment() {
             binding.halfScreenContainerTop.setBackgroundColor(Color.parseColor(mInAppMessage!!.mActionData!!.mBackground))
             binding.topTitleView.text = mInAppMessage!!.mActionData!!.mMsgTitle!!.replace("\\n", "\n")
             binding.topTitleView.setTextColor(Color.parseColor(mInAppMessage!!.mActionData!!.mMsgTitleColor))
-            binding.topTitleView.textSize = mInAppMessage!!.mActionData!!.mMsgTitleTextSize!!.toFloat() * 2 + 14
+            binding.topTitleView.textSize = mInAppMessage!!.mActionData!!.mMsgTitleTextSize!!.toFloat() * 2 + 8
             binding.topTitleView.typeface = mInAppMessage!!.mActionData!!.getFontFamily(requireActivity())
         } else {
             binding.topTitleView.visibility = View.GONE
@@ -187,7 +257,7 @@ class HalfScreenFragment : Fragment() {
             binding.halfScreenContainerBot.setBackgroundColor(Color.parseColor(mInAppMessage!!.mActionData!!.mBackground))
             binding.botTitleView.text = mInAppMessage!!.mActionData!!.mMsgTitle!!.replace("\\n", "\n")
             binding.botTitleView.setTextColor(Color.parseColor(mInAppMessage!!.mActionData!!.mMsgTitleColor))
-            binding.botTitleView.textSize = mInAppMessage!!.mActionData!!.mMsgTitleTextSize!!.toFloat() * 2 + 14
+            binding.botTitleView.textSize = mInAppMessage!!.mActionData!!.mMsgTitleTextSize!!.toFloat() * 2 + 8
             binding.botTitleView.typeface = mInAppMessage!!.mActionData!!.getFontFamily(requireActivity())
         } else {
             binding.botTitleView.visibility = View.GONE
