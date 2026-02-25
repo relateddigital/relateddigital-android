@@ -1798,6 +1798,20 @@ object RelatedDigital {
     }
 
     @JvmStatic
+    fun setPushPermission(context: Context, pushPermit: Boolean) {
+        if(model != null) {
+            if(pushPermit) {
+                model!!.add(context, "pushPermit", "Y")
+            } else {
+                model!!.add(context, "pushPermit", "N")
+            }
+            sync(context)
+        } else {
+            Log.e(LOG_TAG, "Call RelatedDigital.init() first")
+        }
+    }
+
+    @JvmStatic
     fun requestNotificationPermission(context: Context) {
         if (Build.VERSION.SDK_INT >= 33) {
             val callback = object : NotificationPermissionCallback {
