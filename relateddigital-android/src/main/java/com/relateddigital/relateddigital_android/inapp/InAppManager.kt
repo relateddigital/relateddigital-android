@@ -116,7 +116,8 @@ class InAppManager(
                     InAppNotificationType.SMILE_RATING.toString(),
                     InAppNotificationType.NPS.toString(), InAppNotificationType.IMAGE_TEXT_BUTTON.toString(),
                     InAppNotificationType.NPS_WITH_NUMBERS.toString(), InAppNotificationType.IMAGE_BUTTON.toString(),
-                    InAppNotificationType.CAROUSEL.toString(), InAppNotificationType.NPS_AND_SECOND_POP_UP.toString() -> {
+                    InAppNotificationType.CAROUSEL.toString(), InAppNotificationType.NPS_AND_SECOND_POP_UP.toString(),
+                    InAppNotificationType.NPS_WITH_MULTIPLE_POPUP.toString() -> {
                         intent.putExtra(
                                 Constants.INTENT_ID_KEY, getStateId(
                                 parent,

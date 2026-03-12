@@ -253,12 +253,14 @@ class InAppNotificationActivity : AppCompatActivity() {
 
         binding.notificationBellButton.setOnClickListener {
             sendInAppRequest("NotificationBell")
-
         }
 
         binding.multipleChoiceSurveyButton.setOnClickListener {
             sendInAppRequest("MultipleChoiceSurvey")
+        }
 
+        binding.npsWithMultiplePopup.setOnClickListener {
+            sendInAppRequest("nps_with_multiple_popup")
         }
 
     }

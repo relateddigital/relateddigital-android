@@ -541,6 +541,25 @@
                 android:padding="@dimen/in_app_button_padding"
                 android:text="@string/multiple_choice_survey" />
 
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/in_app_button_height"
+            android:layout_marginTop="@dimen/in_app_button_bottom_margin"
+            android:orientation="horizontal">
+
+
+            <Button
+                android:id="@+id/nps_with_multiple_popup"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="@dimen/in_app_button_left_right_margin"
+                android:layout_marginEnd="@dimen/in_app_button_left_right_margin"
+                android:layout_weight="1"
+                android:background="@drawable/rounded_corners_background"
+                android:padding="@dimen/in_app_button_padding"
+                android:text="@string/nps_with_multiple_popup" />
 
         </LinearLayout>
 

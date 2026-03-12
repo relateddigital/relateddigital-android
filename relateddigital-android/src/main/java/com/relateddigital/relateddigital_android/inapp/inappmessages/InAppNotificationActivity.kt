@@ -34,6 +34,7 @@ import com.relateddigital.relateddigital_android.RelatedDigital
 import com.relateddigital.relateddigital_android.constants.Constants
 import com.relateddigital.relateddigital_android.databinding.ActivityInAppNotificationBinding
 import com.relateddigital.relateddigital_android.databinding.CarouselBinding
+import com.relateddigital.relateddigital_android.databinding.InappNpsWithMultiplePopupBinding
 import com.relateddigital.relateddigital_android.databinding.NpsSecondPopUpBinding
 import com.relateddigital.relateddigital_android.inapp.InAppButtonInterface
 import com.relateddigital.relateddigital_android.inapp.InAppNotificationState
@@ -54,7 +55,7 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
     }
 
     internal enum class NpsType {
-        NPS, SMILE_RATING, NPS_WITH_NUMBERS, NPS_WITH_SECOND_POPUP, NONE
+        NPS, SMILE_RATING, NPS_WITH_NUMBERS, NPS_WITH_SECOND_POPUP, NPS_WITH_MULTIPLE_POPUP, NONE
     }
 
     private var mInAppMessage: InAppMessage? = null
@@ -63,6 +64,7 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
     private lateinit var binding: ActivityInAppNotificationBinding
     private lateinit var bindingSecondPopUp: NpsSecondPopUpBinding
     private lateinit var bindingCarousel: CarouselBinding
+    private lateinit var bindingNpsWithMultiplePopup: InappNpsWithMultiplePopupBinding
     private var mIsRotation = false
     private var secondPopUpType = NpsSecondPopUpType.IMAGE_TEXT_BUTTON
     private var npsType = NpsType.NONE
@@ -92,8 +94,13 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
             if (mInAppMessage!!.mActionData!!.mMsgType == InAppNotificationType.CAROUSEL.toString()) {
                 bindingCarousel = CarouselBinding.inflate(layoutInflater)
                 view = bindingCarousel.root
+            } else if (mInAppMessage!!.mActionData!!.mMsgType == InAppNotificationType.NPS_WITH_MULTIPLE_POPUP.toString()) {
+                bindingNpsWithMultiplePopup = InappNpsWithMultiplePopupBinding.inflate(layoutInflater)
+                view = bindingNpsWithMultiplePopup.root
             } else {
-                binding = ActivityInAppNotificationBinding.inflate(layoutInflater)
+                binding = ActivityInAppNotificationBinding.inflate(
+                    layoutInflater
+                )
                 view = binding.root
             }
             cacheResources()
@@ -102,6 +109,8 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
             if (isShowingInApp) {
                 if (mInAppMessage!!.mActionData!!.mMsgType == InAppNotificationType.CAROUSEL.toString()) {
                     setupCarousel()
+                } else if (mInAppMessage!!.mActionData!!.mMsgType == InAppNotificationType.NPS_WITH_MULTIPLE_POPUP.toString()) {
+                    setupNpsWithMultiplePopup()
                 } else {
                     setUpView()
                 }
@@ -643,6 +652,211 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
             }
         }
     }
+
+    private fun setupNpsWithMultiplePopup() {
+        npsType = NpsType.NPS_WITH_MULTIPLE_POPUP
+
+        val actionData = mInAppMessage!!.mActionData!!
+
+        val backColor = if (!actionData.mBackground.isNullOrEmpty()) {
+            Color.parseColor(actionData.mBackground)
+        } else {
+            Color.WHITE
+        }
+
+        bindingNpsWithMultiplePopup.container.setBackgroundColor(android.graphics.Color.TRANSPARENT)
+        bindingNpsWithMultiplePopup.llBack.setCardBackgroundColor(backColor)
+
+        if (actionData.mCloseButtonColor == "white") {
+            bindingNpsWithMultiplePopup.ibClose.setBackgroundResource(R.drawable.ic_close_white_24dp)
+        } else {
+            bindingNpsWithMultiplePopup.ibClose.setBackgroundResource(R.drawable.ic_close_black_24dp)
+        }
+
+        bindingNpsWithMultiplePopup.ibClose.setOnClickListener {
+            closeMultiplePopup()
+        }
+
+        if (actionData.mCloseEventTrigger == "backgroundclick") {
+            bindingNpsWithMultiplePopup.ibClose.visibility = View.GONE
+            setFinishOnTouchOutside(true)
+        } else {
+            setFinishOnTouchOutside(!actionData.mCloseEventTrigger.equals("closebutton"))
+        }
+
+        val fontFamily = actionData.getFontFamily(this)
+
+        // ----------- PAGE 1 -------------
+        bindingNpsWithMultiplePopup.tvTitle.typeface = fontFamily
+        bindingNpsWithMultiplePopup.tvTitle.text = actionData.mMsgTitle?.replace("\\n", "\n") ?: ""
+        val titleColor = if (!actionData.mMsgTitleColor.isNullOrEmpty()) {
+            Color.parseColor(actionData.mMsgTitleColor)
+        } else {
+            Color.BLACK
+        }
+        bindingNpsWithMultiplePopup.tvTitle.setTextColor(titleColor)
+        val titleSize = (actionData.mMsgBodyTextSize?.toFloat() ?: 16f) + 12f
+        bindingNpsWithMultiplePopup.tvTitle.textSize = titleSize
+
+        bindingNpsWithMultiplePopup.ratingBar.stepSize = 0.5f
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            bindingNpsWithMultiplePopup.ratingBar.progressTintList =
+                ColorStateList.valueOf(ContextCompat.getColor(applicationContext, R.color.yellow))
+        }
+        
+        bindingNpsWithMultiplePopup.tvScaleLabel.typeface = fontFamily
+        bindingNpsWithMultiplePopup.tvScaleLabel.text = actionData.mMsgBody?.replace("\\n", "\n") ?: ""
+        
+        val msgBodyColor = if (!actionData.mMsgBodyColor.isNullOrEmpty()) {
+            Color.parseColor(actionData.mMsgBodyColor)
+        } else {
+            Color.BLACK
+        }
+        bindingNpsWithMultiplePopup.tvScaleLabel.setTextColor(msgBodyColor)
+        val msgBodySize = (actionData.mMsgBodyTextSize?.toFloat() ?: 16f) + 8f
+        bindingNpsWithMultiplePopup.tvScaleLabel.textSize = msgBodySize
+
+        bindingNpsWithMultiplePopup.ratingBar.setOnRatingBarChangeListener { _, rating, fromUser ->
+            // Do not update the label with star count
+        }
+
+        bindingNpsWithMultiplePopup.btnSubmit1.typeface = fontFamily
+        bindingNpsWithMultiplePopup.btnSubmit1.text = actionData.mBtnText?.replace("\\n", "\n") ?: "Gönder"
+        
+        if (!actionData.mButtonTextColor.isNullOrEmpty()) {
+            try {
+                bindingNpsWithMultiplePopup.btnSubmit1.setTextColor(Color.parseColor(actionData.mButtonTextColor))
+            } catch (e: Exception) {}
+        } else {
+            bindingNpsWithMultiplePopup.btnSubmit1.setTextColor(Color.WHITE)
+        }
+        
+        if (!actionData.mButtonColor.isNullOrEmpty()) {
+            try {
+                bindingNpsWithMultiplePopup.btnSubmit1.setBackgroundColor(Color.parseColor(actionData.mButtonColor))
+            } catch (e: Exception) {}
+        } else {
+            bindingNpsWithMultiplePopup.btnSubmit1.setBackgroundColor(Color.BLACK)
+        }
+
+        bindingNpsWithMultiplePopup.btnSubmit1.setOnClickListener {
+            val rating = bindingNpsWithMultiplePopup.ratingBar.rating
+            if (rating > 0) {
+                val minPointStr = actionData.mMultiplePopupFeedbackFormMinPoint ?: "0"
+                val minPoint = try { minPointStr.toFloat() } catch (e: Exception) { 0f }
+                
+                if (rating >= minPoint) {
+                    val rate = "OM.s_point=" + rating.toString() +
+                            "&OM.s_cat=" + mInAppMessage!!.mActionData!!.mMsgType.toString() +
+                            "&OM.s_page=act-" + mInAppMessage!!.mActId
+                    InAppNotificationClickRequest.createInAppNotificationClickRequest(
+                        applicationContext,
+                        mInAppMessage,
+                        rate
+                    )
+                    closeMultiplePopup()
+                } else {
+                    bindingNpsWithMultiplePopup.npsPage1.visibility = View.GONE
+                    bindingNpsWithMultiplePopup.npsPage2.visibility = View.VISIBLE
+                }
+            }
+        }
+
+        // ----------- PAGE 2 -------------
+        bindingNpsWithMultiplePopup.tvTitle2.typeface = fontFamily
+        bindingNpsWithMultiplePopup.tvTitle2.text = actionData.mMultiplePopupMsgTitle?.replace("\\n", "\n") ?: ""
+
+        bindingNpsWithMultiplePopup.tvTitle2.setTextColor(titleColor)
+        val title2Size = (actionData.mMultiplePopupMsgBodyTextSize2?.toFloat() ?: 16f) + 12f
+        bindingNpsWithMultiplePopup.tvTitle2.textSize = title2Size
+
+        bindingNpsWithMultiplePopup.tvBody2.typeface = fontFamily
+        bindingNpsWithMultiplePopup.tvBody2.text = actionData.mMultiplePopupMsgBody?.replace("\\n", "\n") ?: ""
+        bindingNpsWithMultiplePopup.tvBody2.setTextColor(titleColor)
+        val body2Size = (actionData.mMultiplePopupMsgBodyTextSize2?.toFloat() ?: 14f) + 8f
+        bindingNpsWithMultiplePopup.tvBody2.textSize = body2Size
+
+        bindingNpsWithMultiplePopup.btnBack2.typeface = fontFamily
+        bindingNpsWithMultiplePopup.btnBack2.text = actionData.mMultiplePopupButtonText3?.replace("\\n", "\n") ?: "Geri"
+        try {
+            if (!actionData.mMultiplePopupButtonTextColor3.isNullOrEmpty()) {
+                bindingNpsWithMultiplePopup.btnBack2.setTextColor(Color.parseColor(actionData.mMultiplePopupButtonTextColor3))
+            }
+            if (!actionData.mMultiplePopupButtonColor3.isNullOrEmpty()) {
+                bindingNpsWithMultiplePopup.btnBack2.setBackgroundColor(Color.parseColor(actionData.mMultiplePopupButtonColor3))
+            }
+        } catch (e: Exception) {
+        }
+        bindingNpsWithMultiplePopup.btnBack2.setOnClickListener {
+            bindingNpsWithMultiplePopup.npsPage2.visibility = View.GONE
+            bindingNpsWithMultiplePopup.npsPage1.visibility = View.VISIBLE
+            bindingNpsWithMultiplePopup.tvScaleLabel.text = ""
+        }
+
+        bindingNpsWithMultiplePopup.btnSave2.typeface = fontFamily
+        bindingNpsWithMultiplePopup.btnSave2.text = actionData.mMultiplePopupButtonText2?.replace("\\n", "\n") ?: "İleri"
+        try {
+            if (!actionData.mMultiplePopupButtonTextColor2.isNullOrEmpty()) {
+                bindingNpsWithMultiplePopup.btnSave2.setTextColor(Color.parseColor(actionData.mMultiplePopupButtonTextColor2))
+            }
+            if (!actionData.mMultiplePopupButtonColor2.isNullOrEmpty()) {
+                bindingNpsWithMultiplePopup.btnSave2.setBackgroundColor(Color.parseColor(actionData.mMultiplePopupButtonColor2))
+            }
+        } catch (e: Exception) {
+        }
+        bindingNpsWithMultiplePopup.btnSave2.setOnClickListener {
+            val feed = bindingNpsWithMultiplePopup.etFeedback.text.toString()
+            val rate = "OM.s_point=" + bindingNpsWithMultiplePopup.ratingBar.rating.toString() +
+                    "&OM.s_cat=" + mInAppMessage!!.mActionData!!.mMsgType.toString() +
+                    "&OM.s_page=act-" + mInAppMessage!!.mActId +
+                    "&OM.s_feed=" + feed
+            InAppNotificationClickRequest.createInAppNotificationClickRequest(
+                applicationContext,
+                mInAppMessage,
+                rate
+            )
+
+            bindingNpsWithMultiplePopup.npsPage2.visibility = View.GONE
+            bindingNpsWithMultiplePopup.npsPage3.visibility = View.VISIBLE
+
+            val imageUrl = actionData.mMultiplePopupImage3
+            if (!imageUrl.isNullOrEmpty()) {
+                bindingNpsWithMultiplePopup.ivImage3.visibility = View.VISIBLE
+                if (AppUtils.isAnImage(imageUrl)) {
+                    Picasso.get().load(imageUrl).into(bindingNpsWithMultiplePopup.ivImage3)
+                } else {
+                    Glide.with(this).load(imageUrl).into(bindingNpsWithMultiplePopup.ivImage3)
+                }
+            } else {
+                bindingNpsWithMultiplePopup.ivImage3.visibility = View.GONE
+            }
+        }
+
+        // ----------- PAGE 3 -------------
+        bindingNpsWithMultiplePopup.tvTitle3.typeface = fontFamily
+
+        bindingNpsWithMultiplePopup.tvTitle3.setTextColor(titleColor)
+        bindingNpsWithMultiplePopup.tvTitle3.text = actionData.mMultiplePopupMsgTitle3?.replace("\\n", "\n") ?: ""
+
+        bindingNpsWithMultiplePopup.btnClose3.typeface = fontFamily
+        bindingNpsWithMultiplePopup.btnClose3.text = actionData.mMultiplePopupButtonText4 ?: "Kapat"
+        val close3BtnColor = if (!actionData.mMultiplePopupButtonColor4.isNullOrEmpty()) {
+            Color.parseColor(actionData.mMultiplePopupButtonColor4)
+        } else {
+            Color.LTGRAY
+        }
+        bindingNpsWithMultiplePopup.btnClose3.setBackgroundColor(close3BtnColor)
+
+        bindingNpsWithMultiplePopup.btnClose3.setOnClickListener {
+            closeMultiplePopup()
+        }
+    }
+
+    private fun closeMultiplePopup() {
+        InAppUpdateDisplayState.releaseDisplayState(mIntentId)
+        finish()
+    }
+
     private fun setYoutubeVideo() {
 
         val webSettings: WebSettings = binding.webViewInapp.settings
@@ -1196,6 +1410,7 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
                 InAppNotificationType.SMILE_RATING.toString() -> return "OM.s_point=" + binding.smileRating.rating.toString() + "&OM.s_cat=" + mInAppMessage!!.mActionData!!.mMsgType.toString() + "&OM.s_page=act-" + mInAppMessage!!.mActId
                 InAppNotificationType.NPS.toString(), InAppNotificationType.NPS_AND_SECOND_POP_UP.toString() -> return "OM.s_point=" + binding.ratingBar.rating.toString() + "&OM.s_cat=" + mInAppMessage!!.mActionData!!.mMsgType.toString() + "&OM.s_page=act-" + mInAppMessage!!.mActId
                 InAppNotificationType.NPS_WITH_NUMBERS.toString() -> return "OM.s_point=" + binding.npsWithNumbersView.selectedRate.toString() + "&OM.s_cat=" + mInAppMessage!!.mActionData!!.mMsgType.toString() + "&OM.s_page=act-" + mInAppMessage!!.mActId
+                InAppNotificationType.NPS_WITH_MULTIPLE_POPUP.toString() -> return "OM.s_point=" + bindingNpsWithMultiplePopup.ratingBar.rating.toString() + "&OM.s_cat=" + mInAppMessage!!.mActionData!!.mMsgType.toString() + "&OM.s_page=act-" + mInAppMessage!!.mActId
             }
             return ""
         }

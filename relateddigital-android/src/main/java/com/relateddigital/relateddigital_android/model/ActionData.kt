@@ -201,6 +201,51 @@ class ActionData : Serializable {
     @SerializedName("button_border_radius")
     var mButtonBorderRadius: String? = null
 
+    @SerializedName("multiple_popup_msg_title")
+    var mMultiplePopupMsgTitle: String? = null
+
+    @SerializedName("multiple_popup_msg_body")
+    var mMultiplePopupMsgBody: String? = null
+
+    @SerializedName("multiple_popup_button_text2")
+    var mMultiplePopupButtonText2: String? = null
+
+    @SerializedName("multiple_popup_button_text_color2")
+    var mMultiplePopupButtonTextColor2: String? = null
+
+    @SerializedName("multiple_popup_button_color2")
+    var mMultiplePopupButtonColor2: String? = null
+
+    @SerializedName("multiple_popup_button_text3")
+    var mMultiplePopupButtonText3: String? = null
+
+    @SerializedName("multiple_popup_button_text_color3")
+    var mMultiplePopupButtonTextColor3: String? = null
+
+    @SerializedName("multiple_popup_button_color3")
+    var mMultiplePopupButtonColor3: String? = null
+
+    @SerializedName("multiple_popup_msg_title3")
+    var mMultiplePopupMsgTitle3: String? = null
+
+    @SerializedName("multiple_popup_button_text4")
+    var mMultiplePopupButtonText4: String? = null
+
+    @SerializedName("multiple_popup_button_text_color4")
+    var mMultiplePopupButtonTextColor4: String? = null
+
+    @SerializedName("multiple_popup_button_color4")
+    var mMultiplePopupButtonColor4: String? = null
+
+    @SerializedName("multiple_popup_image3")
+    var mMultiplePopupImage3: String? = null
+
+    @SerializedName("multiple_popup_msg_body_textsize2")
+    var mMultiplePopupMsgBodyTextSize2: String? = null
+
+    @SerializedName("multiple_popup_feedbackform_minpoint")
+    var mMultiplePopupFeedbackFormMinPoint: String? = null
+
 
     fun getFontFamily(context: Context): Typeface? {
         if (mFontFamily == null || mFontFamily == "") {
