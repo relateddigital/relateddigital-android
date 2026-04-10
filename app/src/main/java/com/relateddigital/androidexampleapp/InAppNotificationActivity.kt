@@ -39,6 +39,7 @@ class InAppNotificationActivity : AppCompatActivity() {
             override fun onPress(link: String?) {
                 val intent = Intent(this@InAppNotificationActivity, PushNotificationActivity::class.java)
                 startActivity(intent)
+                Log.i("FulLScreenLink", "onPress: $link")
             }
         }
         RelatedDigital.setInAppButtonInterface(buttonCallback)
@@ -114,6 +115,10 @@ class InAppNotificationActivity : AppCompatActivity() {
 
         binding.inAppCarouselButton.setOnClickListener {
             sendInAppRequest("inappcarousel")
+        }
+
+        binding.carouselFullscreenButton.setOnClickListener {
+            sendInAppRequest("carousel_fullscreen")
         }
 
         binding.shakeToWinButton.setOnClickListener {
@@ -261,6 +266,10 @@ class InAppNotificationActivity : AppCompatActivity() {
 
         binding.npsWithMultiplePopup.setOnClickListener {
             sendInAppRequest("nps_with_multiple_popup")
+        }
+
+        binding.fullscreenCarousel.setOnClickListener {
+            sendInAppRequest("fullscreen_carousel")
         }
 
     }

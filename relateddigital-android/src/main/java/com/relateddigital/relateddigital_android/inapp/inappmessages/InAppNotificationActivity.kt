@@ -91,17 +91,24 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
             buttonCallback = RelatedDigital.getInAppButtonInterface()
             val view: View
 
-            if (mInAppMessage!!.mActionData!!.mMsgType == InAppNotificationType.CAROUSEL.toString()) {
-                bindingCarousel = CarouselBinding.inflate(layoutInflater)
-                view = bindingCarousel.root
-            } else if (mInAppMessage!!.mActionData!!.mMsgType == InAppNotificationType.NPS_WITH_MULTIPLE_POPUP.toString()) {
-                bindingNpsWithMultiplePopup = InappNpsWithMultiplePopupBinding.inflate(layoutInflater)
-                view = bindingNpsWithMultiplePopup.root
-            } else {
-                binding = ActivityInAppNotificationBinding.inflate(
-                    layoutInflater
-                )
-                view = binding.root
+            try {
+                if (mInAppMessage!!.mActionData!!.mMsgType == InAppNotificationType.CAROUSEL.toString()) {
+                    bindingCarousel = CarouselBinding.inflate(layoutInflater)
+                    view = bindingCarousel.root
+                } else if (mInAppMessage!!.mActionData!!.mMsgType == InAppNotificationType.NPS_WITH_MULTIPLE_POPUP.toString()) {
+                    bindingNpsWithMultiplePopup = InappNpsWithMultiplePopupBinding.inflate(layoutInflater)
+                    view = bindingNpsWithMultiplePopup.root
+                } else {
+                    binding = ActivityInAppNotificationBinding.inflate(
+                        layoutInflater
+                    )
+                    view = binding.root
+                }
+            } catch (e: Exception) {
+                Log.e(LOG_TAG, "Error inflating layout (possibly WebView issue): ${e.message}")
+                InAppUpdateDisplayState.releaseDisplayState(mIntentId)
+                finish()
+                return
             }
             cacheResources()
             setContentView(view)
@@ -748,7 +755,8 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
                 if (rating >= minPoint) {
                     val rate = "OM.s_point=" + rating.toString() +
                             "&OM.s_cat=" + mInAppMessage!!.mActionData!!.mMsgType.toString() +
-                            "&OM.s_page=act-" + mInAppMessage!!.mActId
+                            "&OM.s_page=act-" + mInAppMessage!!.mActId +
+                            "&OM.s_feed=Feedback Sayfası Görüntülenmedi"
                     InAppNotificationClickRequest.createInAppNotificationClickRequest(
                         applicationContext,
                         mInAppMessage,
@@ -805,7 +813,13 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
         } catch (e: Exception) {
         }
         bindingNpsWithMultiplePopup.btnSave2.setOnClickListener {
-            val feed = bindingNpsWithMultiplePopup.etFeedback.text.toString()
+            var feed: String
+            if (!bindingNpsWithMultiplePopup.etFeedback.text.toString().isEmpty()) {
+                feed = bindingNpsWithMultiplePopup.etFeedback.text.toString()
+            } else {
+                feed = "Kullanıcı feedback alanını boş bıraktı"
+            }
+
             val rate = "OM.s_point=" + bindingNpsWithMultiplePopup.ratingBar.rating.toString() +
                     "&OM.s_cat=" + mInAppMessage!!.mActionData!!.mMsgType.toString() +
                     "&OM.s_page=act-" + mInAppMessage!!.mActId +
@@ -947,6 +961,7 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
 
     private fun setupSecondButton() {
         binding.btnTemplateSecond.visibility = View.VISIBLE
+        binding.btnTemplateSecond.typeface = mInAppMessage!!.mActionData!!.getSecondButtonFontFamily(this)
         binding.btnTemplateSecond.text = mInAppMessage!!.mActionData!!.mSecondButtonText
         if (!mInAppMessage!!.mActionData!!.mSecondButtonTextColor.isNullOrEmpty()) {
             try {
@@ -1537,16 +1552,16 @@ class InAppNotificationActivity : Activity(), SmileRating.OnSmileySelectionListe
     override fun onDestroy() {
         super.onDestroy()
         releasePlayer()
-        if (mInAppMessage!!.mActionData!!.mMsgType == InAppNotificationType.CAROUSEL.toString()) {
-            carouselAdapter!!.releasePlayer()
-        }
         if (mInAppMessage != null) {
+            if (mInAppMessage!!.mActionData?.mMsgType == InAppNotificationType.CAROUSEL.toString()) {
+                carouselAdapter?.releasePlayer()
+            }
             if (mIsRotation) {
                 mIsRotation = false
             } else {
                 InAppUpdateDisplayState.releaseDisplayState(mIntentId)
             }
-            if (mInAppMessage!!.mActionData!!.mMsgType == InAppNotificationType.NPS_AND_SECOND_POP_UP.toString()) {
+            if (mInAppMessage!!.mActionData?.mMsgType == InAppNotificationType.NPS_AND_SECOND_POP_UP.toString()) {
                 if (!isNpsSecondPopupButtonClicked && isNpsSecondPopupActivated) {
                     InAppNotificationClickRequest.createInAppNotificationClickRequest(
                         applicationContext,

@@ -198,6 +198,15 @@ class ActionData : Serializable {
     @SerializedName("second_button_android_lnk")
     var mSecondButtonAndroidLink: String? = null
 
+    @SerializedName("second_button_font_family")
+    var mSecondButtonFontFamily: String? = null
+
+    @SerializedName("second_button_custom_font_family_ios")
+    var mSecondButtonCustomFontFamilyIos: String? = null
+
+    @SerializedName("second_button_custom_font_family_android")
+    var mSecondButtonCustomFontFamilyAndroid: String? = null
+
     @SerializedName("button_border_radius")
     var mButtonBorderRadius: String? = null
 
@@ -272,5 +281,32 @@ class ActionData : Serializable {
         }
 
         return Typeface.DEFAULT
+    }
+
+    fun getSecondButtonFontFamily(context: Context): Typeface? {
+        if (mSecondButtonFontFamily == null || mSecondButtonFontFamily == "") {
+            return getFontFamily(context)
+        }
+        if (FontFamily.Monospace.toString() == mSecondButtonFontFamily!!.lowercase(Locale.getDefault())) {
+            return Typeface.MONOSPACE
+        }
+        if (FontFamily.SansSerif.toString() == mSecondButtonFontFamily!!.lowercase(Locale.getDefault())) {
+            return Typeface.SANS_SERIF
+        }
+        if (FontFamily.Serif.toString() == mSecondButtonFontFamily!!.lowercase(Locale.getDefault())) {
+            return Typeface.SERIF
+        }
+        if (!mSecondButtonCustomFontFamilyAndroid.isNullOrEmpty()) {
+            if (isFontResourceAvailable(context, mSecondButtonCustomFontFamilyAndroid)) {
+                val id = context.resources.getIdentifier(
+                    mSecondButtonCustomFontFamilyAndroid,
+                    "font",
+                    context.packageName
+                )
+                return ResourcesCompat.getFont(context, id)
+            }
+        }
+
+        return getFontFamily(context)
     }
 }

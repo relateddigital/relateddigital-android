@@ -179,6 +179,12 @@ class StoryActivity : Activity(), StoriesProgressView.StoriesListener {
 
         mCountdownEndGifView.visibility = View.GONE
 
+        if (mStories?.title == null || mActionId == null) {
+            Log.e(LOG_TAG, "Stories or title is null, finishing...")
+            finish()
+            return
+        }
+
         val title: String = mStories!!.title!!
         Log.i("StoryActivityShows ", mActionId + " : " + mStories!!.title)
         PersistentTargetManager.saveShownStory(applicationContext, mActionId!!, mStories!!.title!!)

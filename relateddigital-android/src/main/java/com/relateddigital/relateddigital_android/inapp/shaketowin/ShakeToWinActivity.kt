@@ -590,10 +590,13 @@ class ShakeToWinActivity : Activity(), SensorEventListener {
     }
 
     private fun initializeSoundPlayer() {
+        val soundUrl = mShakeToWinMessage?.actiondata?.gameElements?.soundUrl?.toString()
+        if (soundUrl.isNullOrEmpty()) {
+            Log.w(LOG_TAG, "Sound URL is null or empty, skipping sound player initialization")
+            return
+        }
         soundPlayer = ExoPlayer.Builder(this).build()
-        val mediaItem = MediaItem.fromUri(
-            mShakeToWinMessage!!.actiondata!!.gameElements!!.soundUrl.toString()
-        )
+        val mediaItem = MediaItem.fromUri(soundUrl)
         soundPlayer!!.setMediaItem(mediaItem)
         soundPlayer!!.prepare()
         soundPlayer!!.playWhenReady = true

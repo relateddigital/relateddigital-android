@@ -300,6 +300,7 @@ class PushNotificationActivity : AppCompatActivity() {
                 val message = intent.extras!!.getSerializable("message") as Message?
                 if (message != null) {
                     handlePush(message, intent)
+                    message.url?.let { Log.d("Deeplink", it) }
                 } else {
                     // Carousel push notification : an item was clicked
                     val itemClickedUrl = bundle.getString("CarouselItemClickedUrl")
@@ -328,6 +329,7 @@ class PushNotificationActivity : AppCompatActivity() {
                     val message = intent.extras!!.getSerializable("message") as Message?
                     if (message != null) {
                         handlePush(message, intent)
+                        message.url?.let { Log.d("Deeplink", it) }
                     } else {
                         // Carousel push notification : an item was clicked
                         val itemClickedUrl = bundle.getString("CarouselItemClickedUrl")

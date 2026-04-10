@@ -230,6 +230,17 @@
                 android:text="@string/in_app_carousel" />
 
             <Button
+                android:id="@+id/carouselFullscreenButton"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="@dimen/in_app_button_left_right_margin"
+                android:layout_marginEnd="@dimen/in_app_button_left_right_margin"
+                android:layout_weight="1"
+                android:background="@drawable/rounded_corners_background"
+                android:padding="@dimen/in_app_button_padding"
+                android:text="Carousel Fullscreen" />
+
+            <Button
                 android:id="@+id/shakeToWinButton"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
@@ -560,6 +571,17 @@
                 android:background="@drawable/rounded_corners_background"
                 android:padding="@dimen/in_app_button_padding"
                 android:text="@string/nps_with_multiple_popup" />
+
+            <Button
+                android:id="@+id/fullscreen_carousel"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="@dimen/in_app_button_left_right_margin"
+                android:layout_marginEnd="@dimen/in_app_button_left_right_margin"
+                android:layout_weight="1"
+                android:background="@drawable/rounded_corners_background"
+                android:padding="@dimen/in_app_button_padding"
+                android:text="@string/fullscreen_carousel" />
 
         </LinearLayout>
 

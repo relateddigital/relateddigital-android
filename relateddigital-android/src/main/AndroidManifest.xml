@@ -71,6 +71,10 @@
             android:noHistory="true"
             android:theme="@style/Theme.AppCompat.Light.Dialog.Alert" />
         <activity
+            android:name=".inapp.inappmessages.CarouselFullscreenActivity"
+            android:noHistory="true"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+        <activity
             android:name=".inapp.inappmessages.InAppNotificationActivity"
             android:noHistory="true"
             android:theme="@style/Theme.AppCompat.Light.Dialog.AlertRounded" />

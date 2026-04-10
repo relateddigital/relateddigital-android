@@ -70,5 +70,10 @@ enum class InAppNotificationType {
         override fun toString(): String {
             return "nps_with_multiple_popup"
         }
+    },
+    CAROUSEL_FULLSCREEN {
+        override fun toString(): String {
+            return "carousel_fullscreen"
+        }
     }
 }

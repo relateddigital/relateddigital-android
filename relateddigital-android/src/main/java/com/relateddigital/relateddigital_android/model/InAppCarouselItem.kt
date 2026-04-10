@@ -107,6 +107,30 @@ class InAppCarouselItem constructor(`in`: Parcel) : Parcelable {
     @SerializedName("button_border_radius")
     var mButtonBorderRadius: Int? = null
 
+    @SerializedName("second_button_text")
+    var secondButtonText: String? = null
+
+    @SerializedName("second_button_text_color")
+    var secondButtonTextColor: String? = null
+
+    @SerializedName("second_button_color")
+    var secondButtonColor: String? = null
+
+    @SerializedName("second_button_font_family")
+    private var secondButtonFontFamily: String? = null
+
+    @SerializedName("second_button_custom_font_family_android")
+    var secondButtonCustomFontFamilyAndroid: String? = null
+
+    @SerializedName("second_button_textsize")
+    var secondButtonTextsize: String? = null
+
+    @SerializedName("second_button_android_lnk")
+    var secondAndroidLnk: String? = null
+
+    @SerializedName("second_button_function")
+    var secondButtonFunction: String? = null
+
     fun getTitleFontFamily(context: Context): Typeface? {
         if (titleFontFamily == null || titleFontFamily == "") {
             return Typeface.DEFAULT
@@ -197,6 +221,36 @@ class InAppCarouselItem constructor(`in`: Parcel) : Parcelable {
         this.buttonFontFamily = buttonFontFamily
     }
 
+    fun getSecondButtonFontFamily(context: Context): Typeface? {
+        if (secondButtonFontFamily == null || secondButtonFontFamily == "") {
+            return Typeface.DEFAULT
+        }
+        if (FontFamily.Monospace.toString() == secondButtonFontFamily!!.lowercase(Locale.getDefault())) {
+            return Typeface.MONOSPACE
+        }
+        if (FontFamily.SansSerif.toString() == secondButtonFontFamily!!.lowercase(Locale.getDefault())) {
+            return Typeface.SANS_SERIF
+        }
+        if (FontFamily.Serif.toString() == secondButtonFontFamily!!.lowercase(Locale.getDefault())) {
+            return Typeface.SERIF
+        }
+        if (!secondButtonCustomFontFamilyAndroid.isNullOrEmpty()) {
+            if (AppUtils.isFontResourceAvailable(context, secondButtonCustomFontFamilyAndroid)) {
+                val id = context.resources.getIdentifier(
+                    secondButtonCustomFontFamilyAndroid,
+                    "font",
+                    context.packageName
+                )
+                return ResourcesCompat.getFont(context, id)
+            }
+        }
+        return Typeface.DEFAULT
+    }
+
+    fun setSecondButtonFontFamily(secondButtonFontFamily: String?) {
+        this.secondButtonFontFamily = secondButtonFontFamily
+    }
+
     override fun describeContents(): Int {
         return 0
     }
@@ -233,6 +287,14 @@ class InAppCarouselItem constructor(`in`: Parcel) : Parcelable {
         dest.writeString(androidLnk)
         dest.writeString(videoUrl)
         dest.writeString(buttonFunction)
+        dest.writeString(secondButtonText)
+        dest.writeString(secondButtonTextColor)
+        dest.writeString(secondButtonColor)
+        dest.writeString(secondButtonFontFamily)
+        dest.writeString(secondButtonCustomFontFamilyAndroid)
+        dest.writeString(secondButtonTextsize)
+        dest.writeString(secondAndroidLnk)
+        dest.writeString(secondButtonFunction)
     }
 
     companion object CREATOR : Parcelable.Creator<InAppCarouselItem> {
@@ -277,5 +339,13 @@ class InAppCarouselItem constructor(`in`: Parcel) : Parcelable {
         iosLnk = `in`.readString()
         androidLnk = `in`.readString()
         videoUrl = `in`.readString()
+        secondButtonText = `in`.readString()
+        secondButtonTextColor = `in`.readString()
+        secondButtonColor = `in`.readString()
+        secondButtonFontFamily = `in`.readString()
+        secondButtonCustomFontFamilyAndroid = `in`.readString()
+        secondButtonTextsize = `in`.readString()
+        secondAndroidLnk = `in`.readString()
+        secondButtonFunction = `in`.readString()
     }
 }
