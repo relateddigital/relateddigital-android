@@ -117,9 +117,6 @@ class InAppNotificationActivity : AppCompatActivity() {
             sendInAppRequest("inappcarousel")
         }
 
-        binding.carouselFullscreenButton.setOnClickListener {
-            sendInAppRequest("carousel_fullscreen")
-        }
 
         binding.shakeToWinButton.setOnClickListener {
             sendInAppRequest("ShakeToWin");
@@ -143,6 +140,10 @@ class InAppNotificationActivity : AppCompatActivity() {
 
         binding.halfScreenButton.setOnClickListener {
             sendInAppRequest("halfscreen")
+        }
+
+        binding.drawer.setOnClickListener {
+            sendInAppRequest("drawer")
         }
 
         binding.locationPermissionButton.setOnClickListener {

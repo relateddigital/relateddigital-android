@@ -284,8 +284,15 @@ class NotificationBellFragment : Fragment() {
         binding.dialogContainer.visibility = View.GONE
     }
 
+    override fun onStop() {
+        super.onStop()
+        if (activity?.isChangingConfigurations == false) {
+            endFragment()
+        }
+    }
+
     private fun endFragment() {
-        activity?.supportFragmentManager?.beginTransaction()?.remove(this@NotificationBellFragment)?.commit()
+        activity?.supportFragmentManager?.beginTransaction()?.remove(this@NotificationBellFragment)?.commitAllowingStateLoss()
     }
 
     companion object {

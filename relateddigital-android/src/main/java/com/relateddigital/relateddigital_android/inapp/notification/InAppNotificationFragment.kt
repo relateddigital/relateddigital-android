@@ -1864,6 +1864,13 @@ class InAppNotificationFragment : Fragment() {
         }
     }
 
+    override fun onStop() {
+        super.onStop()
+        if (activity?.isChangingConfigurations == false) {
+            endFragment()
+        }
+    }
+
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putSerializable("drawer", response)
@@ -1872,7 +1879,7 @@ class InAppNotificationFragment : Fragment() {
     private fun endFragment() {
         if (activity != null) {
             requireActivity().supportFragmentManager.beginTransaction().remove(this@InAppNotificationFragment)
-                .commit()
+                .commitAllowingStateLoss()
         }
     }
 
