@@ -73,7 +73,7 @@ class CountdownTimerBannerFragment : Fragment() {
         parseExtendedProps()
         positionBanner()
 
-        
+
         val passthroughRoot = object : FrameLayout(inflater.context) {
             override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
                 val card = binding?.bannerCardView ?: return super.dispatchTouchEvent(ev)
