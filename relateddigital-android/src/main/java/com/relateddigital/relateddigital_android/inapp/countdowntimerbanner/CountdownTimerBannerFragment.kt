@@ -6,8 +6,10 @@ import android.os.Bundle
 import android.os.CountDownTimer
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.fragment.app.Fragment
@@ -71,7 +73,31 @@ class CountdownTimerBannerFragment : Fragment() {
         parseExtendedProps()
         positionBanner()
 
-        return binding?.root
+        
+        val passthroughRoot = object : FrameLayout(inflater.context) {
+            override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
+                val card = binding?.bannerCardView ?: return super.dispatchTouchEvent(ev)
+                val location = IntArray(2)
+                card.getLocationInWindow(location)
+                val left = location[0]
+                val top = location[1]
+                val right = left + card.width
+                val bottom = top + card.height
+                val x = ev.rawX.toInt()
+                val y = ev.rawY.toInt()
+                return if (x in left..right && y in top..bottom) {
+                    super.dispatchTouchEvent(ev)
+                } else {
+                    false
+                }
+            }
+        }
+        passthroughRoot.layoutParams = ViewGroup.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.MATCH_PARENT
+        )
+        passthroughRoot.addView(binding!!.root)
+        return passthroughRoot
     }
 
     private fun positionBanner() {
@@ -219,9 +245,11 @@ class CountdownTimerBannerFragment : Fragment() {
         }
 
         // --- Click listener'lar ---
+        // Tıklamalar yalnızca CardView üzerinde dinlenir; root'a click listener
+        // bağlanmaz, dış alanın passthrough davranışı dispatchTouchEvent ile sağlanır.
         binding.ibClose.setOnClickListener { endFragment() }
 
-        binding.root.setOnClickListener {
+        binding.bannerCardView.setOnClickListener {
             val link = data.android_lnk
             if (!link.isNullOrEmpty()) {
                 val callback = RelatedDigital.setCountdownTimerBannerClickCallback()

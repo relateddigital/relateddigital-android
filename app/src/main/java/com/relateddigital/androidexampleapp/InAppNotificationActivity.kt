@@ -146,6 +146,10 @@ class InAppNotificationActivity : AppCompatActivity() {
             sendInAppRequest("drawer")
         }
 
+        binding.fullscreenPopup.setOnClickListener {
+            sendInAppRequest("fullscreen_popup")
+        }
+
         binding.locationPermissionButton.setOnClickListener {
             RelatedDigital.sendLocationPermission(applicationContext)
         }

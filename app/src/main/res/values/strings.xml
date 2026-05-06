@@ -48,6 +48,7 @@
     <string name="jackpot">JACKPOT</string>
     <string name="claw_machine">CLAW MACHINE</string>
     <string name="nps_with_multiple_popup">NPS WITH MULTIPLE POPUP</string>
+    <string name="fullscreen_popup">FULLSCREEN POPUP</string>
     <string name="fullscreen_carousel">FULLSCREEN CAROUSEL</string>
     <string name="drawer">DRAWER</string>
     <string name="custom_actions">CUSTOM ACTIONS</string>

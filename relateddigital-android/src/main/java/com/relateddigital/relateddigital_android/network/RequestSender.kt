@@ -513,7 +513,7 @@ object RequestSender {
                                             Handler(Looper.getMainLooper()).postDelayed({
                                                 val countdownTimerBannerFragment: CountdownTimerBannerFragment = CountdownTimerBannerFragment.newInstance(actionsResponse.mCountdownTimerBanner!![0])
                                                 val transaction : FragmentTransaction= (currentRequest.parent!! as FragmentActivity).supportFragmentManager.beginTransaction()
-                                                transaction.replace(android.R.id.content, countdownTimerBannerFragment)
+                                                transaction.add(android.R.id.content, countdownTimerBannerFragment)
                                                 transaction.commit()
                                             }, waitTime * 1000L)
                                         }

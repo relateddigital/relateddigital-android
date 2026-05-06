@@ -116,6 +116,10 @@ class InAppManager(
                         openCarouselFullscreenActivity(parent, getStateId(parent, inAppMessage))
                     }
 
+                    InAppNotificationType.FULLSCREEN_POPUP.toString() -> {
+                        openFullscreenPopupActivity(parent, getStateId(parent, inAppMessage))
+                    }
+
                     InAppNotificationType.FULL_IMAGE.toString(),
                     InAppNotificationType.SMILE_RATING.toString(),
                     InAppNotificationType.NPS.toString(), InAppNotificationType.IMAGE_TEXT_BUTTON.toString(),
@@ -231,6 +235,14 @@ class InAppManager(
 
     private fun openCarouselFullscreenActivity(parent: Activity, inAppData: Int) {
         val intent = Intent(parent.applicationContext, CarouselFullscreenActivity::class.java)
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
+        intent.putExtra(Constants.INTENT_ID_KEY, inAppData)
+        parent.startActivity(intent)
+    }
+
+    private fun openFullscreenPopupActivity(parent: Activity, inAppData: Int) {
+        val intent = Intent(parent.applicationContext, FullscreenPopupActivity::class.java)
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
         intent.putExtra(Constants.INTENT_ID_KEY, inAppData)
