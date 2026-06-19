@@ -11,6 +11,9 @@
         <item name="colorOnSecondary">@color/black</item>
         <!-- Status bar color. -->
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
+        <!-- Android 15+/16 edge-to-edge zorlamasını devre dışı bırak; header/ActionBar
+             status bar'ın altında düzgün konumlansın. -->
+        <item name="android:windowOptOutEdgeToEdgeEnforcement" tools:targetApi="35">true</item>
         <!-- Customize your theme here. -->
     </style>
 </resources>

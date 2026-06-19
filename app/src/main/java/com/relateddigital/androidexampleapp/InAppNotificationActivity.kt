@@ -37,8 +37,6 @@ class InAppNotificationActivity : AppCompatActivity() {
 
         val buttonCallback = object : InAppButtonInterface {
             override fun onPress(link: String?) {
-                val intent = Intent(this@InAppNotificationActivity, PushNotificationActivity::class.java)
-                startActivity(intent)
                 Log.i("FulLScreenLink", "onPress: $link")
             }
         }

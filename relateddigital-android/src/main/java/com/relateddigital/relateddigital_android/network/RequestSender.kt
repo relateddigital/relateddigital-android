@@ -503,19 +503,36 @@ object RequestSender {
                                             transaction.commit()
                                         }
                                         !actionsResponse.mCountdownTimerBanner.isNullOrEmpty() -> {
-                                            var waitTime = 0L
+                                            val bannerModel = actionsResponse.mCountdownTimerBanner!![0]
 
+                                            when {
+                                                // Süresi dolmuş banner hiç gösterilmez.
+                                                CountdownTimerBannerFragment.isExpired(bannerModel) -> {
+                                                    Log.i(LOG_TAG, "CountdownTimerBanner expired, not showing.")
+                                                }
+                                                // Zaten bir banner gösteriliyorsa çoklama yapılmaz.
+                                                CountdownTimerBannerFragment.isShowing -> {
+                                                    Log.i(LOG_TAG, "CountdownTimerBanner already showing, skipping duplicate.")
+                                                }
+                                                else -> {
+                                                    var waitTime = 0L
+                                                    if (!bannerModel.actiondata!!.waiting_time.toString().isNullOrEmpty()) {
+                                                        waitTime = bannerModel.actiondata!!.waiting_time!!.toLong()
+                                                    }
 
-                                            if (!actionsResponse.mCountdownTimerBanner!!.get(0).actiondata!!.waiting_time.toString().isNullOrEmpty()) {
-                                                waitTime = actionsResponse.mCountdownTimerBanner!!.get(0).actiondata!!.waiting_time!!.toLong()
+                                                    Handler(Looper.getMainLooper()).postDelayed({
+                                                        if (!CountdownTimerBannerFragment.isExpired(bannerModel) &&
+                                                            !CountdownTimerBannerFragment.isShowing
+                                                        ) {
+                                                            CountdownTimerBannerFragment.isShowing = true
+                                                            val countdownTimerBannerFragment: CountdownTimerBannerFragment = CountdownTimerBannerFragment.newInstance(bannerModel)
+                                                            val transaction : FragmentTransaction= (currentRequest.parent!! as FragmentActivity).supportFragmentManager.beginTransaction()
+                                                            transaction.add(android.R.id.content, countdownTimerBannerFragment)
+                                                            transaction.commit()
+                                                        }
+                                                    }, waitTime * 1000L)
+                                                }
                                             }
-
-                                            Handler(Looper.getMainLooper()).postDelayed({
-                                                val countdownTimerBannerFragment: CountdownTimerBannerFragment = CountdownTimerBannerFragment.newInstance(actionsResponse.mCountdownTimerBanner!![0])
-                                                val transaction : FragmentTransaction= (currentRequest.parent!! as FragmentActivity).supportFragmentManager.beginTransaction()
-                                                transaction.add(android.R.id.content, countdownTimerBannerFragment)
-                                                transaction.commit()
-                                            }, waitTime * 1000L)
                                         }
                                         else -> {
                                             Log.e(
