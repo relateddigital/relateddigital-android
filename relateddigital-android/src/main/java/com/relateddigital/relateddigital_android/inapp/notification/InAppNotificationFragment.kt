@@ -8,11 +8,18 @@ import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
+import android.view.Gravity
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
+import android.widget.LinearLayout
 import android.widget.Toast
+import kotlin.math.abs
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
@@ -76,6 +83,13 @@ class InAppNotificationFragment : Fragment() {
     private var staticCode = ""
     private var buttonFunction: ButtonFunction = ButtonFunction.COPY
 
+    private var items: MutableList<DrawerExtendedProps> = mutableListOf()
+    private var currentItemIndex = 0
+    private val autoScrollHandler = Handler(Looper.getMainLooper())
+    private var autoScrollRunnable: Runnable? = null
+    private var minimizedDots: LinearLayout? = null
+    private var maximizedDots: LinearLayout? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         response = if (savedInstanceState != null) {
@@ -93,6 +107,7 @@ class InAppNotificationFragment : Fragment() {
                     URI(response!!.getActionData()!!.getExtendedProps()).path,
                     DrawerExtendedProps::class.java
                 )
+                buildItems()
             } catch (e: URISyntaxException) {
                 e.printStackTrace()
                 endFragment()
@@ -101,6 +116,27 @@ class InAppNotificationFragment : Fragment() {
                 endFragment()
             }
         }
+    }
+
+    /**
+     * Collects the drawer items. A payload without `content_minimized_items` describes a single
+     * item through the extended props and the action data, so it is turned into a one item list.
+     */
+    private fun buildItems() {
+        val parsedItems = mExtendedProps!!.getItems()
+
+        items = if (parsedItems.isNullOrEmpty()) {
+            mutableListOf(mExtendedProps!!)
+        } else {
+            parsedItems.toMutableList()
+        }
+
+        for (item in items) {
+            item.fillMissingContentFrom(response!!.getActionData())
+        }
+
+        currentItemIndex = 0
+        mExtendedProps = items[0]
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -123,9 +159,7 @@ class InAppNotificationFragment : Fragment() {
             PositionOnScreen.BOTTOM
         }
 
-        isTopToBottom = mExtendedProps!!.getMiniTextOrientation() == "topToBottom"
-
-        isSmallImage = !response!!.getActionData()!!.getContentMinimizedImage().isNullOrEmpty()
+        refreshItemFlags()
 
         shape = when(response!!.getActionData()!!.getShape()) {
             "circle" -> {
@@ -142,12 +176,6 @@ class InAppNotificationFragment : Fragment() {
         buttonFunction = getButtonFunctionFromString(response!!.getActionData()!!.getButtonFunction())
 
         staticCode = response!!.getActionData()!!.getStaticCode().toString()
-
-        isArrow = !mExtendedProps!!.getArrowColor().isNullOrEmpty()
-
-        isMiniBackgroundImage = !mExtendedProps!!.getMiniBackgroundImage().isNullOrEmpty()
-
-        isMaxiBackgroundImage = !mExtendedProps!!.getMaxiBackgroundImage().isNullOrEmpty()
 
         if (isRight) {
             when (positionOnScreen) {
@@ -188,6 +216,8 @@ class InAppNotificationFragment : Fragment() {
         }
 
         setupInitialView()
+        setupItemNavigation()
+        startAutoScroll()
         return view
     }
 
@@ -205,6 +235,263 @@ class InAppNotificationFragment : Fragment() {
                 else -> adjustLb()
             }
         }
+    }
+
+    /** Reads the flags that depend on the item that is currently shown. */
+    private fun refreshItemFlags() {
+        isTopToBottom = mExtendedProps!!.getMiniTextOrientation() == "topToBottom"
+        isSmallImage = !mExtendedProps!!.getMiniImage().isNullOrEmpty()
+        isArrow = !mExtendedProps!!.getArrowColor().isNullOrEmpty()
+        isMiniBackgroundImage = !mExtendedProps!!.getMiniBackgroundImage().isNullOrEmpty()
+        isMaxiBackgroundImage = !mExtendedProps!!.getMaxiBackgroundImage().isNullOrEmpty()
+    }
+
+    private fun hasMultipleItems(): Boolean {
+        return items.size > 1
+    }
+
+    private fun minimizedContainer(): FrameLayout {
+        val isCircle = shape == Shape.CIRCLE
+        return if (isRight) {
+            when (positionOnScreen) {
+                PositionOnScreen.TOP ->
+                    if (isCircle) bindingRt.smallCircleContainerRt else bindingRt.smallSquareContainerRt
+                PositionOnScreen.MIDDLE ->
+                    if (isCircle) bindingRm.smallCircleContainerRm else bindingRm.smallSquareContainerRm
+                else ->
+                    if (isCircle) bindingRb.smallCircleContainerRb else bindingRb.smallSquareContainerRb
+            }
+        } else {
+            when (positionOnScreen) {
+                PositionOnScreen.TOP ->
+                    if (isCircle) bindingLt.smallCircleContainerLt else bindingLt.smallSquareContainerLt
+                PositionOnScreen.MIDDLE ->
+                    if (isCircle) bindingLm.smallCircleContainerLm else bindingLm.smallSquareContainerLm
+                else ->
+                    if (isCircle) bindingLb.smallCircleContainerLb else bindingLb.smallSquareContainerLb
+            }
+        }
+    }
+
+    private fun maximizedContainer(): FrameLayout {
+        return if (isRight) {
+            when (positionOnScreen) {
+                PositionOnScreen.TOP -> bindingRt.bigContainerRt
+                PositionOnScreen.MIDDLE -> bindingRm.bigContainerRm
+                else -> bindingRb.bigContainerRb
+            }
+        } else {
+            when (positionOnScreen) {
+                PositionOnScreen.TOP -> bindingLt.bigContainerLt
+                PositionOnScreen.MIDDLE -> bindingLm.bigContainerLm
+                else -> bindingLb.bigContainerLb
+            }
+        }
+    }
+
+    private fun closeFrameLayout(): FrameLayout {
+        return if (isRight) {
+            when (positionOnScreen) {
+                PositionOnScreen.TOP -> bindingRt.closeFrameLayoutRt
+                PositionOnScreen.MIDDLE -> bindingRm.closeFrameLayoutRm
+                else -> bindingRb.closeFrameLayoutRb
+            }
+        } else {
+            when (positionOnScreen) {
+                PositionOnScreen.TOP -> bindingLt.closeFrameLayoutLt
+                PositionOnScreen.MIDDLE -> bindingLm.closeFrameLayoutLm
+                else -> bindingLb.closeFrameLayoutLb
+            }
+        }
+    }
+
+    private fun closeButton(): View {
+        return if (isRight) {
+            when (positionOnScreen) {
+                PositionOnScreen.TOP -> bindingRt.closeButtonRt
+                PositionOnScreen.MIDDLE -> bindingRm.closeButtonRm
+                else -> bindingRb.closeButtonRb
+            }
+        } else {
+            when (positionOnScreen) {
+                PositionOnScreen.TOP -> bindingLt.closeButtonLt
+                PositionOnScreen.MIDDLE -> bindingLm.closeButtonLm
+                else -> bindingLb.closeButtonLb
+            }
+        }
+    }
+
+    private fun setupItemNavigation() {
+        if (!hasMultipleItems()) {
+            return
+        }
+        reserveSpaceForMinimizedDots(minimizedContainer())
+        minimizedDots = addDots(minimizedContainer(), LinearLayout.HORIZONTAL)
+        maximizedDots = addDots(maximizedContainer(), LinearLayout.HORIZONTAL)
+        updateDots()
+        addSwipeDetection(minimizedContainer(), horizontalOnly = true)
+        addSwipeDetection(maximizedContainer())
+    }
+
+    private fun selectItem(index: Int) {
+        if (!hasMultipleItems()) {
+            return
+        }
+        val itemCount = items.size
+        currentItemIndex = ((index % itemCount) + itemCount) % itemCount
+        mExtendedProps = items[currentItemIndex]
+        refreshItemFlags()
+
+        // Rebuilding the view is what applies the new item; the adjust functions read
+        // everything from mExtendedProps.
+        setupInitialView()
+        restoreExpandedState()
+        updateDots()
+        // Restart the countdown so a manual change is not followed by an immediate automatic one.
+        startAutoScroll()
+    }
+
+    /** The adjust functions always collapse the drawer, so an open drawer has to be reopened. */
+    private fun restoreExpandedState() {
+        if (!isExpanded) {
+            return
+        }
+        maximizedContainer().visibility = View.VISIBLE
+        closeFrameLayout().visibility = View.VISIBLE
+        closeButton().visibility = View.VISIBLE
+    }
+
+    /**
+     * Shrinks the minimized content so that it ends above the dots instead of sitting behind them.
+     * The background image is the first child and is left alone so that it keeps filling the strip.
+     */
+    private fun reserveSpaceForMinimizedDots(container: FrameLayout) {
+        val reservedHeight = dpToPx(MINIMIZED_DOTS_RESERVED_DP)
+        for (index in 1 until container.childCount) {
+            val child = container.getChildAt(index)
+            val params = child.layoutParams as? FrameLayout.LayoutParams ?: continue
+            params.bottomMargin += reservedHeight
+            child.layoutParams = params
+        }
+    }
+
+    private fun addDots(container: FrameLayout, orientation: Int): LinearLayout {
+        val dots = LinearLayout(requireContext())
+        dots.orientation = orientation
+        dots.gravity = Gravity.CENTER
+
+        val containerParams = FrameLayout.LayoutParams(
+            FrameLayout.LayoutParams.WRAP_CONTENT,
+            FrameLayout.LayoutParams.WRAP_CONTENT
+        )
+        containerParams.gravity = Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL
+        containerParams.bottomMargin = dpToPx(6)
+        dots.layoutParams = containerParams
+
+        val dotSize = dpToPx(7)
+        val halfSpacing = dpToPx(2)
+        for (index in items.indices) {
+            val dot = View(requireContext())
+            val dotParams = LinearLayout.LayoutParams(dotSize, dotSize)
+            if (orientation == LinearLayout.HORIZONTAL) {
+                dotParams.marginStart = halfSpacing
+                dotParams.marginEnd = halfSpacing
+            } else {
+                dotParams.topMargin = halfSpacing
+                dotParams.bottomMargin = halfSpacing
+            }
+            dot.layoutParams = dotParams
+            dot.setOnClickListener { selectItem(index) }
+            dots.addView(dot)
+        }
+
+        // Consumes taps that land between the dots so that the drawer does not open or close.
+        dots.setOnClickListener { }
+        container.addView(dots)
+        return dots
+    }
+
+    private fun updateDots() {
+        updateDots(minimizedDots)
+        updateDots(maximizedDots)
+    }
+
+    private fun updateDots(dots: LinearLayout?) {
+        if (dots == null) {
+            return
+        }
+        for (index in 0 until dots.childCount) {
+            val background = GradientDrawable()
+            background.shape = GradientDrawable.OVAL
+            background.setColor(
+                if (index == currentItemIndex) Color.WHITE else Color.argb(90, 255, 255, 255)
+            )
+            background.setStroke(dpToPx(1), Color.argb(64, 0, 0, 0))
+            dots.getChildAt(index).background = background
+        }
+    }
+
+    private fun addSwipeDetection(view: View, horizontalOnly: Boolean = false) {
+        var startX = 0f
+        var startY = 0f
+        // The minimized strip is only about 48dp wide, so a swipe there has to be recognized
+        // over a shorter distance than in the maximized panel.
+        val threshold = dpToPx(if (horizontalOnly) 16 else 24)
+
+        view.setOnTouchListener { _, event ->
+            when (event.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    startX = event.x
+                    startY = event.y
+                    false
+                }
+                MotionEvent.ACTION_UP -> {
+                    val deltaX = event.x - startX
+                    val deltaY = event.y - startY
+                    val isHorizontal = horizontalOnly || abs(deltaX) >= abs(deltaY)
+                    val travel = if (isHorizontal) deltaX else deltaY
+                    if (abs(travel) > threshold) {
+                        selectItem(currentItemIndex + if (travel < 0) 1 else -1)
+                        // Consuming the event keeps the swipe from also toggling the drawer.
+                        true
+                    } else {
+                        false
+                    }
+                }
+                else -> false
+            }
+        }
+    }
+
+    private fun startAutoScroll() {
+        stopAutoScroll()
+        if (!hasMultipleItems()) {
+            return
+        }
+        val runnable = object : Runnable {
+            override fun run() {
+                if (!isAdded) {
+                    return
+                }
+                if (isExpanded) {
+                    // Paused while the drawer is open; check again on the next tick.
+                    autoScrollHandler.postDelayed(this, AUTO_SCROLL_INTERVAL_MS)
+                } else {
+                    selectItem(currentItemIndex + 1)
+                }
+            }
+        }
+        autoScrollRunnable = runnable
+        autoScrollHandler.postDelayed(runnable, AUTO_SCROLL_INTERVAL_MS)
+    }
+
+    private fun stopAutoScroll() {
+        autoScrollRunnable?.let { autoScrollHandler.removeCallbacks(it) }
+        autoScrollRunnable = null
+    }
+
+    private fun dpToPx(dp: Int): Int {
+        return (dp * resources.displayMetrics.density).toInt()
     }
 
     private fun getButtonFunctionFromString(functionName: String?): ButtonFunction {
@@ -361,12 +648,12 @@ class InAppNotificationFragment : Fragment() {
                             GranularRoundedCorners(500f, 0f, 0f, 500f)
                         )
                     )
-                    .load(response!!.getActionData()!!.getContentMinimizedImage())
+                    .load(mExtendedProps!!.getMiniImage())
                     .into(bindingRt.smallCircleImageRt)
                 bindingRt.smallCircleTextRt.visibility = View.GONE
             } else {
                 bindingRt.smallCircleTextRt.text =
-                    response!!.getActionData()!!.getContentMinimizedText()
+                    mExtendedProps!!.getMiniText()
                 if (!mExtendedProps!!.getMiniTextColor().isNullOrEmpty()) {
                     bindingRt.smallCircleTextRt.setTextColor(
                         Color.parseColor(
@@ -421,16 +708,16 @@ class InAppNotificationFragment : Fragment() {
                                 GranularRoundedCorners(40f, 0f, 0f, 40f)
                             )
                         )
-                        .load(response!!.getActionData()!!.getContentMinimizedImage())
+                        .load(mExtendedProps!!.getMiniImage())
                         .into(bindingRt.smallSquareImageRt)
                 } else {
-                    Picasso.get().load(response!!.getActionData()!!.getContentMinimizedImage())
+                    Picasso.get().load(mExtendedProps!!.getMiniImage())
                         .into(bindingRt.smallSquareImageRt)
                 }
                 bindingRt.smallSquareTextRt.visibility = View.GONE
             } else {
                 bindingRt.smallSquareTextRt.text =
-                    response!!.getActionData()!!.getContentMinimizedText()
+                    mExtendedProps!!.getMiniText()
                 if (!mExtendedProps!!.getMiniTextColor().isNullOrEmpty()) {
                     bindingRt.smallSquareTextRt.setTextColor(
                         Color.parseColor(
@@ -475,8 +762,8 @@ class InAppNotificationFragment : Fragment() {
             bindingRt.bigBackgroundImageRt.visibility = View.GONE
         }
 
-        if (!response!!.getActionData()!!.getContentMaximizedImage().isNullOrEmpty()) {
-            Picasso.get().load(response!!.getActionData()!!.getContentMaximizedImage())
+        if (!mExtendedProps!!.getMaxiImage().isNullOrEmpty()) {
+            Picasso.get().load(mExtendedProps!!.getMaxiImage())
                 .into(bindingRt.bigImageRt)
         }
 
@@ -625,12 +912,12 @@ class InAppNotificationFragment : Fragment() {
                             GranularRoundedCorners(500f, 0f, 0f, 500f)
                         )
                     )
-                    .load(response!!.getActionData()!!.getContentMinimizedImage())
+                    .load(mExtendedProps!!.getMiniImage())
                     .into(bindingRm.smallCircleImageRm)
                 bindingRm.smallCircleTextRm.visibility = View.GONE
             } else {
                 bindingRm.smallCircleTextRm.text =
-                    response!!.getActionData()!!.getContentMinimizedText()
+                    mExtendedProps!!.getMiniText()
                 if (!mExtendedProps!!.getMiniTextColor().isNullOrEmpty()) {
                     bindingRm.smallCircleTextRm.setTextColor(
                         Color.parseColor(
@@ -685,16 +972,16 @@ class InAppNotificationFragment : Fragment() {
                                 GranularRoundedCorners(40f, 0f, 0f, 40f)
                             )
                         )
-                        .load(response!!.getActionData()!!.getContentMinimizedImage())
+                        .load(mExtendedProps!!.getMiniImage())
                         .into(bindingRm.smallSquareImageRm)
                 } else {
-                    Picasso.get().load(response!!.getActionData()!!.getContentMinimizedImage())
+                    Picasso.get().load(mExtendedProps!!.getMiniImage())
                         .into(bindingRm.smallSquareImageRm)
                 }
                 bindingRm.smallSquareTextRm.visibility = View.GONE
             } else {
                 bindingRm.smallSquareTextRm.text =
-                    response!!.getActionData()!!.getContentMinimizedText()
+                    mExtendedProps!!.getMiniText()
                 if (!mExtendedProps!!.getMiniTextColor().isNullOrEmpty()) {
                     bindingRm.smallSquareTextRm.setTextColor(
                         Color.parseColor(
@@ -739,8 +1026,8 @@ class InAppNotificationFragment : Fragment() {
             bindingRm.bigBackgroundImageRm.visibility = View.GONE
         }
 
-        if (!response!!.getActionData()!!.getContentMaximizedImage().isNullOrEmpty()) {
-            Picasso.get().load(response!!.getActionData()!!.getContentMaximizedImage())
+        if (!mExtendedProps!!.getMaxiImage().isNullOrEmpty()) {
+            Picasso.get().load(mExtendedProps!!.getMaxiImage())
                 .into(bindingRm.bigImageRm)
         }
 
@@ -888,12 +1175,12 @@ class InAppNotificationFragment : Fragment() {
                             GranularRoundedCorners(500f, 0f, 0f, 500f)
                         )
                     )
-                    .load(response!!.getActionData()!!.getContentMinimizedImage())
+                    .load(mExtendedProps!!.getMiniImage())
                     .into(bindingRb.smallCircleImageRb)
                 bindingRb.smallCircleTextRb.visibility = View.GONE
             } else {
                 bindingRb.smallCircleTextRb.text =
-                    response!!.getActionData()!!.getContentMinimizedText()
+                    mExtendedProps!!.getMiniText()
                 if (!mExtendedProps!!.getMiniTextColor().isNullOrEmpty()) {
                     bindingRb.smallCircleTextRb.setTextColor(
                         Color.parseColor(
@@ -948,16 +1235,16 @@ class InAppNotificationFragment : Fragment() {
                                 GranularRoundedCorners(40f, 0f, 0f, 40f)
                             )
                         )
-                        .load(response!!.getActionData()!!.getContentMinimizedImage())
+                        .load(mExtendedProps!!.getMiniImage())
                         .into(bindingRb.smallSquareImageRb)
                 } else {
-                    Picasso.get().load(response!!.getActionData()!!.getContentMinimizedImage())
+                    Picasso.get().load(mExtendedProps!!.getMiniImage())
                         .into(bindingRb.smallSquareImageRb)
                 }
                 bindingRb.smallSquareTextRb.visibility = View.GONE
             } else {
                 bindingRb.smallSquareTextRb.text =
-                    response!!.getActionData()!!.getContentMinimizedText()
+                    mExtendedProps!!.getMiniText()
                 if (!mExtendedProps!!.getMiniTextColor().isNullOrEmpty()) {
                     bindingRb.smallSquareTextRb.setTextColor(
                         Color.parseColor(
@@ -1002,8 +1289,8 @@ class InAppNotificationFragment : Fragment() {
             bindingRb.bigBackgroundImageRb.visibility = View.GONE
         }
 
-        if (!response!!.getActionData()!!.getContentMaximizedImage().isNullOrEmpty()) {
-            Picasso.get().load(response!!.getActionData()!!.getContentMaximizedImage())
+        if (!mExtendedProps!!.getMaxiImage().isNullOrEmpty()) {
+            Picasso.get().load(mExtendedProps!!.getMaxiImage())
                 .into(bindingRb.bigImageRb)
         }
 
@@ -1153,12 +1440,12 @@ class InAppNotificationFragment : Fragment() {
                             GranularRoundedCorners(0f, 500f, 500f, 0f)
                         )
                     )
-                    .load(response!!.getActionData()!!.getContentMinimizedImage())
+                    .load(mExtendedProps!!.getMiniImage())
                     .into(bindingLt.smallCircleImageLt)
                 bindingLt.smallCircleTextLt.visibility = View.GONE
             } else {
                 bindingLt.smallCircleTextLt.text =
-                    response!!.getActionData()!!.getContentMinimizedText()
+                    mExtendedProps!!.getMiniText()
                 if (!mExtendedProps!!.getMiniTextColor().isNullOrEmpty()) {
                     bindingLt.smallCircleTextLt.setTextColor(
                         Color.parseColor(
@@ -1213,16 +1500,16 @@ class InAppNotificationFragment : Fragment() {
                                 GranularRoundedCorners(0f, 40f, 40f, 0f)
                             )
                         )
-                        .load(response!!.getActionData()!!.getContentMinimizedImage())
+                        .load(mExtendedProps!!.getMiniImage())
                         .into(bindingLt.smallSquareImageLt)
                 } else {
-                    Picasso.get().load(response!!.getActionData()!!.getContentMinimizedImage())
+                    Picasso.get().load(mExtendedProps!!.getMiniImage())
                         .into(bindingLt.smallSquareImageLt)
                 }
                 bindingLt.smallSquareTextLt.visibility = View.GONE
             } else {
                 bindingLt.smallSquareTextLt.text =
-                    response!!.getActionData()!!.getContentMinimizedText()
+                    mExtendedProps!!.getMiniText()
                 if (!mExtendedProps!!.getMiniTextColor().isNullOrEmpty()) {
                     bindingLt.smallSquareTextLt.setTextColor(
                         Color.parseColor(
@@ -1267,8 +1554,8 @@ class InAppNotificationFragment : Fragment() {
             bindingLt.bigBackgroundImageLt.visibility = View.GONE
         }
 
-        if (!response!!.getActionData()!!.getContentMaximizedImage().isNullOrEmpty()) {
-            Picasso.get().load(response!!.getActionData()!!.getContentMaximizedImage())
+        if (!mExtendedProps!!.getMaxiImage().isNullOrEmpty()) {
+            Picasso.get().load(mExtendedProps!!.getMaxiImage())
                 .into(bindingLt.bigImageLt)
         }
 
@@ -1418,12 +1705,12 @@ class InAppNotificationFragment : Fragment() {
                             GranularRoundedCorners(0f, 500f, 500f, 0f)
                         )
                     )
-                    .load(response!!.getActionData()!!.getContentMinimizedImage())
+                    .load(mExtendedProps!!.getMiniImage())
                     .into(bindingLm.smallCircleImageLm)
                 bindingLm.smallCircleTextLm.visibility = View.GONE
             } else {
                 bindingLm.smallCircleTextLm.text =
-                    response!!.getActionData()!!.getContentMinimizedText()
+                    mExtendedProps!!.getMiniText()
                 if (!mExtendedProps!!.getMiniTextColor().isNullOrEmpty()) {
                     bindingLm.smallCircleTextLm.setTextColor(
                         Color.parseColor(
@@ -1478,16 +1765,16 @@ class InAppNotificationFragment : Fragment() {
                                 GranularRoundedCorners(0f, 40f, 40f, 0f)
                             )
                         )
-                        .load(response!!.getActionData()!!.getContentMinimizedImage())
+                        .load(mExtendedProps!!.getMiniImage())
                         .into(bindingLm.smallSquareImageLm)
                 } else {
-                    Picasso.get().load(response!!.getActionData()!!.getContentMinimizedImage())
+                    Picasso.get().load(mExtendedProps!!.getMiniImage())
                         .into(bindingLm.smallSquareImageLm)
                 }
                 bindingLm.smallSquareTextLm.visibility = View.GONE
             } else {
                 bindingLm.smallSquareTextLm.text =
-                    response!!.getActionData()!!.getContentMinimizedText()
+                    mExtendedProps!!.getMiniText()
                 if (!mExtendedProps!!.getMiniTextColor().isNullOrEmpty()) {
                     bindingLm.smallSquareTextLm.setTextColor(
                         Color.parseColor(
@@ -1532,8 +1819,8 @@ class InAppNotificationFragment : Fragment() {
             bindingLm.bigBackgroundImageLm.visibility = View.GONE
         }
 
-        if (!response!!.getActionData()!!.getContentMaximizedImage().isNullOrEmpty()) {
-            Picasso.get().load(response!!.getActionData()!!.getContentMaximizedImage())
+        if (!mExtendedProps!!.getMaxiImage().isNullOrEmpty()) {
+            Picasso.get().load(mExtendedProps!!.getMaxiImage())
                 .into(bindingLm.bigImageLm)
         }
 
@@ -1683,12 +1970,12 @@ class InAppNotificationFragment : Fragment() {
                             GranularRoundedCorners(0f, 500f, 500f, 0f)
                         )
                     )
-                    .load(response!!.getActionData()!!.getContentMinimizedImage())
+                    .load(mExtendedProps!!.getMiniImage())
                     .into(bindingLb.smallCircleImageLb)
                 bindingLb.smallCircleTextLb.visibility = View.GONE
             } else {
                 bindingLb.smallCircleTextLb.text =
-                    response!!.getActionData()!!.getContentMinimizedText()
+                    mExtendedProps!!.getMiniText()
                 if (!mExtendedProps!!.getMiniTextColor().isNullOrEmpty()) {
                     bindingLb.smallCircleTextLb.setTextColor(
                         Color.parseColor(
@@ -1743,16 +2030,16 @@ class InAppNotificationFragment : Fragment() {
                                 GranularRoundedCorners(0f, 40f, 40f, 0f)
                             )
                         )
-                        .load(response!!.getActionData()!!.getContentMinimizedImage())
+                        .load(mExtendedProps!!.getMiniImage())
                         .into(bindingLb.smallSquareImageLb)
                 } else {
-                    Picasso.get().load(response!!.getActionData()!!.getContentMinimizedImage())
+                    Picasso.get().load(mExtendedProps!!.getMiniImage())
                         .into(bindingLb.smallSquareImageLb)
                 }
                 bindingLb.smallSquareTextLb.visibility = View.GONE
             } else {
                 bindingLb.smallSquareTextLb.text =
-                    response!!.getActionData()!!.getContentMinimizedText()
+                    mExtendedProps!!.getMiniText()
                 if (!mExtendedProps!!.getMiniTextColor().isNullOrEmpty()) {
                     bindingLb.smallSquareTextLb.setTextColor(
                         Color.parseColor(
@@ -1797,8 +2084,8 @@ class InAppNotificationFragment : Fragment() {
             bindingLb.bigBackgroundImageLb.visibility = View.GONE
         }
 
-        if (!response!!.getActionData()!!.getContentMaximizedImage().isNullOrEmpty()) {
-            Picasso.get().load(response!!.getActionData()!!.getContentMaximizedImage())
+        if (!mExtendedProps!!.getMaxiImage().isNullOrEmpty()) {
+            Picasso.get().load(mExtendedProps!!.getMaxiImage())
                 .into(bindingLb.bigImageLb)
         }
 
@@ -1871,6 +2158,11 @@ class InAppNotificationFragment : Fragment() {
         }
     }
 
+    override fun onDestroyView() {
+        stopAutoScroll()
+        super.onDestroyView()
+    }
+
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putSerializable("drawer", response)
@@ -1886,6 +2178,10 @@ class InAppNotificationFragment : Fragment() {
     companion object {
         private const val LOG_TAG = "InAppNotification"
         private const val ARG_PARAM1 = "dataKey"
+        private const val AUTO_SCROLL_INTERVAL_MS = 5000L
+
+        /** Vertical space the dot row occupies at the bottom of the minimized strip. */
+        private const val MINIMIZED_DOTS_RESERVED_DP = 18
 
         /**
          * Use this factory method to create a new instance of
