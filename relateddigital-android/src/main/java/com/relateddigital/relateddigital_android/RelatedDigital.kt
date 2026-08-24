@@ -1537,7 +1537,7 @@ object RelatedDigital {
                 val payloads = DataStoreManager.getPayloadsFlow(activity.applicationContext).first()
 
                 if (payloads.isEmpty()) {
-                    callback.fail("Kaydedilmiş bir push bildirimi bulunamadı.")
+                    callback.success(emptyList())
                     return@launch
                 }
 
@@ -1577,14 +1577,17 @@ object RelatedDigital {
         activity.lifecycleScope.launch {
             try {
                 val orderedPushMessages = withContext(Dispatchers.IO) {
-                    val loginID = DataStoreManager.getLoginId(activity.applicationContext)
+                    val loginID = SharedPref.readString(
+                        activity.applicationContext,
+                        Constants.NOTIFICATION_LOGIN_ID_KEY
+                    )
                     if (loginID.isEmpty()) {
                         throw Exception("Login ID bulunamadı.")
                     }
 
                     val payloads = DataStoreManager.getPayloadsById(activity.applicationContext)
                     if (payloads.isEmpty()) {
-                        throw Exception("Kaydedilmiş bir push bildirimi bulunamadı.")
+                        return@withContext emptyList<Message>()
                     }
 
                     try {
@@ -1615,7 +1618,40 @@ object RelatedDigital {
     }
 
     /**
+     * Verilen payload içinden [shouldRemove] koşulunu sağlayan mesajları çıkarır.
+     * Geriye güncellenmiş payload ile silinen mesaj sayısını döner.
+     */
+    private fun removeMessagesFromPayload(
+        currentPayload: String,
+        arrayKey: String,
+        shouldRemove: (JSONObject) -> Boolean
+    ): Pair<String, Int> {
+        if (currentPayload.isEmpty()) return Pair("", 0)
+
+        return try {
+            val jsonObject = JSONObject(currentPayload)
+            val jsonArray = jsonObject.optJSONArray(arrayKey) ?: return Pair(currentPayload, 0)
+            val newJsonArray = JSONArray()
+            var removedCount = 0
+
+            for (i in 0 until jsonArray.length()) {
+                val currentObject = jsonArray.getJSONObject(i)
+                if (shouldRemove(currentObject)) {
+                    removedCount++
+                } else {
+                    newJsonArray.put(currentObject)
+                }
+            }
+            Pair(jsonObject.put(arrayKey, newJsonArray).toString(), removedCount)
+        } catch (e: Exception) {
+            Log.e(LOG_TAG, "Mesaj silinirken hata oluştu ($arrayKey)", e)
+            Pair(currentPayload, 0) // Hata durumunda eski veriyi koru
+        }
+    }
+
+    /**
      * Belirtilen ID'ye sahip push mesajını asenkron olarak siler.
+     * Mesaj, loginID'li veya loginID'siz depodan hangisinde kayıtlıysa oradan silinir.
      * UYGULAMAYI KİLİTLEMEZ. Sonucu bir callback ile döndürür.
      * @param callback İşlem sonucunu döndüren lambda. `true` başarılı, `false` başarısız.
      */
@@ -1626,29 +1662,24 @@ object RelatedDigital {
             return
         }
         activity.lifecycleScope.launch(Dispatchers.IO) { // İşi doğrudan arka planda başlat
+            val context = activity.applicationContext
             var messageFound = false
-            DataStoreManager.updatePayloads(activity.applicationContext) { currentPayload ->
-                if (currentPayload.isEmpty()) return@updatePayloads ""
+            val hasMessageId = { message: JSONObject -> message.optString("pushId") == messageId }
 
-                try {
-                    val jsonObject = JSONObject(currentPayload)
-                    val jsonArray = jsonObject.getJSONArray(Constants.PAYLOAD_SP_ARRAY_KEY)
-                    val newJsonArray = JSONArray()
-
-                    for (i in 0 until jsonArray.length()) {
-                        val currentObject = jsonArray.getJSONObject(i)
-                        if (currentObject.optString("pushId") != messageId) {
-                            newJsonArray.put(currentObject)
-                        } else {
-                            messageFound = true
-                        }
-                    }
-                    jsonObject.put(Constants.PAYLOAD_SP_ARRAY_KEY, newJsonArray).toString()
-                } catch (e: Exception) {
-                    Log.e(LOG_TAG, "Mesaj silinirken hata oluştu", e)
-                    currentPayload // Hata durumunda eski veriyi koru
-                }
+            DataStoreManager.updatePayloads(context) { currentPayload ->
+                val (newPayload, removedCount) =
+                    removeMessagesFromPayload(currentPayload, Constants.PAYLOAD_SP_ARRAY_KEY, hasMessageId)
+                if (removedCount > 0) messageFound = true
+                newPayload
             }
+
+            DataStoreManager.updatePayloadsById(context) { currentPayload ->
+                val (newPayload, removedCount) =
+                    removeMessagesFromPayload(currentPayload, Constants.PAYLOAD_SP_ARRAY_ID_KEY, hasMessageId)
+                if (removedCount > 0) messageFound = true
+                newPayload
+            }
+
             // Sonucu Main thread'e geri taşıyıp callback'i çağır
             withContext(Dispatchers.Main) {
                 callback(messageFound)
@@ -1658,14 +1689,17 @@ object RelatedDigital {
 
     /**
      * Tüm push mesajlarını asenkron olarak siler.
+     * loginID atanmışsa ID bazlı depodan yalnızca o kullanıcıya ait mesajlar silinir;
+     * aynı cihazı kullanan diğer kullanıcıların bildirimleri korunur.
      * UYGULAMAYI KİLİTLEMEZ. Sonucu bir callback ile döndürür.
      */
     @JvmStatic
     fun deleteAllPushMessagesFromLSPM(activity: AppCompatActivity, callback: (Boolean) -> Unit) {
         activity.lifecycleScope.launch(Dispatchers.IO) {
+            val context = activity.applicationContext
             var success = true
             try {
-                DataStoreManager.updatePayloads(activity.applicationContext) { currentPayload ->
+                DataStoreManager.updatePayloads(context) { currentPayload ->
                     if (currentPayload.isEmpty()) return@updatePayloads ""
                     try {
                         val jsonObject = JSONObject(currentPayload)
@@ -1674,6 +1708,15 @@ object RelatedDigital {
                     } catch (e: Exception) {
                         Log.e(LOG_TAG, "Tüm mesajlar silinirken hata oluştu", e)
                         currentPayload
+                    }
+                }
+
+                val loginID = SharedPref.readString(context, Constants.NOTIFICATION_LOGIN_ID_KEY)
+                if (loginID.isNotEmpty()) {
+                    DataStoreManager.updatePayloadsById(context) { currentPayload ->
+                        removeMessagesFromPayload(currentPayload, Constants.PAYLOAD_SP_ARRAY_ID_KEY) {
+                            it.optString("loginID") == loginID
+                        }.first
                     }
                 }
             } catch (e: Exception) {

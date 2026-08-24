@@ -88,7 +88,7 @@ object PayloadUtils {
                         return@updatePayloadsById currentPayload
                     }
                     jsonArray = addNewOneWithID(context, jsonArray, message, loginID)
-                    //jsonArray = removeOldOnes(jsonArray)
+                    jsonArray = removeOldOnes(jsonArray)
                     val finalObject = JSONObject()
                     finalObject.put(Constants.PAYLOAD_SP_ARRAY_ID_KEY, jsonArray)
                     finalPayloadString = finalObject.toString()
