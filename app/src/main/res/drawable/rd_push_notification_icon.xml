@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Notification small icon: the system keeps only the alpha channel of this drawable and paints it
+    with the notification accent colour, so the artwork has to be a single-layer silhouette on a
+    transparent canvas. The launcher icon (@mipmap/rd_push_icon) cannot be used for this because its
+    adaptive background layer is fully opaque, which leaves the status bar with a shapeless blob.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:pathData="M2.31,4.49V15.49"
+        android:strokeColor="#FFFFFFFF"
+        android:strokeWidth="2.61"
+        android:strokeLineCap="round" />
+    <path
+        android:pathData="M8.79,8.49V19.49"
+        android:strokeColor="#FFFFFFFF"
+        android:strokeWidth="2.61"
+        android:strokeLineCap="round" />
+    <path
+        android:pathData="M15.21,4.49V15.49"
+        android:strokeColor="#FFFFFFFF"
+        android:strokeWidth="2.61"
+        android:strokeLineCap="round" />
+    <path
+        android:pathData="M21.69,8.49V19.49"
+        android:strokeColor="#FFFFFFFF"
+        android:strokeWidth="2.61"
+        android:strokeLineCap="round" />
+</vector>

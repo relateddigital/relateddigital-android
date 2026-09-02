@@ -7,6 +7,7 @@ import com.relateddigital.relateddigital_android.constants.Constants
 import com.relateddigital.relateddigital_android.model.RelatedDigitalModel
 import com.relateddigital.relateddigital_android.network.RequestHandler
 import com.relateddigital.relateddigital_android.network.RequestSender
+import com.relateddigital.relateddigital_android.util.PushDiagnostics
 import com.relateddigital.relateddigital_android.util.RetryCounterManager
 
 object RegisterEmailRequest {
@@ -18,11 +19,33 @@ object RegisterEmailRequest {
             return
         }
 
-        if (registerEmailModel.getToken().isEmpty() || (registerEmailModel.getGoogleAppAlias().isEmpty() && registerEmailModel.getHuaweiAppAlias().isEmpty()) ) {
-            Log.e(LOG_TAG, "token or appKey cannot be null!")
+        val tokenMissing = registerEmailModel.getToken().isEmpty()
+        val appAliasMissing =
+            PushDiagnostics.getEffectiveAppAlias(context, registerEmailModel).isEmpty()
+
+        if (tokenMissing || appAliasMissing) {
+            val reason = when {
+                tokenMissing && appAliasMissing ->
+                    "both the push token and the appAlias (appKey) are empty"
+                tokenMissing -> "the push token is empty"
+                else -> "the appAlias (appKey) used by this device is empty"
+            }
+            PushDiagnostics.logBlocked(
+                context,
+                registerEmailModel,
+                "cannot register the email address because $reason",
+                "Call RelatedDigital.setIsPushNotificationEnabled(context, true, " +
+                        "googleAppAlias, huaweiAppAlias, token) with a valid token and appAlias " +
+                        "before registering an email address."
+            )
             return
         }
 
-        RequestSender.sendSubscriptionRequest(context, registerEmailModel, RetryCounterManager.counterId, null)
+        RequestSender.sendSubscriptionRequest(
+            context,
+            registerEmailModel,
+            RetryCounterManager.counterId,
+            null
+        )
     }
 }

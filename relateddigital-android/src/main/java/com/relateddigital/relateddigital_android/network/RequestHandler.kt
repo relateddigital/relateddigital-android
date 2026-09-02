@@ -646,37 +646,20 @@ object RequestHandler {
         )
     }
 
+    @Deprecated(
+        "Kept for binary compatibility only.",
+        ReplaceWith("SyncRequest.createSyncRequest(context, callback)")
+    )
     fun createSyncRequest(context: Context, callback: EuromessageCallback? = null) {
-        if (Build.VERSION.SDK_INT < Constants.SDK_MIN_API_VERSION) {
-            Log.e(LOG_TAG, "RelatedDigital SDK requires min API level 21!")
-            return
-        }
-
-        val model = RelatedDigital.getRelatedDigitalModel(context)
-
-        if (model.getToken().isEmpty() || (model.getGoogleAppAlias().isEmpty() && model.getHuaweiAppAlias().isEmpty()) ) {
-            Log.e(LOG_TAG, "token or appKey cannot be null!")
-            return
-        }
-
-        if(!model.isEqual(RelatedDigital.getPreviousModel()) && model.isValid(context)) {
-            RelatedDigital.updatePreviousModel(context)
-
-            RequestSender.sendSubscriptionRequest(context, model, RetryCounterManager.counterId, callback)
-        }
+        SyncRequest.createSyncRequest(context, callback)
     }
+
+    @Deprecated(
+        "Kept for binary compatibility only.",
+        ReplaceWith("RegisterEmailRequest.createRegisterEmailRequest(context, registerEmailModel)")
+    )
     fun createRegisterEmailRequest(context: Context, registerEmailModel: RelatedDigitalModel) {
-        if (Build.VERSION.SDK_INT < Constants.SDK_MIN_API_VERSION) {
-            Log.e(LOG_TAG, "RelatedDigital SDK requires min API level 21!")
-            return
-        }
-
-        if (registerEmailModel.getToken().isEmpty() || (registerEmailModel.getGoogleAppAlias().isEmpty() && registerEmailModel.getHuaweiAppAlias().isEmpty()) ) {
-            Log.e(LOG_TAG, "token or appKey cannot be null!")
-            return
-        }
-
-        RequestSender.sendSubscriptionRequest(context, registerEmailModel, RetryCounterManager.counterId, null)
+        RegisterEmailRequest.createRegisterEmailRequest(context, registerEmailModel)
     }
 
 

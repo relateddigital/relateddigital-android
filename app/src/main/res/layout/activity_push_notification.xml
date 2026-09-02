@@ -307,7 +307,7 @@
                 android:layout_height="80dp"
                 android:layout_marginEnd="5dp"
                 android:layout_weight="0.2"
-                android:src="@mipmap/ic_launcher" />
+                android:src="@drawable/relateddigital_ic" />
         </LinearLayout>
     </LinearLayout>
 </ScrollView>

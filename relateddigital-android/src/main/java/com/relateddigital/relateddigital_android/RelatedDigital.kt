@@ -44,11 +44,16 @@ import org.json.JSONObject
 
 object RelatedDigital {
 
+    // init() runs on the main thread while FCM/HMS deliver onNewToken on a background thread, so
+    // both references have to be published safely between them.
+    @Volatile
     private var model: RelatedDigitalModel? = null
     private var inAppButtonInterface: InAppButtonInterface? = null
     private var mHandler: Handler? = null
     private var mRunnable: Runnable? = null
     private const val LOG_TAG: String = "RelatedDigital"
+
+    @Volatile
     private var previousModel: RelatedDigitalModel? = null
     private var countdownCallback: CountdownTimerBannerClickCallback? = null
     private var notificationBellCallback: NotificationBellClickCallback? = null
@@ -157,62 +162,60 @@ object RelatedDigital {
         notificationColor: String = "",
         notificationPriority: RDNotificationPriority = RDNotificationPriority.NORMAL
     ) {
-        if (model != null) {
-            model!!.setIsPushNotificationEnabled(context, isPushNotificationEnabled)
-            model!!.setGoogleAppAlias(context, googleAppAlias)
-            model!!.setHuaweiAppAlias(context, huaweiAppAlias)
-            model!!.setToken(context, token)
+        val requiredAlias = if (GoogleUtils.checkPlayService(context)) {
+            "googleAppAlias"
         } else {
-            if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
-                model = Gson().fromJson(
-                    SharedPref.readString(
-                        context,
-                        Constants.RELATED_DIGITAL_MODEL_KEY
-                    ), RelatedDigitalModel::class.java
-                )
-                model!!.setIsPushNotificationEnabled(context, isPushNotificationEnabled)
-                model!!.setGoogleAppAlias(context, googleAppAlias)
-                model!!.setHuaweiAppAlias(context, huaweiAppAlias)
-                model!!.setToken(context, token)
-            } else {
-                model = createInitialModel(context)
-                model!!.setGoogleAppAlias(context, googleAppAlias)
-                model!!.setHuaweiAppAlias(context, huaweiAppAlias)
-                model!!.setToken(context, token)
-            }
+            "huaweiAppAlias"
+        }
+        if (googleAppAlias.isEmpty() && huaweiAppAlias.isEmpty()) {
+            Log.e(
+                PushDiagnostics.LOG_TAG,
+                "setIsPushNotificationEnabled was called with both aliases empty. This device " +
+                        "sends $requiredAlias as the appKey, so pass the appAlias given to you " +
+                        "by Related Digital, otherwise the subscription cannot be delivered."
+            )
+        }
+        if (token.isEmpty()) {
+            Log.w(
+                PushDiagnostics.LOG_TAG,
+                "setIsPushNotificationEnabled was called with an empty token. Obtain it with " +
+                        "FirebaseMessaging.getInstance().token (or HmsInstanceId.getToken on " +
+                        "Huawei devices) and only call this method from the success branch of " +
+                        "that listener. A previously stored token is kept."
+            )
         }
 
+        // getRelatedDigitalModel() rebuilds the model through createInitialModel(), which is what
+        // refreshes the device-dependent fields; reading the JSON directly would keep them stale.
+        val currentModel = getRelatedDigitalModel(context)
+        currentModel.setIsPushNotificationEnabled(context, isPushNotificationEnabled)
+        currentModel.setGoogleAppAlias(context, googleAppAlias)
+        currentModel.setHuaweiAppAlias(context, huaweiAppAlias)
+        currentModel.setToken(context, token)
+
         if(notificationSmallIcon != 0) {
-            if (AppUtils.isIconResourceAvailable(
+            if (!NotificationIconResolver.persistIcon(
                     context,
-                    notificationSmallIcon
+                    notificationSmallIcon,
+                    Constants.NOTIFICATION_TRANSPARENT_SMALL_ICON,
+                    Constants.NOTIFICATION_TRANSPARENT_SMALL_ICON_NAME_KEY
                 )
             ) {
-                SharedPref.writeInt(
-                    context,
-                    Constants.NOTIFICATION_TRANSPARENT_SMALL_ICON,
-                    notificationSmallIcon
-                )
-            } else {
-                Log.i(LOG_TAG, "Resource (notification small icon) could not be found" +
+                Log.e(LOG_TAG, "Resource (notification small icon) is not a usable drawable" +
                         " : $notificationSmallIcon")
             }
         }
 
         if(notificationSmallIconDarkMode != 0) {
-            if (AppUtils.isIconResourceAvailable(
+            if (!NotificationIconResolver.persistIcon(
                     context,
-                    notificationSmallIconDarkMode
+                    notificationSmallIconDarkMode,
+                    Constants.NOTIFICATION_TRANSPARENT_SMALL_ICON_DARK_MODE,
+                    Constants.NOTIFICATION_TRANSPARENT_SMALL_ICON_DARK_MODE_NAME_KEY
                 )
             ) {
-                SharedPref.writeInt(
-                    context,
-                    Constants.NOTIFICATION_TRANSPARENT_SMALL_ICON_DARK_MODE,
-                    notificationSmallIconDarkMode
-                )
-            } else {
-                Log.i(LOG_TAG, "Resource (notification small icon dark mode) could not be found" +
-                        " : $notificationSmallIconDarkMode")
+                Log.e(LOG_TAG, "Resource (notification small icon dark mode) is not a usable" +
+                        " drawable : $notificationSmallIconDarkMode")
             }
         }
 
@@ -223,36 +226,28 @@ object RelatedDigital {
         )
 
         if(notificationLargeIcon != 0) {
-            if (AppUtils.isIconResourceAvailable(
+            if (!NotificationIconResolver.persistIcon(
                     context,
-                    notificationLargeIcon
+                    notificationLargeIcon,
+                    Constants.NOTIFICATION_LARGE_ICON,
+                    Constants.NOTIFICATION_LARGE_ICON_NAME_KEY
                 )
             ) {
-                SharedPref.writeInt(
-                    context,
-                    Constants.NOTIFICATION_LARGE_ICON,
-                    notificationLargeIcon
-                )
-            } else {
-                Log.i(LOG_TAG, "Resource (notification large icon) could not be found" +
+                Log.e(LOG_TAG, "Resource (notification large icon) is not a usable drawable" +
                         " : $notificationLargeIcon")
             }
         }
 
         if(notificationLargeIconDarkMode != 0) {
-            if (AppUtils.isIconResourceAvailable(
+            if (!NotificationIconResolver.persistIcon(
                     context,
-                    notificationLargeIconDarkMode
+                    notificationLargeIconDarkMode,
+                    Constants.NOTIFICATION_LARGE_ICON_DARK_MODE,
+                    Constants.NOTIFICATION_LARGE_ICON_DARK_MODE_NAME_KEY
                 )
             ) {
-                SharedPref.writeInt(
-                    context,
-                    Constants.NOTIFICATION_LARGE_ICON_DARK_MODE,
-                    notificationLargeIconDarkMode
-                )
-            } else {
-                Log.i(LOG_TAG, "Resource (notification large icon dark mode) could not be found" +
-                        " : $notificationLargeIconDarkMode")
+                Log.e(LOG_TAG, "Resource (notification large icon dark mode) is not a usable" +
+                        " drawable : $notificationLargeIconDarkMode")
             }
         }
 
@@ -304,13 +299,36 @@ object RelatedDigital {
 
         registerToFCM(context)
 
-        if(model!!.getPushPermissionStatus() == "granted") {
-            model!!.add(context, "pushPermit", "Y")
-        } else {
-            model!!.add(context, "pushPermit", "N")
-        }
+        refreshPushPermit(context)
 
         sync(context)
+    }
+
+    /**
+     * Re-reads the notification permission from the OS and rewrites `pushPermit` from it.
+     *
+     * The stored status is only a snapshot taken when the model was created, so without this the
+     * SDK would keep reporting a permission the user has since changed in the system settings.
+     */
+    private fun refreshPushPermit(context: Context) {
+        val currentModel = model ?: return
+        val osPermissionStatus = AppUtils.getNotificationPermissionStatus(context)
+        val storedPermissionStatus = currentModel.getPushPermissionStatus()
+
+        if (osPermissionStatus != storedPermissionStatus) {
+            Log.i(
+                PushDiagnostics.LOG_TAG,
+                "Notification permission changed: $storedPermissionStatus -> $osPermissionStatus"
+            )
+            currentModel.setPushPermissionStatus(context, osPermissionStatus)
+        }
+
+        val pushPermit = if (osPermissionStatus == Constants.NOTIFICATION_PERMISSION_GRANTED) {
+            "Y"
+        } else {
+            "N"
+        }
+        currentModel.add(context, Constants.PUSH_PERMIT_KEY, pushPermit)
     }
 
     @JvmStatic
@@ -482,18 +500,14 @@ object RelatedDigital {
 
     @JvmStatic
     fun setToken(context: Context, token: String) {
-        if (model != null) {
-            model!!.setToken(context, token)
-        } else {
-            if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
-                model = Gson().fromJson(SharedPref.readString(context,
-                        Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
-                model!!.setToken(context, token)
-            } else {
-                model = createInitialModel(context)
-                model!!.setToken(context, token)
-            }
+        if (token.isEmpty()) {
+            Log.w(
+                PushDiagnostics.LOG_TAG,
+                "setToken was called with an empty token; a previously stored token is kept. " +
+                        "Obtain the token from FirebaseMessaging or HmsInstanceId first."
+            )
         }
+        getRelatedDigitalModel(context).setToken(context, token)
     }
 
     @JvmStatic
@@ -1138,6 +1152,15 @@ object RelatedDigital {
         previousModel!!.copyFrom(context, model!!)
     }
 
+    /**
+     * Drops the in-flight guard so a subscription that failed to reach the server is attempted
+     * again on the next sync instead of being treated as already delivered.
+     */
+    @JvmStatic
+    fun clearPreviousModel() {
+        previousModel = null
+    }
+
     @JvmStatic
     fun signUp(context: Context, exVisitorId: String, properties: HashMap<String, String>? = null,
               parent: Activity? = null) {
@@ -1332,18 +1355,51 @@ object RelatedDigital {
 
     @JvmStatic
     fun sync(context: Context, callback: EuromessageCallback? = null) {
-        if(model != null) {
-            if(model!!.getIsPushNotificationEnabled()) {
-                SyncRequest.createSyncRequest(context, callback)
-            } else {
-                Log.e(
-                    LOG_TAG, "Push notification is not enabled." +
-                            "Call RelatedDigital.setIsPushNotificationEnabled() first"
-                )
-            }
-        } else {
-            Log.e(LOG_TAG, "Call RelatedDigital.init() first")
+        val currentModel = model
+        if (currentModel == null) {
+            val message = "Subscription NOT sent. Reason: the SDK is not initialised. " +
+                    "How to fix: call RelatedDigital.init(context, organizationId, profileId, " +
+                    "dataSource) from Application.onCreate() before any other SDK call."
+            Log.e(PushDiagnostics.LOG_TAG, message)
+            callback?.fail(message)
+            return
         }
+
+        if (!currentModel.getIsPushNotificationEnabled()) {
+            PushDiagnostics.logBlocked(
+                context,
+                currentModel,
+                "push notifications are disabled for this device",
+                "Call RelatedDigital.setIsPushNotificationEnabled(context, true, " +
+                        "googleAppAlias, huaweiAppAlias, token) first."
+            )
+            callback?.fail("Subscription not sent: push notifications are disabled")
+            return
+        }
+
+        SyncRequest.createSyncRequest(context, callback)
+    }
+
+    /**
+     * Writes the current push token and permission state to logcat under the
+     * [PushDiagnostics.LOG_TAG] tag. Useful when an integrator reports that a token or a
+     * `pushPermit` value never reached Related Digital.
+     */
+    @JvmStatic
+    fun logPushDiagnostics(context: Context) {
+        val currentModel = model
+        if (currentModel == null) {
+            Log.e(
+                PushDiagnostics.LOG_TAG,
+                "The SDK is not initialised. Call RelatedDigital.init(context, organizationId, " +
+                        "profileId, dataSource) from Application.onCreate()."
+            )
+            return
+        }
+        Log.i(
+            PushDiagnostics.LOG_TAG,
+            "Push state -> ${PushDiagnostics.describeState(context, currentModel)}"
+        )
     }
 
     private fun syncForRegisterEmail(context: Context, registerEmailModel: RelatedDigitalModel) {
@@ -1842,16 +1898,27 @@ object RelatedDigital {
 
     @JvmStatic
     fun setPushPermission(context: Context, pushPermit: Boolean) {
-        if(model != null) {
-            if(pushPermit) {
-                model!!.add(context, "pushPermit", "Y")
-            } else {
-                model!!.add(context, "pushPermit", "N")
-            }
-            sync(context)
-        } else {
+        val currentModel = model
+        if (currentModel == null) {
             Log.e(LOG_TAG, "Call RelatedDigital.init() first")
+            return
         }
+
+        val osPermissionStatus = AppUtils.getNotificationPermissionStatus(context)
+        if (pushPermit && osPermissionStatus == Constants.NOTIFICATION_PERMISSION_DENIED) {
+            Log.w(
+                PushDiagnostics.LOG_TAG,
+                "setPushPermission(true) was called while notifications are disabled in the " +
+                        "system settings. pushPermit is reported as Y, but this device cannot " +
+                        "display push notifications until the user enables them."
+            )
+        }
+
+        currentModel.add(context, Constants.PUSH_PERMIT_KEY, if (pushPermit) "Y" else "N")
+        // Keeping the status aligned lets the change detection notice this update.
+        currentModel.setPushPermissionStatus(context, osPermissionStatus)
+
+        sync(context)
     }
 
     @JvmStatic
@@ -1860,18 +1927,23 @@ object RelatedDigital {
             val callback = object : NotificationPermissionCallback {
                 override fun onPermissionResult(granted: Boolean) {
                     model?.setIsPushNotificationEnabled(context, granted)
-                    model?.setPushPermissionStatus(context, AppUtils.getNotificationPermissionStatus(context))
-                    if(model?.getPushPermissionStatus() == "granted") {
-                        model?.add(context, "pushPermit", "Y")
-                    } else {
-                        model?.add(context, "pushPermit", "N")
-                    }
+                    refreshPushPermit(context)
                     sync(context)
                 }
             }
             NotificationPermissionActivity.callback = callback
             val intent = Intent(context, NotificationPermissionActivity::class.java)
             context.startActivity(intent)
+        } else {
+            // Below API 33 there is no runtime prompt, but the user can still have turned
+            // notifications off in the system settings, so the permission is re-read here too.
+            Log.i(
+                PushDiagnostics.LOG_TAG,
+                "No runtime notification permission below API 33; reading the current " +
+                        "notification setting instead."
+            )
+            refreshPushPermit(context)
+            sync(context)
         }
     }
 

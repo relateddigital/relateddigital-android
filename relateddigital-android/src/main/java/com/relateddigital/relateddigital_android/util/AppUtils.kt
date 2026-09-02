@@ -448,22 +448,19 @@ object AppUtils {
         return res != 0
     }
 
+    /**
+     * An id that merely resolves is not enough for a notification icon, because after a rebuild a
+     * stale id usually still resolves - to a layout, a colour or a different drawable.
+     */
     fun isIconResourceAvailable(context: Context?, resId: Int): Boolean {
-        if (context != null) {
-            try {
-                return context.resources.getResourceName(resId) != null
-            } catch (ignore: NotFoundException) {
-                Log.e("IconResource : ", "Checking if a resource is available : " + ignore.message)
-            }
-        }
-        return false
+        return NotificationIconResolver.isUsableIcon(context, resId)
     }
 
     fun getNotificationPermissionStatus(context: Context): String {
         return if (NotificationManagerCompat.from(context).areNotificationsEnabled()) {
-            "granted"
+            Constants.NOTIFICATION_PERMISSION_GRANTED
         } else {
-            "denied"
+            Constants.NOTIFICATION_PERMISSION_DENIED
         }
     }
 

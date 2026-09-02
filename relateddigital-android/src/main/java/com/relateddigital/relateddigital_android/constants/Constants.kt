@@ -147,6 +147,15 @@ class Constants {
         const val NOTIFICATION_TRANSPARENT_SMALL_ICON_DARK_MODE = "small_icon_dark_mode"
         const val NOTIFICATION_LARGE_ICON = "large_icon"
         const val NOTIFICATION_LARGE_ICON_DARK_MODE = "large_icon_dark_mode"
+
+        /**
+         * Resource names ("drawable/ic_push") of the icons above. Resource ids are per build, so
+         * the names are what survives an app update; see NotificationIconResolver.
+         */
+        const val NOTIFICATION_TRANSPARENT_SMALL_ICON_NAME_KEY = "small_icon_name"
+        const val NOTIFICATION_TRANSPARENT_SMALL_ICON_DARK_MODE_NAME_KEY = "small_icon_dark_mode_name"
+        const val NOTIFICATION_LARGE_ICON_NAME_KEY = "large_icon_name"
+        const val NOTIFICATION_LARGE_ICON_DARK_MODE_NAME_KEY = "large_icon_dark_mode_name"
         const val NOTIFICATION_USE_LARGE_ICON = "use_large_icon"
         const val INTENT_NAME = "intent_name"
         const val NOTIFICATION_COLOR = "notification_color"
@@ -157,8 +166,19 @@ class Constants {
         const val LAST_SUBS_DATE_KEY = "last_subscription_date"
         const val LAST_SUBS_KEY = "last_subscription"
 
+        /**
+         * Must stay in sync with the pattern AppUtils.isDateDifferenceGreaterThan parses with,
+         * otherwise the subscription de-duplication window cannot be evaluated.
+         */
+        const val SUBSCRIPTION_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss"
+
+        const val SUBSCRIPTION_DEDUPE_DAYS = 3
+
         const val EMAIL_PERMIT_KEY = "emailPermit"
         const val GSM_PERMIT_KEY = "gsmPermit"
+        const val PUSH_PERMIT_KEY = "pushPermit"
+        const val NOTIFICATION_PERMISSION_GRANTED = "granted"
+        const val NOTIFICATION_PERMISSION_DENIED = "denied"
         const val TWITTER_KEY = "twitter"
         const val FACEBOOK_KEY = "facebook"
         const val EMAIL_KEY = "email"

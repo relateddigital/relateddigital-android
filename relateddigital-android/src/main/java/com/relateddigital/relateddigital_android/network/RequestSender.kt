@@ -36,6 +36,7 @@ import com.relateddigital.relateddigital_android.push.EuromessageCallback
 import com.relateddigital.relateddigital_android.recommendation.RecommendationUtils
 import com.relateddigital.relateddigital_android.util.ActivityUtils
 import com.relateddigital.relateddigital_android.util.InAppNotificationTimer
+import com.relateddigital.relateddigital_android.util.PushDiagnostics
 import com.relateddigital.relateddigital_android.util.RetryCounterManager
 import com.relateddigital.relateddigital_android.util.SharedPref
 import okhttp3.Headers
@@ -51,6 +52,7 @@ import java.util.*
 
 object RequestSender {
     private const val LOG_TAG = "Request Sender"
+    private const val MAX_SUBSCRIPTION_ATTEMPTS = 3
     private val requestQueue = ArrayList<Request>()
     private var isSendingARequest = false
     private var retryCounter = 0
@@ -1141,99 +1143,83 @@ object RequestSender {
             subscription
         )
 
-        if(counterId != -1) {
-            call.enqueue(object : Callback<Void> {
-                override fun onResponse(
-                    call: Call<Void>?,
-                    response: Response<Void>
-                ) {
-                    if (response.isSuccessful) {
-                        RetryCounterManager.clearCounter(counterId)
-                        saveSubscription(context, model)
-                        Log.i(
-                           LOG_TAG,
-                            "Sending the subscription is success"
-                        )
-                        callback?.success()
-                    } else {
-                        if (RetryCounterManager.getCounterValue(counterId) >= 3) {
-                            RetryCounterManager.clearCounter(counterId)
-                            Log.e(
-                                LOG_TAG,
-                                "Sending the subscription is failed after 3 attempts!!!"
-                            )
-                            call!!.cancel()
-                            callback?.fail(response.message())
-                        } else {
-                            RetryCounterManager.increaseCounter(counterId)
-                            sendSubscriptionRequest(context, model, counterId)
-                        }
-                    }
+        call.enqueue(object : Callback<Void> {
+            override fun onResponse(
+                call: Call<Void>?,
+                response: Response<Void>
+            ) {
+                if (response.isSuccessful) {
+                    RetryCounterManager.clearCounter(counterId)
+                    saveSubscription(context, model)
+                    PushDiagnostics.logSuccess(context, model)
+                    callback?.success()
+                    return
                 }
 
-                override fun onFailure(call: Call<Void>, t: Throwable) {
-                    if (RetryCounterManager.getCounterValue(counterId) >= 3) {
-                        RetryCounterManager.clearCounter(counterId)
-                        Log.e(
-                            LOG_TAG,
-                            "Sending the subscription is failed after 3 attempts!!!"
-                        )
-                        call.cancel()
-                        t.printStackTrace()
-                        callback?.fail(t.message)
-                    } else {
-                        RetryCounterManager.increaseCounter(counterId)
-                        sendSubscriptionRequest(context, model, counterId)
-                    }
+                if (canRetrySubscription(counterId)) {
+                    Log.w(
+                        PushDiagnostics.LOG_TAG,
+                        "Subscription attempt failed with httpCode=${response.code()}, retrying..."
+                    )
+                    RetryCounterManager.increaseCounter(counterId)
+                    sendSubscriptionRequest(context, model, counterId, callback)
+                } else {
+                    RetryCounterManager.clearCounter(counterId)
+                    call?.cancel()
+                    giveUpOnSubscription(context, model, response.code(), response.message())
+                    callback?.fail(response.message())
                 }
-            })
-        } else {
-            call.enqueue(object : Callback<Void> {
-                override fun onResponse(
-                    call: Call<Void>?,
-                    response: Response<Void>
-                ) {
-                    if (response.isSuccessful) {
-                        RetryCounterManager.clearCounter(counterId)
-                        saveSubscription(context, model)
-                        Log.i(
-                            LOG_TAG,
-                            "Sending the subscription is success"
-                        )
-                        callback?.success()
-                    } else {
-                        if (RetryCounterManager.getCounterValue(counterId) >= 3) {
-                            RetryCounterManager.clearCounter(counterId)
-                            Log.e(
-                                LOG_TAG,
-                                "Sending the subscription is failed after 3 attempts!!!"
-                            )
-                            call!!.cancel()
-                            callback?.fail(response.message())
-                        } else {
-                            RetryCounterManager.increaseCounter(counterId)
-                            sendSubscriptionRequest(context, model, counterId)
-                        }
-                    }
-                }
+            }
 
-                override fun onFailure(call: Call<Void>, t: Throwable) {
-                    if (RetryCounterManager.getCounterValue(counterId) >= 3) {
-                        RetryCounterManager.clearCounter(counterId)
-                        Log.e(
-                            LOG_TAG,
-                            "Sending the subscription is failed after 3 attempts!!!"
-                        )
-                        call.cancel()
-                        t.printStackTrace()
-                        callback?.fail(t.message)
-                    } else {
-                        RetryCounterManager.increaseCounter(counterId)
-                        sendSubscriptionRequest(context, model, counterId)
-                    }
+            override fun onFailure(call: Call<Void>, t: Throwable) {
+                if (canRetrySubscription(counterId)) {
+                    Log.w(
+                        PushDiagnostics.LOG_TAG,
+                        "Subscription attempt failed (${t.message}), retrying..."
+                    )
+                    RetryCounterManager.increaseCounter(counterId)
+                    sendSubscriptionRequest(context, model, counterId, callback)
+                } else {
+                    RetryCounterManager.clearCounter(counterId)
+                    call.cancel()
+                    giveUpOnSubscription(
+                        context,
+                        model,
+                        null,
+                        "${t.message}. Check the device network connection and that " +
+                                "${Constants.SUBSCRIPTION_ENDPOINT} is reachable."
+                    )
+                    callback?.fail(t.message)
                 }
-            })
+            }
+        })
+    }
+
+    /**
+     * A counterId of -1 means every retry slot was taken, so there is nowhere to record attempts
+     * and retrying would loop forever.
+     */
+    private fun canRetrySubscription(counterId: Int): Boolean {
+        if (counterId == -1) {
+            return false
         }
+        return RetryCounterManager.getCounterValue(counterId) < MAX_SUBSCRIPTION_ATTEMPTS
+    }
+
+    private fun giveUpOnSubscription(
+        context: Context,
+        model: RelatedDigitalModel,
+        httpCode: Int?,
+        errorMessage: String?
+    ) {
+        PushDiagnostics.logFailure(
+            context,
+            model,
+            httpCode,
+            "$errorMessage (gave up after $MAX_SUBSCRIPTION_ATTEMPTS attempts)"
+        )
+        // The server never received this state, so the next sync must be allowed to resend it.
+        RelatedDigital.clearPreviousModel()
     }
 
     fun sendRetentionRequest(context: Context, retention: Retention, counterId: Int) {
@@ -1334,7 +1320,7 @@ object RequestSender {
     }
 
     private fun saveSubscription(context: Context, model: RelatedDigitalModel) {
-        val dateFormat: DateFormat = SimpleDateFormat("yyyy-MM-dd hh:mm:ss")
+        val dateFormat: DateFormat = SimpleDateFormat(Constants.SUBSCRIPTION_DATE_FORMAT)
         val dateNow = dateFormat.format(Calendar.getInstance().time)
         SharedPref.writeString(context, Constants.LAST_SUBS_DATE_KEY, dateNow)
         SharedPref.writeString(context, Constants.LAST_SUBS_KEY, Gson().toJson(model))
