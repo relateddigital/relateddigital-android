@@ -33,6 +33,7 @@ import com.relateddigital.relateddigital_android.remoteConfig.RemoteConfigHelper
 import com.relateddigital.relateddigital_android.util.*
 import com.relateddigital.relateddigital_android.inapp.countdowntimerbanner.CountdownTimerBannerClickCallback
 import com.relateddigital.relateddigital_android.inapp.notificationbell.NotificationBellClickCallback
+import com.relateddigital.relateddigital_android.inapp.notification.DrawerClickCallback
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.first
@@ -57,6 +58,7 @@ object RelatedDigital {
     private var previousModel: RelatedDigitalModel? = null
     private var countdownCallback: CountdownTimerBannerClickCallback? = null
     private var notificationBellCallback: NotificationBellClickCallback? = null
+    private var drawerClickCallback: DrawerClickCallback? = null
 
 
     @JvmStatic
@@ -1894,6 +1896,18 @@ object RelatedDigital {
 
     fun setNotificationBellClickCallback(): NotificationBellClickCallback? {
         return this.notificationBellCallback
+    }
+
+    /**
+     * Set this to handle drawer links in the app, for example to route deep links.
+     * While it is set the SDK does not open drawer links itself.
+     */
+    fun setDrawerClickCallback(callback: DrawerClickCallback?) {
+        this.drawerClickCallback = callback
+    }
+
+    fun getDrawerClickCallback(): DrawerClickCallback? {
+        return this.drawerClickCallback
     }
 
     @JvmStatic

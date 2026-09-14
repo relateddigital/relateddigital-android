@@ -35,7 +35,6 @@ import com.relateddigital.relateddigital_android.databinding.FragmentInAppNotifi
 import com.relateddigital.relateddigital_android.databinding.FragmentInAppNotificationRbBinding
 import com.relateddigital.relateddigital_android.databinding.FragmentInAppNotificationRmBinding
 import com.relateddigital.relateddigital_android.databinding.FragmentInAppNotificationRtBinding
-import com.relateddigital.relateddigital_android.inapp.InAppButtonInterface
 import com.relateddigital.relateddigital_android.model.Drawer
 import com.relateddigital.relateddigital_android.model.DrawerExtendedProps
 import com.relateddigital.relateddigital_android.model.MailSubReport
@@ -173,10 +172,6 @@ class InAppNotificationFragment : Fragment() {
             }
         }
 
-        buttonFunction = getButtonFunctionFromString(response!!.getActionData()!!.getButtonFunction())
-
-        staticCode = response!!.getActionData()!!.getStaticCode().toString()
-
         if (isRight) {
             when (positionOnScreen) {
                 PositionOnScreen.TOP -> {
@@ -244,6 +239,9 @@ class InAppNotificationFragment : Fragment() {
         isArrow = !mExtendedProps!!.getArrowColor().isNullOrEmpty()
         isMiniBackgroundImage = !mExtendedProps!!.getMiniBackgroundImage().isNullOrEmpty()
         isMaxiBackgroundImage = !mExtendedProps!!.getMaxiBackgroundImage().isNullOrEmpty()
+        // The redirect target, promo code and button behaviour are per item.
+        buttonFunction = getButtonFunctionFromString(mExtendedProps!!.getButtonFunction())
+        staticCode = mExtendedProps!!.getStaticCode() ?: ""
     }
 
     private fun hasMultipleItems(): Boolean {
@@ -325,9 +323,24 @@ class InAppNotificationFragment : Fragment() {
         if (!hasMultipleItems()) {
             return
         }
-        reserveSpaceForMinimizedDots(minimizedContainer())
-        minimizedDots = addDots(minimizedContainer(), LinearLayout.HORIZONTAL)
-        maximizedDots = addDots(maximizedContainer(), LinearLayout.HORIZONTAL)
+        val isCircle = shape == Shape.CIRCLE
+        // The half circle silhouette comes from a background that the text and image views
+        // repeat at container size. Shrinking those views makes Android scale their copy of
+        // the shape down, so its corners no longer line up and stick out of the circle near
+        // the top. The strip therefore keeps its full height on that shape; its label is
+        // centred and ends above the dots anyway.
+        if (!isCircle) {
+            reserveSpaceForDots(minimizedContainer())
+        }
+        reserveSpaceForDots(maximizedContainer())
+        minimizedDots = addDots(
+            minimizedContainer(),
+            if (isCircle) CIRCLE_DOTS_BOTTOM_MARGIN_DP else DOTS_BOTTOM_MARGIN_DP
+        )
+        maximizedDots = addDots(maximizedContainer(), DOTS_BOTTOM_MARGIN_DP)
+        if (isCircle) {
+            moveDotsInsideHalfCircle(minimizedDots!!)
+        }
         updateDots()
         addSwipeDetection(minimizedContainer(), horizontalOnly = true)
         addSwipeDetection(maximizedContainer())
@@ -362,11 +375,12 @@ class InAppNotificationFragment : Fragment() {
     }
 
     /**
-     * Shrinks the minimized content so that it ends above the dots instead of sitting behind them.
-     * The background image is the first child and is left alone so that it keeps filling the strip.
+     * Shrinks the content so that it ends above the dots instead of sitting behind them.
+     * The background image is the first child and is left alone so that it keeps filling the
+     * container, which gives the dots a backdrop to sit on.
      */
-    private fun reserveSpaceForMinimizedDots(container: FrameLayout) {
-        val reservedHeight = dpToPx(MINIMIZED_DOTS_RESERVED_DP)
+    private fun reserveSpaceForDots(container: FrameLayout) {
+        val reservedHeight = dpToPx(DOTS_RESERVED_DP)
         for (index in 1 until container.childCount) {
             val child = container.getChildAt(index)
             val params = child.layoutParams as? FrameLayout.LayoutParams ?: continue
@@ -375,9 +389,9 @@ class InAppNotificationFragment : Fragment() {
         }
     }
 
-    private fun addDots(container: FrameLayout, orientation: Int): LinearLayout {
+    private fun addDots(container: FrameLayout, bottomMarginDp: Int): LinearLayout {
         val dots = LinearLayout(requireContext())
-        dots.orientation = orientation
+        dots.orientation = LinearLayout.HORIZONTAL
         dots.gravity = Gravity.CENTER
 
         val containerParams = FrameLayout.LayoutParams(
@@ -385,7 +399,7 @@ class InAppNotificationFragment : Fragment() {
             FrameLayout.LayoutParams.WRAP_CONTENT
         )
         containerParams.gravity = Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL
-        containerParams.bottomMargin = dpToPx(6)
+        containerParams.bottomMargin = dpToPx(bottomMarginDp)
         dots.layoutParams = containerParams
 
         val dotSize = dpToPx(7)
@@ -393,13 +407,8 @@ class InAppNotificationFragment : Fragment() {
         for (index in items.indices) {
             val dot = View(requireContext())
             val dotParams = LinearLayout.LayoutParams(dotSize, dotSize)
-            if (orientation == LinearLayout.HORIZONTAL) {
-                dotParams.marginStart = halfSpacing
-                dotParams.marginEnd = halfSpacing
-            } else {
-                dotParams.topMargin = halfSpacing
-                dotParams.bottomMargin = halfSpacing
-            }
+            dotParams.marginStart = halfSpacing
+            dotParams.marginEnd = halfSpacing
             dot.layoutParams = dotParams
             dot.setOnClickListener { selectItem(index) }
             dots.addView(dot)
@@ -409,6 +418,28 @@ class InAppNotificationFragment : Fragment() {
         dots.setOnClickListener { }
         container.addView(dots)
         return dots
+    }
+
+    /**
+     * The half circle fills only part of its container: the flat edge runs along the screen edge
+     * and the curve bulges out from there, so the shape gets narrower towards the top and bottom.
+     * Dots centred on the container therefore fall outside the filled area. This shifts them
+     * towards the flat edge, to the middle of the width the circle still has at their height.
+     */
+    private fun moveDotsInsideHalfCircle(dots: LinearLayout) {
+        val radius = resources.getDimension(R.dimen.in_app_notification_small_radius)
+        val containerHeight =
+            resources.getDimension(R.dimen.in_app_notification_small_circle_height)
+
+        // Distance from the centre of the circle down to the lowest point of the dots.
+        val distanceFromCentre =
+            (containerHeight / 2f - dpToPx(CIRCLE_DOTS_BOTTOM_MARGIN_DP)).coerceAtMost(radius)
+        val widthAtDots =
+            kotlin.math.sqrt((radius * radius - distanceFromCentre * distanceFromCentre)
+                .coerceAtLeast(0f))
+        val offset = ((radius - widthAtDots) / 2f).coerceAtLeast(0f)
+
+        dots.translationX = if (isRight) offset else -offset
     }
 
     private fun updateDots() {
@@ -495,7 +526,7 @@ class InAppNotificationFragment : Fragment() {
     }
 
     private fun getButtonFunctionFromString(functionName: String?): ButtonFunction {
-        return when (functionName?.uppercase()) {
+        return when (functionName?.lowercase()) {
             "copy" -> ButtonFunction.COPY
             "redirect" -> ButtonFunction.REDIRECT
             else -> ButtonFunction.COPY_REDIRECT
@@ -503,6 +534,9 @@ class InAppNotificationFragment : Fragment() {
     }
 
     private fun copyStaticCodeToClipboard(staticCode: String?) {
+        if (staticCode.isNullOrEmpty()) {
+            return
+        }
         val clipboard = requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         val clip = ClipData.newPlainText("staticCode", staticCode)
         clipboard.setPrimaryClip(clip)
@@ -2126,27 +2160,29 @@ class InAppNotificationFragment : Fragment() {
     }
 
     private fun performRedirect() {
-        val uriString = response!!.getActionData()!!.getAndroidLnk()
-        val buttonInterface: InAppButtonInterface? =
-            RelatedDigital.getInAppButtonInterface()
+        // The link belongs to the item that is currently shown.
+        val uriString = mExtendedProps!!.getAndroidLnk()
 
-        if (buttonInterface != null) {
-            RelatedDigital.setInAppButtonInterface(null)
-            buttonInterface.onPress(uriString)
-        } else {
-            if (!uriString.isNullOrEmpty()) {
-                val uri: Uri
-                try {
-                    uri = Uri.parse(uriString)
-                    val viewIntent = Intent(Intent.ACTION_VIEW, uri)
-                    requireActivity().startActivity(viewIntent)
-                } catch (e: Exception) {
-                    Log.i(
-                        LOG_TAG,
-                        "Can't parse notification URI, will not take any action",
-                        e
-                    )
-                }
+        // A registered callback takes over the navigation, so that the app can route deep
+        // links itself. Opening the link here as well would navigate twice.
+        val drawerCallback: DrawerClickCallback? = RelatedDigital.getDrawerClickCallback()
+        if (drawerCallback != null) {
+            drawerCallback.onDrawerClick(uriString, currentItemIndex, staticCode)
+            return
+        }
+
+        if (!uriString.isNullOrEmpty()) {
+            val uri: Uri
+            try {
+                uri = Uri.parse(uriString)
+                val viewIntent = Intent(Intent.ACTION_VIEW, uri)
+                requireActivity().startActivity(viewIntent)
+            } catch (e: Exception) {
+                Log.i(
+                    LOG_TAG,
+                    "Can't parse notification URI, will not take any action",
+                    e
+                )
             }
         }
     }
@@ -2180,8 +2216,15 @@ class InAppNotificationFragment : Fragment() {
         private const val ARG_PARAM1 = "dataKey"
         private const val AUTO_SCROLL_INTERVAL_MS = 5000L
 
-        /** Vertical space the dot row occupies at the bottom of the minimized strip. */
-        private const val MINIMIZED_DOTS_RESERVED_DP = 18
+        /** Vertical space the dot row occupies at the bottom of a container. */
+        private const val DOTS_RESERVED_DP = 18
+        private const val DOTS_BOTTOM_MARGIN_DP = 6
+
+        /**
+         * The half circle tapers off towards its bottom edge, where it is too narrow to hold the
+         * dots, so on that shape they sit a bit higher.
+         */
+        private const val CIRCLE_DOTS_BOTTOM_MARGIN_DP = 14
 
         /**
          * Use this factory method to create a new instance of

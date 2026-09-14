@@ -48,8 +48,30 @@ class DrawerExtendedProps : Serializable {
 
     private var content_maximized_image: String? = null
 
+    /**
+     * The redirect target, promo code and button behaviour of this item. Older payloads only
+     * carry them once on the action data, so they are filled in from there when missing.
+     */
+    private var android_lnk: String? = null
+
+    private var staticcode: String? = null
+
+    private var copybutton_function: String? = null
+
     fun getItems(): List<DrawerExtendedProps>? {
         return content_minimized_items
+    }
+
+    fun getAndroidLnk(): String? {
+        return android_lnk
+    }
+
+    fun getStaticCode(): String? {
+        return staticcode
+    }
+
+    fun getButtonFunction(): String? {
+        return copybutton_function
     }
 
     fun getMiniImage(): String? {
@@ -80,6 +102,15 @@ class DrawerExtendedProps : Serializable {
         }
         if (content_maximized_image.isNullOrEmpty()) {
             content_maximized_image = actionData.getContentMaximizedImage()
+        }
+        if (android_lnk.isNullOrEmpty()) {
+            android_lnk = actionData.getAndroidLnk()
+        }
+        if (staticcode.isNullOrEmpty()) {
+            staticcode = actionData.getStaticCode()
+        }
+        if (copybutton_function.isNullOrEmpty()) {
+            copybutton_function = actionData.getButtonFunction()
         }
     }
 
