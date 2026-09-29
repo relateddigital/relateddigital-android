@@ -61,4 +61,32 @@ object RecommendationUtils {
             ""
         }
     }
+
+    fun parseProductVariants2(productObject: JSONObject?): List<com.relateddigital.relateddigital_android.model.ProductVariant2>? {
+        if (productObject == null || !productObject.has("variants2")) return null
+        val variantsArray = productObject.optJSONArray("variants2") ?: return null
+        val list = mutableListOf<com.relateddigital.relateddigital_android.model.ProductVariant2>()
+        for (i in 0 until variantsArray.length()) {
+            val vObj = variantsArray.optJSONObject(i)
+            val v = com.relateddigital.relateddigital_android.model.ProductVariant2.fromJsonObject(vObj)
+            if (v != null) {
+                list.add(v)
+            }
+        }
+        return list
+    }
+
+    fun getProductList(response: com.relateddigital.relateddigital_android.inapp.VisilabsResponse?): List<com.relateddigital.relateddigital_android.model.VisilabsProduct> {
+        val list = mutableListOf<com.relateddigital.relateddigital_android.model.VisilabsProduct>()
+        val json = response?.json ?: return list
+        val recommendations = json.optJSONArray("recommendations") ?: return list
+        for (i in 0 until recommendations.length()) {
+            val pObj = recommendations.optJSONObject(i)
+            val p = com.relateddigital.relateddigital_android.model.VisilabsProduct.fromJsonObject(pObj)
+            if (p != null) {
+                list.add(p)
+            }
+        }
+        return list
+    }
 }

@@ -166,6 +166,10 @@ class InAppNotificationActivity : AppCompatActivity() {
                             val currentProductPrice = currentProductObject.getDouble("price")
                             val currentProductFreeShipping = currentProductObject.getBoolean("freeshipping")
                             val qs = currentProductObject.getString("qs")
+                            val variants2 = com.relateddigital.relateddigital_android.recommendation.RecommendationUtils.parseProductVariants2(currentProductObject)
+                            if (variants2 != null && variants2.isNotEmpty()) {
+                                Log.d("InAppNotification", "Product variants2 count: " + variants2.size)
+                            }
                             //Continues like this...
                         }
                     } catch (e: Exception) {
