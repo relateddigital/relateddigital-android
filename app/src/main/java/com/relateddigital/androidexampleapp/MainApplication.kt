@@ -126,7 +126,8 @@ class MainApplication : Application() {
             context = applicationContext,
             organizationId = organizationId,
             profileId = profileId,
-            dataSource = dataSource
+            dataSource = dataSource,
+            captureApiKey = Constants.CAPTURE_API_KEY
         )
     }
 

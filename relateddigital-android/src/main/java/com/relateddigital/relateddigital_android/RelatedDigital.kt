@@ -17,6 +17,7 @@ import com.google.firebase.FirebaseApp
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
 import com.relateddigital.relateddigital_android.appTracker.AppTracker
+import com.relateddigital.relateddigital_android.capture.RDCapture
 import com.relateddigital.relateddigital_android.constants.Constants
 import com.relateddigital.relateddigital_android.geofence.GeofenceStarter
 import com.relateddigital.relateddigital_android.inapp.InAppButtonInterface
@@ -61,11 +62,21 @@ object RelatedDigital {
     private var drawerClickCallback: DrawerClickCallback? = null
 
 
+    /**
+     * @param captureApiKey `capture` event'lerinde gönderilen müşteriye özel `api_key`.
+     * Verilmezse capture kapalıdır.
+     */
     @JvmStatic
+    @JvmOverloads
     fun init(context: Context,
              organizationId: String,
              profileId: String,
-             dataSource: String) {
+             dataSource: String,
+             captureApiKey: String? = null) {
+
+        // createInitialModel cookieId yoksa üretip kaydettiği için kontrol ondan önce yapılıyor:
+        // cookieId önceki bir açılıştan kaldıysa SDK bu cihazda daha önce çalışmış demektir.
+        val isExistingInstall = SharedPref.readString(context, Constants.COOKIE_ID_KEY, "").isNotEmpty()
 
         model = createInitialModel(context)
 
@@ -97,6 +108,8 @@ object RelatedDigital {
         initVisilabsParameters()
 
         createRemoteConfigJob(context)
+
+        getCapture(context).configure(captureApiKey, model!!.getExVisitorId(), isExistingInstall)
     }
 
     private fun createInitialModel(context: Context): RelatedDigitalModel {
@@ -486,6 +499,9 @@ object RelatedDigital {
 
     @JvmStatic
     fun setExVisitorId(context: Context, exVisitorId: String) {
+        if (exVisitorId.isNotBlank()) {
+            getCapture(context).identify(exVisitorId)
+        }
         if (model != null) {
             model!!.setExVisitorId(context, exVisitorId, false)
         } else {
@@ -1211,6 +1227,7 @@ object RelatedDigital {
 
     @JvmStatic
     fun logout(context: Context) {
+        getCapture(context).reset()
         if (model != null) {
             model!!.setExVisitorId(context, "", true)
             model!!.setCookieId(context, null)
@@ -1310,6 +1327,50 @@ object RelatedDigital {
         }
     }
 
+    /**
+     * PostHog uyumlu event gönderir. Cihaz, uygulama, session ve kimlik bilgileri otomatik eklenir.
+     * `init`'e `captureApiKey` verilmediyse hiçbir şey göndermez.
+     *
+     * Kullanıcı eşleştirme otomatiktir: `login` / `signUp` çağrıldığında exVisitorId ile `$identify`
+     * gönderilir ve önceki anonim event'ler bu kullanıcıya bağlanır; `logout` yeni anonim kimlik başlatır.
+     *
+     * @param event Event adı, ör. "rmc_view_item".
+     * @param properties String, sayı, Boolean, Date, Map ve List değerleri desteklenir.
+     */
+    @JvmStatic
+    @JvmOverloads
+    fun capture(context: Context, event: String, properties: Map<String, Any?>? = null) {
+        getCapture(context).capture(event, properties)
+    }
+
+    /**
+     * Mevcut kullanıcının kişi profiline property yazar (`$set` event'i).
+     *
+     * @param properties Her çağrıda üzerine yazılır.
+     * @param setOnce Sadece daha önce yazılmamışsa yazılır.
+     */
+    @JvmStatic
+    @JvmOverloads
+    fun setPersonProperties(context: Context, properties: Map<String, Any?>, setOnce: Map<String, Any?>? = null) {
+        getCapture(context).setPersonProperties(properties, setOnce)
+    }
+
+    /** Kuyrukta bekleyen capture event'lerini hemen gönderir. */
+    @JvmStatic
+    fun flushCapture(context: Context) {
+        getCapture(context).flush()
+    }
+
+    /** Capture event'lerinin `distinct_id`'si: login öncesi anonim id, sonrası exVisitorId. */
+    @JvmStatic
+    fun getDistinctId(context: Context): String = getCapture(context).distinctId
+
+    /** Bu kurulum için üretilen anonim id. `logout` ile yenilenir. */
+    @JvmStatic
+    fun getAnonymousId(context: Context): String = getCapture(context).anonymousId
+
+    private fun getCapture(context: Context): RDCapture = RDCapture.shared(context, AppUtils.getSdkVersion())
+
     @JvmStatic
     fun customEvent(context: Context, pageName: String, properties: HashMap<String, String>?,
                     parent: Activity? = null) {
@@ -1321,6 +1382,13 @@ object RelatedDigital {
         if (Build.VERSION.SDK_INT < Constants.SDK_MIN_API_VERSION) {
             Log.e(LOG_TAG, "Related Digital SDK requires min API level 21!")
             return
+        }
+
+        // login / signUp / OM.exVisitorID ile gelen kullanıcı capture tarafında da tanıtılır.
+        // Sonrasında çağrılan capture'lardan önce sıraya girmesi için burada, senkron çağrılıyor.
+        val exVisitorId = properties?.get(Constants.EXVISITOR_ID_REQUEST_KEY)
+        if (!exVisitorId.isNullOrBlank()) {
+            getCapture(context).identify(exVisitorId)
         }
 
         RequestFormer.updateSessionParameters(context, pageName)

@@ -219,6 +219,7 @@ class NotificationBellFragment : Fragment() {
         }
 
         binding.tvTitle.text = notificationBell?.actiondata?.title
+        binding.ivClose.setImageResource(getCloseIcon())
         binding.ivClose.setOnClickListener {
             endFragment()
         }
@@ -293,6 +294,25 @@ class NotificationBellFragment : Fragment() {
 
     private fun endFragment() {
         activity?.supportFragmentManager?.beginTransaction()?.remove(this@NotificationBellFragment)?.commitAllowingStateLoss()
+    }
+
+    private fun getCloseIcon(): Int {
+        val closeColor = extendedProps?.close_button_color?.lowercase(Locale.ROOT)
+        if (closeColor == "white") {
+            return R.drawable.vl_close_button_white
+        } else if (closeColor == "black") {
+            return R.drawable.vl_close_button_black
+        }
+        extendedProps?.background_color?.let { bgColorStr ->
+            try {
+                val bgColor = Color.parseColor(bgColorStr)
+                if (androidx.core.graphics.ColorUtils.calculateLuminance(bgColor) < 0.5) {
+                    return R.drawable.vl_close_button_white
+                }
+            } catch (ignored: Exception) {
+            }
+        }
+        return R.drawable.vl_close_button_black
     }
 
     companion object {

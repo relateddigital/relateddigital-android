@@ -6,6 +6,10 @@ import android.content.Context
 import androidx.fragment.app.Fragment
 import android.content.Intent
 import android.graphics.Color
+import android.graphics.drawable.GradientDrawable
+import android.util.TypedValue
+import android.widget.ImageView
+import java.util.Locale
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
@@ -178,7 +182,7 @@ class HalfScreenFragment : Fragment() {
     }
 
     private fun adjustTop() {
-        binding.halfScreenContainerTop.setOnClickListener {
+        binding.topContentArea.setOnClickListener {
             val uriString: String? = mInAppMessage!!.mActionData!!.mAndroidLnk
             val buttonInterface: InAppButtonInterface? = RelatedDigital.getInAppButtonInterface()
             InAppNotificationClickRequest.createInAppNotificationClickRequest(requireActivity(), mInAppMessage, null)
@@ -198,8 +202,15 @@ class HalfScreenFragment : Fragment() {
             }
             endFragment()
         }
+        val bg = mInAppMessage!!.mActionData!!.mBackground
+        if (!bg.isNullOrEmpty()) {
+            try {
+                binding.topContentArea.setBackgroundColor(Color.parseColor(bg))
+            } catch (e: Exception) {
+                Log.e(LOG_TAG, "Could not parse background color", e)
+            }
+        }
         if (!mInAppMessage!!.mActionData!!.mMsgTitle.isNullOrEmpty()) {
-            binding.halfScreenContainerTop.setBackgroundColor(Color.parseColor(mInAppMessage!!.mActionData!!.mBackground))
             binding.topTitleView.text = mInAppMessage!!.mActionData!!.mMsgTitle!!.replace("\\n", "\n")
             binding.topTitleView.setTextColor(Color.parseColor(mInAppMessage!!.mActionData!!.mMsgTitleColor))
             binding.topTitleView.textSize = mInAppMessage!!.mActionData!!.mMsgTitleTextSize!!.toFloat() * 2 + 8
@@ -233,7 +244,7 @@ class HalfScreenFragment : Fragment() {
     }
 
     private fun adjustBottom() {
-        binding.halfScreenContainerBot.setOnClickListener {
+        binding.botContentArea.setOnClickListener {
             val uriString: String? = mInAppMessage!!.mActionData!!.mAndroidLnk
             val buttonInterface: InAppButtonInterface? = RelatedDigital.getInAppButtonInterface()
             InAppNotificationClickRequest.createInAppNotificationClickRequest(requireActivity(), mInAppMessage, null)
@@ -253,8 +264,15 @@ class HalfScreenFragment : Fragment() {
             }
             endFragment()
         }
+        val bg = mInAppMessage!!.mActionData!!.mBackground
+        if (!bg.isNullOrEmpty()) {
+            try {
+                binding.botContentArea.setBackgroundColor(Color.parseColor(bg))
+            } catch (e: Exception) {
+                Log.e(LOG_TAG, "Could not parse background color", e)
+            }
+        }
         if (!mInAppMessage!!.mActionData!!.mMsgTitle.isNullOrEmpty()) {
-            binding.halfScreenContainerBot.setBackgroundColor(Color.parseColor(mInAppMessage!!.mActionData!!.mBackground))
             binding.botTitleView.text = mInAppMessage!!.mActionData!!.mMsgTitle!!.replace("\\n", "\n")
             binding.botTitleView.setTextColor(Color.parseColor(mInAppMessage!!.mActionData!!.mMsgTitleColor))
             binding.botTitleView.textSize = mInAppMessage!!.mActionData!!.mMsgTitleTextSize!!.toFloat() * 2 + 8
@@ -288,21 +306,41 @@ class HalfScreenFragment : Fragment() {
     }
 
     private fun setupCloseButton() {
-        if (mIsTop) {
-            binding.topCloseButton.setBackgroundResource(getCloseIcon())
-            binding.topCloseButton.setOnClickListener { endFragment() }
-        } else {
-            binding.botCloseButton.setBackgroundResource(getCloseIcon())
-            binding.botCloseButton.setOnClickListener { endFragment() }
+        val closeButton = if (mIsTop) binding.topCloseButton else binding.botCloseButton
+        val closeColor = mInAppMessage?.mActionData?.mCloseButtonColor
+        val isWhite = isWhiteColor(closeColor)
+
+        val bgColor = if (isWhite) Color.BLACK else Color.WHITE
+        val strokeColor = if (isWhite) Color.parseColor("#33FFFFFF") else Color.parseColor("#26000000")
+        val iconRes = if (isWhite) R.drawable.ic_close_white_24dp else R.drawable.ic_close_black_24dp
+
+        val circleBg = GradientDrawable().apply {
+            shape = GradientDrawable.OVAL
+            setColor(bgColor)
+            setStroke(dpToPx(0.5f).toInt(), strokeColor)
         }
+
+        closeButton.background = circleBg
+        closeButton.setImageResource(iconRes)
+        closeButton.scaleType = ImageView.ScaleType.FIT_CENTER
+        val paddingPx = dpToPx(6f).toInt()
+        closeButton.setPadding(paddingPx, paddingPx, paddingPx, paddingPx)
+
+        closeButton.setOnClickListener { endFragment() }
     }
 
-    private fun getCloseIcon(): Int {
-        when (mInAppMessage!!.mActionData!!.mCloseButtonColor) {
-            "white" -> return R.drawable.ic_close_white_24dp
-            "black" -> return R.drawable.ic_close_black_24dp
-        }
-        return R.drawable.ic_close_black_24dp
+    private fun isWhiteColor(color: String?): Boolean {
+        if (color.isNullOrBlank()) return false
+        val cleanColor = color.trim().lowercase(Locale.ROOT)
+        return cleanColor == "white" || cleanColor == "#ffffff" || cleanColor == "#fff"
+    }
+
+    private fun dpToPx(dp: Float): Float {
+        return TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_DIP,
+            dp,
+            resources.displayMetrics
+        )
     }
 
     private fun endFragment() {

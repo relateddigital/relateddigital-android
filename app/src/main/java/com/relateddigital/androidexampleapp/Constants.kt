@@ -1,6 +1,8 @@
 package com.relateddigital.androidexampleapp
 
 object Constants {
+    const val CAPTURE_API_KEY = ""
+
     const val GOOGLE_APP_ALIAS = "relateddigital-android-test"
     const val HUAWEI_APP_ALIAS = "relateddigital-android-huawei-test"
 
