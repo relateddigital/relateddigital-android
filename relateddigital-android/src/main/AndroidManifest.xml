@@ -8,9 +8,9 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
     <uses-permission android:name="android.permission.CANCEL_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <application
-        android:networkSecurityConfig="@xml/network_security_config"
         android:supportsRtl="true"
         tools:targetApi="n">
         <activity
@@ -126,6 +126,9 @@
         <receiver
             android:name=".push.carousel.CarouselEventReceiver"
             android:enabled="true"
+            android:exported="false" />
+        <receiver
+            android:name=".push.NotificationActionBroadcastReceiver"
             android:exported="false" />
     </application>
 

@@ -14,5 +14,8 @@ data class SurveyActionData(
     var extendedProps: String? = null,
 
     @SerializedName("report")
-    var report: SurveyReport? = null
+    var report: SurveyReport? = null,
+
+    @SerializedName("waiting_time")
+    var waitingTime: Int? = null
 ) : Serializable

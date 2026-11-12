@@ -22,12 +22,18 @@ class MailSubscriptionForm() : Serializable, Parcelable {
         actid = parcel.readString()
         title = parcel.readString()
         actiontype = parcel.readString()
+        actiondata = try {
+            parcel.readSerializable() as? MailSubActionData
+        } catch (e: Exception) {
+            null
+        }
     }
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeString(actid)
         parcel.writeString(title)
         parcel.writeString(actiontype)
+        parcel.writeSerializable(actiondata)
     }
 
     override fun describeContents(): Int {

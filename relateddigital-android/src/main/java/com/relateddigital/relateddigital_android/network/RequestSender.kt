@@ -1,6 +1,8 @@
 package com.relateddigital.relateddigital_android.network
 
 import androidx.fragment.app.FragmentTransaction
+import android.app.Activity
+import android.app.Application
 import android.content.Context
 import android.content.Intent
 import android.os.Handler
@@ -12,6 +14,7 @@ import com.google.gson.Gson
 import com.relateddigital.relateddigital_android.RelatedDigital
 import com.relateddigital.relateddigital_android.api.*
 import com.relateddigital.relateddigital_android.constants.Constants
+import com.relateddigital.relateddigital_android.inapp.InAppActionManager
 import com.relateddigital.relateddigital_android.inapp.InAppManager
 import com.relateddigital.relateddigital_android.inapp.VisilabsResponse
 import com.relateddigital.relateddigital_android.inapp.choosefavorite.ChooseFavoriteActivity
@@ -46,6 +49,7 @@ import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.lang.ref.WeakReference
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
@@ -56,6 +60,34 @@ object RequestSender {
     private val requestQueue = ArrayList<Request>()
     private var isSendingARequest = false
     private var retryCounter = 0
+    private var inAppNotificationTimer: Timer? = null
+
+    private fun startActivitySafely(parent: Activity?, intent: Intent) {
+        if (parent == null) {
+            Log.w(LOG_TAG, "Could not start the in-app activity since the parent activity is null!")
+            return
+        }
+        try {
+            parent.startActivity(intent)
+        } catch (e: Exception) {
+            Log.e(LOG_TAG, "Could not start the in-app activity : " + e.message)
+        }
+    }
+
+    private fun scheduleInAppNotification(timerTask: TimerTask, delay: Long) {
+        synchronized(this) {
+            val timer = inAppNotificationTimer
+                ?: Timer("InAppNotification Delay Timer", true).also { inAppNotificationTimer = it }
+            try {
+                timer.schedule(timerTask, delay)
+            } catch (e: IllegalStateException) {
+                val newTimer = Timer("InAppNotification Delay Timer", true)
+                inAppNotificationTimer = newTimer
+                newTimer.schedule(timerTask, delay)
+            }
+        }
+    }
+
     fun addToQueue(request: Request, model: RelatedDigitalModel, context: Context) {
         synchronized(requestQueue) {
             requestQueue.add(request)
@@ -174,17 +206,22 @@ object RequestSender {
                                         LOG_TAG,
                                         "Successful InApp Request : " + call.request().url.toString()
                                     )
-                                    val timer = Timer("InAppNotification Delay Timer", false)
+                                    val targetParent = currentRequest.parent ?: ActivityUtils.parentActivity
                                     val timerTask = InAppNotificationTimer(
                                         null, 0,
-                                        inAppMessages, currentRequest.parent, model, context
+                                        inAppMessages, targetParent, model, context
                                     )
                                     var delay: Long = 0
+                                    var actId: Int? = null
                                     if (timerTask.getMessage() != null) {
+                                        actId = timerTask.getMessage()!!.mActId
                                         delay =
                                             timerTask.getMessage()!!.mActionData!!.mWaitingTime!!.toLong() * 1000
                                     }
-                                    timer.schedule(timerTask, delay)
+                                    (targetParent?.application ?: (context.applicationContext as? Application))?.let { InAppActionManager.init(it) }
+                                    InAppActionManager.scheduleOrShow(actId, delay) {
+                                        timerTask.run()
+                                    }
                                     if (inAppMessages[0].mActionData?.mMsgType == "nps_with_numbers") {
                                         if (inAppMessages[0].mActionData?.mDisplayType == "inline") {
                                             val visilabsResponse = VisilabsResponse(
@@ -246,6 +283,9 @@ object RequestSender {
                                 )
                                 val actionsResponse = response.body()
                                 if (actionsResponse != null) {
+                                    val targetParent = currentRequest.parent ?: ActivityUtils.parentActivity
+                                    ActivityUtils.parentActivity = targetParent
+                                    (targetParent?.application ?: (context.applicationContext as? Application))?.let { InAppActionManager.init(it) }
                                     when {
                                         !actionsResponse.mSpinToWinList.isNullOrEmpty() -> {
                                             val spinToWinModel: SpinToWin =
@@ -254,33 +294,34 @@ object RequestSender {
                                             if(!spinToWinModel!!.actiondata!!.waitingTime.toString().isNullOrEmpty()) {
                                                 waitTime = spinToWinModel!!.actiondata!!.waitingTime!!.toLong()
                                             }
-                                            ActivityUtils.parentActivity = currentRequest.parent
                                             val intent =
                                                 Intent(
-                                                    currentRequest.parent,
+                                                    targetParent,
                                                     SpinToWinActivity::class.java
                                                 )
 
                                             intent.putExtra("spin-to-win-data", spinToWinModel)
-                                            Handler(Looper.getMainLooper()).postDelayed({
-                                                currentRequest.parent!!.startActivity(intent)
-                                            }, waitTime * 1000L)
+                                            InAppActionManager.scheduleOrShow(spinToWinModel.actid, waitTime * 1000L) {
+                                                startActivitySafely(targetParent, intent)
+                                            }
                                         }
                                         !actionsResponse.mSurveyList.isNullOrEmpty() -> {
                                             val surveyModel: SurveyModel =
                                                 actionsResponse.mSurveyList!![0]
                                             var waitTime = 0L
-                                            ActivityUtils.parentActivity = currentRequest.parent
+                                            if (!surveyModel.actiondata?.waitingTime.toString().isNullOrEmpty()) {
+                                                waitTime = surveyModel.actiondata!!.waitingTime!!.toLong()
+                                            }
                                             val intent =
                                                 Intent(
-                                                    currentRequest.parent,
+                                                    targetParent,
                                                     SurveyActivity::class.java
                                                 )
 
                                             intent.putExtra("survey-data", surveyModel)
-                                            Handler(Looper.getMainLooper()).postDelayed({
-                                                currentRequest.parent!!.startActivity(intent)
-                                            }, waitTime)
+                                            InAppActionManager.scheduleOrShow(surveyModel.actid, waitTime * 1000L) {
+                                                startActivitySafely(targetParent, intent)
+                                            }
                                         }
                                         !actionsResponse.mScratchToWinList.isNullOrEmpty() -> {
                                             val scratchToWinModel: ScratchToWin =
@@ -289,10 +330,9 @@ object RequestSender {
                                             if(!scratchToWinModel!!.actiondata!!.waitingTime.toString().isNullOrEmpty()) {
                                                 waitTime = scratchToWinModel!!.actiondata!!.waitingTime!!.toLong()
                                             }
-                                            ActivityUtils.parentActivity = currentRequest.parent
                                             val intent =
                                                     Intent(
-                                                            currentRequest.parent,
+                                                            targetParent,
                                                             ScratchToWinActivity::class.java
                                                     )
 
@@ -300,9 +340,9 @@ object RequestSender {
                                                     "scratch-to-win-data",
                                                     scratchToWinModel
                                             )
-                                            Handler(Looper.getMainLooper()).postDelayed({
-                                                currentRequest.parent!!.startActivity(intent)
-                                            }, waitTime * 1000L)
+                                            InAppActionManager.scheduleOrShow(scratchToWinModel.actid, waitTime * 1000L) {
+                                                startActivitySafely(targetParent, intent)
+                                            }
                                         }
                                         !actionsResponse.mShakeToWinList.isNullOrEmpty() -> {
                                             val shakeToWinModel: ShakeToWin =
@@ -311,71 +351,72 @@ object RequestSender {
                                             if(!shakeToWinModel!!.actiondata!!.waitingTime.toString().isNullOrEmpty()) {
                                                 waitTime = shakeToWinModel!!.actiondata!!.waitingTime!!.toLong()
                                             }
-                                            ActivityUtils.parentActivity = currentRequest.parent
                                             val intent =
                                                 Intent(
-                                                    currentRequest.parent,
+                                                    targetParent,
                                                     ShakeToWinActivity::class.java
                                                 )
                                             intent.putExtra(
                                                 "shake-to-win-data",
                                                 shakeToWinModel
                                             )
-                                            Handler(Looper.getMainLooper()).postDelayed({
-                                                currentRequest.parent!!.startActivity(intent)
-                                            }, waitTime * 1000L)
+                                            InAppActionManager.scheduleOrShow(shakeToWinModel.actid, waitTime * 1000L) {
+                                                startActivitySafely(targetParent, intent)
+                                            }
                                         }
                                         !actionsResponse.mMailSubscriptionForm.isNullOrEmpty() -> {
+                                            val mailSubModel = actionsResponse.mMailSubscriptionForm!![0]
+                                            var waitTime = 0L
+                                            if (mailSubModel.actiondata?.waiting_time != null) {
+                                                 waitTime = mailSubModel.actiondata!!.waiting_time!!.toLong()
+                                            }
+                                            InAppActionManager.scheduleOrShow(mailSubModel.actid, waitTime * 1000L) {
+                                                if(!mailSubModel.actiondata!!.taTemplate.isNullOrEmpty()
+                                                    && mailSubModel.actiondata!!.taTemplate == "customizable") {
+                                                    val mailSubscriptionFormHalfFragment = MailSubscriptionFormHalfFragment.newInstance(
+                                                        mailSubModel.actiondata, mailSubModel.actid!!
+                                                    )
 
-                                            if(!actionsResponse.mMailSubscriptionForm!![0].actiondata!!.taTemplate.isNullOrEmpty()
-                                                && actionsResponse.mMailSubscriptionForm!![0].actiondata!!.taTemplate == "customizable") {
-                                                val mailSubscriptionFormHalfFragment = MailSubscriptionFormHalfFragment.newInstance(
-                                                    actionsResponse.mMailSubscriptionForm!![0].actiondata, actionsResponse.mMailSubscriptionForm!![0].actid!!
-                                                )
-
-                                                val transaction : FragmentTransaction = (currentRequest.parent!! as FragmentActivity).supportFragmentManager.beginTransaction()
-                                                transaction.replace(android.R.id.content, mailSubscriptionFormHalfFragment)
-                                                transaction.commit()
-                                            } else {
-                                                InAppManager(
-                                                    model.getCookieId()!!,
-                                                    model.getDataSource()
-                                                ).showMailSubscriptionForm(
-                                                    actionsResponse.mMailSubscriptionForm!![0],
-                                                    currentRequest.parent!!
-                                                )
+                                                    val transaction : FragmentTransaction? = (targetParent as? FragmentActivity)?.supportFragmentManager?.beginTransaction()
+                                                    transaction?.replace(android.R.id.content, mailSubscriptionFormHalfFragment)?.commit()
+                                                } else if (targetParent != null) {
+                                                    InAppManager(
+                                                        model.getCookieId().orEmpty(),
+                                                        model.getDataSource()
+                                                    ).showMailSubscriptionForm(
+                                                        mailSubModel,
+                                                        targetParent
+                                                    )
+                                                }
                                             }
                                         }
                                         !actionsResponse.mProductStatNotifierList.isNullOrEmpty() -> {
                                             val socialProofFragment: SocialProofFragment = SocialProofFragment.newInstance(actionsResponse.mProductStatNotifierList!![0])
 
-                                            val transaction : FragmentTransaction= (currentRequest.parent!! as FragmentActivity).supportFragmentManager.beginTransaction()
-                                            transaction.replace(android.R.id.content, socialProofFragment)
-                                            transaction.commit()
+                                            val transaction : FragmentTransaction? = (targetParent as? FragmentActivity)?.supportFragmentManager?.beginTransaction()
+                                            transaction?.replace(android.R.id.content, socialProofFragment)?.commit()
                                         }
                                         !actionsResponse.mDrawer.isNullOrEmpty() -> {
                                             val inAppNotificationFragment = InAppNotificationFragment.newInstance(
                                                 actionsResponse.mDrawer!![0]
                                             )
 
-                                            val transaction : FragmentTransaction= (currentRequest.parent!! as FragmentActivity).supportFragmentManager.beginTransaction()
-                                            transaction.replace(android.R.id.content, inAppNotificationFragment)
-                                            transaction.commit()
+                                            val transaction : FragmentTransaction? = (targetParent as? FragmentActivity)?.supportFragmentManager?.beginTransaction()
+                                            transaction?.replace(android.R.id.content, inAppNotificationFragment)?.commit()
                                         }
                                         !actionsResponse.mCustomActionList.isNullOrEmpty() -> {
                                             val CustomActionFragment = CustomActionFragment.newInstance(
                                                 actionsResponse.mCustomActionList!![0]
                                             )
 
-                                            val transaction : FragmentTransaction= (currentRequest.parent!! as FragmentActivity).supportFragmentManager.beginTransaction()
-                                            transaction.replace(android.R.id.content, CustomActionFragment)
-                                            transaction.commit()
+                                            val transaction : FragmentTransaction? = (targetParent as? FragmentActivity)?.supportFragmentManager?.beginTransaction()
+                                            transaction?.replace(android.R.id.content, CustomActionFragment)?.commit()
                                         }
                                         /*!actionsResponse.mAppRatingList.isNullOrEmpty() -> {
-                                            val reviewManager = ReviewManagerFactory.create(currentRequest.parent!!)
+                                            val reviewManager = ReviewManagerFactory.create(targetParent!!)
                                             reviewManager.requestReviewFlow().addOnCompleteListener{
                                                 if(it.isSuccessful) {
-                                                    reviewManager.launchReviewFlow(currentRequest.parent!!, it.result)
+                                                    reviewManager.launchReviewFlow(targetParent!!, it.result)
                                                 }
                                             }
                                         } */
@@ -386,16 +427,15 @@ object RequestSender {
                                             if(!giftRainModel!!.actiondata!!.waitingTime.toString().isNullOrEmpty()) {
                                                 waitTime = giftRainModel!!.actiondata!!.waitingTime!!.toLong()
                                             }
-                                            ActivityUtils.parentActivity = currentRequest.parent
                                             val intent =
                                                 Intent(
-                                                    currentRequest.parent,
+                                                    targetParent,
                                                     GiftCatchActivity::class.java
                                                 )
                                             intent.putExtra("gift-rain-data", giftRainModel)
-                                            Handler(Looper.getMainLooper()).postDelayed({
-                                                currentRequest.parent!!.startActivity(intent)
-                                            }, waitTime * 1000L)
+                                            InAppActionManager.scheduleOrShow(giftRainModel.actid, waitTime * 1000L) {
+                                                startActivitySafely(targetParent, intent)
+                                            }
 
                                         }
                                         !actionsResponse.mGiftBox.isNullOrEmpty() -> {
@@ -405,17 +445,16 @@ object RequestSender {
                                             if(!giftBoxModel!!.actiondata!!.waitingTime.toString().isNullOrEmpty()) {
                                                 waitTime = giftBoxModel!!.actiondata!!.waitingTime!!.toLong()
                                             }
-                                            ActivityUtils.parentActivity = currentRequest.parent
                                             val intent =
                                                 Intent(
-                                                    currentRequest.parent,
+                                                    targetParent,
                                                     GiftBoxActivity::class.java
                                                 )
 
                                             intent.putExtra("gift-box-data", giftBoxModel)
-                                            Handler(Looper.getMainLooper()).postDelayed({
-                                                currentRequest.parent!!.startActivity(intent)
-                                            }, waitTime * 1000L)
+                                            InAppActionManager.scheduleOrShow(giftBoxModel.actid, waitTime * 1000L) {
+                                                startActivitySafely(targetParent, intent)
+                                            }
                                         }
                                         !actionsResponse.mClawMachineList.isNullOrEmpty() -> {
                                             val clawMachineModel: ClawMachine =
@@ -425,29 +464,33 @@ object RequestSender {
                                             if(!clawMachineModel!!.actiondata!!.waitingTime.toString().isNullOrEmpty()) {
                                                 waitTime = clawMachineModel!!.actiondata!!.waitingTime!!.toLong()
                                             }
-                                            ActivityUtils.parentActivity = currentRequest.parent
                                             val intent =
                                                 Intent(
-                                                    currentRequest.parent,
+                                                    targetParent,
                                                     ClawMachineActivity::class.java
                                                 )
 
                                             intent.putExtra("claw-machine-data", clawMachineModel)
-                                            Handler(Looper.getMainLooper()).postDelayed({
-                                                currentRequest.parent!!.startActivity(intent)
-                                            }, waitTime * 1000L)
+                                            InAppActionManager.scheduleOrShow(clawMachineModel.actid, waitTime * 1000L) {
+                                                startActivitySafely(targetParent, intent)
+                                            }
                                         }
                                         !actionsResponse.mChooseFavoriteList.isNullOrEmpty() -> {
-                                            ActivityUtils.parentActivity = currentRequest.parent
-                                            val intent =
-                                                Intent(
-                                                    currentRequest.parent,
-                                                    ChooseFavoriteActivity::class.java
-                                                )
                                             val chooseFavoriteModel: ChooseFavorite =
                                                 actionsResponse.mChooseFavoriteList!![0]
+                                            var waitTime = 0L
+                                            if (!chooseFavoriteModel.actiondata?.waitingTime.toString().isNullOrEmpty()) {
+                                                waitTime = chooseFavoriteModel.actiondata!!.waitingTime!!.toLong()
+                                            }
+                                            val intent =
+                                                Intent(
+                                                    targetParent,
+                                                    ChooseFavoriteActivity::class.java
+                                                )
                                             intent.putExtra("choose-favorite-data", chooseFavoriteModel)
-                                            currentRequest.parent!!.startActivity(intent)
+                                            InAppActionManager.scheduleOrShow(chooseFavoriteModel.actid, waitTime * 1000L) {
+                                                startActivitySafely(targetParent, intent)
+                                            }
                                         }
                                         !actionsResponse.mFindToWin.isNullOrEmpty() -> {
                                             val findToWinModel: FindToWin =
@@ -456,17 +499,16 @@ object RequestSender {
                                             if(!findToWinModel!!.actiondata!!.waitingTime.toString().isNullOrEmpty()) {
                                                 waitTime = findToWinModel!!.actiondata!!.waitingTime!!.toLong()
                                             }
-                                            ActivityUtils.parentActivity = currentRequest.parent
                                             val intent =
                                                 Intent(
-                                                    currentRequest.parent,
+                                                    targetParent,
                                                     FindToWinActivity::class.java
                                                 )
 
                                             intent.putExtra("find-to-win-data", findToWinModel)
-                                            Handler(Looper.getMainLooper()).postDelayed({
-                                                currentRequest.parent!!.startActivity(intent)
-                                            }, waitTime * 1000L)
+                                            InAppActionManager.scheduleOrShow(findToWinModel.actid, waitTime * 1000L) {
+                                                startActivitySafely(targetParent, intent)
+                                            }
                                         }
                                         !actionsResponse.mSlotMachine.isNullOrEmpty() -> {
                                             val slotMachineModel: SlotMachine =
@@ -475,17 +517,16 @@ object RequestSender {
                                             if(!slotMachineModel!!.actiondata!!.waitingTime.toString().isNullOrEmpty()) {
                                                 waitTime = slotMachineModel!!.actiondata!!.waitingTime!!.toLong()
                                             }
-                                            ActivityUtils.parentActivity = currentRequest.parent
                                             val intent =
                                                 Intent(
-                                                    currentRequest.parent,
+                                                    targetParent,
                                                     SlotMachineActivity::class.java
                                                 )
 
                                             intent.putExtra("slotMachine-data", slotMachineModel)
-                                            Handler(Looper.getMainLooper()).postDelayed({
-                                                currentRequest.parent!!.startActivity(intent)
-                                            }, waitTime * 1000L)
+                                            InAppActionManager.scheduleOrShow(slotMachineModel.actid, waitTime * 1000L) {
+                                                startActivitySafely(targetParent, intent)
+                                            }
                                         }
                                         !actionsResponse.mAppBanner.isNullOrEmpty() -> {
                                             val visilabsResponse = VisilabsResponse(
@@ -500,9 +541,8 @@ object RequestSender {
                                         !actionsResponse.mNotificationBell.isNullOrEmpty() -> {
                                             val notificationBellFragment: NotificationBellFragment = NotificationBellFragment.newInstance(actionsResponse.mNotificationBell!![0])
 
-                                            val transaction : FragmentTransaction= (currentRequest.parent!! as FragmentActivity).supportFragmentManager.beginTransaction()
-                                            transaction.replace(android.R.id.content, notificationBellFragment)
-                                            transaction.commit()
+                                            val transaction : FragmentTransaction? = (targetParent as? FragmentActivity)?.supportFragmentManager?.beginTransaction()
+                                            transaction?.replace(android.R.id.content, notificationBellFragment)?.commit()
                                         }
                                         !actionsResponse.mCountdownTimerBanner.isNullOrEmpty() -> {
                                             val bannerModel = actionsResponse.mCountdownTimerBanner!![0]
@@ -522,17 +562,33 @@ object RequestSender {
                                                         waitTime = bannerModel.actiondata!!.waiting_time!!.toLong()
                                                     }
 
-                                                    Handler(Looper.getMainLooper()).postDelayed({
-                                                        if (!CountdownTimerBannerFragment.isExpired(bannerModel) &&
-                                                            !CountdownTimerBannerFragment.isShowing
-                                                        ) {
-                                                            CountdownTimerBannerFragment.isShowing = true
-                                                            val countdownTimerBannerFragment: CountdownTimerBannerFragment = CountdownTimerBannerFragment.newInstance(bannerModel)
-                                                            val transaction : FragmentTransaction= (currentRequest.parent!! as FragmentActivity).supportFragmentManager.beginTransaction()
-                                                            transaction.add(android.R.id.content, countdownTimerBannerFragment)
-                                                            transaction.commit()
+                                                    val parentRef = WeakReference(targetParent)
+                                                    InAppActionManager.scheduleOrShow(bannerModel.actid, waitTime * 1000L) {
+                                                        try {
+                                                            val activity = parentRef.get() as? FragmentActivity
+                                                            if (activity == null || activity.isFinishing || activity.isDestroyed) {
+                                                                Log.w(LOG_TAG, "CountdownTimerBanner could not be shown, the page is not available.")
+                                                                return@scheduleOrShow
+                                                            }
+                                                            val fragmentManager = activity.supportFragmentManager
+                                                            if (fragmentManager.isStateSaved || fragmentManager.isDestroyed) {
+                                                                Log.w(LOG_TAG, "CountdownTimerBanner could not be shown, the page state is already saved.")
+                                                                return@scheduleOrShow
+                                                            }
+                                                            if (!CountdownTimerBannerFragment.isExpired(bannerModel) &&
+                                                                !CountdownTimerBannerFragment.isShowing
+                                                            ) {
+                                                                CountdownTimerBannerFragment.isShowing = true
+                                                                val countdownTimerBannerFragment: CountdownTimerBannerFragment = CountdownTimerBannerFragment.newInstance(bannerModel)
+                                                                val transaction : FragmentTransaction = fragmentManager.beginTransaction()
+                                                                transaction.add(android.R.id.content, countdownTimerBannerFragment)
+                                                                transaction.commitAllowingStateLoss()
+                                                            }
+                                                        } catch (e: Exception) {
+                                                            CountdownTimerBannerFragment.isShowing = false
+                                                            Log.e(LOG_TAG, "CountdownTimerBanner could not be shown : " + e.message)
                                                         }
-                                                    }, waitTime * 1000L)
+                                                    }
                                                 }
                                             }
                                         }
@@ -662,7 +718,7 @@ object RequestSender {
                                                 null,
                                                 null
                                         )
-                                        currentRequest.visilabsCallback!!.success(visilabsResponse)
+                                        currentRequest.visilabsCallback?.success(visilabsResponse)
                                     } else {
                                         Log.e(
                                                 LOG_TAG,
@@ -675,7 +731,7 @@ object RequestSender {
                                                 null,
                                                 "Empty promotion code - auth issue"
                                         )
-                                        currentRequest.visilabsCallback!!.fail(visilabsResponse)
+                                        currentRequest.visilabsCallback?.fail(visilabsResponse)
                                     }
                                 } else {
                                     Log.e(
@@ -689,7 +745,7 @@ object RequestSender {
                                             null,
                                             "empty string"
                                     )
-                                    currentRequest.visilabsCallback!!.fail(visilabsResponse)
+                                    currentRequest.visilabsCallback?.fail(visilabsResponse)
                                 }
                             } catch (e: java.lang.Exception) {
                                 e.printStackTrace()
@@ -704,7 +760,7 @@ object RequestSender {
                                         null,
                                         rawJsonResponse
                                 )
-                                currentRequest.visilabsCallback!!.fail(visilabsResponse)
+                                currentRequest.visilabsCallback?.fail(visilabsResponse)
                             }
                         } else {
                             applyFailConditions(call!!.request().url.toString(), model, context)
@@ -727,9 +783,9 @@ object RequestSender {
                                 null,
                                 t.message,
                                 t,
-                                t.message!!
+                                t.message ?: t.javaClass.simpleName
                         )
-                        currentRequest.visilabsCallback!!.fail(visilabsResponse)
+                        currentRequest.visilabsCallback?.fail(visilabsResponse)
                     }
                 })
             }
@@ -765,7 +821,7 @@ object RequestSender {
                                                 null,
                                                 null
                                         )
-                                        currentRequest.visilabsCallback!!.success(visilabsResponse)
+                                        currentRequest.visilabsCallback?.success(visilabsResponse)
                                     } else {
                                         Log.e(
                                                 LOG_TAG,
@@ -778,7 +834,7 @@ object RequestSender {
                                                 null,
                                                 "empty string"
                                         )
-                                        currentRequest.visilabsCallback!!.fail(visilabsResponse)
+                                        currentRequest.visilabsCallback?.fail(visilabsResponse)
                                     }
                                 } else {
                                     Log.e(
@@ -792,7 +848,7 @@ object RequestSender {
                                             null,
                                             "empty string"
                                     )
-                                    currentRequest.visilabsCallback!!.fail(visilabsResponse)
+                                    currentRequest.visilabsCallback?.fail(visilabsResponse)
                                 }
                             } catch (e: java.lang.Exception) {
                                 e.printStackTrace()
@@ -802,7 +858,7 @@ object RequestSender {
                                 )
                                 val visilabsResponse =
                                         VisilabsResponse(null, null, rawJsonResponse, null, rawJsonResponse)
-                                currentRequest.visilabsCallback!!.fail(visilabsResponse)
+                                currentRequest.visilabsCallback?.fail(visilabsResponse)
                             }
                         } else {
                             applyFailConditions(call!!.request().url.toString(), model, context)
@@ -814,7 +870,7 @@ object RequestSender {
                             val visilabsResponse = VisilabsResponse(null, null,
                                     "Fail Request Response Code : " + response.code(), null,
                                     "Fail Request Response Code : " + response.code())
-                            currentRequest.visilabsCallback!!.fail(visilabsResponse)
+                            currentRequest.visilabsCallback?.fail(visilabsResponse)
                         }
                     }
 
@@ -825,7 +881,7 @@ object RequestSender {
                                 "Fail Request Message : " + t.message
                         )
                         val visilabsResponse = VisilabsResponse(null, null, t.message, t, t.message)
-                        currentRequest.visilabsCallback!!.fail(visilabsResponse)
+                        currentRequest.visilabsCallback?.fail(visilabsResponse)
                     }
                 })
             }
@@ -858,7 +914,7 @@ object RequestSender {
                                             null,
                                             null
                                     )
-                                    currentRequest.visilabsCallback!!.success(visilabsResponse)
+                                    currentRequest.visilabsCallback?.success(visilabsResponse)
                                 } else {
                                     Log.e(
                                             LOG_TAG,
@@ -871,7 +927,7 @@ object RequestSender {
                                             null,
                                             "empty string"
                                     )
-                                    currentRequest.visilabsCallback!!.fail(visilabsResponse)
+                                    currentRequest.visilabsCallback?.fail(visilabsResponse)
                                 }
                             } catch (e: java.lang.Exception) {
                                 e.printStackTrace()
@@ -881,7 +937,7 @@ object RequestSender {
                                 )
                                 val visilabsResponse =
                                         VisilabsResponse(null, null, rawJsonResponse, null, rawJsonResponse)
-                                currentRequest.visilabsCallback!!.fail(visilabsResponse)
+                                currentRequest.visilabsCallback?.fail(visilabsResponse)
                             }
                         } else {
                             applyFailConditions(call!!.request().url.toString(), model, context)
@@ -893,7 +949,7 @@ object RequestSender {
                             val visilabsResponse = VisilabsResponse(null, null,
                                     "Fail Request Response Code : " + response.code(), null,
                                     "Fail Request Response Code : " + response.code())
-                            currentRequest.visilabsCallback!!.fail(visilabsResponse)
+                            currentRequest.visilabsCallback?.fail(visilabsResponse)
                         }
                     }
 
@@ -904,7 +960,7 @@ object RequestSender {
                                 "Fail Request Message : " + t.message
                         )
                         val visilabsResponse = VisilabsResponse(null, null, t.message, t, t.message)
-                        currentRequest.visilabsCallback!!.fail(visilabsResponse)
+                        currentRequest.visilabsCallback?.fail(visilabsResponse)
                     }
                 })
             }
@@ -937,7 +993,7 @@ object RequestSender {
                                             null,
                                             null
                                     )
-                                    currentRequest.visilabsCallback!!.success(visilabsResponse)
+                                    currentRequest.visilabsCallback?.success(visilabsResponse)
                                 } else {
                                     Log.e(
                                             LOG_TAG,
@@ -950,7 +1006,7 @@ object RequestSender {
                                             null,
                                             "empty string"
                                     )
-                                    currentRequest.visilabsCallback!!.fail(visilabsResponse)
+                                    currentRequest.visilabsCallback?.fail(visilabsResponse)
                                 }
                             } catch (e: java.lang.Exception) {
                                 e.printStackTrace()
@@ -960,7 +1016,7 @@ object RequestSender {
                                 )
                                 val visilabsResponse =
                                         VisilabsResponse(null, null, rawJsonResponse, null, rawJsonResponse)
-                                currentRequest.visilabsCallback!!.fail(visilabsResponse)
+                                currentRequest.visilabsCallback?.fail(visilabsResponse)
                             }
                         } else {
                             applyFailConditions(call!!.request().url.toString(), model, context)
@@ -972,7 +1028,7 @@ object RequestSender {
                             val visilabsResponse = VisilabsResponse(null, null,
                                     "Fail Request Response Code : " + response.code(), null,
                                     "Fail Request Response Code : " + response.code())
-                            currentRequest.visilabsCallback!!.fail(visilabsResponse)
+                            currentRequest.visilabsCallback?.fail(visilabsResponse)
                         }
                     }
 
@@ -983,7 +1039,7 @@ object RequestSender {
                                 "Fail Request Message : " + t.message
                         )
                         val visilabsResponse = VisilabsResponse(null, null, t.message, t, t.message)
-                        currentRequest.visilabsCallback!!.fail(visilabsResponse)
+                        currentRequest.visilabsCallback?.fail(visilabsResponse)
                     }
                 })
             }
@@ -1008,7 +1064,7 @@ object RequestSender {
                             try {
                                 val geofenceGetListResponse: List<GeofenceListResponse>? =
                                     response.body()
-                                currentRequest.geofenceGetListCallback!!.success(
+                                currentRequest.geofenceGetListCallback?.success(
                                     geofenceGetListResponse,
                                     response.raw().request.url.toString()
                                 )
@@ -1019,13 +1075,13 @@ object RequestSender {
                                     "Could not parse the response for the request : " + response.raw().request.url.toString()
                                 )
                                 try {
-                                    currentRequest.geofenceGetListCallback!!.fail(
+                                    currentRequest.geofenceGetListCallback?.fail(
                                         Throwable(response.body().toString()),
                                         call!!.request().url.toString()
                                     )
                                 } catch (c: Exception) {
                                     c.printStackTrace()
-                                    currentRequest.geofenceGetListCallback!!.fail(
+                                    currentRequest.geofenceGetListCallback?.fail(
                                         Throwable("The response is not in the correct format"),
                                         call!!.request().url.toString()
                                     )
@@ -1033,7 +1089,7 @@ object RequestSender {
                             }
                         } else {
                             applyFailConditions(call!!.request().url.toString(), model, context)
-                            currentRequest.geofenceGetListCallback!!.fail(
+                            currentRequest.geofenceGetListCallback?.fail(
                                 Throwable("The response is not in the correct format"),
                                 call.request().url.toString())
                         }
@@ -1041,7 +1097,7 @@ object RequestSender {
 
                     override fun onFailure(call: Call<List<GeofenceListResponse>>, t: Throwable) {
                         applyFailConditions(call.request().url.toString(), model, context)
-                        currentRequest.geofenceGetListCallback!!.fail(t, call.request().url.toString())
+                        currentRequest.geofenceGetListCallback?.fail(t, call.request().url.toString())
                     }
                 })
             }
@@ -1323,7 +1379,7 @@ object RequestSender {
         val dateFormat: DateFormat = SimpleDateFormat(Constants.SUBSCRIPTION_DATE_FORMAT)
         val dateNow = dateFormat.format(Calendar.getInstance().time)
         SharedPref.writeString(context, Constants.LAST_SUBS_DATE_KEY, dateNow)
-        SharedPref.writeString(context, Constants.LAST_SUBS_KEY, Gson().toJson(model))
+        SharedPref.writeString(context, Constants.LAST_SUBS_KEY, synchronized(model) { Gson().toJson(model) })
     }
 
     private fun parseAndSetResponseHeaders(

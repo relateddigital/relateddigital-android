@@ -1,5 +1,7 @@
 package com.relateddigital.relateddigital_android.inapp.choosefavorite
 
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.webkit.JavascriptInterface
 import com.google.gson.Gson
@@ -11,9 +13,10 @@ import com.relateddigital.relateddigital_android.network.requestHandler.SubsJson
 class ChooseFavoriteJavaScriptInterface internal constructor(webViewDialogFragment: ChooseFavoriteWebDialogFragment,
                                                              @get:JavascriptInterface val response: String) {
     var mWebViewDialogFragment: ChooseFavoriteWebDialogFragment = webViewDialogFragment
-    private lateinit var mListener: ChooseFavoriteCompleteInterface
-    private lateinit var mCopyToClipboardInterface: ChooseFavoriteCopyToClipboardInterface
-    private lateinit var mShowCodeInterface: ChooseFavoriteShowCodeInterface
+    private val mMainHandler = Handler(Looper.getMainLooper())
+    private var mListener: ChooseFavoriteCompleteInterface? = null
+    private var mCopyToClipboardInterface: ChooseFavoriteCopyToClipboardInterface? = null
+    private var mShowCodeInterface: ChooseFavoriteShowCodeInterface? = null
     private val chooseFavoriteModel: ChooseFavorite = Gson().fromJson(this.response, ChooseFavorite::class.java)
 
     private var subEmail = ""
@@ -23,8 +26,10 @@ class ChooseFavoriteJavaScriptInterface internal constructor(webViewDialogFragme
      */
     @JavascriptInterface
     fun close() {
-        mWebViewDialogFragment.dismiss()
-        mListener.onCompleted()
+        runOnMain {
+            mWebViewDialogFragment.dismissAllowingStateLoss()
+            mListener?.onCompleted()
+        }
     }
 
     /**
@@ -35,8 +40,10 @@ class ChooseFavoriteJavaScriptInterface internal constructor(webViewDialogFragme
      */
     @JavascriptInterface
     fun copyToClipboard(couponCode: String?, link: String?) {
-        mWebViewDialogFragment.dismiss()
-        mCopyToClipboardInterface.copyToClipboard(couponCode, link)
+        runOnMain {
+            mWebViewDialogFragment.dismissAllowingStateLoss()
+            mCopyToClipboardInterface?.copyToClipboard(couponCode, link)
+        }
     }
 
     /**
@@ -48,8 +55,10 @@ class ChooseFavoriteJavaScriptInterface internal constructor(webViewDialogFragme
     fun subscribeEmail(email: String?) {
         if (!email.isNullOrEmpty()) {
             subEmail = email
-            SubsJsonRequest.createSubsJsonRequest(mWebViewDialogFragment.requireContext(), chooseFavoriteModel.actiondata!!.type!!,
-                chooseFavoriteModel.actid.toString(), chooseFavoriteModel.actiondata!!.auth!!,
+            val context = mWebViewDialogFragment.context ?: return
+            val actionData = chooseFavoriteModel.actiondata ?: return
+            SubsJsonRequest.createSubsJsonRequest(context, actionData.type.orEmpty(),
+                chooseFavoriteModel.actid.toString(), actionData.auth.orEmpty(),
                 email)
         } else {
             Log.e("ChooseFavorite : ", "Email entered is not valid!")
@@ -59,32 +68,32 @@ class ChooseFavoriteJavaScriptInterface internal constructor(webViewDialogFragme
     /**
      * This method sends the report to the server
      */
-
     @JavascriptInterface
     fun sendReport() {
         var report: MailSubReport?
         try {
             report = MailSubReport()
-            report.impression = chooseFavoriteModel.actiondata!!.report!!.impression
-            report.click = chooseFavoriteModel.actiondata!!.report!!.click
+            report.impression = chooseFavoriteModel.actiondata?.report?.impression
+            report.click = chooseFavoriteModel.actiondata?.report?.click
         } catch (e: Exception) {
             Log.e("ChooseFavorite : ", "There is no report to send!")
             e.printStackTrace()
             report = null
         }
-        if (report != null) {
-            InAppActionClickRequest.createInAppActionClickRequest(mWebViewDialogFragment.requireContext(), report)
+        val context = mWebViewDialogFragment.context
+        if (report != null && context != null) {
+            InAppActionClickRequest.createInAppActionClickRequest(context, report)
         }
     }
-
-
 
     /**
      * This method saves the promotion code shown
      */
     @JavascriptInterface
     fun saveCodeGotten(code: String, email: String?, report: String?) {
-        mShowCodeInterface.onCodeShown(code)
+        runOnMain {
+            mShowCodeInterface?.onCodeShown(code)
+        }
     }
 
     fun setChooseFavoriteListeners(
@@ -95,5 +104,18 @@ class ChooseFavoriteJavaScriptInterface internal constructor(webViewDialogFragme
         mListener = listener
         mCopyToClipboardInterface = copyToClipboardInterface
         mShowCodeInterface = showCodeInterface
+    }
+
+    private fun runOnMain(block: () -> Unit) {
+        mMainHandler.post {
+            if (!mWebViewDialogFragment.isAdded) {
+                return@post
+            }
+            try {
+                block()
+            } catch (e: Exception) {
+                Log.e("JavaScriptInterface", "Could not handle the web view call!", e)
+            }
+        }
     }
 }

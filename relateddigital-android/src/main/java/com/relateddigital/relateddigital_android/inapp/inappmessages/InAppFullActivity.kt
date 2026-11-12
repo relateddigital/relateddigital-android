@@ -7,6 +7,7 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Intent
 import android.graphics.Color
+import com.relateddigital.relateddigital_android.inapp.SafeColor
 import android.os.Bundle
 import android.util.Log
 import android.view.MotionEvent
@@ -132,7 +133,7 @@ class InAppFullActivity : Activity(), IVisilabs {
 
         val webSettings: WebSettings = binding.webViewFull!!.settings
         if (!mInApp!!.mActionData!!.mBackground.isNullOrEmpty()) {
-            binding.webViewFull!!.setBackgroundColor(Color.parseColor(mInApp!!.mActionData!!.mBackground))
+            binding.webViewFull!!.setBackgroundColor(SafeColor.parse(mInApp!!.mActionData!!.mBackground, Color.BLACK))
 
         }
         else binding.webViewFull!!.setBackgroundColor(getResources().getColor(R.color.black))
@@ -220,9 +221,9 @@ class InAppFullActivity : Activity(), IVisilabs {
             && !StringUtils.isNullOrWhiteSpace(mInApp!!.mActionData!!.mPromoCodeTextColor)
         ) {
             binding.llCouponContainer.visibility = View.VISIBLE
-            binding.llCouponContainer.setBackgroundColor(Color.parseColor(mInApp!!.mActionData!!.mPromoCodeBackgroundColor))
+            binding.llCouponContainer.setBackgroundColor(SafeColor.parse(mInApp!!.mActionData!!.mPromoCodeBackgroundColor, Color.BLACK))
             binding.tvCouponCode.text = mInApp!!.mActionData!!.mPromotionCode
-            binding.tvCouponCode.setTextColor(Color.parseColor(mInApp!!.mActionData!!.mPromoCodeTextColor))
+            binding.tvCouponCode.setTextColor(SafeColor.parse(mInApp!!.mActionData!!.mPromoCodeTextColor, Color.BLACK))
             binding.llCouponContainer.setOnClickListener {
                 val clipboard =
                     applicationContext.getSystemService(CLIPBOARD_SERVICE) as ClipboardManager

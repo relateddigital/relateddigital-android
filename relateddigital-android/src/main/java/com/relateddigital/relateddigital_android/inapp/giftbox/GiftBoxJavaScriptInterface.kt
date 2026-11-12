@@ -1,5 +1,7 @@
 package com.relateddigital.relateddigital_android.inapp.giftbox
 
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.webkit.JavascriptInterface
 import com.google.gson.Gson
@@ -11,9 +13,10 @@ import com.relateddigital.relateddigital_android.network.requestHandler.SubsJson
 class GiftBoxJavaScriptInterface internal constructor(webViewDialogFragment: GiftBoxWebDialogFragment,
                                                       @get:JavascriptInterface val response: String) {
     var mWebViewDialogFragment: GiftBoxWebDialogFragment = webViewDialogFragment
-    private  var mListener: GiftBoxCompleteInterface? = null
-    private lateinit var mCopyToClipboardInterface: GiftBoxCopyToClipboardInterface
-    private lateinit var mShowCodeInterface: GiftBoxShowCodeInterface
+    private val mMainHandler = Handler(Looper.getMainLooper())
+    private var mListener: GiftBoxCompleteInterface? = null
+    private var mCopyToClipboardInterface: GiftBoxCopyToClipboardInterface? = null
+    private var mShowCodeInterface: GiftBoxShowCodeInterface? = null
     private val giftboxModel: GiftBox = Gson().fromJson(this.response, GiftBox::class.java)
 
     private var subEmail = ""
@@ -23,8 +26,10 @@ class GiftBoxJavaScriptInterface internal constructor(webViewDialogFragment: Gif
      */
     @JavascriptInterface
     fun close() {
-        mWebViewDialogFragment.dismiss()
-        mListener?.onCompleted()
+        runOnMain {
+            mWebViewDialogFragment.dismissAllowingStateLoss()
+            mListener?.onCompleted()
+        }
     }
 
     /**
@@ -35,8 +40,10 @@ class GiftBoxJavaScriptInterface internal constructor(webViewDialogFragment: Gif
      */
     @JavascriptInterface
     fun copyToClipboard(couponCode: String?, link: String?) {
-        mWebViewDialogFragment.dismiss()
-        mCopyToClipboardInterface.copyToClipboard(couponCode, link)
+        runOnMain {
+            mWebViewDialogFragment.dismissAllowingStateLoss()
+            mCopyToClipboardInterface?.copyToClipboard(couponCode, link)
+        }
     }
 
     /**
@@ -48,8 +55,10 @@ class GiftBoxJavaScriptInterface internal constructor(webViewDialogFragment: Gif
     fun subscribeEmail(email: String?) {
         if (!email.isNullOrEmpty()) {
             subEmail = email
-            SubsJsonRequest.createSubsJsonRequest(mWebViewDialogFragment.requireContext(), giftboxModel.actiondata!!.type!!,
-                giftboxModel.actid.toString(), giftboxModel.actiondata!!.auth!!,
+            val context = mWebViewDialogFragment.context ?: return
+            val actionData = giftboxModel.actiondata ?: return
+            SubsJsonRequest.createSubsJsonRequest(context, actionData.type.orEmpty(),
+                giftboxModel.actid.toString(), actionData.auth.orEmpty(),
                 email)
         } else {
             Log.e("GiftBox : ", "Email entered is not valid!")
@@ -84,7 +93,9 @@ class GiftBoxJavaScriptInterface internal constructor(webViewDialogFragment: Gif
      */
     @JavascriptInterface
     fun saveCodeGotten(code: String, email: String?, report: String?) {
-        mShowCodeInterface.onCodeShown(code)
+        runOnMain {
+            mShowCodeInterface?.onCodeShown(code)
+        }
     }
 
     fun setGiftBoxListeners(
@@ -95,5 +106,18 @@ class GiftBoxJavaScriptInterface internal constructor(webViewDialogFragment: Gif
         mListener = listener
         mCopyToClipboardInterface = copyToClipboardInterface
         mShowCodeInterface = showCodeInterface
+    }
+
+    private fun runOnMain(block: () -> Unit) {
+        mMainHandler.post {
+            if (!mWebViewDialogFragment.isAdded) {
+                return@post
+            }
+            try {
+                block()
+            } catch (e: Exception) {
+                Log.e("JavaScriptInterface", "Could not handle the web view call!", e)
+            }
+        }
     }
 }

@@ -6,7 +6,6 @@ import android.content.Intent
 import android.graphics.Color
 import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
-import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -21,6 +20,9 @@ import com.bumptech.glide.Glide
 import com.google.gson.Gson
 import com.relateddigital.relateddigital_android.R
 import com.relateddigital.relateddigital_android.constants.Constants
+import com.relateddigital.relateddigital_android.inapp.SafeColor
+import com.relateddigital.relateddigital_android.inapp.toFloatOr
+import com.relateddigital.relateddigital_android.inapp.toLongOr
 import com.relateddigital.relateddigital_android.model.SkinBasedStories
 import com.relateddigital.relateddigital_android.model.StoryItems
 import com.relateddigital.relateddigital_android.model.StorySkinBasedActionData
@@ -57,7 +59,6 @@ class StoryActivity : Activity(), StoriesProgressView.StoriesListener {
     private var mStoryPosition = 0
     private var mOnTouchListener: OnTouchListener? = null
     private var mVideoLastPosition = 0
-    private var mRetriever: MediaMetadataRetriever? = null
     private var mActivity: Activity? = null
     private var isCountDownTimer = false
     private var mCountDownContainer: LinearLayout? = null
@@ -106,13 +107,18 @@ class StoryActivity : Activity(), StoriesProgressView.StoriesListener {
                 Log.e(LOG_TAG, "Could not get the story data properly, finishing...")
                 e.printStackTrace()
                 finish()
+                return
             }
         } else {
             Log.e(LOG_TAG, "Could not get the story data properly, finishing...")
             finish()
+            return
         }
-        mRetriever = MediaMetadataRetriever()
-        calculateDisplayTimeVideo()
+        if (mStories?.getItems().isNullOrEmpty() || mStoryItemPosition !in mStories!!.getItems()!!.indices) {
+            Log.e(LOG_TAG, "Story items are empty, finishing...")
+            finish()
+            return
+        }
         setTouchEvents()
         setInitialView()
     }
@@ -188,32 +194,22 @@ class StoryActivity : Activity(), StoriesProgressView.StoriesListener {
         val title: String = mStories!!.title!!
         Log.i("StoryActivityShows ", mActionId + " : " + mStories!!.title)
         PersistentTargetManager.saveShownStory(applicationContext, mActionId!!, mStories!!.title!!)
-        mVisilabsSkinBasedAdapter!!.setStoryList(
-            mVisilabsSkinBasedAdapter!!.mVisilabsSkinBasedResponse!!,
-            mVisilabsSkinBasedAdapter!!.mExtendsProps
-        )
-        mRecyclerView!!.adapter!!.notifyDataSetChanged()
+        val skinBasedAdapter = mVisilabsSkinBasedAdapter
+        val skinBasedResponse = skinBasedAdapter?.mVisilabsSkinBasedResponse
+        if (skinBasedAdapter != null && skinBasedResponse != null) {
+            skinBasedAdapter.setStoryList(skinBasedResponse, skinBasedAdapter.mExtendsProps)
+        }
+        mRecyclerView?.adapter?.notifyDataSetChanged()
         mStoriesProgressView.setStoriesCount(mStories!!.getItems()!!.size)
         mStoriesProgressView.setStoriesListener(this)
-        if (mStories!!.getItems()!![0].fileType.equals(Constants.STORY_PHOTO_KEY)) {
-            mStoriesProgressView.setStoryDuration((
-                mStories!!.getItems()
-                !![mStoryItemPosition].displayTime!!.toInt() * 1000).toLong()
-            )
-        } else {
-            mStoriesProgressView.setStoryDuration((
-                mStories!!.getItems()
-                !![mStoryItemPosition].displayTime!!.toInt().toLong())
-            )
-        }
-        val impressionReport: String = mBannerActionData!!.report!!.impression!!
-        StoryImpressionClickRequest.createStoryImpressionClickRequest(applicationContext, impressionReport)
+        mStoriesProgressView.setStoryDuration(getStoryDuration(mStories!!.getItems()!![mStoryItemPosition]))
+        StoryImpressionClickRequest.createStoryImpressionClickRequest(applicationContext, mBannerActionData?.report?.impression)
         if (!mStories!!.thumbnail.equals("")) {
             Picasso.get().load(mStories!!.thumbnail).into(mIvCover)
         }
         mTvCover.text = mStories!!.title
         if (mExtendedProps != null && !mExtendedProps!!.storyz_label_color.isNullOrEmpty()) {
-            mTvCover.setTextColor(Color.parseColor(mExtendedProps!!.storyz_label_color))
+            SafeColor.parseOrNull(mExtendedProps!!.storyz_label_color)?.let { mTvCover.setTextColor(it) }
         }
 
         mTvCover.typeface = getFontFamily(
@@ -240,7 +236,7 @@ class StoryActivity : Activity(), StoriesProgressView.StoriesListener {
 
     override fun onNext() {
         mCountdownEndGifView.visibility = View.GONE
-        StoryImpressionClickRequest.createStoryImpressionClickRequest(applicationContext, mBannerActionData!!.report!!.impression)
+        StoryImpressionClickRequest.createStoryImpressionClickRequest(applicationContext, mBannerActionData?.report?.impression)
         if (mStories!!.getItems()!!.size > mStoryItemPosition + 1) {
             setStoryItem(mStories!!.getItems()!![++mStoryItemPosition])
         }
@@ -248,13 +244,13 @@ class StoryActivity : Activity(), StoriesProgressView.StoriesListener {
 
     override fun onPrev() {
         mCountdownEndGifView.visibility = View.GONE
-        StoryImpressionClickRequest.createStoryImpressionClickRequest(applicationContext, mBannerActionData!!.report!!.impression)
+        StoryImpressionClickRequest.createStoryImpressionClickRequest(applicationContext, mBannerActionData?.report?.impression)
         if (mStoryItemPosition - 1 < 0) {
             if (mStoryPosition - 1 < mBannerActionData!!.stories!!.size && mStoryPosition - 1 > -1) {
                 mStoryPosition--
                 val previousStoryGroupLatestPosition: Int =
-                    mBannerActionData!!.stories!![mStoryPosition]
-                        .getItems()!!.size - 1
+                    (mBannerActionData!!.stories!![mStoryPosition]
+                        .getItems()?.size ?: 1) - 1
                 startStoryGroup(previousStoryGroupLatestPosition)
             } else {
                 onBackPressed()
@@ -289,8 +285,9 @@ class StoryActivity : Activity(), StoriesProgressView.StoriesListener {
     }
 
     override fun onDestroy() {
-        mStoriesProgressView.destroy()
-        mRetriever!!.release()
+        if (::mStoriesProgressView.isInitialized) {
+            mStoriesProgressView.destroy()
+        }
         if(mTimerCountDown!=null){
             mTimerCountDown!!.cancel()
         }
@@ -302,15 +299,7 @@ class StoryActivity : Activity(), StoriesProgressView.StoriesListener {
             mTimerCountDown!!.cancel()
         }
 
-        if (item.fileType.equals(Constants.STORY_PHOTO_KEY)) {
-            mStoriesProgressView.setStoryDuration((
-                mStories!!.getItems()!![mStoryItemPosition].displayTime!!.toInt() * 1000).toLong()
-            )
-        } else {
-            mStoriesProgressView.setStoryDuration((
-                mStories!!.getItems()!![mStoryItemPosition].displayTime!!.toInt()).toLong()
-            )
-        }
+        mStoriesProgressView.setStoryDuration(getStoryDuration(mStories!!.getItems()!![mStoryItemPosition]))
         if (item.fileType.equals(Constants.STORY_PHOTO_KEY)) {
             mVideoView.visibility = View.INVISIBLE
             mIvStory.visibility = View.VISIBLE
@@ -331,22 +320,22 @@ class StoryActivity : Activity(), StoriesProgressView.StoriesListener {
                     mCountDownBotText!!.visibility = View.GONE
 
                     mCountDownTopText!!.text = mStories!!.getItems()!![mStoryItemPosition]
-                        .countdown!!.messageText!!.replace("\\n", "\n")
-                    mCountDownTopText!!.setTextColor(Color.parseColor(mStories!!.getItems()!![mStoryItemPosition]
-                        .countdown!!.messageTextColor))
+                        .countdown!!.messageText.orEmpty().replace("\\n", "\n")
+                    SafeColor.parseOrNull(mStories!!.getItems()!![mStoryItemPosition]
+                        .countdown!!.messageTextColor)?.let { mCountDownTopText!!.setTextColor(it) }
                     mCountDownTopText!!.textSize = mStories!!.getItems()!![mStoryItemPosition]
-                        .countdown!!.messageTextSize!!.toFloat() + 16
+                        .countdown!!.messageTextSize.toFloatOr(2f) + 16
                     mCountDownTopText!!.typeface = Typeface.DEFAULT
                 } else {
                     mCountDownBotText!!.visibility = View.VISIBLE
                     mCountDownTopText!!.visibility = View.GONE
 
                     mCountDownBotText!!.text = mStories!!.getItems()!![mStoryItemPosition]
-                        .countdown!!.messageText!!.replace("\\n", "\n")
-                    mCountDownBotText!!.setTextColor(Color.parseColor(mStories!!.getItems()!![mStoryItemPosition]
-                        .countdown!!.messageTextColor))
+                        .countdown!!.messageText.orEmpty().replace("\\n", "\n")
+                    SafeColor.parseOrNull(mStories!!.getItems()!![mStoryItemPosition]
+                        .countdown!!.messageTextColor)?.let { mCountDownBotText!!.setTextColor(it) }
                     mCountDownBotText!!.textSize = mStories!!.getItems()!![mStoryItemPosition]
-                        .countdown!!.messageTextSize!!.toFloat() + 16
+                        .countdown!!.messageTextSize.toFloatOr(2f) + 16
                     mCountDownBotText!!.typeface = Typeface.DEFAULT
                 }
 
@@ -355,7 +344,7 @@ class StoryActivity : Activity(), StoriesProgressView.StoriesListener {
                 if(mWeekNum!!.visibility != View.GONE) {
                     mWeekNum!!.setBackgroundResource(R.drawable.rounded_corners_full_small_edge)
                     val gdWeek = mWeekNum!!.background as GradientDrawable
-                    gdWeek.setColor(Color.parseColor("#E5E4E2"))
+                    gdWeek.setColor(SafeColor.parse("#E5E4E2", Color.BLACK))
                     mWeekNum!!.text = mWeekNumber.toString()
                     mWeekNum!!.setTextColor(ContextCompat.getColor(this, R.color.black))
                 }
@@ -363,7 +352,7 @@ class StoryActivity : Activity(), StoriesProgressView.StoriesListener {
                 if(mDayNum!!.visibility != View.GONE) {
                     mDayNum!!.setBackgroundResource(R.drawable.rounded_corners_full_small_edge)
                     val gdDay = mDayNum!!.background as GradientDrawable
-                    gdDay.setColor(Color.parseColor("#E5E4E2"))
+                    gdDay.setColor(SafeColor.parse("#E5E4E2", Color.BLACK))
                     mDayNum!!.text = mDayNumber.toString()
                     mDayNum!!.setTextColor(ContextCompat.getColor(this, R.color.black))
                 }
@@ -371,7 +360,7 @@ class StoryActivity : Activity(), StoriesProgressView.StoriesListener {
                 if(mHourNum!!.visibility != View.GONE) {
                     mHourNum!!.setBackgroundResource(R.drawable.rounded_corners_full_small_edge)
                     val gdHour = mHourNum!!.background as GradientDrawable
-                    gdHour.setColor(Color.parseColor("#E5E4E2"))
+                    gdHour.setColor(SafeColor.parse("#E5E4E2", Color.BLACK))
                     mHourNum!!.text = mHourNumber.toString()
                     mHourNum!!.setTextColor(ContextCompat.getColor(this, R.color.black))
                 }
@@ -379,7 +368,7 @@ class StoryActivity : Activity(), StoriesProgressView.StoriesListener {
                 if(mMinuteNum!!.visibility != View.GONE) {
                     mMinuteNum!!.setBackgroundResource(R.drawable.rounded_corners_full_small_edge)
                     val gdMinute = mMinuteNum!!.background as GradientDrawable
-                    gdMinute.setColor(Color.parseColor("#E5E4E2"))
+                    gdMinute.setColor(SafeColor.parse("#E5E4E2", Color.BLACK))
                     mMinuteNum!!.text = mMinuteNumber.toString()
                     mMinuteNum!!.setTextColor(ContextCompat.getColor(this, R.color.black))
                 }
@@ -387,7 +376,7 @@ class StoryActivity : Activity(), StoriesProgressView.StoriesListener {
                 if(mSecNum!!.visibility != View.GONE) {
                     mSecNum!!.setBackgroundResource(R.drawable.rounded_corners_full_small_edge)
                     val gdSec = mSecNum!!.background as GradientDrawable
-                    gdSec.setColor(Color.parseColor("#E5E4E2"))
+                    gdSec.setColor(SafeColor.parse("#E5E4E2", Color.BLACK))
                     mSecNum!!.text = mSecondNumber.toString()
                     mSecNum!!.setTextColor(ContextCompat.getColor(this, R.color.black))
                 }
@@ -406,7 +395,13 @@ class StoryActivity : Activity(), StoriesProgressView.StoriesListener {
             if (!item.fileSrc.equals("")) {
                 mVideoView.setVideoURI(Uri.parse(item.fileSrc))
             }
-            mVideoView.setOnPreparedListener {
+            mVideoView.setOnPreparedListener { mediaPlayer ->
+                if (isFinishing || isDestroyed) {
+                    return@setOnPreparedListener
+                }
+                if (mediaPlayer.duration > 0) {
+                    mStoriesProgressView.setStoryDuration((mediaPlayer.duration + VIDEO_DURATION_OFFSET).toLong())
+                }
                 mStoriesProgressView.startStories(
                     mStoryItemPosition
                 )
@@ -414,16 +409,16 @@ class StoryActivity : Activity(), StoriesProgressView.StoriesListener {
             mVideoView.requestFocus()
             mVideoView.start()
         }
-        if (!item.buttonText.equals("")) {
+        if (!item.buttonText.isNullOrEmpty()) {
             mBtnStory.visibility = View.VISIBLE
             mBtnStory.text = item.buttonText
-            mBtnStory.setTextColor(Color.parseColor(item.buttonTextColor))
-            mBtnStory.setBackgroundColor(Color.parseColor(item.buttonColor))
+            mBtnStory.setTextColor(SafeColor.parse(item.buttonTextColor, Color.WHITE))
+            mBtnStory.setBackgroundColor(SafeColor.parse(item.buttonColor, Color.BLACK))
         } else {
             mBtnStory.visibility = View.GONE
         }
         mBtnStory.setOnClickListener {
-            StoryImpressionClickRequest.createStoryImpressionClickRequest(applicationContext, mBannerActionData!!.report!!.click)
+            StoryImpressionClickRequest.createStoryImpressionClickRequest(applicationContext, mBannerActionData?.report?.click)
             mActivity!!.finish()
             if (mStoryItemClickListener != null) {
                 mStoryItemClickListener!!.storyItemClicked(item.targetUrl)
@@ -432,30 +427,11 @@ class StoryActivity : Activity(), StoriesProgressView.StoriesListener {
     }
 
 
-    private fun calculateDisplayTimeVideo() {
-        try {
-            val items: List<StoryItems> = mStories!!.getItems()!!
-            for (i in items.indices) {
-                if (items[i].fileType.equals(Constants.STORY_VIDEO_KEY)) {
-                    try {
-                        mRetriever!!.setDataSource(items[i].fileSrc, HashMap())
-                        val time =
-                            mRetriever!!.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
-                        if(time != null) {
-                            val timeInMilliSec = time.toLong()
-                            mStories!!.getItems()!![i]
-                                .displayTime = (timeInMilliSec + VIDEO_DURATION_OFFSET).toString()
-                        } else {
-                            mStories!!.getItems()!![i].displayTime = "3000" // 3 saniye
-                        }
-                    } catch (e: Exception) {
-                        Log.e("StoryActivity-Catch", "Bir video işlenirken hata oluştu: " + items[i].fileSrc, e)
-                        mStories!!.getItems()!![i].displayTime = "3000"
-                    }
-                }
-            }
-        } catch (e: Exception) {
-            Log.e("StoryActivity-Catch", "calculateDisplayTimeVideo fonksiyonunda genel bir hata oluştu.", e)
+    private fun getStoryDuration(item: StoryItems): Long {
+        return if (item.fileType.equals(Constants.STORY_PHOTO_KEY)) {
+            (item.displayTime.toFloatOr(DEFAULT_PHOTO_DURATION_SEC) * 1000).toLong()
+        } else {
+            item.displayTime.toLongOr(DEFAULT_VIDEO_DURATION_MS)
         }
     }
 
@@ -598,6 +574,9 @@ class StoryActivity : Activity(), StoriesProgressView.StoriesListener {
     private fun reAdjustTimerViews() {
         calculateTimeFields()
         runOnUiThread {
+            if (isFinishing || isDestroyed) {
+                return@runOnUiThread
+            }
             try {
                 if (mWeekNum!!.visibility != View.GONE) {
                     mWeekNum!!.text = mWeekNumber.toString()
@@ -695,6 +674,9 @@ class StoryActivity : Activity(), StoriesProgressView.StoriesListener {
 
     private fun startCountdownEndAnimation() {
         runOnUiThread {
+            if (isFinishing || isDestroyed) {
+                return@runOnUiThread
+            }
             mCountdownEndGifView.visibility = View.VISIBLE
             Glide.with(this)
                 .load(mStories!!.getItems()!![mStoryItemPosition].countdown!!.endAnimationImageUrl)
@@ -706,6 +688,8 @@ class StoryActivity : Activity(), StoriesProgressView.StoriesListener {
     companion object {
         private const val LOG_TAG = "Story Activity"
         private const val VIDEO_DURATION_OFFSET = 1000
+        private const val DEFAULT_PHOTO_DURATION_SEC = 3f
+        private const val DEFAULT_VIDEO_DURATION_MS = 3000L
         private const val TIMER_SCHEDULE: Short = 1000
         private const val TIMER_PERIOD: Short = 1000
         var mStoryItemClickListener: StoryItemClickListener? = null

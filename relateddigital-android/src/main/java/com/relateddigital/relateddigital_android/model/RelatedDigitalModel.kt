@@ -603,7 +603,8 @@ fun setUtmTerm(context: Context, utmTerm: String) {
 
     fun getExtra(): HashMap<String, Any> {
         synchronized(this) {
-            return extra
+            val currentExtra: HashMap<String, Any>? = extra
+            return if (currentExtra == null) HashMap() else HashMap(currentExtra)
         }
     }
 
@@ -877,8 +878,85 @@ fun setUtmTerm(context: Context, utmTerm: String) {
             } else {
                 fromModel.getSdkVersion()
             }
-
-
+            deviceType = if (fromModel.getDeviceType().isNullOrEmpty()) {
+                AppUtils.getDeviceType()
+            } else {
+                fromModel.getDeviceType()
+            }
+            deviceName = if (fromModel.getDeviceName().isNullOrEmpty()) {
+                AppUtils.getDeviceName()
+            } else {
+                fromModel.getDeviceName()
+            }
+            carrier = if (fromModel.getCarrier().isNullOrEmpty()) {
+                AppUtils.getCarrier(context)
+            } else {
+                fromModel.getCarrier()
+            }
+            identifierForVendor = if (fromModel.getIdentifierForVendor().isNullOrEmpty()) {
+                AppUtils.getIdentifierForVendor(context)
+            } else {
+                fromModel.getIdentifierForVendor()
+            }
+            advertisingIdentifier = fromModel.getAdvertisingIdentifier()
+            local = if (fromModel.getLocal().isNullOrEmpty()) {
+                AppUtils.getLocal(context)
+            } else {
+                fromModel.getLocal()
+            }
+            exVisitorId = fromModel.getExVisitorId()
+            token = fromModel.getToken()
+            cookieId = if (fromModel.getCookieId().isNullOrEmpty()) {
+                AppUtils.getCookieId(context)
+            } else {
+                fromModel.getCookieId()
+            }
+            utmCampaign = if (fromModel.getUtmCampaign() == null) {
+                null
+            } else {
+                fromModel.getUtmCampaign()
+            }
+            utmContent = if (fromModel.getUtmContent() == null) {
+                null
+            } else {
+                fromModel.getUtmContent()
+            }
+            utmMedium = if (fromModel.getUtmMedium() == null) {
+                null
+            } else {
+                fromModel.getUtmMedium()
+            }
+            utmTerm = if (fromModel.getUtmTerm() == null) {
+                null
+            } else {
+                fromModel.getUtmTerm()
+            }
+            utmSource = if (fromModel.getUtmSource() == null) {
+                null
+            } else {
+                fromModel.getUtmSource()
+            }
+            userAgent = if (fromModel.getUserAgent().isNullOrEmpty()) {
+                AppUtils.getUserAgent()
+            } else {
+                fromModel.getUserAgent()
+            }
+            visitorData = if (fromModel.getVisitorData().isNullOrEmpty()) {
+                ""
+            } else {
+                fromModel.getVisitorData()
+            }
+            visitData = if (fromModel.getVisitData().isNullOrEmpty()) {
+                ""
+            } else {
+                fromModel.getVisitData()
+            }
+            cookie = if (fromModel.getCookie() == null) {
+                null
+            } else {
+                fromModel.getCookie()
+            }
+            extra = fromModel.getExtra()
         }
     }
 }

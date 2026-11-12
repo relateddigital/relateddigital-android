@@ -22,9 +22,9 @@ class ChooseFavoriteWebDialogFragment :DialogFragment(){
     private var baseUrl: String? = ""
     private var htmlString: String? = ""
     private var mIsRotation = false
-    private lateinit var mListener: ChooseFavoriteCompleteInterface
-    private lateinit var mCopyToClipboardInterface: ChooseFavoriteCopyToClipboardInterface
-    private lateinit var mShowCodeInterface: ChooseFavoriteShowCodeInterface
+    private var mListener: ChooseFavoriteCompleteInterface? = null
+    private var mCopyToClipboardInterface: ChooseFavoriteCopyToClipboardInterface? = null
+    private var mShowCodeInterface: ChooseFavoriteShowCodeInterface? = null
 
     fun display(fragmentManagerLoc: FragmentManager?): ChooseFavoriteWebDialogFragment {
         val ft = fragmentManagerLoc?.beginTransaction()
@@ -50,8 +50,16 @@ class ChooseFavoriteWebDialogFragment :DialogFragment(){
             baseUrl = requireArguments().getString("baseUrl")
             htmlString = requireArguments().getString("htmlString")
             mResponse = requireArguments().getString("response")
+            val listener = mListener
+            val copyToClipboardInterface = mCopyToClipboardInterface
+            val showCodeInterface = mShowCodeInterface
+            if (listener == null || copyToClipboardInterface == null || showCodeInterface == null) {
+                mIsRotation = true
+                dismissAllowingStateLoss()
+                return
+            }
             mJavaScriptInterface = ChooseFavoriteJavaScriptInterface(this, mResponse!!)
-            mJavaScriptInterface!!.setChooseFavoriteListeners(mListener, mCopyToClipboardInterface, mShowCodeInterface)
+            mJavaScriptInterface!!.setChooseFavoriteListeners(listener, copyToClipboardInterface, showCodeInterface)
         }
     }
 
@@ -72,7 +80,13 @@ class ChooseFavoriteWebDialogFragment :DialogFragment(){
     @SuppressLint("SetJavaScriptEnabled", "JavascriptInterface")
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         super.onCreateView(inflater, container, savedInstanceState)
-        val view: View = inflater.inflate(R.layout.layout_web_view, container, false)
+        val view: View = try {
+            inflater.inflate(R.layout.layout_web_view, container, false)
+        } catch (e: Exception) {
+            Log.e(TAG, "WebView could not be inflated!", e)
+            dismissAllowingStateLoss()
+            return View(requireContext())
+        }
         webView = view.findViewById(R.id.webview)
         webView!!.webChromeClient = webViewClient
         webView!!.settings.javaScriptEnabled = true

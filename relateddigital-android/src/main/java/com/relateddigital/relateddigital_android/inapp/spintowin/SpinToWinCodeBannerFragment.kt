@@ -3,6 +3,7 @@ package com.relateddigital.relateddigital_android.inapp.spintowin
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.graphics.Color
+import com.relateddigital.relateddigital_android.inapp.SafeColor
 import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
@@ -85,7 +86,7 @@ class SpinToWinCodeBannerFragment : Fragment() {
 
     private fun setupUi() {
         if (!mExtendedProps!!.promocode_banner_background_color.isNullOrEmpty()) {
-            binding.container.setBackgroundColor(Color.parseColor(mExtendedProps!!.promocode_banner_background_color))
+            binding.container.setBackgroundColor(SafeColor.parse(mExtendedProps!!.promocode_banner_background_color, Color.BLACK))
         } else {
             binding.container.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.black))
         }
@@ -95,13 +96,13 @@ class SpinToWinCodeBannerFragment : Fragment() {
         binding.bannerCode.text = bannerCode
 
         if (!mExtendedProps!!.promocode_banner_text_color.isNullOrEmpty()) {
-            binding.bannerText.setTextColor(Color.parseColor(mExtendedProps!!.promocode_banner_text_color))
-            //binding.bannerLabel.setTextColor(Color.parseColor(mExtendedProps!!.promocode_banner_text_color))
-            binding.bannerCode.setTextColor(Color.parseColor(mExtendedProps!!.promocode_banner_text_color))
+            binding.bannerText.setTextColor(SafeColor.parse(mExtendedProps!!.promocode_banner_text_color, Color.BLACK))
+            //binding.bannerLabel.setTextColor(SafeColor.parse(mExtendedProps!!.promocode_banner_text_color, Color.BLACK))
+            binding.bannerCode.setTextColor(SafeColor.parse(mExtendedProps!!.promocode_banner_text_color, Color.BLACK))
             val drawable = ContextCompat.getDrawable(requireContext(), R.drawable.dotted_border) as GradientDrawable
             drawable.setStroke(
                 3,
-                Color.parseColor(mExtendedProps!!.promocode_banner_text_color),
+                SafeColor.parse(mExtendedProps!!.promocode_banner_text_color, Color.BLACK),
                 6f, // Noktaların uzunluğu (dp)
                 6f
             )
@@ -170,7 +171,7 @@ class SpinToWinCodeBannerFragment : Fragment() {
 
     private fun endFragment() {
         if (activity != null) {
-            requireActivity().supportFragmentManager.beginTransaction().remove(this@SpinToWinCodeBannerFragment).commit()
+            requireActivity().supportFragmentManager.beginTransaction().remove(this@SpinToWinCodeBannerFragment).commitAllowingStateLoss()
         }
     }
 

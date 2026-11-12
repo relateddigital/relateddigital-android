@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.graphics.Color
+import com.relateddigital.relateddigital_android.inapp.SafeColor
 import android.os.Bundle
 import android.util.Log
 import android.view.Gravity
@@ -122,7 +123,7 @@ class FullscreenPopupActivity : Activity() {
             when {
                 color.equals("black", ignoreCase = true) -> Color.BLACK
                 color.equals("white", ignoreCase = true) -> Color.WHITE
-                else -> Color.parseColor(color)
+                else -> SafeColor.parse(color, Color.BLACK)
             }
         } catch (_: IllegalArgumentException) {
             Color.WHITE

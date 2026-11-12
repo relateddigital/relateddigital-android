@@ -3,6 +3,7 @@ package com.relateddigital.relateddigital_android.inapp.inappmessages
 import android.app.Activity
 import android.content.Intent
 import android.graphics.Color
+import com.relateddigital.relateddigital_android.inapp.SafeColor
 import android.graphics.drawable.GradientDrawable
 import android.net.Uri
 import android.os.Build
@@ -192,7 +193,7 @@ class CarouselFullscreenActivity : Activity() {
         primaryButton.visibility = View.VISIBLE
         primaryButton.text = item.buttonText!!.replace("\\n", "\n")
 
-        var fillColor = Color.parseColor("#00897B")
+        var fillColor = SafeColor.parse("#00897B", Color.BLACK)
         if (!item.buttonColor.isNullOrEmpty()) {
             try { fillColor = parseColor(item.buttonColor!!) } catch (_: Exception) {}
         }
@@ -223,7 +224,7 @@ class CarouselFullscreenActivity : Activity() {
 
         secondaryButton.text = item.secondButtonText!!.replace("\\n", "\n")
 
-        var fillColor = Color.parseColor("#00897B")
+        var fillColor = SafeColor.parse("#00897B", Color.BLACK)
         if (!item.secondButtonColor.isNullOrEmpty()) {
             try { fillColor = parseColor(item.secondButtonColor!!) } catch (_: Exception) {}
         } else if (!item.buttonColor.isNullOrEmpty()) {
@@ -298,7 +299,7 @@ class CarouselFullscreenActivity : Activity() {
     private fun parseColor(colorStr: String): Int {
         var c = colorStr
         if (!c.startsWith("#")) c = "#$c"
-        return Color.parseColor(c)
+        return SafeColor.parse(c, Color.BLACK)
     }
 
     // -- Adapter --
@@ -333,7 +334,7 @@ class CarouselFullscreenActivity : Activity() {
             val cardBg = GradientDrawable()
             cardBg.setColor(Color.WHITE)
             cardBg.cornerRadius = dpToPx(22f).toFloat()
-            cardBg.setStroke(dpToPx(1f), Color.parseColor("#DDDDDD"))
+            cardBg.setStroke(dpToPx(1f), SafeColor.parse("#DDDDDD", Color.BLACK))
             cardView.background = cardBg
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 cardView.clipToOutline = true

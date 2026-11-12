@@ -23,6 +23,7 @@ import java.util.*
 class SpinToWinJavaScriptInterface internal constructor(webViewDialogFragment: SpinToWinWebDialogFragment,
                                                         @get:JavascriptInterface val response: String) {
     var mWebViewDialogFragment: SpinToWinWebDialogFragment = webViewDialogFragment
+    private val mMainHandler = Handler(Looper.getMainLooper())
     private var mListener: SpinToWinCompleteInterface? = null
     private var mCopyToClipboardInterface: SpinToWinCopyToClipboardInterface? = null
     private var mSpinToWinShowCodeInterface: SpinToWinShowCodeInterface? = null
@@ -36,8 +37,10 @@ class SpinToWinJavaScriptInterface internal constructor(webViewDialogFragment: S
      */
     @JavascriptInterface
     fun close() {
-        mWebViewDialogFragment.dismiss()
-        mListener?.onCompleted()
+        runOnMain {
+            mWebViewDialogFragment.dismissAllowingStateLoss()
+            mListener?.onCompleted()
+        }
     }
 
     /**
@@ -48,17 +51,19 @@ class SpinToWinJavaScriptInterface internal constructor(webViewDialogFragment: S
      */
     @JavascriptInterface
     fun copyToClipboard(couponCode: String?, link: String?) {
-        mWebViewDialogFragment.dismiss()
-        if(!spinToWinModel.actiondata!!.slices!![selectedIndex].androidLink.isNullOrEmpty()) {
-            mCopyToClipboardInterface?.copyToClipboard(
-                couponCode,
-                spinToWinModel.actiondata!!.slices!![selectedIndex].androidLink
-            )
+        runOnMain {
+            mWebViewDialogFragment.dismissAllowingStateLoss()
+            val sliceLink = spinToWinModel.actiondata?.slices?.getOrNull(selectedIndex)?.androidLink
+            if(!sliceLink.isNullOrEmpty()) {
+                mCopyToClipboardInterface?.copyToClipboard(
+                    couponCode,
+                    sliceLink
+                )
+            }
+            else {
+                mCopyToClipboardInterface?.copyToClipboard(couponCode, link)
+            }
         }
-        else {
-            mCopyToClipboardInterface!!.copyToClipboard(couponCode, link)
-        }
-
     }
 
     /**
@@ -166,9 +171,12 @@ class SpinToWinJavaScriptInterface internal constructor(webViewDialogFragment: S
                     val finalSelectedSliceText = selectedSliceText
                     val finalSelectedIndex = selectedIndex
                     val myRunnable = Runnable {
+                        if (!mWebViewDialogFragment.isAdded) {
+                            return@Runnable
+                        }
                         mSpinToWinShowCodeInterface?.onCodeShown(finalSelectedCode)
                         sendPromotionCodeInfo(finalSelectedCode, finalSelectedSliceText)
-                        mWebViewDialogFragment.getWebView()!!.evaluateJavascript(
+                        mWebViewDialogFragment.getWebView()?.evaluateJavascript(
                                 "window.chooseSlice($finalSelectedIndex,'$finalSelectedCode');",
                                 null)
                     }
@@ -183,7 +191,10 @@ class SpinToWinJavaScriptInterface internal constructor(webViewDialogFragment: S
         if (selectedIndex == -1) {
             val mainHandler = Handler(Looper.getMainLooper())
             val myRunnable = Runnable {
-                mWebViewDialogFragment.getWebView()!!.evaluateJavascript(
+                if (!mWebViewDialogFragment.isAdded) {
+                    return@Runnable
+                }
+                mWebViewDialogFragment.getWebView()?.evaluateJavascript(
                         "window.chooseSlice(-1, undefined);", null)
             }
             mainHandler.post(myRunnable)
@@ -199,9 +210,12 @@ class SpinToWinJavaScriptInterface internal constructor(webViewDialogFragment: S
                 val promotionCode: String = jsonResponse.getString("promocode")
                 val mainHandler = Handler(Looper.getMainLooper())
                 val myRunnable = Runnable {
+                    if (!mWebViewDialogFragment.isAdded) {
+                        return@Runnable
+                    }
                     mSpinToWinShowCodeInterface?.onCodeShown(promotionCode)
                     sendPromotionCodeInfo(promotionCode, sliceText)
-                    mWebViewDialogFragment.getWebView()!!.evaluateJavascript(
+                    mWebViewDialogFragment.getWebView()?.evaluateJavascript(
                             "window.chooseSlice($idx,'$promotionCode');",
                             null)
                 }
@@ -236,9 +250,12 @@ class SpinToWinJavaScriptInterface internal constructor(webViewDialogFragment: S
                         val mainHandler = Handler(Looper.getMainLooper())
                         val finalSelectedIndex = selectedIndex
                         val myRunnable = Runnable {
+                            if (!mWebViewDialogFragment.isAdded) {
+                                return@Runnable
+                            }
                             mSpinToWinShowCodeInterface?.onCodeShown(finalSelectedCode)
                             sendPromotionCodeInfo(finalSelectedCode, finalSelectedSliceText)
-                            mWebViewDialogFragment.getWebView()!!.evaluateJavascript(
+                            mWebViewDialogFragment.getWebView()?.evaluateJavascript(
                                     "window.chooseSlice($finalSelectedIndex,'$finalSelectedCode');",
                                     null)
                         }
@@ -252,7 +269,10 @@ class SpinToWinJavaScriptInterface internal constructor(webViewDialogFragment: S
                 if (selectedIndex == -1) {
                     val mainHandler = Handler(Looper.getMainLooper())
                     val myRunnable = Runnable {
-                        mWebViewDialogFragment.getWebView()!!.evaluateJavascript(
+                        if (!mWebViewDialogFragment.isAdded) {
+                            return@Runnable
+                        }
+                        mWebViewDialogFragment.getWebView()?.evaluateJavascript(
                                 "window.chooseSlice(-1, undefined);", null)
                     }
                     mainHandler.post(myRunnable)
@@ -278,14 +298,29 @@ class SpinToWinJavaScriptInterface internal constructor(webViewDialogFragment: S
         if (subEmail.isNotEmpty()) {
             parameters[Constants.PROMOTION_CODE_EMAIL_REQUEST_KEY] = subEmail
         }
-        parameters[Constants.PROMOTION_CODE_TITLE_REQUEST_KEY] = spinToWinModel.actiondata!!.promocodeTitle!!
+        spinToWinModel.actiondata?.promocodeTitle?.let {
+            parameters[Constants.PROMOTION_CODE_TITLE_REQUEST_KEY] = it
+        }
         if (sliceText.isNotEmpty()) {
             parameters[Constants.PROMOTION_CODE_SLICE_TEXT_REQUEST_KEY] = sliceText
         }
+        val context = mWebViewDialogFragment.context ?: return
         RelatedDigital.customEvent(
-                context = mWebViewDialogFragment.requireContext(),
+                context = context,
                 pageName = Constants.PAGE_NAME_REQUEST_VAL,
                 properties = parameters)
     }
 
+    private fun runOnMain(block: () -> Unit) {
+        mMainHandler.post {
+            if (!mWebViewDialogFragment.isAdded) {
+                return@post
+            }
+            try {
+                block()
+            } catch (e: Exception) {
+                Log.e("JavaScriptInterface", "Could not handle the web view call!", e)
+            }
+        }
+    }
 }

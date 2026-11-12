@@ -107,7 +107,7 @@ open class RelatedDigitalFirebaseMessagingService : FirebaseMessagingService() {
                             // PushNotificationManager metotları 'this' yerine 'context' alacak
                             if (channelName != PushNotificationManager.getChannelName(context) ||
                                 channelDescription != PushNotificationManager.getChannelDescription(context) ||
-                                channelSound != pushMessage.sound
+                                channelSound != pushMessage.sound.orEmpty()
                             ) {
                                 val oldChannelId: String =
                                     SharedPref.readString(context, Constants.NOTIFICATION_CHANNEL_ID_KEY)
@@ -131,13 +131,11 @@ open class RelatedDigitalFirebaseMessagingService : FirebaseMessagingService() {
                                 PushNotificationManager.getChannelDescription(context)
                             )
 
-                            if (!pushMessage.sound.isNullOrEmpty()) {
-                                SharedPref.writeString(
-                                    context,
-                                    Constants.NOTIFICATION_CHANNEL_SOUND_KEY,
-                                    pushMessage.sound!!
-                                )
-                            }
+                            SharedPref.writeString(
+                                context,
+                                Constants.NOTIFICATION_CHANNEL_SOUND_KEY,
+                                pushMessage.sound.orEmpty()
+                            )
                         }
 
                         when (pushMessage.getPushType()) {
@@ -198,7 +196,7 @@ open class RelatedDigitalFirebaseMessagingService : FirebaseMessagingService() {
                     } else {
                         Log.d(LOG_TAG, "remoteMessageData transform problem")
                     }
-                } catch (e: Exception) {
+                } catch (e: Throwable) {
                     Log.e(LOG_TAG, "Error handling push message: ${e.localizedMessage}")
                     // Hata loglaması için de context gerekebilir
                     LogUtils.formGraylogModel(

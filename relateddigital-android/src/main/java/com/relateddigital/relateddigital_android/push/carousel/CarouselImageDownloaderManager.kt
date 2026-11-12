@@ -71,35 +71,44 @@ class CarouselImageDownloaderManager(
         val runnable = Runnable {
             var imagePath: String? = null
             val currentTimeInMillis = System.currentTimeMillis()
-            val bitmap: Bitmap? = AppUtils.getBitMapFromUri(context, imageUrl)
-            if (bitmap != null) {
-                val sampleSize: Int =
-                    ImageUtils.calculateInSampleSize(bitmap.width, bitmap.height, 250, 250)
-                val bit = Bitmap.createScaledBitmap(
-                    bitmap,
-                    bitmap.width / sampleSize,
-                    bitmap.height / sampleSize,
-                    false
-                )
-                imagePath = ImageUtils.saveBitmapToInternalStorage(
-                    context,
-                    bit,
-                    Constants.CAROUSAL_IMAGE_BEGENNING + currentTimeInMillis
-                )
-            }
-            if (imagePath == null) {
-                Log.e(TAG, "factory returned a null result")
-                mImageLoaderListener.onError(
-                    ImageError("downloaded file could not be decoded as bitmap")
-                        .setErrorCode(ImageError.ERROR_DECODE_FAILED)
-                )
-            } else {
-                Log.d(TAG, "download complete")
-                if (currentItem != null) {
-                    currentItem!!.imageFileLocation = imagePath
-                    currentItem!!.imageFileName = Constants.CAROUSAL_IMAGE_BEGENNING + currentTimeInMillis
+            try {
+                val bitmap: Bitmap? = AppUtils.getBitMapFromUri(context, imageUrl)
+                if (bitmap != null) {
+                    val sampleSize: Int =
+                        ImageUtils.calculateInSampleSize(bitmap.width, bitmap.height, 250, 250)
+                    val bit = Bitmap.createScaledBitmap(
+                        bitmap,
+                        bitmap.width / sampleSize,
+                        bitmap.height / sampleSize,
+                        false
+                    )
+                    imagePath = ImageUtils.saveBitmapToInternalStorage(
+                        context,
+                        bit,
+                        Constants.CAROUSAL_IMAGE_BEGENNING + currentTimeInMillis
+                    )
                 }
-                mImageLoaderListener.onComplete(imagePath)
+            } catch (t: Throwable) {
+                imagePath = null
+                Log.e(TAG, "Carousel image could not be downloaded : " + t.message)
+            }
+            try {
+                if (imagePath == null) {
+                    Log.e(TAG, "factory returned a null result")
+                    mImageLoaderListener.onError(
+                        ImageError("downloaded file could not be decoded as bitmap")
+                            .setErrorCode(ImageError.ERROR_DECODE_FAILED)
+                    )
+                } else {
+                    Log.d(TAG, "download complete")
+                    if (currentItem != null) {
+                        currentItem!!.imageFileLocation = imagePath
+                        currentItem!!.imageFileName = Constants.CAROUSAL_IMAGE_BEGENNING + currentTimeInMillis
+                    }
+                    mImageLoaderListener.onComplete(imagePath)
+                }
+            } catch (t: Throwable) {
+                Log.e(TAG, "Carousel could not be prepared : " + t.message)
             }
             System.gc()
         }
@@ -128,9 +137,7 @@ class CarouselImageDownloaderManager(
         }
     }
 
-    companion object {
-        private var currentDownloadTaskIndex = 0
-    }
+    private var currentDownloadTaskIndex = 0
 
     init {
         this.carouselItems = carouselItems

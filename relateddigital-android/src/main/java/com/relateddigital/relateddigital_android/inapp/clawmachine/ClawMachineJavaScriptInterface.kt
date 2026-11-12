@@ -1,5 +1,7 @@
 package com.relateddigital.relateddigital_android.inapp.clawmachine
 
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.webkit.JavascriptInterface
 import com.google.gson.Gson
@@ -13,9 +15,10 @@ import com.relateddigital.relateddigital_android.network.requestHandler.SubsJson
 class ClawMachineJavaScriptInterface internal constructor(webViewDialogFragment: ClawMachineWebDialogFragment,
                                                           @get:JavascriptInterface val response: String) {
     var mWebViewDialogFragment: ClawMachineWebDialogFragment = webViewDialogFragment
-    private lateinit var mListener: ClawMachineCompleteInterface
-    private lateinit var mCopyToClipboardInterface: ClawMachineCopyToClipboardInterface
-    private lateinit var mShowCodeInterface: ClawMachineShowCodeInterface
+    private val mMainHandler = Handler(Looper.getMainLooper())
+    private var mListener: ClawMachineCompleteInterface? = null
+    private var mCopyToClipboardInterface: ClawMachineCopyToClipboardInterface? = null
+    private var mShowCodeInterface: ClawMachineShowCodeInterface? = null
     private val clawmachineModel: ClawMachine = Gson().fromJson(this.response, ClawMachine::class.java)
 
     private var subEmail = ""
@@ -25,8 +28,10 @@ class ClawMachineJavaScriptInterface internal constructor(webViewDialogFragment:
      */
     @JavascriptInterface
     fun close() {
-        mWebViewDialogFragment.dismiss()
-        mListener.onCompleted()
+        runOnMain {
+            mWebViewDialogFragment.dismissAllowingStateLoss()
+            mListener?.onCompleted()
+        }
     }
 
     /**
@@ -37,8 +42,10 @@ class ClawMachineJavaScriptInterface internal constructor(webViewDialogFragment:
      */
     @JavascriptInterface
     fun copyToClipboard(couponCode: String?) {
-        mWebViewDialogFragment.dismiss()
-        mCopyToClipboardInterface.copyToClipboard(couponCode)
+        runOnMain {
+            mWebViewDialogFragment.dismissAllowingStateLoss()
+            mCopyToClipboardInterface?.copyToClipboard(couponCode)
+        }
     }
 
     /**
@@ -86,16 +93,29 @@ class ClawMachineJavaScriptInterface internal constructor(webViewDialogFragment:
      */
     @JavascriptInterface
     fun saveCodeGotten(code: String, email: String?, report: String?) {
-        mShowCodeInterface.onCodeShown(code)
+        mShowCodeInterface?.onCodeShown(code)
     }
 
     fun setClawMachineListeners(
-        listener: ClawMachineCompleteInterface,
-        copyToClipboardInterface: ClawMachineCopyToClipboardInterface,
-        showCodeInterface: ClawMachineShowCodeInterface
+        listener: ClawMachineCompleteInterface?,
+        copyToClipboardInterface: ClawMachineCopyToClipboardInterface?,
+        showCodeInterface: ClawMachineShowCodeInterface?
     ) {
         mListener = listener
         mCopyToClipboardInterface = copyToClipboardInterface
         mShowCodeInterface = showCodeInterface
+    }
+
+    private fun runOnMain(block: () -> Unit) {
+        mMainHandler.post {
+            if (!mWebViewDialogFragment.isAdded) {
+                return@post
+            }
+            try {
+                block()
+            } catch (e: Exception) {
+                Log.e("JavaScriptInterface", "Could not handle the web view call!", e)
+            }
+        }
     }
 }

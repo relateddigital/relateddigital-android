@@ -148,16 +148,16 @@ class GiftCatchActivity : FragmentActivity(), GiftCatchCompleteInterface,
                 )
 
                 if (!extendedProps.promocodeBannerButtonLabel.isNullOrEmpty()) {
-                    if(ActivityUtils.parentActivity != null) {
+                    val parent = ActivityUtils.parentActivity as? FragmentActivity
+                    if (parent != null && !parent.isFinishing && !parent.isDestroyed) {
                         val giftCatchCodeBannerFragment =
                             GiftCatchCodeBannerFragment.newInstance(extendedProps, giftCatchPromotionCode)
 
-                        val transaction: FragmentTransaction =
-                            (ActivityUtils.parentActivity as FragmentActivity).supportFragmentManager.beginTransaction()
+                        val transaction: FragmentTransaction = parent.supportFragmentManager.beginTransaction()
                         transaction.replace(android.R.id.content, giftCatchCodeBannerFragment)
-                        transaction.commit()
-                        ActivityUtils.parentActivity = null
+                        transaction.commitAllowingStateLoss()
                     }
+                    ActivityUtils.parentActivity = null
                 }
             } catch (e: Exception) {
                 Log.e(LOG_TAG, "GiftCatchCodeBanner : " + e.message)

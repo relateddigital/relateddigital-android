@@ -3,7 +3,9 @@ package com.relateddigital.relateddigital_android
 import android.app.Activity
 import android.app.ActivityManager
 import android.app.ActivityManager.RunningAppProcessInfo
+import android.app.Application
 import android.app.NotificationManager
+import com.relateddigital.relateddigital_android.inapp.InAppActionManager
 import android.content.Context
 import android.content.Intent
 import android.os.Build
@@ -18,6 +20,7 @@ import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
 import com.relateddigital.relateddigital_android.appTracker.AppTracker
 import com.relateddigital.relateddigital_android.capture.RDCapture
+import com.relateddigital.relateddigital_android.util.RelatedDigitalInstallTracker
 import com.relateddigital.relateddigital_android.constants.Constants
 import com.relateddigital.relateddigital_android.geofence.GeofenceStarter
 import com.relateddigital.relateddigital_android.inapp.InAppButtonInterface
@@ -76,19 +79,29 @@ object RelatedDigital {
 
         // createInitialModel cookieId yoksa üretip kaydettiği için kontrol ondan önce yapılıyor:
         // cookieId önceki bir açılıştan kaldıysa SDK bu cihazda daha önce çalışmış demektir.
-        val isExistingInstall = SharedPref.readString(context, Constants.COOKIE_ID_KEY, "").isNotEmpty()
+        val hasCookie = SharedPref.readString(context, Constants.COOKIE_ID_KEY, "").isNotEmpty()
+        RelatedDigitalInstallTracker.getInstance(context)
+        val isExistingInstall = hasCookie || RelatedDigitalInstallTracker.isExistingInstall(context)
 
         model = createInitialModel(context)
+
+        (context.applicationContext as? Application ?: context as? Application)?.let { app ->
+            InAppActionManager.init(app)
+        }
 
         val modelStr = SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY, "")
 
         if (modelStr.isNotEmpty()) {
             try {
-                val parsedModel = Gson().fromJson(modelStr, RelatedDigitalModel::class.java)
-                model!!.fill(parsedModel)
+                val parsedModel: RelatedDigitalModel? = Gson().fromJson(modelStr, RelatedDigitalModel::class.java)
+                if (parsedModel != null) {
+                    model!!.fill(parsedModel)
+                }
             } catch (e: JsonSyntaxException) {
                 Log.e(LOG_TAG, "JSON parsing error in init: ${e.message}")
                 SharedPref.writeString(context, Constants.RELATED_DIGITAL_MODEL_KEY, "")
+            } catch (e: Exception) {
+                Log.e(LOG_TAG, "Stored model could not be read in init: ${e.message}")
             }
         }
 
@@ -142,22 +155,29 @@ object RelatedDigital {
 
     fun getRelatedDigitalModel(context: Context): RelatedDigitalModel {
         if (model == null) {
-            model = createInitialModel(context)
-
-            val modelStr = SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY, "")
-
-            if (modelStr.isNotEmpty()) {
-                try {
-                    val parsedModel = Gson().fromJson(modelStr, RelatedDigitalModel::class.java)
-                    model!!.fill(parsedModel)
-                } catch (e: JsonSyntaxException) {
-                    Log.e("RelatedDigitalModel", "JSON parsing error: ${e.message}")
-                } catch (e: Exception) {
-                    Log.e("RelatedDigitalModel", "Unexpected error: ${e.message}")
-                }
-            }
+            model = loadModelFromSharedPref(context)
         }
         return model!!
+    }
+
+    private fun loadModelFromSharedPref(context: Context): RelatedDigitalModel {
+        val initialModel = createInitialModel(context)
+
+        val modelStr = SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY, "")
+
+        if (modelStr.isNotEmpty()) {
+            try {
+                val parsedModel: RelatedDigitalModel? = Gson().fromJson(modelStr, RelatedDigitalModel::class.java)
+                if (parsedModel != null) {
+                    initialModel.fill(parsedModel)
+                }
+            } catch (e: JsonSyntaxException) {
+                Log.e("RelatedDigitalModel", "JSON parsing error: ${e.message}")
+            } catch (e: Exception) {
+                Log.e("RelatedDigitalModel", "Unexpected error: ${e.message}")
+            }
+        }
+        return initialModel
     }
 
     @JvmStatic
@@ -274,6 +294,9 @@ object RelatedDigital {
             )
         }
 
+        val previousChannelName = SharedPref.readString(context, Constants.CHANNEL_NAME)
+        val previousPriority = SharedPref.readString(context, Constants.NOTIFICATION_PRIORITY_KEY)
+
         if(notificationChannelName.isNotEmpty()) {
             SharedPref.writeString(
                 context,
@@ -290,17 +313,6 @@ object RelatedDigital {
             )
         }
 
-        val notificationManager =
-            context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager?
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && notificationManager != null) {
-            val oldChannelId: String =
-                SharedPref.readString(context, Constants.NOTIFICATION_CHANNEL_ID_KEY)
-            if (oldChannelId.isNotEmpty()) {
-                notificationManager.deleteNotificationChannel(oldChannelId)
-            }
-            AppUtils.getNotificationChannelId(context, true)
-        }
-
         var importance = ""
         importance = if (notificationPriority == RDNotificationPriority.HIGH) {
             "high"
@@ -308,6 +320,22 @@ object RelatedDigital {
             "low"
         } else {
             "normal"
+        }
+
+        val notificationManager =
+            context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager?
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && notificationManager != null) {
+            val oldChannelId: String =
+                SharedPref.readString(context, Constants.NOTIFICATION_CHANNEL_ID_KEY)
+            val currentChannelName = SharedPref.readString(context, Constants.CHANNEL_NAME)
+            if (oldChannelId.isEmpty() || currentChannelName != previousChannelName ||
+                importance != previousPriority
+            ) {
+                if (oldChannelId.isNotEmpty()) {
+                    notificationManager.deleteNotificationChannel(oldChannelId)
+                }
+                AppUtils.getNotificationChannelId(context, true)
+            }
         }
 
         SharedPref.writeString(context, Constants.NOTIFICATION_PRIORITY_KEY, importance)
@@ -352,8 +380,7 @@ object RelatedDigital {
             model!!.setIsInAppNotificationEnabled(context, isInAppNotificationEnabled)
         } else {
             if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
-                model = Gson().fromJson(SharedPref.readString(context,
-                        Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
+                model = loadModelFromSharedPref(context)
                 model!!.setIsInAppNotificationEnabled(context, isInAppNotificationEnabled)
             } else {
                 model = createInitialModel(context)
@@ -369,8 +396,7 @@ object RelatedDigital {
             model!!.setGeofencingIntervalInMinute(context, geofencingIntervalInMinute)
         } else {
             if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
-                model = Gson().fromJson(SharedPref.readString(context,
-                        Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
+                model = loadModelFromSharedPref(context)
                 model!!.setIsGeofenceEnabled(context, isGeofenceEnabled)
                 model!!.setGeofencingIntervalInMinute(context, geofencingIntervalInMinute)
             } else {
@@ -391,8 +417,7 @@ object RelatedDigital {
             model!!.setGoogleAppAlias(context, googleAppAlias)
         } else {
             if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
-                model = Gson().fromJson(SharedPref.readString(context,
-                        Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
+                model = loadModelFromSharedPref(context)
                 model!!.setGoogleAppAlias(context, googleAppAlias)
             } else {
                 model = createInitialModel(context)
@@ -407,8 +432,7 @@ object RelatedDigital {
             model!!.setHuaweiAppAlias(context, huaweiAppAlias)
         } else {
             if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
-                model = Gson().fromJson(SharedPref.readString(context,
-                        Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
+                model = loadModelFromSharedPref(context)
                 model!!.setHuaweiAppAlias(context, huaweiAppAlias)
             } else {
                 model = createInitialModel(context)
@@ -423,8 +447,7 @@ object RelatedDigital {
             model!!.setOrganizationId(context, organizationId)
         } else {
             if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
-                model = Gson().fromJson(SharedPref.readString(context,
-                        Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
+                model = loadModelFromSharedPref(context)
                 model!!.setOrganizationId(context, organizationId)
             } else {
                 model = createInitialModel(context)
@@ -439,8 +462,7 @@ object RelatedDigital {
             model!!.setProfileId(context, profileId)
         } else {
             if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
-                model = Gson().fromJson(SharedPref.readString(context,
-                        Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
+                model = loadModelFromSharedPref(context)
                 model!!.setProfileId(context, profileId)
             } else {
                 model = createInitialModel(context)
@@ -455,8 +477,7 @@ object RelatedDigital {
             model!!.setDataSource(context, dataSource)
         } else {
             if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
-                model = Gson().fromJson(SharedPref.readString(context,
-                        Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
+                model = loadModelFromSharedPref(context)
                 model!!.setDataSource(context, dataSource)
             } else {
                 model = createInitialModel(context)
@@ -471,8 +492,7 @@ object RelatedDigital {
             model!!.setRequestTimeoutInSecond(context, requestTimeoutInSecond)
         } else {
             if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
-                model = Gson().fromJson(SharedPref.readString(context,
-                        Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
+                model = loadModelFromSharedPref(context)
                 model!!.setRequestTimeoutInSecond(context, requestTimeoutInSecond)
             } else {
                 model = createInitialModel(context)
@@ -487,8 +507,7 @@ object RelatedDigital {
             model!!.setAdvertisingIdentifier(context, advertisingIdentifier)
         } else {
             if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
-                model = Gson().fromJson(SharedPref.readString(context,
-                        Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
+                model = loadModelFromSharedPref(context)
                 model!!.setAdvertisingIdentifier(context, advertisingIdentifier)
             } else {
                 model = createInitialModel(context)
@@ -506,8 +525,7 @@ object RelatedDigital {
             model!!.setExVisitorId(context, exVisitorId, false)
         } else {
             if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
-                model = Gson().fromJson(SharedPref.readString(context,
-                        Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
+                model = loadModelFromSharedPref(context)
                 model!!.setExVisitorId(context, exVisitorId, false)
             } else {
                 model = createInitialModel(context)
@@ -534,12 +552,7 @@ object RelatedDigital {
             model!!.setUtmCampaign(context, utmCampaign)
         } else {
             if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
-                model = Gson().fromJson(
-                    SharedPref.readString(
-                        context,
-                        Constants.RELATED_DIGITAL_MODEL_KEY
-                    ), RelatedDigitalModel::class.java
-                )
+                model = loadModelFromSharedPref(context)
                 model!!.setUtmCampaign(context, utmCampaign)
             } else {
                 model = createInitialModel(context)
@@ -554,12 +567,7 @@ object RelatedDigital {
             model!!.setUtmMedium(context, utmMedium)
         } else {
             if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
-                model = Gson().fromJson(
-                    SharedPref.readString(
-                        context,
-                        Constants.RELATED_DIGITAL_MODEL_KEY
-                    ), RelatedDigitalModel::class.java
-                )
+                model = loadModelFromSharedPref(context)
                 model!!.setUtmMedium(context, utmMedium)
             } else {
                 model = createInitialModel(context)
@@ -574,12 +582,7 @@ object RelatedDigital {
             model!!.setUtmSource(context, utmSource)
         } else {
             if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
-                model = Gson().fromJson(
-                    SharedPref.readString(
-                        context,
-                        Constants.RELATED_DIGITAL_MODEL_KEY
-                    ), RelatedDigitalModel::class.java
-                )
+                model = loadModelFromSharedPref(context)
                 model!!.setUtmSource(context, utmSource)
             } else {
                 model = createInitialModel(context)
@@ -594,12 +597,7 @@ object RelatedDigital {
             model!!.setUtmContent(context, utmContent)
         } else {
             if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
-                model = Gson().fromJson(
-                    SharedPref.readString(
-                        context,
-                        Constants.RELATED_DIGITAL_MODEL_KEY
-                    ), RelatedDigitalModel::class.java
-                )
+                model = loadModelFromSharedPref(context)
                 model!!.setUtmContent(context, utmContent)
             } else {
                 model = createInitialModel(context)
@@ -614,12 +612,7 @@ object RelatedDigital {
             model!!.setUtmTerm(context, utmTerm)
         } else {
             if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
-                model = Gson().fromJson(
-                    SharedPref.readString(
-                        context,
-                        Constants.RELATED_DIGITAL_MODEL_KEY
-                    ), RelatedDigitalModel::class.java
-                )
+                model = loadModelFromSharedPref(context)
                 model!!.setUtmTerm(context, utmTerm)
             } else {
                 model = createInitialModel(context)
@@ -648,8 +641,7 @@ object RelatedDigital {
             model!!.getIsPushNotificationEnabled()
         } else {
             if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
-                model = Gson().fromJson(SharedPref.readString(context,
-                        Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
+                model = loadModelFromSharedPref(context)
                 model!!.getIsPushNotificationEnabled()
             } else {
                 Log.e(LOG_TAG, "isPushNotificationEnabled has never been set before!!")
@@ -664,8 +656,7 @@ object RelatedDigital {
             model!!.getIsInAppNotificationEnabled()
         } else {
             if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
-                model = Gson().fromJson(SharedPref.readString(context,
-                        Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
+                model = loadModelFromSharedPref(context)
                 model!!.getIsInAppNotificationEnabled()
             } else {
                 Log.e(LOG_TAG, "isInAppNotificationEnabled has never been set before!!")
@@ -680,8 +671,7 @@ object RelatedDigital {
             model!!.getIsGeofenceEnabled()
         } else {
             if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
-                model = Gson().fromJson(SharedPref.readString(context,
-                        Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
+                model = loadModelFromSharedPref(context)
                 model!!.getIsGeofenceEnabled()
             } else {
                 Log.e(LOG_TAG, "isGeofenceEnabled has never been set before!!")
@@ -696,8 +686,7 @@ object RelatedDigital {
             model!!.getGoogleAppAlias()
         } else {
             if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
-                model = Gson().fromJson(SharedPref.readString(context,
-                        Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
+                model = loadModelFromSharedPref(context)
                 model!!.getGoogleAppAlias()
             } else {
                 Log.e(LOG_TAG, "googleAppAlias has never been set before!!")
@@ -712,8 +701,7 @@ object RelatedDigital {
             model!!.getHuaweiAppAlias()
         } else {
             if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
-                model = Gson().fromJson(SharedPref.readString(context,
-                        Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
+                model = loadModelFromSharedPref(context)
                 model!!.getHuaweiAppAlias()
             } else {
                 Log.e(LOG_TAG, "huaweiAppAlias has never been set before!!")
@@ -728,8 +716,7 @@ object RelatedDigital {
             model!!.getOrganizationId()
         } else {
             if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
-                model = Gson().fromJson(SharedPref.readString(context,
-                        Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
+                model = loadModelFromSharedPref(context)
                 model!!.getOrganizationId()
             } else {
                 Log.e(LOG_TAG, "organizationId has never been set before!!")
@@ -744,8 +731,7 @@ object RelatedDigital {
             model!!.getProfileId()
         } else {
             if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
-                model = Gson().fromJson(SharedPref.readString(context,
-                        Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
+                model = loadModelFromSharedPref(context)
                 model!!.getProfileId()
             } else {
                 Log.e(LOG_TAG, "profileId has never been set before!!")
@@ -760,8 +746,7 @@ object RelatedDigital {
             model!!.getDataSource()
         } else {
             if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
-                model = Gson().fromJson(SharedPref.readString(context,
-                        Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
+                model = loadModelFromSharedPref(context)
                 model!!.getDataSource()
             } else {
                 Log.e(LOG_TAG, "dataSource has never been set before!!")
@@ -776,8 +761,7 @@ object RelatedDigital {
             model!!.getRequestTimeoutInSecond()
         } else {
             if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
-                model = Gson().fromJson(SharedPref.readString(context,
-                        Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
+                model = loadModelFromSharedPref(context)
                 model!!.getRequestTimeoutInSecond()
             } else {
                 Log.e(LOG_TAG, "requestTimeoutInSecond has never been set before!!")
@@ -792,8 +776,7 @@ object RelatedDigital {
             model!!.getAppVersion()
         } else {
             if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
-                model = Gson().fromJson(SharedPref.readString(context,
-                        Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
+                model = loadModelFromSharedPref(context)
                 model!!.getAppVersion()
             } else {
                 AppUtils.getAppVersion(context)
@@ -807,8 +790,7 @@ object RelatedDigital {
             model!!.getOsType()
         } else {
             if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
-                model = Gson().fromJson(SharedPref.readString(context,
-                        Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
+                model = loadModelFromSharedPref(context)
                 model!!.getOsType()
             } else {
                 AppUtils.getOsType()
@@ -822,8 +804,7 @@ object RelatedDigital {
             model!!.getOsVersion()
         } else {
             if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
-                model = Gson().fromJson(SharedPref.readString(context,
-                        Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
+                model = loadModelFromSharedPref(context)
                 model!!.getOsVersion()
             } else {
                 AppUtils.getOsVersion()
@@ -837,8 +818,7 @@ object RelatedDigital {
             model!!.getSdkVersion()
         } else {
             if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
-                model = Gson().fromJson(SharedPref.readString(context,
-                        Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
+                model = loadModelFromSharedPref(context)
                 model!!.getSdkVersion()
             } else {
                 AppUtils.getSdkVersion()
@@ -851,8 +831,7 @@ object RelatedDigital {
             model!!.getSdkType()
         } else {
             if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
-                model = Gson().fromJson(SharedPref.readString(context,
-                    Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
+                model = loadModelFromSharedPref(context)
                 model!!.getSdkType()
             } else {
                 AppUtils.getSdkType()
@@ -866,8 +845,7 @@ object RelatedDigital {
             model!!.getDeviceType()
         } else {
             if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
-                model = Gson().fromJson(SharedPref.readString(context,
-                        Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
+                model = loadModelFromSharedPref(context)
                 model!!.getDeviceType()
             } else {
                 AppUtils.getDeviceType()
@@ -881,8 +859,7 @@ object RelatedDigital {
             model!!.getDeviceName()
         } else {
             if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
-                model = Gson().fromJson(SharedPref.readString(context,
-                        Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
+                model = loadModelFromSharedPref(context)
                 model!!.getDeviceName()
             } else {
                 AppUtils.getDeviceName()
@@ -896,8 +873,7 @@ object RelatedDigital {
             model!!.getCarrier()
         } else {
             if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
-                model = Gson().fromJson(SharedPref.readString(context,
-                        Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
+                model = loadModelFromSharedPref(context)
                 model!!.getCarrier()
             } else {
                 AppUtils.getCarrier(context)
@@ -911,8 +887,7 @@ object RelatedDigital {
             model!!.getIdentifierForVendor()
         } else {
             if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
-                model = Gson().fromJson(SharedPref.readString(context,
-                        Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
+                model = loadModelFromSharedPref(context)
                 model!!.getIdentifierForVendor()
             } else {
                 AppUtils.getIdentifierForVendor(context)
@@ -926,8 +901,7 @@ object RelatedDigital {
             model!!.getAdvertisingIdentifier()
         } else {
             if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
-                model = Gson().fromJson(SharedPref.readString(context,
-                        Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
+                model = loadModelFromSharedPref(context)
                 model!!.getAdvertisingIdentifier()
             } else {
                 Log.e(LOG_TAG, "advertisingIdentifier has never been set before!!")
@@ -942,8 +916,7 @@ object RelatedDigital {
             model!!.getLocal()
         } else {
             if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
-                model = Gson().fromJson(SharedPref.readString(context,
-                        Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
+                model = loadModelFromSharedPref(context)
                 model!!.getLocal()
             } else {
                 AppUtils.getLocal(context)
@@ -957,8 +930,7 @@ object RelatedDigital {
             model!!.getExVisitorId()
         } else {
             if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
-                model = Gson().fromJson(SharedPref.readString(context,
-                        Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
+                model = loadModelFromSharedPref(context)
                 model!!.getExVisitorId()
             } else {
                 Log.e(LOG_TAG, "exVisitorId has never been set before!!")
@@ -973,12 +945,7 @@ object RelatedDigital {
             model!!.getUtmCampaign()
         } else {
             if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
-                model = Gson().fromJson(
-                    SharedPref.readString(
-                        context,
-                        Constants.RELATED_DIGITAL_MODEL_KEY
-                    ), RelatedDigitalModel::class.java
-                )
+                model = loadModelFromSharedPref(context)
                 model!!.getUtmCampaign()
             } else {
                 Log.e(LOG_TAG, "utmCampaign has never been set before!!")
@@ -993,12 +960,7 @@ object RelatedDigital {
             model!!.getUtmMedium()
         } else {
             if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
-                model = Gson().fromJson(
-                    SharedPref.readString(
-                        context,
-                        Constants.RELATED_DIGITAL_MODEL_KEY
-                    ), RelatedDigitalModel::class.java
-                )
+                model = loadModelFromSharedPref(context)
                 model!!.getUtmMedium()
             } else {
                 Log.e(LOG_TAG, "utmMedium has never been set before!!")
@@ -1013,12 +975,7 @@ object RelatedDigital {
             model!!.getUtmSource()
         } else {
             if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
-                model = Gson().fromJson(
-                    SharedPref.readString(
-                        context,
-                        Constants.RELATED_DIGITAL_MODEL_KEY
-                    ), RelatedDigitalModel::class.java
-                )
+                model = loadModelFromSharedPref(context)
                 model!!.getUtmSource()
             } else {
                 Log.e(LOG_TAG, "utmSource has never been set before!!")
@@ -1033,12 +990,7 @@ object RelatedDigital {
             model!!.getUtmContent()
         } else {
             if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
-                model = Gson().fromJson(
-                    SharedPref.readString(
-                        context,
-                        Constants.RELATED_DIGITAL_MODEL_KEY
-                    ), RelatedDigitalModel::class.java
-                )
+                model = loadModelFromSharedPref(context)
                 model!!.getUtmContent()
             } else {
                 Log.e(LOG_TAG, "utmContent has never been set before!!")
@@ -1053,12 +1005,7 @@ object RelatedDigital {
             model!!.getUtmTerm()
         } else {
             if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
-                model = Gson().fromJson(
-                    SharedPref.readString(
-                        context,
-                        Constants.RELATED_DIGITAL_MODEL_KEY
-                    ), RelatedDigitalModel::class.java
-                )
+                model = loadModelFromSharedPref(context)
                 model!!.getUtmTerm()
             } else {
                 Log.e(LOG_TAG, "utmTerm has never been set before!!")
@@ -1073,8 +1020,7 @@ object RelatedDigital {
             model!!.getToken()
         } else {
             if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
-                model = Gson().fromJson(SharedPref.readString(context,
-                        Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
+                model = loadModelFromSharedPref(context)
                 model!!.getToken()
             } else {
                 Log.e(LOG_TAG, "token has never been set before!!")
@@ -1089,8 +1035,7 @@ object RelatedDigital {
             model!!.getCookieId()
         } else {
             if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
-                model = Gson().fromJson(SharedPref.readString(context,
-                        Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
+                model = loadModelFromSharedPref(context)
                 model!!.getCookieId()
             } else {
                 Log.e(LOG_TAG, "no cookieID is available!!")
@@ -1105,8 +1050,7 @@ object RelatedDigital {
             model!!.getUserAgent()
         } else {
             if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
-                model = Gson().fromJson(SharedPref.readString(context,
-                        Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
+                model = loadModelFromSharedPref(context)
                 model!!.getUserAgent()
             } else {
                 AppUtils.getUserAgent()
@@ -1120,8 +1064,7 @@ object RelatedDigital {
             model!!.getVisitorData()
         } else {
             if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
-                model = Gson().fromJson(SharedPref.readString(context,
-                        Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
+                model = loadModelFromSharedPref(context)
                 model!!.getVisitorData()
             } else {
                 Log.e(LOG_TAG, "No visitor data gotten yet!!")
@@ -1233,8 +1176,7 @@ object RelatedDigital {
             model!!.setCookieId(context, null)
         } else {
             if (SharedPref.readString(context, Constants.RELATED_DIGITAL_MODEL_KEY).isNotEmpty()) {
-                model = Gson().fromJson(SharedPref.readString(context,
-                        Constants.RELATED_DIGITAL_MODEL_KEY), RelatedDigitalModel::class.java)
+                model = loadModelFromSharedPref(context)
                 model!!.setExVisitorId(context, "", true)
                 model!!.setCookieId(context, null)
             } else {
@@ -1273,14 +1215,16 @@ object RelatedDigital {
                 message.pushId, message.emPushSp
             )
             (context as? androidx.appcompat.app.AppCompatActivity)?.lifecycleScope?.launch(Dispatchers.IO) {
-                PayloadUtils.updatePayload(context, message.pushId)
+                try {
+                    PayloadUtils.updatePayload(context, message.pushId)
+                } catch (e: Exception) {
+                    Log.e(LOG_TAG, "Payload could not be updated : " + e.message)
+                }
             } ?: run {
-                // Eğer context bir Activity değilse (örn. Application context), GlobalScope kullanabiliriz.
-                // Bu genellikle son çaredir.
-                GlobalScope.launch(Dispatchers.IO) {
+                LibraryCoroutineScope.scope.launch {
                     PayloadUtils.updatePayload(context, message.pushId)
                 }
-                Log.w(LOG_TAG, "Context bir Activity değil. GlobalScope kullanıldı.")
+                Log.w(LOG_TAG, "Context bir Activity değil. LibraryCoroutineScope kullanıldı.")
             }
         } else {
             Log.e(LOG_TAG, "Push notification is not enabled." +
@@ -1372,6 +1316,18 @@ object RelatedDigital {
     private fun getCapture(context: Context): RDCapture = RDCapture.shared(context, AppUtils.getSdkVersion())
 
     @JvmStatic
+    val isFirstInstall: Boolean
+        get() = RelatedDigitalInstallTracker.getInstance()?.isFirstInstall ?: true
+
+    @JvmStatic
+    val isReinstall: Boolean
+        get() = RelatedDigitalInstallTracker.getInstance()?.isReinstall ?: false
+
+    @JvmStatic
+    val installType: String
+        get() = RelatedDigitalInstallTracker.getInstance()?.getInstallType() ?: RelatedDigitalInstallTracker.TYPE_FIRST_INSTALL
+
+    @JvmStatic
     fun customEvent(context: Context, pageName: String, properties: HashMap<String, String>?,
                     parent: Activity? = null) {
         if (pageName.isEmpty()) {
@@ -1384,9 +1340,25 @@ object RelatedDigital {
             return
         }
 
+        val eventProperties = if (properties != null) HashMap(properties) else HashMap<String, String>()
+        val tracker = RelatedDigitalInstallTracker.getInstance(context)
+        if (tracker != null) {
+            val tvc = try {
+                SharedPref.readString(context, Constants.TVC_KEY, "1").toInt()
+            } catch (e: Exception) {
+                1
+            }
+            if (!eventProperties.containsKey(Constants.IS_FIRST_INSTALL_KEY)) {
+                eventProperties[Constants.IS_FIRST_INSTALL_KEY] = tracker.isFirstInstallValue(tvc)
+            }
+            if (!eventProperties.containsKey(Constants.IS_REINSTALL_KEY)) {
+                eventProperties[Constants.IS_REINSTALL_KEY] = tracker.isReinstallValue(tvc)
+            }
+        }
+
         // login / signUp / OM.exVisitorID ile gelen kullanıcı capture tarafında da tanıtılır.
         // Sonrasında çağrılan capture'lardan önce sıraya girmesi için burada, senkron çağrılıyor.
-        val exVisitorId = properties?.get(Constants.EXVISITOR_ID_REQUEST_KEY)
+        val exVisitorId = eventProperties[Constants.EXVISITOR_ID_REQUEST_KEY]
         if (!exVisitorId.isNullOrBlank()) {
             getCapture(context).identify(exVisitorId)
         }
@@ -1395,29 +1367,28 @@ object RelatedDigital {
 
         if(model != null) {
             if (model!!.getIsInAppNotificationEnabled()) {
-                if(parent != null) {
-                    InAppNotificationRequest.createInAppNotificationRequest(
-                        context,
-                        model!!,
-                        pageName,
-                        properties,
-                        parent
-                    )
-                    InAppActionRequest.createInAppActionRequest(
-                        context,
-                        model!!,
-                        pageName,
-                        properties,
-                        parent
-                    )
-                }
+                val targetParent = parent ?: ActivityUtils.parentActivity
+                InAppNotificationRequest.createInAppNotificationRequest(
+                    context,
+                    model!!,
+                    pageName,
+                    eventProperties,
+                    targetParent
+                )
+                InAppActionRequest.createInAppActionRequest(
+                    context,
+                    model!!,
+                    pageName,
+                    eventProperties,
+                    targetParent
+                )
             } else {
                 Log.e(
                     LOG_TAG, "In-app notification is not enabled." +
                             "Call RelatedDigital.setIsInAppNotificationEnabled() first"
                 )
             }
-            LoggerRequest.createLoggerRequest(context, model!!, pageName, properties)
+            LoggerRequest.createLoggerRequest(context, model!!, pageName, eventProperties)
         } else {
             Log.e(LOG_TAG, "Call RelatedDigital.init() first")
         }
@@ -1792,18 +1763,23 @@ object RelatedDigital {
             var messageFound = false
             val hasMessageId = { message: JSONObject -> message.optString("pushId") == messageId }
 
-            DataStoreManager.updatePayloads(context) { currentPayload ->
-                val (newPayload, removedCount) =
-                    removeMessagesFromPayload(currentPayload, Constants.PAYLOAD_SP_ARRAY_KEY, hasMessageId)
-                if (removedCount > 0) messageFound = true
-                newPayload
-            }
+            try {
+                DataStoreManager.updatePayloads(context) { currentPayload ->
+                    val (newPayload, removedCount) =
+                        removeMessagesFromPayload(currentPayload, Constants.PAYLOAD_SP_ARRAY_KEY, hasMessageId)
+                    if (removedCount > 0) messageFound = true
+                    newPayload
+                }
 
-            DataStoreManager.updatePayloadsById(context) { currentPayload ->
-                val (newPayload, removedCount) =
-                    removeMessagesFromPayload(currentPayload, Constants.PAYLOAD_SP_ARRAY_ID_KEY, hasMessageId)
-                if (removedCount > 0) messageFound = true
-                newPayload
+                DataStoreManager.updatePayloadsById(context) { currentPayload ->
+                    val (newPayload, removedCount) =
+                        removeMessagesFromPayload(currentPayload, Constants.PAYLOAD_SP_ARRAY_ID_KEY, hasMessageId)
+                    if (removedCount > 0) messageFound = true
+                    newPayload
+                }
+            } catch (e: Exception) {
+                Log.e(LOG_TAG, "Push message could not be deleted : " + e.message)
+                messageFound = false
             }
 
             // Sonucu Main thread'e geri taşıyıp callback'i çağır
@@ -2015,7 +1991,14 @@ object RelatedDigital {
             }
             NotificationPermissionActivity.callback = callback
             val intent = Intent(context, NotificationPermissionActivity::class.java)
-            context.startActivity(intent)
+            if (context !is Activity) {
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            }
+            try {
+                context.startActivity(intent)
+            } catch (e: Exception) {
+                Log.e(LOG_TAG, "Notification permission could not be requested : " + e.message)
+            }
         } else {
             // Below API 33 there is no runtime prompt, but the user can still have turned
             // notifications off in the system settings, so the permission is re-read here too.
@@ -2026,6 +2009,15 @@ object RelatedDigital {
             )
             refreshPushPermit(context)
             sync(context)
+        }
+    }
+
+    internal fun getVisilabsParameters(): List<VisilabsParameter> {
+        synchronized(this) {
+            return Constants.VISILABS_PARAMETERS ?: run {
+                initVisilabsParameters()
+                Constants.VISILABS_PARAMETERS ?: emptyList()
+            }
         }
     }
 

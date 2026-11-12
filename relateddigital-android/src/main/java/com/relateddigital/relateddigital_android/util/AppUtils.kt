@@ -43,6 +43,7 @@ import com.relateddigital.relateddigital_android.model.SurveyExtendedProps
 object AppUtils {
     private var sId: String = ""
     private const val installationDir = "INSTALLATION"
+    private const val MAX_PUSH_IMAGE_SIZE = 1440
 
     private fun id(context: Context): String {
         if (sId.isEmpty()) {
@@ -55,26 +56,10 @@ object AppUtils {
                         e.printStackTrace()
                     }
                     if (sId.isEmpty()) {
-                        val installation = File(context.filesDir, installationDir)
-                        sId = try {
-                            if (!installation.exists()) {
-                                writeInstallationFile(installation)
-                            }
-                            readInstallationFile(installation)
-                        } catch (e: Exception) {
-                            throw RuntimeException(e)
-                        }
+                        sId = getIdFromInstallationFile(context)
                     }
                 } else {
-                    val installation = File(context.filesDir, installationDir)
-                    sId = try {
-                        if (!installation.exists()) {
-                            writeInstallationFile(installation)
-                        }
-                        readInstallationFile(installation)
-                    } catch (e: Exception) {
-                        throw RuntimeException(e)
-                    }
+                    sId = getIdFromInstallationFile(context)
                 }
             } else {
                 val pm = context.packageManager
@@ -96,30 +81,27 @@ object AppUtils {
                         e.printStackTrace()
                     }
                     if (sId.isEmpty()) {
-                        val installation = File(context.filesDir, installationDir)
-                        sId = try {
-                            if (!installation.exists()) {
-                                writeInstallationFile(installation)
-                            }
-                            readInstallationFile(installation)
-                        } catch (e: Exception) {
-                            throw RuntimeException(e)
-                        }
+                        sId = getIdFromInstallationFile(context)
                     }
                 } else {
-                    val installation = File(context.filesDir, installationDir)
-                    sId = try {
-                        if (!installation.exists()) {
-                            writeInstallationFile(installation)
-                        }
-                        readInstallationFile(installation)
-                    } catch (e: Exception) {
-                        throw RuntimeException(e)
-                    }
+                    sId = getIdFromInstallationFile(context)
                 }
             }
         }
         return sId
+    }
+
+    private fun getIdFromInstallationFile(context: Context): String {
+        val installation = File(context.filesDir, installationDir)
+        return try {
+            if (!installation.exists()) {
+                writeInstallationFile(installation)
+            }
+            readInstallationFile(installation)
+        } catch (e: Exception) {
+            Log.e("AppUtils", "Installation id could not be persisted : " + e.message)
+            UUID.randomUUID().toString()
+        }
     }
 
     @Throws(IOException::class)
@@ -424,7 +406,9 @@ object AppUtils {
     }
 
     fun cleanParameters(map: HashMap<String, String>) {
-        for (key in map.keys) {
+        val iterator = map.keys.iterator()
+        while (iterator.hasNext()) {
+            val key = iterator.next()
             if (!StringUtils.isNullOrWhiteSpace(key)) {
                 if (!(key != Constants.ORGANIZATION_ID_REQUEST_KEY && key != Constants.SITE_ID_REQUEST_KEY
                             && key != Constants.EXVISITOR_ID_REQUEST_KEY && key != Constants.COOKIE_ID_REQUEST_KEY
@@ -435,10 +419,10 @@ object AppUtils {
                             && key != Constants.UTM_MEDIUM && key != Constants.UTM_SOURCE
                             && key != Constants.UTM_TERM
                 ) {
-                    map.remove(key)
+                    iterator.remove()
                 }
             } else {
-                map.remove(key)
+                iterator.remove()
             }
         }
     }
@@ -509,11 +493,23 @@ object AppUtils {
             setThreadPool()
             url = URL(photoUrl)
             val connection = url.openConnection()
+            connection.connectTimeout = 30000 // 30 sec
             connection.readTimeout = 30000 // 30 sec
-            image = BitmapFactory.decodeStream(connection.getInputStream())
+            val bytes = connection.getInputStream().use { it.readBytes() }
+            val bounds = BitmapFactory.Options()
+            bounds.inJustDecodeBounds = true
+            BitmapFactory.decodeByteArray(bytes, 0, bytes.size, bounds)
+            val options = BitmapFactory.Options()
+            options.inSampleSize = ImageUtils.calculateInSampleSize(
+                bounds.outWidth, bounds.outHeight, MAX_PUSH_IMAGE_SIZE, MAX_PUSH_IMAGE_SIZE
+            )
+            image = BitmapFactory.decodeByteArray(bytes, 0, bytes.size, options)
         } catch (e: IOException) {
             Log.e("GetBitmapFromUri : ", "Could not get bitmap from uri : " + e.message)
             e.printStackTrace()
+        } catch (t: Throwable) {
+            Log.e("GetBitmapFromUri : ", "Could not decode bitmap from uri : " + t.message)
+            image = null
         }
         return image
     }
@@ -656,26 +652,26 @@ object AppUtils {
         if (spinToWinModel == null || extendedProps == null) {
             return null
         }
-        val displayNameFontFamily: String = extendedProps.displayNameFontFamily!!
-        val titleFontFamily: String = extendedProps.titleFontFamily!!
-        val textFontFamily: String = extendedProps.textFontFamily!!
-        val buttonFontFamily: String = extendedProps.buttonFontFamily!!
-        val promoCodeTitleFontFamily: String = extendedProps.promocodeTitleFontFamily!!
-        val copyButtonFontFamily: String = extendedProps.copyButtonFontFamily!!
+        val displayNameFontFamily: String = extendedProps.displayNameFontFamily.orEmpty()
+        val titleFontFamily: String = extendedProps.titleFontFamily.orEmpty()
+        val textFontFamily: String = extendedProps.textFontFamily.orEmpty()
+        val buttonFontFamily: String = extendedProps.buttonFontFamily.orEmpty()
+        val promoCodeTitleFontFamily: String = extendedProps.promocodeTitleFontFamily.orEmpty()
+        val copyButtonFontFamily: String = extendedProps.copyButtonFontFamily.orEmpty()
         val promoCodesSoldOutMessageFontFamily: String =
-            extendedProps.promocodesSoldOutMessageFontFamily!!
+            extendedProps.promocodesSoldOutMessageFontFamily.orEmpty()
 
         val htmlStr: String = writeHtmlToFile(context, "spin_to_win", spinToWinJsStr)
 
         if (displayNameFontFamily == "custom") {
             val fontExtension = getFontNameWithExtension(
                 context,
-                extendedProps.displayNameCustomFontFamilyAndroid!!
+                extendedProps.displayNameCustomFontFamilyAndroid.orEmpty()
             )
             if (fontExtension.isNotEmpty()) {
                 writeFontToFile(
                     context,
-                    extendedProps.displayNameCustomFontFamilyAndroid!!,
+                    extendedProps.displayNameCustomFontFamilyAndroid.orEmpty(),
                     fontExtension
                 )
                 spinToWinModel.fontFiles.add(fontExtension)
@@ -683,11 +679,11 @@ object AppUtils {
         }
         if (titleFontFamily == "custom") {
             val fontExtension =
-                getFontNameWithExtension(context, extendedProps.titleCustomFontFamilyAndroid!!)
+                getFontNameWithExtension(context, extendedProps.titleCustomFontFamilyAndroid.orEmpty())
             if (fontExtension.isNotEmpty()) {
                 writeFontToFile(
                     context,
-                    extendedProps.titleCustomFontFamilyAndroid!!,
+                    extendedProps.titleCustomFontFamilyAndroid.orEmpty(),
                     fontExtension
                 )
                 spinToWinModel.fontFiles.add(fontExtension)
@@ -695,11 +691,11 @@ object AppUtils {
         }
         if (textFontFamily == "custom") {
             val fontExtension =
-                getFontNameWithExtension(context, extendedProps.textCustomFontFamilyAndroid!!)
+                getFontNameWithExtension(context, extendedProps.textCustomFontFamilyAndroid.orEmpty())
             if (fontExtension.isNotEmpty()) {
                 writeFontToFile(
                     context,
-                    extendedProps.textCustomFontFamilyAndroid!!,
+                    extendedProps.textCustomFontFamilyAndroid.orEmpty(),
                     fontExtension
                 )
                 spinToWinModel.fontFiles.add(fontExtension)
@@ -707,11 +703,11 @@ object AppUtils {
         }
         if (buttonFontFamily == "custom") {
             val fontExtension =
-                getFontNameWithExtension(context, extendedProps.buttonCustomFontFamilyAndroid!!)
+                getFontNameWithExtension(context, extendedProps.buttonCustomFontFamilyAndroid.orEmpty())
             if (fontExtension.isNotEmpty()) {
                 writeFontToFile(
                     context,
-                    extendedProps.buttonCustomFontFamilyAndroid!!,
+                    extendedProps.buttonCustomFontFamilyAndroid.orEmpty(),
                     fontExtension
                 )
                 spinToWinModel.fontFiles.add(fontExtension)
@@ -720,12 +716,12 @@ object AppUtils {
         if (promoCodeTitleFontFamily == "custom") {
             val fontExtension = getFontNameWithExtension(
                 context,
-                extendedProps.promocodeTitleCustomFontFamilyAndroid!!
+                extendedProps.promocodeTitleCustomFontFamilyAndroid.orEmpty()
             )
             if (fontExtension.isNotEmpty()) {
                 writeFontToFile(
                     context,
-                    extendedProps.promocodeTitleCustomFontFamilyAndroid!!,
+                    extendedProps.promocodeTitleCustomFontFamilyAndroid.orEmpty(),
                     fontExtension
                 )
                 spinToWinModel.fontFiles.add(fontExtension)
@@ -734,12 +730,12 @@ object AppUtils {
         if (copyButtonFontFamily == "custom") {
             val fontExtension = getFontNameWithExtension(
                 context,
-                extendedProps.copyButtonCustomFontFamilyAndroid!!
+                extendedProps.copyButtonCustomFontFamilyAndroid.orEmpty()
             )
             if (fontExtension.isNotEmpty()) {
                 writeFontToFile(
                     context,
-                    extendedProps.copyButtonCustomFontFamilyAndroid!!,
+                    extendedProps.copyButtonCustomFontFamilyAndroid.orEmpty(),
                     fontExtension
                 )
                 spinToWinModel.fontFiles.add(fontExtension)
@@ -748,12 +744,12 @@ object AppUtils {
         if (promoCodesSoldOutMessageFontFamily == "custom") {
             val fontExtension = getFontNameWithExtension(
                 context,
-                extendedProps.promocodesSoldOutMessageCustomFontFamilyAndroid!!
+                extendedProps.promocodesSoldOutMessageCustomFontFamilyAndroid.orEmpty()
             )
             if (fontExtension.isNotEmpty()) {
                 writeFontToFile(
                     context,
-                    extendedProps.promocodesSoldOutMessageCustomFontFamilyAndroid!!,
+                    extendedProps.promocodesSoldOutMessageCustomFontFamilyAndroid.orEmpty(),
                     fontExtension
                 )
                 spinToWinModel.fontFiles.add(fontExtension)

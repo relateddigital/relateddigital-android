@@ -21,9 +21,9 @@ class SlotMachineWebDialogFragment: DialogFragment() {
     private var baseUrl: String? = ""
     private var htmlString: String? = ""
     private var mIsRotation = false
-    private lateinit var mListener: SlotMachineCompleteInterface
-    private lateinit var mCopyToClipboardInterface: SlotMachineCopyToClipboardInterface
-    private lateinit var mShowCodeInterface: SlotMachineShowCodeInterface
+    private var mListener: SlotMachineCompleteInterface? = null
+    private var mCopyToClipboardInterface: SlotMachineCopyToClipboardInterface? = null
+    private var mShowCodeInterface: SlotMachineShowCodeInterface? = null
 
     fun display(fragmentManagerLoc: FragmentManager?): SlotMachineWebDialogFragment {
         val ft = fragmentManagerLoc?.beginTransaction()
@@ -49,8 +49,16 @@ class SlotMachineWebDialogFragment: DialogFragment() {
             baseUrl = requireArguments().getString("baseUrl")
             htmlString = requireArguments().getString("htmlString")
             mResponse = requireArguments().getString("response")
+            val listener = mListener
+            val copyToClipboardInterface = mCopyToClipboardInterface
+            val showCodeInterface = mShowCodeInterface
+            if (listener == null || copyToClipboardInterface == null || showCodeInterface == null) {
+                mIsRotation = true
+                dismissAllowingStateLoss()
+                return
+            }
             mJavaScriptInterface = SlotMachineJavaScriptInterface(this, mResponse!!)
-            mJavaScriptInterface!!.setSlotMachineListeners(mListener, mCopyToClipboardInterface, mShowCodeInterface)
+            mJavaScriptInterface!!.setSlotMachineListeners(listener, copyToClipboardInterface, showCodeInterface)
         }
     }
 
@@ -71,7 +79,13 @@ class SlotMachineWebDialogFragment: DialogFragment() {
     @SuppressLint("SetJavaScriptEnabled", "JavascriptInterface")
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         super.onCreateView(inflater, container, savedInstanceState)
-        val view: View = inflater.inflate(R.layout.layout_web_view, container, false)
+        val view: View = try {
+            inflater.inflate(R.layout.layout_web_view, container, false)
+        } catch (e: Exception) {
+            Log.e(TAG, "WebView could not be inflated!", e)
+            dismissAllowingStateLoss()
+            return View(requireContext())
+        }
         webView = view.findViewById(R.id.webview)
         webView!!.webChromeClient = webViewClient
         webView!!.settings.javaScriptEnabled = true

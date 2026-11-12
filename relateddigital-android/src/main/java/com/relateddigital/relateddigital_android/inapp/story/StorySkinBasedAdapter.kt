@@ -16,12 +16,13 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.Gson
 import com.relateddigital.relateddigital_android.R
 import com.relateddigital.relateddigital_android.constants.Constants
+import com.relateddigital.relateddigital_android.inapp.SafeColor
+import com.relateddigital.relateddigital_android.inapp.parseEncodedExtendedProps
 import com.relateddigital.relateddigital_android.model.*
 import com.relateddigital.relateddigital_android.util.PersistentTargetManager
 import com.squareup.picasso.Picasso
 import de.hdodenhof.circleimageview.CircleImageView
 import java.net.URI
-import java.net.URISyntaxException
 import java.util.*
 import com.relateddigital.relateddigital_android.util.AppUtils.getFontFamily
 
@@ -60,19 +61,10 @@ class StorySkinBasedAdapter(var mContext: Context) :
             Picasso.get().load(storyImage).fit().into(storyHolder.civStory)
         }
         val extendedPropsEncoded = mExtendsProps
-        var extendedProps: StorySkinBasedExtendedProps? = null
-        try {
-            extendedProps = Gson().fromJson(
-                URI(extendedPropsEncoded).path,
-                StorySkinBasedExtendedProps::class.java
-            )
-        } catch (e: URISyntaxException) {
-            e.printStackTrace()
-        }
+        val extendedProps: StorySkinBasedExtendedProps? =
+            parseEncodedExtendedProps(extendedPropsEncoded, StorySkinBasedExtendedProps::class.java)
 
-        if (!extendedProps?.storyz_label_color.isNullOrEmpty()) {
-            storyHolder.tvStoryName.setTextColor(Color.parseColor(extendedProps?.storyz_label_color))
-        }
+        SafeColor.parseOrNull(extendedProps?.storyz_label_color)?.let { storyHolder.tvStoryName.setTextColor(it) }
 
         storyHolder.tvStoryName.typeface = getFontFamily(
             mContext,
@@ -120,8 +112,8 @@ class StorySkinBasedAdapter(var mContext: Context) :
     }
 
     private fun clickEvent(position: Int) {
-        if (mVisilabsSkinBasedResponse!!.Story!![0].actiondata!!.stories!![position]
-                .getItems()!!.isNotEmpty()
+        if (mVisilabsSkinBasedResponse?.Story?.firstOrNull()?.actiondata?.stories?.getOrNull(position)
+                ?.getItems().isNullOrEmpty().not()
         ) {
             val story = StoryActivity()
             StoryActivity.setRecyclerView(mRecyclerView)
@@ -145,7 +137,7 @@ class StorySkinBasedAdapter(var mContext: Context) :
     }
 
     override fun getItemCount(): Int {
-        return mVisilabsSkinBasedResponse!!.Story!![0].actiondata!!.stories!!.size
+        return mVisilabsSkinBasedResponse?.Story?.firstOrNull()?.actiondata?.stories?.size ?: 0
     }
 
     fun setStoryList(storySkinBasedResponse: StorySkinBasedResponse, extendsProps: String?) {
@@ -204,12 +196,8 @@ class StorySkinBasedAdapter(var mContext: Context) :
         var frameLayout: FrameLayout = itemView.findViewById(R.id.fl_circle)
         fun setRectangleViewProperties(borderRadius: FloatArray, shown: Boolean) {
             ivStory.visibility = View.VISIBLE
-            var borderColorString: String = extendedProps!!.storyz_img_borderColor!!
-            if (borderColorString == "") {
-                borderColorString = "#161616"
-            }
             val borderColor =
-                if (shown) Color.rgb(127, 127, 127) else Color.parseColor(borderColorString)
+                if (shown) Color.rgb(127, 127, 127) else SafeColor.parse(extendedProps?.storyz_img_borderColor, Color.rgb(22, 22, 22))
             val shape = GradientDrawable()
             shape.shape = GradientDrawable.RECTANGLE
             shape.cornerRadii = borderRadius
@@ -219,34 +207,22 @@ class StorySkinBasedAdapter(var mContext: Context) :
 
         fun setCircleViewProperties(shown: Boolean) {
             civStory.visibility = View.VISIBLE
-            var borderColorString: String = extendedProps!!.storyz_img_borderColor!!
-            if (borderColorString == "") {
-                borderColorString = "#161616"
-            }
             val borderColor =
-                if (shown) Color.rgb(127, 127, 127) else Color.parseColor(borderColorString)
+                if (shown) Color.rgb(127, 127, 127) else SafeColor.parse(extendedProps?.storyz_img_borderColor, Color.rgb(22, 22, 22))
             civStory.borderColor = borderColor
             civStory.borderWidth = 3
         }
 
         init {
-            val extendedPropsEncoded = mExtendsProps
-            try {
-                extendedProps = Gson().fromJson(
-                    URI(extendedPropsEncoded)
-                        .path, StorySkinBasedExtendedProps::class.java
-                )
-            } catch (e: URISyntaxException) {
-                e.printStackTrace()
-            }
+            extendedProps = parseEncodedExtendedProps(mExtendsProps, StorySkinBasedExtendedProps::class.java)
         }
     }
 
     private fun cacheImagesBeforeDisplaying() {
         isFirstRun = false
-        val actiondata: StorySkinBasedActionData = mVisilabsSkinBasedResponse!!.Story!![0].actiondata!!
-        for (i in actiondata.stories!!.indices) {
-            for (j in actiondata.stories!![i].getItems()!!.indices) {
+        val actiondata: StorySkinBasedActionData = mVisilabsSkinBasedResponse?.Story?.firstOrNull()?.actiondata ?: return
+        for (i in actiondata.stories.orEmpty().indices) {
+            for (j in actiondata.stories!![i].getItems().orEmpty().indices) {
                 if (actiondata.stories!![i].getItems()!![j].fileType
                         .equals(Constants.STORY_PHOTO_KEY)
                 ) {

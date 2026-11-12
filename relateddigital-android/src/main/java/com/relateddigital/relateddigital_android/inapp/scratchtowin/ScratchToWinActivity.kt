@@ -1,7 +1,6 @@
 package com.relateddigital.relateddigital_android.inapp.scratchtowin
 
 import android.app.Activity
-import android.content.ActivityNotFoundException
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Intent
@@ -24,6 +23,8 @@ import com.relateddigital.relateddigital_android.R
 import com.relateddigital.relateddigital_android.RelatedDigital
 import com.relateddigital.relateddigital_android.constants.Constants
 import com.relateddigital.relateddigital_android.databinding.ActivityScratchToWinBinding
+import com.relateddigital.relateddigital_android.inapp.SafeColor
+import com.relateddigital.relateddigital_android.inapp.toFloatOr
 import com.relateddigital.relateddigital_android.inapp.shaketowin.ShakeToWinActivity
 import com.relateddigital.relateddigital_android.inapp.shaketowin.ShakeToWinActivity.Companion
 import com.relateddigital.relateddigital_android.model.MailSubReport
@@ -56,7 +57,15 @@ class ScratchToWinActivity : Activity(), ScratchToWinInterface {
 
         setFinishOnTouchOutside(true)
         scratchToWinMessage
+        if (mScratchToWinMessage?.actiondata == null) {
+            finish()
+            return
+        }
         parseExtendedProps()
+        if (mExtendedProps == null) {
+            finish()
+            return
+        }
         setupInitialView()
     }
 
@@ -77,7 +86,8 @@ class ScratchToWinActivity : Activity(), ScratchToWinInterface {
     private fun setupInitialView() {
         setupCloseButton()
         setupScratchToWin()
-        isMailSubsForm = mScratchToWinMessage!!.actiondata!!.mailSubscription!!
+        isMailSubsForm = mScratchToWinMessage!!.actiondata!!.mailSubscription == true &&
+                mScratchToWinMessage!!.actiondata!!.mailSubscriptionForm != null
 
         if (isMailSubsForm) {
             binding.viewToBeScratched.setInvalidEmailMessage(mScratchToWinMessage!!.actiondata!!
@@ -98,29 +108,29 @@ class ScratchToWinActivity : Activity(), ScratchToWinInterface {
 
     private fun setupScratchToWin() {
         if (!mExtendedProps!!.backgroundColor.isNullOrEmpty()) {
-            binding.scratchToWinContainer.setBackgroundColor(Color.parseColor(mExtendedProps!!.backgroundColor))
+            SafeColor.parseOrNull(mExtendedProps!!.backgroundColor)?.let { binding.scratchToWinContainer.setBackgroundColor(it) }
         }
-        if (mScratchToWinMessage!!.actiondata!!.img!!.isNotEmpty()) {
+        if (!mScratchToWinMessage!!.actiondata!!.img.isNullOrEmpty()) {
             Picasso.get().load(mScratchToWinMessage!!.actiondata!!.img).into(binding.mainImage)
         }
-        binding.titleText.text = mScratchToWinMessage!!.actiondata!!.contentTitle!!.replace("\\n", "\n")
-        binding.titleText.setTextColor(Color.parseColor(mExtendedProps!!.contentTitleTextColor))
-        binding.titleText.textSize = mExtendedProps!!.contentBodyTextSize!!.toFloat() + 12
+        binding.titleText.text = mScratchToWinMessage!!.actiondata!!.contentTitle.orEmpty().replace("\\n", "\n")
+        SafeColor.parseOrNull(mExtendedProps!!.contentTitleTextColor)?.let { binding.titleText.setTextColor(it) }
+        binding.titleText.textSize = mExtendedProps!!.contentBodyTextSize.toFloatOr(2f) + 12
         binding.titleText.setTypeface(mExtendedProps!!.getContentTitleFontFamily(this), Typeface.BOLD)
-        binding.bodyText.text = mScratchToWinMessage!!.actiondata!!.contentBody!!.replace("\\n", "\n")
-        binding.bodyText.setTextColor(Color.parseColor(mExtendedProps!!.contentBodyTextColor))
-        binding.bodyText.textSize = mExtendedProps!!.contentBodyTextSize!!.toFloat() + 8
+        binding.bodyText.text = mScratchToWinMessage!!.actiondata!!.contentBody.orEmpty().replace("\\n", "\n")
+        SafeColor.parseOrNull(mExtendedProps!!.contentBodyTextColor)?.let { binding.bodyText.setTextColor(it) }
+        binding.bodyText.textSize = mExtendedProps!!.contentBodyTextSize.toFloatOr(2f) + 8
         binding.bodyText.typeface = mExtendedProps!!.getContentBodyFontFamily(this)
         binding.promotionCodeText.text = mScratchToWinMessage!!.actiondata!!.promotionCode
-        binding.promotionCodeText.setTextColor(Color.parseColor(mExtendedProps!!.promoCodeTextColor))
-        binding.promotionCodeText.textSize = mExtendedProps!!.promoCodeTextSize!!.toFloat() + 12
+        SafeColor.parseOrNull(mExtendedProps!!.promoCodeTextColor)?.let { binding.promotionCodeText.setTextColor(it) }
+        binding.promotionCodeText.textSize = mExtendedProps!!.promoCodeTextSize.toFloatOr(2f) + 12
         binding.promotionCodeText.typeface = mExtendedProps!!.getPromoCodeFontFamily(this)
         binding.copyToClipboard.text = mScratchToWinMessage!!.actiondata!!.copybuttonLabel
-        binding.copyToClipboard.setTextColor(Color.parseColor(mExtendedProps!!.copyButtonTextColor))
-        binding.copyToClipboard.textSize = mExtendedProps!!.copyButtonTextSize!!.toFloat() + 10
+        SafeColor.parseOrNull(mExtendedProps!!.copyButtonTextColor)?.let { binding.copyToClipboard.setTextColor(it) }
+        binding.copyToClipboard.textSize = mExtendedProps!!.copyButtonTextSize.toFloatOr(2f) + 10
         binding.copyToClipboard.typeface = mExtendedProps!!.getCopyButtonFontFamily(this)
-        binding.copyToClipboard.setBackgroundColor(Color.parseColor(mExtendedProps!!.copyButtonColor))
-        binding.viewToBeScratched.setColor(Color.parseColor(mScratchToWinMessage!!.actiondata!!.scratchColor))
+        SafeColor.parseOrNull(mExtendedProps!!.copyButtonColor)?.let { binding.copyToClipboard.setBackgroundColor(it) }
+        binding.viewToBeScratched.setColor(SafeColor.parse(mScratchToWinMessage!!.actiondata!!.scratchColor, Color.GRAY))
         binding.copyToClipboard.visibility = View.GONE
         binding.viewToBeScratched.setContainer(binding.scratchToWinContainer)
         binding.viewToBeScratched.setListener(this)
@@ -151,8 +161,8 @@ class ScratchToWinActivity : Activity(), ScratchToWinInterface {
             binding.downContentBody.visibility = View.GONE
         } else {
             binding.downContentBody.text = mScratchToWinMessage!!.actiondata!!.downContentBody!!.replace("\\n", "\n")
-            binding.downContentBody.setTextColor(Color.parseColor(mExtendedProps!!.downContentBodyTextColor))
-            binding.downContentBody.textSize = mExtendedProps!!.downContentBodyTextSize!!.toFloat() + 8
+            SafeColor.parseOrNull(mExtendedProps!!.downContentBodyTextColor)?.let { binding.downContentBody.setTextColor(it) }
+            binding.downContentBody.textSize = mExtendedProps!!.downContentBodyTextSize.toFloatOr(2f) + 8
             binding.downContentBody.typeface = mExtendedProps!!.getDownContentBodyFontFamily(this)
             binding.downContentBody.visibility = View.VISIBLE
         }
@@ -161,28 +171,28 @@ class ScratchToWinActivity : Activity(), ScratchToWinInterface {
     private fun setupEmail() {
         binding.invalidEmailMessage.text = mScratchToWinMessage!!.actiondata!!.mailSubscriptionForm!!.invalidEmailMessage
         binding.resultText.text = mScratchToWinMessage!!.actiondata!!.mailSubscriptionForm!!.checkConsentMessage
-        binding.emailPermitText.text = createHtml(mScratchToWinMessage!!.actiondata!!.mailSubscriptionForm!!.emailpermitText!!,
+        binding.emailPermitText.text = createHtml(mScratchToWinMessage!!.actiondata!!.mailSubscriptionForm!!.emailpermitText.orEmpty(),
                 mExtendedProps!!.emailPermitTextUrl)
-        binding.emailPermitText.textSize = mExtendedProps!!.emailPermitTextSize!!.toFloat() + 10
+        binding.emailPermitText.textSize = mExtendedProps!!.emailPermitTextSize.toFloatOr(2f) + 10
         binding.emailPermitText.setOnClickListener {
             if (!mExtendedProps!!.emailPermitTextUrl.isNullOrEmpty()) {
                 try {
                     val viewIntent = Intent(Intent.ACTION_VIEW, StringUtils.getURIfromUrlString(mExtendedProps!!.emailPermitTextUrl))
                     startActivity(viewIntent)
-                } catch (e: ActivityNotFoundException) {
+                } catch (e: Exception) {
                     Log.i(LOG_TAG, "Could not direct to the url entered!")
                 }
             }
         }
-        binding.consentText.text = createHtml(mScratchToWinMessage!!.actiondata!!.mailSubscriptionForm!!.consentText!!,
+        binding.consentText.text = createHtml(mScratchToWinMessage!!.actiondata!!.mailSubscriptionForm!!.consentText.orEmpty(),
                 mExtendedProps!!.consentTextUrl)
-        binding.consentText.textSize = mExtendedProps!!.consentTextSize!!.toFloat() + 10
+        binding.consentText.textSize = mExtendedProps!!.consentTextSize.toFloatOr(2f) + 10
         binding.consentText.setOnClickListener {
             if (!mExtendedProps!!.consentTextUrl.isNullOrEmpty()) {
                 try {
                     val viewIntent = Intent(Intent.ACTION_VIEW, StringUtils.getURIfromUrlString(mExtendedProps!!.consentTextUrl))
                     startActivity(viewIntent)
-                } catch (e: ActivityNotFoundException) {
+                } catch (e: Exception) {
                     Log.i(LOG_TAG, "Could not direct to the url entered!")
                 }
             }
@@ -203,10 +213,10 @@ class ScratchToWinActivity : Activity(), ScratchToWinInterface {
         }
         binding.emailEdit.hint = mScratchToWinMessage!!.actiondata!!.mailSubscriptionForm!!.placeholder
         binding.saveMail.text = mScratchToWinMessage!!.actiondata!!.mailSubscriptionForm!!.buttonLabel
-        binding.saveMail.setTextColor(Color.parseColor(mExtendedProps!!.buttonTextColor))
-        binding.saveMail.textSize = mExtendedProps!!.buttonTextSize!!.toFloat() + 10
+        SafeColor.parseOrNull(mExtendedProps!!.buttonTextColor)?.let { binding.saveMail.setTextColor(it) }
+        binding.saveMail.textSize = mExtendedProps!!.buttonTextSize.toFloatOr(2f) + 10
         binding.saveMail.typeface = mExtendedProps!!.getButtonFontFamily(this)
-        binding.saveMail.setBackgroundColor(Color.parseColor(mExtendedProps!!.buttonColor))
+        SafeColor.parseOrNull(mExtendedProps!!.buttonColor)?.let { binding.saveMail.setBackgroundColor(it) }
         binding.emailEdit.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
@@ -233,9 +243,9 @@ class ScratchToWinActivity : Activity(), ScratchToWinInterface {
                 binding.emailEdit.visibility = View.GONE
                 binding.saveMail.visibility = View.GONE
                 SubsJsonRequest.createSubsJsonRequest(applicationContext,
-                        mScratchToWinMessage!!.actiondata!!.type!!,
+                        mScratchToWinMessage!!.actiondata!!.type.orEmpty(),
                         mScratchToWinMessage!!.actid.toString(),
-                        mScratchToWinMessage!!.actiondata!!.auth!!, email)
+                        mScratchToWinMessage!!.actiondata!!.auth.orEmpty(), email)
                 promoemail = email
                 binding.viewToBeScratched.enableScratching()
                 Toast.makeText(applicationContext, mScratchToWinMessage!!.actiondata!!.mailSubscriptionForm!!.successMessage, Toast.LENGTH_SHORT).show()
@@ -251,7 +261,7 @@ class ScratchToWinActivity : Activity(), ScratchToWinInterface {
 
     private val closeIcon: Int
         get() {
-            when (mExtendedProps!!.closeButtonColor) {
+            when (mExtendedProps?.closeButtonColor) {
                 "white" -> return R.drawable.ic_close_white_24dp
                 "black" -> return R.drawable.ic_close_black_24dp
             }
@@ -270,8 +280,8 @@ class ScratchToWinActivity : Activity(), ScratchToWinInterface {
     //Email Permit TextEmail Permit <LINK>TextEmail</LINK> Permit Text
     private fun createHtml(text: String, url: String?): Spanned {
         var textLoc = text
-        if (url == null || url.isEmpty() || !Patterns.WEB_URL.matcher(url).matches()) {
-            return Html.fromHtml(url!!.replace("<LINK>", "").replace("</LINK>", ""))
+        if (url.isNullOrEmpty() || !Patterns.WEB_URL.matcher(url).matches()) {
+            return Html.fromHtml(text.replace("<LINK>", "").replace("</LINK>", ""))
         }
         val pattern = Pattern.compile("<LINK>(.+?)</LINK>")
         val matcher = pattern.matcher(textLoc)

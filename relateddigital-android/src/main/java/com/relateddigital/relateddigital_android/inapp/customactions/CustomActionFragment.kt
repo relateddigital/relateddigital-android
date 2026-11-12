@@ -41,9 +41,9 @@ class CustomActionFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         response = if (savedInstanceState != null) {
-            savedInstanceState.getSerializable("customactions") as CustomActions?
+            savedInstanceState.getSerializable(ARG_PARAM1) as? CustomActions
         } else {
-            requireArguments().getSerializable(ARG_PARAM1) as CustomActions?
+            requireArguments().getSerializable(ARG_PARAM1) as? CustomActions
         }
 
         if (response == null) {
@@ -71,11 +71,21 @@ class CustomActionFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_web_view, container, false)
+        return try {
+            inflater.inflate(R.layout.fragment_web_view, container, false)
+        } catch (e: Exception) {
+            Log.e(LOG_TAG, "WebView could not be inflated!", e)
+            endFragment()
+            View(requireContext())
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        if (response?.actiondata == null || mExtendedProps == null || view.findViewById<WebView>(R.id.webView) == null) {
+            endFragment()
+            return
+        }
 
         val webView: WebView = view.findViewById(R.id.webView)
         val webSettings: WebSettings = webView.settings
@@ -117,16 +127,8 @@ class CustomActionFragment : Fragment() {
         } else {
             position = "middleCenter"
         }
-        if (!mExtendedProps!!.height.toString().isNullOrEmpty()) {
-            height = mExtendedProps!!.height
-        } else {
-            height = 100
-        }
-        if (!mExtendedProps!!.width.toString().isNullOrEmpty()) {
-            width = mExtendedProps!!.width
-        } else {
-            width = 100
-        }
+        height = mExtendedProps!!.height ?: 100
+        width = mExtendedProps!!.width ?: 100
 
         val params = RelativeLayout.LayoutParams(
             ViewGroup.LayoutParams.WRAP_CONTENT,
@@ -259,6 +261,13 @@ class CustomActionFragment : Fragment() {
 
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        if (response != null) {
+            outState.putSerializable(ARG_PARAM1, response)
+        }
+    }
+
     companion object {
         private const val LOG_TAG = "CustomActionNotification"
         private const val ARG_PARAM1 = "dataKey"
@@ -283,7 +292,7 @@ class CustomActionFragment : Fragment() {
         if (activity != null) {
             requireActivity().supportFragmentManager.beginTransaction()
                 .remove(this@CustomActionFragment)
-                .commit()
+                .commitAllowingStateLoss()
         }
     }
 

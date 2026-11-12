@@ -15,7 +15,7 @@ object InAppActionClickRequest {
     private const val LOG_TAG = "InAppActionClickRequest"
 
 
-    fun createInAppActionClickRequest(context: Context, report: MailSubReport?) {
+    fun createInAppActionClickRequest(context: Context, report: MailSubReport?, parent: android.app.Activity? = null) {
         if (report?.click.isNullOrEmpty()) {
             Log.e(LOG_TAG, "report click is null or empty.")
             return
@@ -37,9 +37,11 @@ object InAppActionClickRequest {
             }
         }
 
+        val model = RelatedDigital.getRelatedDigitalModel(context)
+
         RequestFormer.formInAppNotificationClickRequest(
             context = context,
-            model = RelatedDigital.getRelatedDigitalModel(context),
+            model = model,
             pageName = Constants.PAGE_NAME_REQUEST_VAL,
             properties = properties,
             queryMap = queryMap,
@@ -50,14 +52,32 @@ object InAppActionClickRequest {
             Request(
                 Domain.LOG_LOGGER, queryMap, headerMap,
                 null
-            ), RelatedDigital.getRelatedDigitalModel(context), context
+            ), model, context
         )
         RequestSender.addToQueue(
             Request(
                 Domain.LOG_REAL_TIME, queryMap, headerMap,
                 null
-            ), RelatedDigital.getRelatedDigitalModel(context), context
+            ), model, context
         )
+
+        if (model.getIsInAppNotificationEnabled()) {
+            val targetParent = parent ?: com.relateddigital.relateddigital_android.util.ActivityUtils.parentActivity
+            InAppNotificationRequest.createInAppNotificationRequest(
+                context,
+                model,
+                Constants.PAGE_NAME_REQUEST_VAL,
+                properties,
+                targetParent
+            )
+            InAppActionRequest.createInAppActionRequest(
+                context,
+                model,
+                Constants.PAGE_NAME_REQUEST_VAL,
+                properties,
+                targetParent
+            )
+        }
     }
 
     fun createInAppActionImressionRequest(context: Context, report: MailSubReport?) {

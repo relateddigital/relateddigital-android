@@ -5,6 +5,7 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.graphics.Color
+import com.relateddigital.relateddigital_android.inapp.SafeColor
 import android.graphics.drawable.GradientDrawable
 import android.util.Log
 import android.view.LayoutInflater
@@ -112,9 +113,9 @@ class CarouselAdapter(
             if (!mCarouselItems!![position].backgroundColor.isNullOrEmpty()) {
                 holder.backgroundImage.visibility = View.GONE
                 holder.carouselContainer.setBackgroundColor(
-                    Color.parseColor(
+                    SafeColor.parse(
                         mCarouselItems!![position].backgroundColor
-                    )
+                    , Color.BLACK)
                 )
             }
         }
@@ -239,7 +240,7 @@ class CarouselAdapter(
         if (!mCarouselItems!![position].title.isNullOrEmpty()) {
             holder.carouselTitle.text = mCarouselItems!![position].title!!.replace("\\n", "\n")
             if (!mCarouselItems!![position].titleColor.isNullOrEmpty()) {
-                holder.carouselTitle.setTextColor(Color.parseColor(mCarouselItems!![position].titleColor))
+                holder.carouselTitle.setTextColor(SafeColor.parse(mCarouselItems!![position].titleColor, Color.BLACK))
             }
             holder.carouselTitle.textSize =
                 mCarouselItems!![position].titleTextsize!!.toFloat() + 12
@@ -254,9 +255,9 @@ class CarouselAdapter(
             holder.carouselBodyText.text = mCarouselItems!![position].body!!.replace("\\n", "\n")
             if (!mCarouselItems!![position].bodyColor.isNullOrEmpty()) {
                 holder.carouselBodyText.setTextColor(
-                    Color.parseColor(
+                    SafeColor.parse(
                         mCarouselItems!![position].bodyColor
-                    )
+                    , Color.BLACK)
                 )
             }
             holder.carouselBodyText.textSize =
@@ -271,14 +272,14 @@ class CarouselAdapter(
         if (!mCarouselItems!![position].promotionCode.isNullOrEmpty()) {
             if (!mCarouselItems!![position].promocodeBackgroundColor.isNullOrEmpty()) {
                 holder.couponContainer.setBackgroundColor(
-                    Color.parseColor(
+                    SafeColor.parse(
                         mCarouselItems!![position].promocodeBackgroundColor
-                    )
+                    , Color.BLACK)
                 )
             }
             holder.couponCode.text = mCarouselItems!![position].promotionCode
             if (!mCarouselItems!![position].promocodeTextColor.isNullOrEmpty()) {
-                holder.couponCode.setTextColor(Color.parseColor(mCarouselItems!![position].promocodeTextColor))
+                holder.couponCode.setTextColor(SafeColor.parse(mCarouselItems!![position].promocodeTextColor, Color.BLACK))
             }
             holder.couponContainer.setOnClickListener {
                 val clipboard =
@@ -301,7 +302,7 @@ class CarouselAdapter(
         if (!mCarouselItems!![position].buttonText.isNullOrEmpty()) {
             if (!mCarouselItems!![position].buttonColor.isNullOrEmpty()) {
                 val gdButton = holder.carouselButton.background as GradientDrawable
-                gdButton.setColor(Color.parseColor(mCarouselItems!![position].buttonColor))
+                gdButton.setColor(SafeColor.parse(mCarouselItems!![position].buttonColor, Color.BLACK))
                 if (mCarouselItems!![position].mButtonBorderRadius != null) {
                     gdButton.cornerRadius =
                         mCarouselItems!![position].mButtonBorderRadius!!.toFloat()
@@ -309,7 +310,7 @@ class CarouselAdapter(
             }
             holder.carouselButton.text = mCarouselItems!![position].buttonText
             if (!mCarouselItems!![position].buttonTextColor.isNullOrEmpty()) {
-                holder.carouselButton.setTextColor(Color.parseColor(mCarouselItems!![position].buttonTextColor))
+                holder.carouselButton.setTextColor(SafeColor.parse(mCarouselItems!![position].buttonTextColor, Color.BLACK))
             }
             holder.carouselButton.textSize =
                 mCarouselItems!![position].buttonTextsize!!.toFloat() + 12

@@ -5,6 +5,7 @@ import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
+import com.relateddigital.relateddigital_android.RelatedDigital
 import com.relateddigital.relateddigital_android.constants.Constants
 import java.text.SimpleDateFormat
 import java.util.*
@@ -19,7 +20,7 @@ object PersistentTargetManager {
      */
     fun saveParameters(context: Context, parameters: HashMap<String, String>?) {
         val now = Date()
-        for (visilabsParameter in Constants.VISILABS_PARAMETERS!!) {
+        for (visilabsParameter in RelatedDigital.getVisilabsParameters()) {
             val key: String = visilabsParameter.key
             val storeKey: String = visilabsParameter.storeKey
             val relatedKeys: List<String>? = visilabsParameter.relatedKeys
@@ -77,7 +78,7 @@ object PersistentTargetManager {
 
     fun getParameters(context: Context): HashMap<String, String> {
         val parameters = HashMap<String, String>()
-        for (visilabsParameter in Constants.VISILABS_PARAMETERS!!) {
+        for (visilabsParameter in RelatedDigital.getVisilabsParameters()) {
             val storeKey: String = visilabsParameter.storeKey
             val value: String = SharedPref.readString(context, storeKey, "")
             if (value.isNotEmpty()) {
@@ -88,7 +89,7 @@ object PersistentTargetManager {
     }
 
     fun clearParameters(context: Context) {
-        for (visilabsParameter in Constants.VISILABS_PARAMETERS!!) {
+        for (visilabsParameter in RelatedDigital.getVisilabsParameters()) {
             SharedPref.clearKey(context, visilabsParameter.storeKey)
         }
         Log.i(LOG_TAG, "Parameters cleared.")

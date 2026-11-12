@@ -22,12 +22,18 @@ class InAppMessage() : Serializable, Parcelable {
         mActId = parcel.readValue(Int::class.java.classLoader) as? Int
         mActionType = parcel.readString()
         mTitle = parcel.readString()
+        mActionData = try {
+            parcel.readSerializable() as? ActionData
+        } catch (e: Exception) {
+            null
+        }
     }
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeValue(mActId)
         parcel.writeString(mActionType)
         parcel.writeString(mTitle)
+        parcel.writeSerializable(mActionData)
     }
 
     override fun describeContents(): Int {

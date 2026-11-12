@@ -1,5 +1,7 @@
 package com.relateddigital.relateddigital_android.inapp.survey
 
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.webkit.JavascriptInterface
 import com.google.gson.Gson
@@ -13,6 +15,7 @@ class WebViewJavascriptInterface(
     private val mWebViewDialogFragment: WebViewDialogFragment,
     response: String
 ) {
+    private val mMainHandler = Handler(Looper.getMainLooper())
 
     private val TAG = "SurveyJSInterface"
     private val mResponse: String = response
@@ -21,20 +24,26 @@ class WebViewJavascriptInterface(
 
     @JavascriptInterface
     fun close() {
-        mWebViewDialogFragment.dismiss()
-        mListener?.onCompleted()
+        runOnMain {
+            mWebViewDialogFragment.dismissAllowingStateLoss()
+            mListener?.onCompleted()
+        }
     }
 
     @JavascriptInterface
     fun sendReport(surveyResultJson: String) {
         Log.d(TAG, "Anket Sonuçları Alındı: $surveyResultJson")
 
+        val context = mWebViewDialogFragment.context ?: return
+
+        val parentActivity = mWebViewDialogFragment.activity ?: com.relateddigital.relateddigital_android.util.ActivityUtils.parentActivity
+
         try {
             val report = MailSubReport().apply {
                 impression = surveyModel.actiondata?.report?.impression
                 click = surveyModel.actiondata?.report?.click
             }
-            InAppActionClickRequest.createInAppActionClickRequest(mWebViewDialogFragment.requireContext(), report)
+            InAppActionClickRequest.createInAppActionClickRequest(context, report, parentActivity)
         } catch (e: Exception) {
             Log.e("Survey", "Rapor gönderilirken bir hata oluştu: ${e.message}")
         }
@@ -47,7 +56,7 @@ class WebViewJavascriptInterface(
                     put("OM.s_cat", qa.question ?: "")
                     put("OM.s_page", qa.answer ?: "")
                 }
-                RelatedDigital.customEvent(mWebViewDialogFragment.requireContext(), "survey-report", parameters)
+                RelatedDigital.customEvent(context, "survey-report", parameters, parentActivity)
                 Log.d(TAG, "Custom Event Gönderildi: Soru='${qa.question}', Cevap='${qa.answer}'")
             }
         } catch (e: Exception) {
@@ -60,5 +69,18 @@ class WebViewJavascriptInterface(
 
     fun setSurveyListeners(listener: SurveyCompleteInterface) {
         mListener = listener
+    }
+
+    private fun runOnMain(block: () -> Unit) {
+        mMainHandler.post {
+            if (!mWebViewDialogFragment.isAdded) {
+                return@post
+            }
+            try {
+                block()
+            } catch (e: Exception) {
+                Log.e("JavaScriptInterface", "Could not handle the web view call!", e)
+            }
+        }
     }
 }

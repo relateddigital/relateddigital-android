@@ -22,22 +22,22 @@ import com.relateddigital.relateddigital_android.network.requestHandler.InAppNot
 class InAppAlertFragment : DialogFragment() {
     private var mInAppStateId = 0
     private var mInAppNotificationState: InAppNotificationState? = null
-    private var mParent: Activity? = null
     private var mInAppMessage: InAppMessage? = null
     private var mContext: Context? = null
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val alertDialogBuilder = AlertDialog.Builder(mParent!!)
-        if (mInAppMessage == null) {
+        val alertDialogBuilder = AlertDialog.Builder(requireActivity())
+        val actionData = mInAppMessage?.mActionData
+        if (actionData == null) {
             cleanUp()
         } else {
             alertDialogBuilder.setTitle(
-                mInAppMessage!!.mActionData!!.mMsgTitle!!.replace("\\n", "\n")
+                actionData.mMsgTitle.orEmpty().replace("\\n", "\n")
             )
-                .setMessage(mInAppMessage!!.mActionData!!.mMsgBody!!.replace("\\n", "\n"))
+                .setMessage(actionData.mMsgBody.orEmpty().replace("\\n", "\n"))
                 .setCancelable(false)
-                .setPositiveButton(mInAppMessage!!.mActionData!!.mBtnText
+                .setPositiveButton(actionData.mBtnText
                 ) { _, _ ->
-                    val uriString: String? = mInAppMessage!!.mActionData!!.mAndroidLnk
+                    val uriString: String? = actionData.mAndroidLnk
                     val buttonInterface: InAppButtonInterface? =
                         RelatedDigital.getInAppButtonInterface()
                     if (buttonInterface != null) {
@@ -49,7 +49,7 @@ class InAppAlertFragment : DialogFragment() {
                             try {
                                 uri = Uri.parse(uriString)
                                 val viewIntent = Intent(Intent.ACTION_VIEW, uri)
-                                mParent!!.startActivity(viewIntent)
+                                activity?.startActivity(viewIntent)
                             } catch (e: IllegalArgumentException) {
                                 Log.e(
                                     LOG_TAG,
@@ -64,18 +64,20 @@ class InAppAlertFragment : DialogFragment() {
                             }
                         }
                     }
-                    InAppNotificationClickRequest.createInAppNotificationClickRequest(
-                        mContext!!,
-                        mInAppMessage,
-                        null
-                    )
+                    mContext?.let {
+                        InAppNotificationClickRequest.createInAppNotificationClickRequest(
+                            it,
+                            mInAppMessage,
+                            null
+                        )
+                    }
                     InAppUpdateDisplayState.releaseDisplayState(mInAppStateId)
-                    dismiss()
+                    dismissAllowingStateLoss()
                 }
-                .setNegativeButton(mInAppMessage!!.mActionData!!.mCloseButtonText
+                .setNegativeButton(actionData.mCloseButtonText
                 ) { _, _ ->
                     InAppUpdateDisplayState.releaseDisplayState(mInAppStateId)
-                    dismiss()
+                    dismissAllowingStateLoss()
                 }
         }
         return alertDialogBuilder.create()
@@ -84,6 +86,13 @@ class InAppAlertFragment : DialogFragment() {
     override fun onAttach(context: Context) {
         super.onAttach(context)
         mContext = context
+        if (mInAppNotificationState == null) {
+            arguments?.let { args ->
+                mInAppStateId = args.getInt(ARG_STATE_ID)
+                mInAppNotificationState = args.getParcelable(ARG_STATE)
+                mInAppMessage = mInAppNotificationState?.getInAppMessage()
+            }
+        }
         if (mInAppMessage == null || mInAppNotificationState == null) {
             Log.e(LOG_TAG, "InAppMessage is null! Could not get display state!")
             cleanUp()
@@ -101,16 +110,21 @@ class InAppAlertFragment : DialogFragment() {
         if (mInAppNotificationState != null) {
             mInAppMessage = mInAppNotificationState!!.getInAppMessage()
         }
-        mParent = parent
+        arguments = Bundle().apply {
+            putInt(ARG_STATE_ID, stateId)
+            putParcelable(ARG_STATE, inAppState)
+        }
     }
 
     private fun cleanUp() {
         InAppUpdateDisplayState.releaseDisplayState(mInAppStateId)
-        dismiss()
+        dismissAllowingStateLoss()
     }
 
     companion object {
         private const val LOG_TAG = "InAppAlertFragment"
+        private const val ARG_STATE_ID = "in_app_alert_state_id"
+        private const val ARG_STATE = "in_app_alert_state"
         fun newInstance(): InAppAlertFragment {
             return InAppAlertFragment()
         }

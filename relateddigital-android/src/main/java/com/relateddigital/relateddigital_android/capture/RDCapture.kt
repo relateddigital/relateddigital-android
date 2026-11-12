@@ -1,5 +1,7 @@
 package com.relateddigital.relateddigital_android.capture
 
+import com.relateddigital.relateddigital_android.constants.Constants
+import com.relateddigital.relateddigital_android.util.RelatedDigitalInstallTracker
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Handler
@@ -103,7 +105,21 @@ internal class RDCapture(
             Log.e(CAPTURE_LOG_TAG, "Event adı boş olamaz.")
             return
         }
-        val sanitized = RDCaptureUtils.sanitize(properties)
+        val tracker = RelatedDigitalInstallTracker.getInstance()
+        val mutableProps = (properties?.toMutableMap() ?: mutableMapOf())
+        if (!mutableProps.containsKey("is_first_install") && tracker != null) {
+            mutableProps["is_first_install"] = tracker.isFirstInstall
+        }
+        if (!mutableProps.containsKey("is_reinstall") && tracker != null) {
+            mutableProps["is_reinstall"] = tracker.isReinstall
+        }
+        if (!mutableProps.containsKey(Constants.IS_FIRST_INSTALL_KEY) && tracker != null) {
+            mutableProps[Constants.IS_FIRST_INSTALL_KEY] = if (tracker.isFirstInstall) "1" else "0"
+        }
+        if (!mutableProps.containsKey(Constants.IS_REINSTALL_KEY) && tracker != null) {
+            mutableProps[Constants.IS_REINSTALL_KEY] = if (tracker.isReinstall) "1" else "0"
+        }
+        val sanitized = RDCaptureUtils.sanitize(mutableProps)
         execute {
             if (!isEnabled) {
                 Log.w(CAPTURE_LOG_TAG, "captureApiKey verilmediği için '$name' gönderilmedi.")
@@ -251,7 +267,15 @@ internal class RDCapture(
 
         val properties = mutableMapOf<String, Any?>("version" to version, "build" to build)
         if (previousVersion == null && previousBuild == null) {
-            return if (isExistingInstall) null else Pair("Application Installed", properties)
+            if (isExistingInstall) return null
+            val tracker = RelatedDigitalInstallTracker.getInstance()
+            if (tracker != null) {
+                properties["is_first_install"] = tracker.isFirstInstall
+                properties["is_reinstall"] = tracker.isReinstall
+                properties[Constants.IS_FIRST_INSTALL_KEY] = if (tracker.isFirstInstall) "1" else "0"
+                properties[Constants.IS_REINSTALL_KEY] = if (tracker.isReinstall) "1" else "0"
+            }
+            return Pair("Application Installed", properties)
         }
         if (previousVersion == version && previousBuild == build) return null
         properties["previous_version"] = previousVersion

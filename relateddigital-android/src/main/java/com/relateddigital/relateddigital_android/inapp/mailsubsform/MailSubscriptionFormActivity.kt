@@ -20,6 +20,8 @@ import com.relateddigital.relateddigital_android.constants.Constants
 import com.relateddigital.relateddigital_android.databinding.ActivityMailSubscriptionFormBinding
 import com.relateddigital.relateddigital_android.inapp.InAppNotificationState
 import com.relateddigital.relateddigital_android.inapp.InAppUpdateDisplayState
+import com.relateddigital.relateddigital_android.inapp.SafeColor
+import com.relateddigital.relateddigital_android.inapp.toFloatOr
 import com.relateddigital.relateddigital_android.model.ExtendedProps
 import com.relateddigital.relateddigital_android.model.MailSubscriptionForm
 import com.relateddigital.relateddigital_android.network.RequestHandler
@@ -49,9 +51,13 @@ class MailSubscriptionFormActivity : Activity() {
             )
         } catch (e: URISyntaxException) {
             e.printStackTrace()
+            InAppUpdateDisplayState.releaseDisplayState(mIntentId)
+            finish()
             return
         } catch (e: Exception) {
             e.printStackTrace()
+            InAppUpdateDisplayState.releaseDisplayState(mIntentId)
+            finish()
             return
         }
         setContentView(view)
@@ -68,7 +74,7 @@ class MailSubscriptionFormActivity : Activity() {
         }
         binding.tvEmailPermit.movementMethod = LinkMovementMethod.getInstance()
         binding.tvConsent.movementMethod = LinkMovementMethod.getInstance()
-        if (isShowingInApp && mMailSubscriptionForm != null) {
+        if (isShowingInApp && mMailSubscriptionForm?.actiondata != null && mExtendedProps != null) {
             setUpView()
         } else {
             InAppUpdateDisplayState.releaseDisplayState(mIntentId)
@@ -77,7 +83,7 @@ class MailSubscriptionFormActivity : Activity() {
     }
 
     private fun setUpView() {
-        binding.llTextContainer.setBackgroundColor(Color.parseColor(mExtendedProps!!.background_color))
+        SafeColor.parseOrNull(mExtendedProps!!.background_color)?.let { binding.llTextContainer.setBackgroundColor(it) }
         setCloseButton()
         setTitle()
         setBody()
@@ -101,16 +107,16 @@ class MailSubscriptionFormActivity : Activity() {
             mExtendedProps!!.getTitleFontFamily(this),
             Typeface.BOLD
         )
-        binding.tvTitle.text = mMailSubscriptionForm!!.actiondata!!.title!!.replace("\\n", "\n")
-        binding.tvTitle.setTextColor(Color.parseColor(mExtendedProps!!.title_text_color))
-        binding.tvTitle.textSize = mExtendedProps!!.title_text_size!!.toFloat() + 12
+        binding.tvTitle.text = mMailSubscriptionForm!!.actiondata!!.title.orEmpty().replace("\\n", "\n")
+        SafeColor.parseOrNull(mExtendedProps!!.title_text_color)?.let { binding.tvTitle.setTextColor(it) }
+        binding.tvTitle.textSize = mExtendedProps!!.title_text_size.toFloatOr(2f) + 12
     }
 
     private fun setBody() {
-        binding.tvBody.text = mMailSubscriptionForm!!.actiondata!!.message!!.replace("\\n", "\n")
+        binding.tvBody.text = mMailSubscriptionForm!!.actiondata!!.message.orEmpty().replace("\\n", "\n")
         binding.tvBody.typeface = mExtendedProps!!.getTextFontFamily(this)
-        binding.tvBody.setTextColor(Color.parseColor(mExtendedProps!!.text_color))
-        binding.tvBody.textSize = mExtendedProps!!.text_size!!.toFloat() + 8
+        SafeColor.parseOrNull(mExtendedProps!!.text_color)?.let { binding.tvBody.setTextColor(it) }
+        binding.tvBody.textSize = mExtendedProps!!.text_size.toFloatOr(2f) + 8
     }
 
     private fun setEmail() {
@@ -119,7 +125,7 @@ class MailSubscriptionFormActivity : Activity() {
 
     private fun setInvalidEmailMessage() {
         binding.tvInvalidEmailMessage.text = mMailSubscriptionForm!!.actiondata!!.invalid_email_message
-        binding.tvInvalidEmailMessage.textSize = mExtendedProps!!.text_size!!.toFloat() + 8
+        binding.tvInvalidEmailMessage.textSize = mExtendedProps!!.text_size.toFloatOr(2f) + 8
         binding.tvInvalidEmailMessage.setTextColor(Color.RED)
     }
 
@@ -133,7 +139,7 @@ class MailSubscriptionFormActivity : Activity() {
                 mMailSubscriptionForm!!.actiondata!!
                     .emailpermit_text!!, mExtendedProps!!.emailpermit_text_url
             )
-            binding.tvEmailPermit.textSize = mExtendedProps!!.emailpermit_text_size!!.toFloat() + 8
+            binding.tvEmailPermit.textSize = mExtendedProps!!.emailpermit_text_size.toFloatOr(2f) + 8
         }
         if (mMailSubscriptionForm!!.actiondata!!.consent_text.isNullOrEmpty()
         ) {
@@ -143,22 +149,22 @@ class MailSubscriptionFormActivity : Activity() {
                 mMailSubscriptionForm!!.actiondata!!.consent_text!!,
                 mExtendedProps!!.consent_text_url
             )
-            binding.tvConsent.textSize = mExtendedProps!!.consent_text_size!!.toFloat() + 8
+            binding.tvConsent.textSize = mExtendedProps!!.consent_text_size.toFloatOr(2f) + 8
         }
     }
 
     private fun setCheckConsentMessage() {
         binding.tvCheckConsentMessage.text = mMailSubscriptionForm!!.actiondata!!.check_consent_message
-        binding.tvCheckConsentMessage.textSize = mExtendedProps!!.text_size!!.toFloat() + 8
+        binding.tvCheckConsentMessage.textSize = mExtendedProps!!.text_size.toFloatOr(2f) + 8
         binding.tvCheckConsentMessage.setTextColor(Color.RED)
     }
 
     private fun setButton() {
         binding.btn.text = mMailSubscriptionForm!!.actiondata!!.button_label
         binding.btn.typeface = mExtendedProps!!.getButtonFontFamily(this)
-        binding.btn.setTextColor(Color.parseColor(mExtendedProps!!.button_text_color))
-        binding.btn.setBackgroundColor(Color.parseColor(mExtendedProps!!.button_color))
-        binding.btn.textSize = mExtendedProps!!.button_text_size!!.toFloat() + 8
+        SafeColor.parseOrNull(mExtendedProps!!.button_text_color)?.let { binding.btn.setTextColor(it) }
+        SafeColor.parseOrNull(mExtendedProps!!.button_color)?.let { binding.btn.setBackgroundColor(it) }
+        binding.btn.textSize = mExtendedProps!!.button_text_size.toFloatOr(2f) + 8
         binding.btn.setOnClickListener(View.OnClickListener {
             val email: String = binding.etEmail.text.toString()
             if (checkEmail(email)) {
@@ -171,8 +177,8 @@ class MailSubscriptionFormActivity : Activity() {
                 return@OnClickListener
             }
             InAppActionClickRequest.createInAppActionClickRequest(applicationContext, mMailSubscriptionForm!!.actiondata!!.report)
-            SubsJsonRequest.createSubsJsonRequest(applicationContext, "subscription_email", mMailSubscriptionForm!!.actid!!,
-                mMailSubscriptionForm!!.actiondata!!.auth!!, email)
+            SubsJsonRequest.createSubsJsonRequest(applicationContext, "subscription_email", mMailSubscriptionForm!!.actid.orEmpty(),
+                mMailSubscriptionForm!!.actiondata!!.auth.orEmpty(), email)
 
             binding.tvCheckConsentMessage.visibility = View.VISIBLE
             binding.tvCheckConsentMessage.setTextColor(Color.GREEN)
@@ -217,8 +223,8 @@ class MailSubscriptionFormActivity : Activity() {
     //Email Permit TextEmail Permit <LINK>TextEmail</LINK> Permit Text
     private fun createHtml(text: String, url: String?): Spanned {
         var textLoc = text
-        if (url == null || url.isEmpty() || !Patterns.WEB_URL.matcher(url).matches()) {
-            return Html.fromHtml(url!!.replace("<LINK>", "").replace("</LINK>", ""))
+        if (url.isNullOrEmpty() || !Patterns.WEB_URL.matcher(url).matches()) {
+            return Html.fromHtml(text.replace("<LINK>", "").replace("</LINK>", ""))
         }
         val pattern = Pattern.compile("<LINK>(.+?)</LINK>")
         val matcher = pattern.matcher(textLoc)

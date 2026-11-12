@@ -15,6 +15,8 @@ import com.bumptech.glide.Glide
 import com.google.gson.Gson
 import com.relateddigital.relateddigital_android.R
 import com.relateddigital.relateddigital_android.databinding.FragmentMailSubscriptionFormHalfBinding
+import com.relateddigital.relateddigital_android.inapp.SafeColor
+import com.relateddigital.relateddigital_android.inapp.toFloatOr
 import com.relateddigital.relateddigital_android.model.MailSubActionData
 import com.relateddigital.relateddigital_android.model.MailSubscriptionFormHalfExtendedProps
 import com.relateddigital.relateddigital_android.network.RequestHandler
@@ -61,10 +63,11 @@ class MailSubscriptionFormHalfFragment : Fragment() {
     private var isImageRight: Boolean = true
     private var isTextTop: Boolean = true
     private var actId = ""
+    private var isValid = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        actId = requireArguments().getString(ARG_PARAM2)!!
+        actId = requireArguments().getString(ARG_PARAM2).orEmpty()
         mResponse = requireArguments().getSerializable(ARG_PARAM1) as MailSubActionData?
         if (mResponse == null) {
             endFragment()
@@ -85,6 +88,8 @@ class MailSubscriptionFormHalfFragment : Fragment() {
 
         if(mExtendedProps == null) {
             endFragment()
+        } else {
+            isValid = true
         }
     }
 
@@ -92,6 +97,9 @@ class MailSubscriptionFormHalfFragment : Fragment() {
                               savedInstanceState: Bundle?): View {
         binding = FragmentMailSubscriptionFormHalfBinding.inflate(inflater, container, false)
         val view: View = binding.root
+        if (!isValid) {
+            return view
+        }
 
         populateUI()
         return view
@@ -112,7 +120,7 @@ class MailSubscriptionFormHalfFragment : Fragment() {
         binding.emailConsent1Container.visibility = View.VISIBLE
         binding.emailConsent2Container.visibility = View.VISIBLE
 
-        if (!mResponse!!.img!!.isNullOrEmpty()) {
+        if (!mResponse!!.img.isNullOrEmpty()) {
             if(isImageRight) {
                 binding.imageViewLeft.visibility = View.GONE
                 if(AppUtils.isAnImage(mResponse!!.img!!)) {
@@ -143,14 +151,14 @@ class MailSubscriptionFormHalfFragment : Fragment() {
             if(isTextTop) {
                 binding.bodyTextViewBot.visibility = View.GONE
                 binding.bodyTextViewTop.text = mResponse!!.message!!.replace("\\n", "\n")
-                binding.bodyTextViewTop.setTextColor(Color.parseColor(mExtendedProps!!.getTextColor()))
-                binding.bodyTextViewTop.textSize = mExtendedProps!!.getTextSize()!!.toFloat() + 6
+                SafeColor.parseOrNull(mExtendedProps!!.getTextColor())?.let { binding.bodyTextViewTop.setTextColor(it) }
+                binding.bodyTextViewTop.textSize = mExtendedProps!!.getTextSize().toFloatOr(2f) + 6
                 binding.bodyTextViewTop.typeface = mExtendedProps!!.getTextFontFamily(requireContext())
             } else {
                 binding.bodyTextViewTop.visibility = View.GONE
                 binding.bodyTextViewBot.text = mResponse!!.message!!.replace("\\n", "\n")
-                binding.bodyTextViewBot.setTextColor(Color.parseColor(mExtendedProps!!.getTextColor()))
-                binding.bodyTextViewBot.textSize = mExtendedProps!!.getTextSize()!!.toFloat() + 6
+                SafeColor.parseOrNull(mExtendedProps!!.getTextColor())?.let { binding.bodyTextViewBot.setTextColor(it) }
+                binding.bodyTextViewBot.textSize = mExtendedProps!!.getTextSize().toFloatOr(2f) + 6
                 binding.bodyTextViewBot.typeface = mExtendedProps!!.getTextFontFamily(requireContext())
             }
         } else {
@@ -158,15 +166,15 @@ class MailSubscriptionFormHalfFragment : Fragment() {
             binding.bodyTextViewTop.visibility = View.GONE
         }
 
-        binding.container.setBackgroundColor(Color.parseColor(mExtendedProps!!.getBackgroundColor()))
-        binding.titleView.text = mResponse!!.title!!.replace("\\n", "\n")
-        binding.titleView.setTextColor(Color.parseColor(mExtendedProps!!.getTitleTextColor()))
-        binding.titleView.textSize = mExtendedProps!!.getTitleTextSize()!!.toFloat() + 10
+        SafeColor.parseOrNull(mExtendedProps!!.getBackgroundColor())?.let { binding.container.setBackgroundColor(it) }
+        binding.titleView.text = mResponse!!.title.orEmpty().replace("\\n", "\n")
+        SafeColor.parseOrNull(mExtendedProps!!.getTitleTextColor())?.let { binding.titleView.setTextColor(it) }
+        binding.titleView.textSize = mExtendedProps!!.getTitleTextSize().toFloatOr(2f) + 10
         binding.titleView.typeface = mExtendedProps!!.getTitleFontFamily(requireContext())
         binding.btn.text = mResponse!!.button_label
-        binding.btn.setTextColor(Color.parseColor(mExtendedProps!!.getButtonTextColor()))
-        binding.btn.setBackgroundColor(Color.parseColor(mExtendedProps!!.getButtonColor()))
-        binding.btn.textSize = mExtendedProps!!.getButtonTextSize()!!.toFloat() + 10
+        SafeColor.parseOrNull(mExtendedProps!!.getButtonTextColor())?.let { binding.btn.setTextColor(it) }
+        SafeColor.parseOrNull(mExtendedProps!!.getButtonColor())?.let { binding.btn.setBackgroundColor(it) }
+        binding.btn.textSize = mExtendedProps!!.getButtonTextSize().toFloatOr(2f) + 10
         binding.btn.typeface = mExtendedProps!!.getButtonFontFamily(requireContext())
         binding.btn.setOnClickListener {
             val email: String = binding.emailView.text.toString()
@@ -184,7 +192,7 @@ class MailSubscriptionFormHalfFragment : Fragment() {
 
             InAppActionClickRequest.createInAppActionClickRequest(requireContext(), mResponse!!.report)
             SubsJsonRequest.createSubsJsonRequest(requireContext(), "subscription_email", actId,
-                mResponse!!.auth!!, email)
+                mResponse!!.auth.orEmpty(), email)
 
             Toast.makeText(activity, mResponse!!.success_message, Toast.LENGTH_SHORT).show()
             endFragment()
@@ -201,7 +209,7 @@ class MailSubscriptionFormHalfFragment : Fragment() {
             binding.emailConsent1.text = createHtml(mResponse!!.emailpermit_text!!,
                 mExtendedProps!!.getEmailPermitTextUrl()
             )
-            binding.emailConsent1.textSize = mExtendedProps!!.getEmailPermitTextSize()!!.toFloat() + 6
+            binding.emailConsent1.textSize = mExtendedProps!!.getEmailPermitTextSize().toFloatOr(2f) + 6
         }
         if (mResponse!!.consent_text.isNullOrEmpty()) {
             binding.emailConsent2Container.visibility = View.GONE
@@ -210,7 +218,7 @@ class MailSubscriptionFormHalfFragment : Fragment() {
             binding.emailConsent2.text = createHtml(mResponse!!.consent_text!!,
                 mExtendedProps!!.getConsentTextUrl()
             )
-            binding.emailConsent2.textSize = mExtendedProps!!.getConsentTextSize()!!.toFloat() + 6
+            binding.emailConsent2.textSize = mExtendedProps!!.getConsentTextSize().toFloatOr(2f) + 6
         }
     }
 
@@ -228,14 +236,14 @@ class MailSubscriptionFormHalfFragment : Fragment() {
     }
 
     private fun endFragment() {
-        requireActivity().supportFragmentManager.beginTransaction().remove(this@MailSubscriptionFormHalfFragment).commit()
+        activity?.supportFragmentManager?.beginTransaction()?.remove(this@MailSubscriptionFormHalfFragment)?.commitAllowingStateLoss()
     }
 
     //Email Permit TextEmail Permit <LINK>TextEmail</LINK> Permit Text
     private fun createHtml(text: String, url: String?): Spanned {
         var textLoc = text
-        if (url == null || url.isEmpty() || !Patterns.WEB_URL.matcher(url).matches()) {
-            return Html.fromHtml(url!!.replace("<LINK>", "").replace("</LINK>", ""))
+        if (url.isNullOrEmpty() || !Patterns.WEB_URL.matcher(url).matches()) {
+            return Html.fromHtml(text.replace("<LINK>", "").replace("</LINK>", ""))
         }
         val pattern = Pattern.compile("<LINK>(.+?)</LINK>")
         val matcher = pattern.matcher(textLoc)

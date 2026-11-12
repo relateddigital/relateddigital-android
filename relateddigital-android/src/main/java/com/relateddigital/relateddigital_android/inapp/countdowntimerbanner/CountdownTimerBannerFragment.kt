@@ -2,6 +2,7 @@ package com.relateddigital.relateddigital_android.inapp.countdowntimerbanner
 
 import android.annotation.SuppressLint
 import android.graphics.Color
+import com.relateddigital.relateddigital_android.inapp.SafeColor
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.os.CountDownTimer
@@ -248,7 +249,7 @@ class CountdownTimerBannerFragment : Fragment() {
             // 1. Ana CardView arkaplan rengi
             try {
                 if (!props.background_color.isNullOrEmpty()) {
-                    binding.bannerCardView.setCardBackgroundColor(Color.parseColor(props.background_color))
+                    binding.bannerCardView.setCardBackgroundColor(SafeColor.parse(props.background_color, Color.BLACK))
                 }
             } catch (e: Exception) {
                 Log.e(LOG_TAG, "Invalid background_color. JSON'da '#RRGGBB' formatı kullanın. Gelen: ${props.background_color}", e)
@@ -257,7 +258,7 @@ class CountdownTimerBannerFragment : Fragment() {
             // 2. Kampanya metni rengi
             try {
                 if (!props.content_body_text_color.isNullOrEmpty()) {
-                    binding.tvBannerText.setTextColor(Color.parseColor(props.content_body_text_color))
+                    binding.tvBannerText.setTextColor(SafeColor.parse(props.content_body_text_color, Color.BLACK))
                 }
             } catch (e: Exception) {
                 Log.e(LOG_TAG, "Invalid content_body_text_color: ${props.content_body_text_color}", e)
@@ -267,7 +268,7 @@ class CountdownTimerBannerFragment : Fragment() {
             try {
                 val closeColor = data.close_button_color
                 if (!closeColor.isNullOrEmpty()) {
-                    val closeButtonColor = Color.parseColor(closeColor)
+                    val closeButtonColor = SafeColor.parse(closeColor, Color.BLACK)
                     DrawableCompat.setTint(binding.ibClose.drawable, closeButtonColor)
                 }
             } catch (e: Exception) {
@@ -279,7 +280,7 @@ class CountdownTimerBannerFragment : Fragment() {
                 if (!data.scratch_color.isNullOrEmpty()) {
                     val timerBackground =
                         binding.layoutTimer.background.mutate() as? GradientDrawable
-                    timerBackground?.setColor(Color.parseColor(data.scratch_color))
+                    timerBackground?.setColor(SafeColor.parse(data.scratch_color, Color.BLACK))
                 }
             } catch (e: Exception) {
                 Log.e(LOG_TAG, "Failed to set timer background color (scratch_color). Gelen: ${data.scratch_color}", e)
@@ -288,7 +289,7 @@ class CountdownTimerBannerFragment : Fragment() {
             // 5. Zamanlayıcı METİN Rengi
             try {
                 if (!props.counter_color.isNullOrEmpty()) {
-                    val timerTextColor = Color.parseColor(props.counter_color)
+                    val timerTextColor = SafeColor.parse(props.counter_color, Color.BLACK)
                     binding.tvTimerDays.setTextColor(timerTextColor)
                     binding.tvTimerHours.setTextColor(timerTextColor)
                     binding.tvTimerMinutes.setTextColor(timerTextColor)
@@ -485,5 +486,6 @@ class CountdownTimerBannerFragment : Fragment() {
         super.onDestroy()
         // Banner kapandığında yeniden gösterilebilmesi için bayrağı sıfırla.
         isShowing = false
+        com.relateddigital.relateddigital_android.inapp.InAppActionManager.onActionDismissed()
     }
 }

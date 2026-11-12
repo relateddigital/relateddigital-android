@@ -24,12 +24,20 @@ class GeofenceTransitionsIntentService : JobIntentService() {
 
     override fun onHandleWork(intent: Intent) {
         Log.v(TAG, "onHandleWork")
-        GeofenceStarter.startGpsManager(this)
-        setGeofenceEvent(intent)
+        try {
+            GeofenceStarter.startGpsManager(this)
+            setGeofenceEvent(intent)
+        } catch (e: Exception) {
+            Log.e(TAG, "Geofence event could not be handled : " + e.message)
+        }
     }
 
     private fun setGeofenceEvent(intent: Intent) {
         mGeoFenceEvent = GeofencingEvent.fromIntent(intent)
+        if (mGeoFenceEvent == null) {
+            Log.w(TAG, "Intent does not contain a geofencing event!")
+            return
+        }
         if (mGeoFenceEvent!!.hasError()) {
             val errorCode = mGeoFenceEvent!!.errorCode
             Log.e(

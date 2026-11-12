@@ -21,9 +21,9 @@ class FindToWinWebDialogFragment : DialogFragment() {
     private var baseUrl: String? = ""
     private var htmlString: String? = ""
     private var mIsRotation = false
-    private lateinit var mListener: FindToWinCompleteInterface
-    private lateinit var mCopyToClipboardInterface: FindToWinCopyToClipboardInterface
-    private lateinit var mShowCodeInterface: FindToWinShowCodeInterface
+    private var mListener: FindToWinCompleteInterface? = null
+    private var mCopyToClipboardInterface: FindToWinCopyToClipboardInterface? = null
+    private var mShowCodeInterface: FindToWinShowCodeInterface? = null
 
     fun display(fragmentManagerLoc: FragmentManager?): FindToWinWebDialogFragment {
         val ft = fragmentManagerLoc?.beginTransaction()
@@ -49,8 +49,16 @@ class FindToWinWebDialogFragment : DialogFragment() {
             baseUrl = requireArguments().getString("baseUrl")
             htmlString = requireArguments().getString("htmlString")
             mResponse = requireArguments().getString("response")
+            val listener = mListener
+            val copyToClipboardInterface = mCopyToClipboardInterface
+            val showCodeInterface = mShowCodeInterface
+            if (listener == null || copyToClipboardInterface == null || showCodeInterface == null) {
+                mIsRotation = true
+                dismissAllowingStateLoss()
+                return
+            }
             mJavaScriptInterface = FindToWinJavaScriptInterface(this, mResponse!!)
-            mJavaScriptInterface!!.setFindToWinListeners(mListener, mCopyToClipboardInterface, mShowCodeInterface)
+            mJavaScriptInterface!!.setFindToWinListeners(listener, copyToClipboardInterface, showCodeInterface)
         }
     }
 
@@ -71,7 +79,13 @@ class FindToWinWebDialogFragment : DialogFragment() {
     @SuppressLint("SetJavaScriptEnabled", "JavascriptInterface")
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         super.onCreateView(inflater, container, savedInstanceState)
-        val view: View = inflater.inflate(R.layout.layout_web_view, container, false)
+        val view: View = try {
+            inflater.inflate(R.layout.layout_web_view, container, false)
+        } catch (e: Exception) {
+            Log.e(TAG, "WebView could not be inflated!", e)
+            dismissAllowingStateLoss()
+            return View(requireContext())
+        }
         webView = view.findViewById(R.id.webview)
         webView!!.webChromeClient = webViewClient
         webView!!.settings.javaScriptEnabled = true

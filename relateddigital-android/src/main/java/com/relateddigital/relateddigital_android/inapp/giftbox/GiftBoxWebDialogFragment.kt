@@ -71,7 +71,13 @@ class GiftBoxWebDialogFragment : DialogFragment() {
     @SuppressLint("SetJavaScriptEnabled", "JavascriptInterface")
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         super.onCreateView(inflater, container, savedInstanceState)
-        val view: View = inflater.inflate(R.layout.layout_web_view, container, false)
+        val view: View = try {
+            inflater.inflate(R.layout.layout_web_view, container, false)
+        } catch (e: Exception) {
+            Log.e(TAG, "WebView could not be inflated!", e)
+            dismissAllowingStateLoss()
+            return View(requireContext())
+        }
         webView = view.findViewById(R.id.webview)
         webView!!.webChromeClient = webViewClient
         webView!!.settings.javaScriptEnabled = true

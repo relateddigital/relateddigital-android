@@ -2,6 +2,7 @@ package com.relateddigital.relateddigital_android.inapp.notificationbell
 
 import android.content.Context
 import android.graphics.Color
+import com.relateddigital.relateddigital_android.inapp.SafeColor
 import android.graphics.Typeface
 import android.util.TypedValue
 import android.view.LayoutInflater
@@ -26,7 +27,7 @@ class NotificationBellAdapter(
 
             // Stilleri uygula
             extendedProps?.let { props ->
-                binding.tvNotificationText.setTextColor(Color.parseColor(props.text_text_color))
+                binding.tvNotificationText.setTextColor(SafeColor.parse(props.text_text_color, Color.BLACK))
                 binding.tvNotificationText.setTextSize(TypedValue.COMPLEX_UNIT_SP, (props.text_text_size?.toFloat() ?: 2f) * 2 + 10)
                 binding.tvNotificationText.typeface = getFontFamily(props.font_family)
             }

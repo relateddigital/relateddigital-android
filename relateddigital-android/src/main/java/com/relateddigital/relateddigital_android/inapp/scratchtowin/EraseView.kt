@@ -1,5 +1,8 @@
 package com.relateddigital.relateddigital_android.inapp.scratchtowin
 
+import android.graphics.Color
+import com.relateddigital.relateddigital_android.inapp.SafeColor
+
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.*
@@ -122,8 +125,10 @@ class EraseView(private val mContext: Context, attrs: AttributeSet?) : View(mCon
         val yInit = yStep / 2
 
         // center of the last rectangle
-        val xEnd = mCodeWidth - xStep / 2
-        val yEnd = mCodeHeight - yStep / 2
+        val areaWidth = minOf(mCodeWidth, width)
+        val areaHeight = minOf(mCodeHeight, height)
+        val xEnd = minOf(areaWidth - xStep / 2, width - 1)
+        val yEnd = minOf(areaHeight - yStep / 2, height - 1)
         var totalTransparent = 0
         var x = xInit
         while (x <= xEnd) {
@@ -136,7 +141,7 @@ class EraseView(private val mContext: Context, attrs: AttributeSet?) : View(mCon
             }
             x += xStep
         }
-        return (totalTransparent.toFloat() / ((mCodeWidth * mCodeHeight).toFloat() / (xStep * yStep).toFloat())).toDouble()
+        return (totalTransparent.toFloat() / ((areaWidth * areaHeight).toFloat() / (xStep * yStep).toFloat())).toDouble()
     }
 
     companion object {
@@ -145,13 +150,9 @@ class EraseView(private val mContext: Context, attrs: AttributeSet?) : View(mCon
     }
 
     init {
-        mColor = Color.parseColor("#000000") //Default black
+        mColor = SafeColor.parse("#000000", Color.BLACK) //Default black
 
-        //convert drawable file into bitmap
-        val rawBitmap = Bitmap.createBitmap(1000, 1000, Bitmap.Config.ARGB_8888)
-
-        //convert bitmap into mutable bitmap
-        mSourceBitmap = Bitmap.createBitmap(rawBitmap.width, rawBitmap.height, Bitmap.Config.ARGB_8888)
+        mSourceBitmap = Bitmap.createBitmap(1000, 1000, Bitmap.Config.ARGB_8888)
         mSourceCanvas.setBitmap(mSourceBitmap)
         mSourceCanvas.drawColor(mColor)
         mDestPaint.alpha = 0

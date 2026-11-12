@@ -64,6 +64,7 @@ class InAppUpdateDisplayState: Parcelable {
                 if (intentId == mShowingIntentId) {
                     mShowingIntentId = -1
                     mInAppDisplayState = null
+                    InAppActionManager.onActionDismissed()
                 }
             } finally {
                 mUpdateDisplayLock.unlock()

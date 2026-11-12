@@ -41,7 +41,7 @@ class CarouselBuilder private constructor(private val context: Context, notifica
     private var leftItemDescription: String? = null
     private var rightItemTitle: String? = null
     private var rightItemDescription: String? = null
-    private lateinit var message: Message
+    private var message: Message? = null
     private var mBuilder: NotificationCompat.Builder
     private var carouselNotificationId =
         9873715 //Random id for notification. Will cancel any notification that have existing same id.
@@ -166,7 +166,7 @@ class CarouselBuilder private constructor(private val context: Context, notifica
             if (isImagesInCarous) {
                 val carouselImageDownloaderManager = CarouselImageDownloaderManager(
                     context,
-                    carouselItems,
+                    ArrayList(carouselItems!!),
                     numberofImages,
                     object : CarouselImageDownloaderManager.OnDownloadsCompletedListener {
                         override fun onComplete() {
@@ -182,16 +182,20 @@ class CarouselBuilder private constructor(private val context: Context, notifica
     }
 
     private fun initiateCarouselTransaction() {
-        currentStartIndex = 0
-        if (carouselItems != null && carouselItems!!.size > 0) {
-            if (carouselItems!!.size == 1) {
-                prepareVariablesForCarouselAndShow(carouselItems!![currentStartIndex], null)
-            } else {
-                prepareVariablesForCarouselAndShow(
-                    carouselItems!![currentStartIndex],
-                    carouselItems!![currentStartIndex + 1]
-                )
+        try {
+            currentStartIndex = 0
+            if (carouselItems != null && carouselItems!!.size > 0) {
+                if (carouselItems!!.size == 1) {
+                    prepareVariablesForCarouselAndShow(carouselItems!![currentStartIndex], null)
+                } else {
+                    prepareVariablesForCarouselAndShow(
+                        carouselItems!![currentStartIndex],
+                        carouselItems!![currentStartIndex + 1]
+                    )
+                }
             }
+        } catch (t: Throwable) {
+            Log.e(TAG, "Carousel notification could not be shown : " + t.message)
         }
     }
 
@@ -221,6 +225,11 @@ class CarouselBuilder private constructor(private val context: Context, notifica
     }
 
     private fun showCarousel() {
+        val message = message
+        if (message == null) {
+            Log.e(TAG, "Carousel payload is missing")
+            return
+        }
         if (carouselItems != null && carouselItems!!.size > 0) {
             if (carousel == null || carousel!!.carouselNotificationId != carouselNotificationId) {
                 //First save this set up into a carousel setup item
@@ -488,14 +497,22 @@ class CarouselBuilder private constructor(private val context: Context, notifica
         //ToDo :  delete all cache files
     }
 
-    fun handleClickEvent(clickEvent: Int, setUp: Carousel) {
-        verifyAndSetUpVariables(setUp)
-        when (clickEvent) {
-            Constants.EVENT_LEFT_ARROW_CLICKED -> onLeftArrowClicked()
-            Constants.EVENT_RIGHT_ARROW_CLICKED -> onRightArrowClicked()
-            Constants.EVENT_LEFT_ITEM_CLICKED -> onLeftItemClicked()
-            Constants.EVENT_RIGHT_ITEM_CLICKED -> onRightItemClicked()
-            else -> {}
+    @JvmOverloads
+    fun handleClickEvent(clickEvent: Int, setUp: Carousel, message: Message? = null) {
+        if (message != null) {
+            this.message = message
+        }
+        try {
+            verifyAndSetUpVariables(setUp)
+            when (clickEvent) {
+                Constants.EVENT_LEFT_ARROW_CLICKED -> onLeftArrowClicked()
+                Constants.EVENT_RIGHT_ARROW_CLICKED -> onRightArrowClicked()
+                Constants.EVENT_LEFT_ITEM_CLICKED -> onLeftItemClicked()
+                Constants.EVENT_RIGHT_ITEM_CLICKED -> onRightItemClicked()
+                else -> {}
+            }
+        } catch (t: Throwable) {
+            Log.e(TAG, "Carousel click event could not be handled : " + t.message)
         }
     }
 
@@ -562,7 +579,7 @@ class CarouselBuilder private constructor(private val context: Context, notifica
         bundle.putParcelable(Constants.CAROUSAL_ITEM_CLICKED_KEY, cItem)
         bundle.putString(
             Constants.CAROUSEL_ITEM_CLICKED_URL,
-            message.getElements()!![cItem!!.id!!.toInt() - 1].url
+            getClickedItemUrl(cItem)
         )
         val intentStr: String =
             SharedPref.readString(context.applicationContext, Constants.INTENT_NAME)
@@ -573,7 +590,7 @@ class CarouselBuilder private constructor(private val context: Context, notifica
             } catch (e: Exception) {
                 Log.e("PushClick : ", "The class could not be found!")
                 val packageManager = context.packageManager
-                intent = packageManager.getLaunchIntentForPackage(context.packageName)!!
+                intent = packageManager.getLaunchIntentForPackage(context.packageName) ?: return
                 val componentName = intent.component
                 val notificationIntent = Intent.makeRestartActivityTask(componentName)
                 notificationIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
@@ -581,7 +598,7 @@ class CarouselBuilder private constructor(private val context: Context, notifica
             }
         } else {
             val packageManager = context.packageManager
-            intent = packageManager.getLaunchIntentForPackage(context.packageName)!!
+            intent = packageManager.getLaunchIntentForPackage(context.packageName) ?: return
             val componentName = intent.component
             val notificationIntent = Intent.makeRestartActivityTask(componentName)
             notificationIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
@@ -596,6 +613,16 @@ class CarouselBuilder private constructor(private val context: Context, notifica
             e.printStackTrace()
             Log.e(TAG, "Unable To send notification's pendingIntent")
         }
+    }
+
+    private fun getClickedItemUrl(cItem: CarouselItem?): String? {
+        val elements = message?.getElements() ?: return null
+        val itemId = cItem?.id ?: return null
+        val index = itemId.toIntOrNull()?.minus(1)
+        if (index != null && index in elements.indices) {
+            return elements[index].url
+        }
+        return elements.firstOrNull { it.id == itemId }?.url
     }
 
     private fun onLeftArrowClicked() {
@@ -673,7 +700,7 @@ class CarouselBuilder private constructor(private val context: Context, notifica
                 synchronized(CarouselBuilder::class.java) {
                     if (carouselBuilder == null) {
                         carouselBuilder =
-                            CarouselBuilder(context, notificationId)
+                            CarouselBuilder(context.applicationContext ?: context, notificationId)
                         try {
                             appIcon = ImageUtils.drawableToBitmap(
                                 context.packageManager

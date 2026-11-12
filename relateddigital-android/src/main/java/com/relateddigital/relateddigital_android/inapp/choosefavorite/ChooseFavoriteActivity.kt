@@ -2,7 +2,9 @@ package com.relateddigital.relateddigital_android.inapp.choosefavorite
 
 import android.content.ClipData
 import android.content.ClipboardManager
+import android.content.Context
 import android.content.Intent
+import android.content.pm.ActivityInfo
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -51,6 +53,12 @@ class ChooseFavoriteActivity : FragmentActivity(), ChooseFavoriteCompleteInterfa
         completeListener = this
         copyToClipboardListener = this
         showCodeListener = this
+
+        if (!isAndroidTV(this)) {
+            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        } else {
+            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+        }
         val jsApi = JSApiClient.getClient(RelatedDigital.getRelatedDigitalModel(this).getRequestTimeoutInSecond())
             ?.create(ApiMethods::class.java)
         val headers = HashMap<String, String>()
@@ -70,7 +78,8 @@ class ChooseFavoriteActivity : FragmentActivity(), ChooseFavoriteCompleteInterfa
                         finish()
                     } else {
                         if (savedInstanceState != null) {
-                            jsonStr = savedInstanceState.getString("chooseFavorite-json-str", "")
+                            jsonStr = savedInstanceState.getString("choosefavorite-json-str", "")
+                            response = intent?.getSerializableExtra("choose-favorite-data") as? ChooseFavorite
                         } else {
                             val intent = intent
                             if (intent != null && intent.hasExtra("choose-favorite-data")) {
@@ -125,6 +134,10 @@ class ChooseFavoriteActivity : FragmentActivity(), ChooseFavoriteCompleteInterfa
         outState.putString("choosefavorite-json-str", jsonStr)
         super.onSaveInstanceState(outState)
     }
+    private fun isAndroidTV(context: Context): Boolean {
+        return context.packageManager.hasSystemFeature("android.software.leanback")
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         if (chooseFavoritePromotionCode.isNotEmpty()) {
@@ -135,16 +148,16 @@ class ChooseFavoriteActivity : FragmentActivity(), ChooseFavoriteCompleteInterfa
                 )
 
                 if (!extendedProps.promocodeBannerButtonLabel.isNullOrEmpty()) {
-                    if(ActivityUtils.parentActivity != null) {
+                    val parent = ActivityUtils.parentActivity as? FragmentActivity
+                    if (parent != null && !parent.isFinishing && !parent.isDestroyed) {
                         val chooseFavoriteCodeBannerFragment =
                             ChooseFavoriteCodeBannerFragment.newInstance(extendedProps, chooseFavoritePromotionCode)
 
-                        val transaction: FragmentTransaction =
-                            (ActivityUtils.parentActivity as FragmentActivity).supportFragmentManager.beginTransaction()
+                        val transaction: FragmentTransaction = parent.supportFragmentManager.beginTransaction()
                         transaction.replace(android.R.id.content, chooseFavoriteCodeBannerFragment)
-                        transaction.commit()
-                        ActivityUtils.parentActivity = null
+                        transaction.commitAllowingStateLoss()
                     }
+                    ActivityUtils.parentActivity = null
                 }
             } catch (e: Exception) {
                 Log.e(ChooseFavoriteActivity.LOG_TAG, "ChooseFavoriteCodeBanner : " + e.message)

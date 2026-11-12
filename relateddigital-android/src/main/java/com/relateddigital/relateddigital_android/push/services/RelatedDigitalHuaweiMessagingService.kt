@@ -27,28 +27,49 @@ open class RelatedDigitalHuaweiMessagingService : HmsMessageService() {
 
     override fun onNewToken(token: String) {
         Log.i(LOG_TAG, "On new token : $token")
-        val googleAppAlias: String = RelatedDigital.getGoogleAppAlias(this)
-        val huaweiAppAlias: String = RelatedDigital.getHuaweiAppAlias(this)
-        PushUtils.sendBroadCast(
-            Constants.PUSH_REGISTER_EVENT,
-            null,
-            token,
-            this
-        )
-        RelatedDigital.setIsPushNotificationEnabled(
-            this,
-            true,
-            googleAppAlias,
-            huaweiAppAlias,
-            token
-        )
+        try {
+            val googleAppAlias: String = RelatedDigital.getGoogleAppAlias(this)
+            val huaweiAppAlias: String = RelatedDigital.getHuaweiAppAlias(this)
+            PushUtils.sendBroadCast(
+                Constants.PUSH_REGISTER_EVENT,
+                null,
+                token,
+                this
+            )
+            RelatedDigital.setIsPushNotificationEnabled(
+                this,
+                true,
+                googleAppAlias,
+                huaweiAppAlias,
+                token
+            )
+        } catch (t: Throwable) {
+            Log.e(LOG_TAG, "Error handling new token : " + t.message)
+        }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         super.onMessageReceived(remoteMessage)
+        try {
+            handleMessage(remoteMessage)
+        } catch (t: Throwable) {
+            Log.e(LOG_TAG, "Error handling push message : " + t.message)
+            try {
+                LogUtils.formGraylogModel(
+                    this,
+                    "e",
+                    "RDHMessagingService : Error handling push message : $t",
+                    Throwable().stackTrace[0].let { "${it.className}/${it.methodName}/${it.lineNumber}" }
+                )
+            } catch (ignored: Throwable) {
+            }
+        }
+    }
+
+    private fun handleMessage(remoteMessage: RemoteMessage) {
         val remoteMessageData = remoteMessage.dataOfMap
-        if (remoteMessageData.isEmpty()) {
+        if (remoteMessageData.isNullOrEmpty()) {
             Log.e(LOG_TAG, "Push message is empty!")
             val element = Throwable().stackTrace[0]
             LogUtils.formGraylogModel(
@@ -106,7 +127,7 @@ open class RelatedDigitalHuaweiMessagingService : HmsMessageService() {
                         SharedPref.readString(this, Constants.NOTIFICATION_CHANNEL_SOUND_KEY)
                     if (channelName != PushNotificationManager.getChannelName(this) ||
                         channelDescription != PushNotificationManager.getChannelDescription(this) ||
-                        channelSound != pushMessage.sound
+                        channelSound != pushMessage.sound.orEmpty()
                     ) {
                         val oldChannelId: String =
                             SharedPref.readString(this, Constants.NOTIFICATION_CHANNEL_ID_KEY)
@@ -127,13 +148,11 @@ open class RelatedDigitalHuaweiMessagingService : HmsMessageService() {
                         Constants.NOTIFICATION_CHANNEL_DESCRIPTION_KEY,
                         PushNotificationManager.getChannelDescription(this)
                     )
-                    if (!pushMessage.sound.isNullOrEmpty()) {
-                        SharedPref.writeString(
-                            this,
-                            Constants.NOTIFICATION_CHANNEL_SOUND_KEY,
-                            pushMessage.sound!!
-                        )
-                    }
+                    SharedPref.writeString(
+                        this,
+                        Constants.NOTIFICATION_CHANNEL_SOUND_KEY,
+                        pushMessage.sound.orEmpty()
+                    )
                 }
 
                 when (pushMessage.getPushType()) {
@@ -144,10 +163,11 @@ open class RelatedDigitalHuaweiMessagingService : HmsMessageService() {
                             notificationId
                         )
                     } else {
+                        val mediaUrl = pushMessage.mediaUrl
                         pushNotificationManager.generateNotification(
                             this,
                             pushMessage,
-                            AppUtils.getBitMapFromUri(this, pushMessage.mediaUrl!!),
+                            if (mediaUrl.isNullOrBlank()) null else AppUtils.getBitMapFromUri(this, mediaUrl),
                             notificationId
                         )
                     }

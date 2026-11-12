@@ -1,5 +1,8 @@
 package com.relateddigital.relateddigital_android.inapp.inappmessages
 
+import android.graphics.Color
+import com.relateddigital.relateddigital_android.inapp.SafeColor
+
 import android.animation.Animator
 import android.animation.ArgbEvaluator
 import android.animation.FloatEvaluator
@@ -27,12 +30,12 @@ import kotlin.math.sqrt
  */
 open class SmileRating : BaseRating {
     private var mPlaceHolderSmileColor = Color.WHITE
-    private var mAngryColor = Color.parseColor("#f29a68")
-    private var mNormalColor = Color.parseColor("#f2dd68")
-    private var mDrawingColor = Color.parseColor("#353431")
+    private var mAngryColor = SafeColor.parse("#f29a68", Color.BLACK)
+    private var mNormalColor = SafeColor.parse("#f2dd68", Color.BLACK)
+    private var mDrawingColor = SafeColor.parse("#353431", Color.BLACK)
     private var mTextSelectedColor = Color.BLACK
-    private var mTextNonSelectedColor = Color.parseColor("#AEB3B5")
-    private var mPlaceholderBackgroundColor = Color.parseColor("#161616")
+    private var mTextNonSelectedColor = SafeColor.parse("#AEB3B5", Color.BLACK)
+    private var mPlaceholderBackgroundColor = SafeColor.parse("#161616", Color.BLACK)
     private val mNames: Array<String> = resources.getStringArray(R.array.names)
     private val mFaces = arrayOfNulls<Face>(SMILES_LIST.size)
     private val mTouchPoints: MutableMap<Int, Point> = HashMap<Int, Point>()

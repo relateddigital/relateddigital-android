@@ -2,6 +2,7 @@ package com.relateddigital.relateddigital_android.inapp.notificationbell
 
 import android.content.Intent
 import android.graphics.Color
+import com.relateddigital.relateddigital_android.inapp.SafeColor
 import android.graphics.Typeface
 import android.net.Uri
 import android.os.Bundle
@@ -210,9 +211,9 @@ class NotificationBellFragment : Fragment() {
     private fun setupDialogContent() {
         // Renkler, yazılar ve fontlar
         extendedProps?.let { props ->
-            binding.dialogCard.setCardBackgroundColor(Color.parseColor(props.background_color))
-            binding.ivPointer.setColorFilter(Color.parseColor(props.background_color))
-            binding.tvTitle.setTextColor(Color.parseColor(props.title_text_color))
+            binding.dialogCard.setCardBackgroundColor(SafeColor.parse(props.background_color, Color.BLACK))
+            binding.ivPointer.setColorFilter(SafeColor.parse(props.background_color, Color.BLACK))
+            binding.tvTitle.setTextColor(SafeColor.parse(props.title_text_color, Color.BLACK))
             binding.tvTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, (props.title_text_size?.toFloat() ?: 7f) * 2 + 6) // Boyutlandırma
             val typeface = getFontFamily(props.font_family)
             binding.tvTitle.typeface = typeface
@@ -305,7 +306,7 @@ class NotificationBellFragment : Fragment() {
         }
         extendedProps?.background_color?.let { bgColorStr ->
             try {
-                val bgColor = Color.parseColor(bgColorStr)
+                val bgColor = SafeColor.parse(bgColorStr, Color.BLACK)
                 if (androidx.core.graphics.ColorUtils.calculateLuminance(bgColor) < 0.5) {
                     return R.drawable.vl_close_button_white
                 }

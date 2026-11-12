@@ -28,6 +28,7 @@ import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.GranularRoundedCorners
 import com.google.gson.Gson
 import com.relateddigital.relateddigital_android.R
+import com.relateddigital.relateddigital_android.inapp.SafeColor
 import com.relateddigital.relateddigital_android.RelatedDigital
 import com.relateddigital.relateddigital_android.databinding.FragmentInAppNotificationLbBinding
 import com.relateddigital.relateddigital_android.databinding.FragmentInAppNotificationLmBinding
@@ -88,6 +89,7 @@ class InAppNotificationFragment : Fragment() {
     private var autoScrollRunnable: Runnable? = null
     private var minimizedDots: LinearLayout? = null
     private var maximizedDots: LinearLayout? = null
+    private var isValid = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -107,6 +109,7 @@ class InAppNotificationFragment : Fragment() {
                     DrawerExtendedProps::class.java
                 )
                 buildItems()
+                isValid = true
             } catch (e: URISyntaxException) {
                 e.printStackTrace()
                 endFragment()
@@ -140,6 +143,10 @@ class InAppNotificationFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?): View {
+        if (!isValid || response?.getActionData() == null) {
+            endFragment()
+            return View(requireContext())
+        }
         val view: View
 
         isRight = response!!.getActionData()!!.getPos() != "topLeft" &&
@@ -568,7 +575,7 @@ class InAppNotificationFragment : Fragment() {
                 } else {
                     if (!mExtendedProps!!.getMiniBackgroundColor().isNullOrEmpty()) {
                         bindingRt.smallSquareContainerRt.setBackgroundColor(
-                            Color.parseColor(mExtendedProps!!.getMiniBackgroundColor())
+                            SafeColor.parse(mExtendedProps!!.getMiniBackgroundColor(), ContextCompat.getColor(requireContext(), R.color.white))
                         )
                     } else {
                         bindingRt.smallSquareContainerRt.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.white))
@@ -597,19 +604,19 @@ class InAppNotificationFragment : Fragment() {
                     bindingRt.smallSquareImageRt.setBackgroundResource(R.drawable.rounded_corners_left)
                     val gd = bindingRt.smallSquareContainerRt.background as GradientDrawable
                     if (!mExtendedProps!!.getMiniBackgroundColor().isNullOrEmpty()) {
-                        gd.setColor(Color.parseColor(mExtendedProps!!.getMiniBackgroundColor()))
+                        gd.setColor(SafeColor.parse(mExtendedProps!!.getMiniBackgroundColor(), ContextCompat.getColor(requireContext(), R.color.white)))
                     } else {
                         gd.setColor(ContextCompat.getColor(requireContext(), R.color.white))
                     }
                     val gdText = bindingRt.smallSquareTextRt.background as GradientDrawable
                     if (!mExtendedProps!!.getMiniBackgroundColor().isNullOrEmpty()) {
-                        gdText.setColor(Color.parseColor(mExtendedProps!!.getMiniBackgroundColor()))
+                        gdText.setColor(SafeColor.parse(mExtendedProps!!.getMiniBackgroundColor(), ContextCompat.getColor(requireContext(), R.color.white)))
                     } else {
                         gdText.setColor(ContextCompat.getColor(requireContext(), R.color.white))
                     }
                     val gdImage = bindingRt.smallSquareImageRt.background as GradientDrawable
                     if (!mExtendedProps!!.getMiniBackgroundColor().isNullOrEmpty()) {
-                        gdImage.setColor(Color.parseColor(mExtendedProps!!.getMiniBackgroundColor()))
+                        gdImage.setColor(SafeColor.parse(mExtendedProps!!.getMiniBackgroundColor(), ContextCompat.getColor(requireContext(), R.color.white)))
                     } else {
                         gdImage.setColor(ContextCompat.getColor(requireContext(), R.color.white))
                     }
@@ -637,19 +644,19 @@ class InAppNotificationFragment : Fragment() {
                     bindingRt.smallCircleImageRt.setBackgroundResource(R.drawable.left_half_circle)
                     val gdCircle = bindingRt.smallCircleContainerRt.background as GradientDrawable
                     if (!mExtendedProps!!.getMiniBackgroundColor().isNullOrEmpty()) {
-                        gdCircle.setColor(Color.parseColor(mExtendedProps!!.getMiniBackgroundColor()))
+                        gdCircle.setColor(SafeColor.parse(mExtendedProps!!.getMiniBackgroundColor(), ContextCompat.getColor(requireContext(), R.color.white)))
                     } else {
                         gdCircle.setColor(ContextCompat.getColor(requireContext(), R.color.white))
                     }
                     val gdCircleText = bindingRt.smallCircleTextRt.background as GradientDrawable
                     if (!mExtendedProps!!.getMiniBackgroundColor().isNullOrEmpty()) {
-                        gdCircleText.setColor(Color.parseColor(mExtendedProps!!.getMiniBackgroundColor()))
+                        gdCircleText.setColor(SafeColor.parse(mExtendedProps!!.getMiniBackgroundColor(), ContextCompat.getColor(requireContext(), R.color.white)))
                     } else {
                         gdCircleText.setColor(ContextCompat.getColor(requireContext(), R.color.white))
                     }
                     val gdCircleImage = bindingRt.smallCircleImageRt.background as GradientDrawable
                     if (!mExtendedProps!!.getMiniBackgroundColor().isNullOrEmpty()) {
-                        gdCircleImage.setColor(Color.parseColor(mExtendedProps!!.getMiniBackgroundColor()))
+                        gdCircleImage.setColor(SafeColor.parse(mExtendedProps!!.getMiniBackgroundColor(), ContextCompat.getColor(requireContext(), R.color.white)))
                     } else {
                         gdCircleImage.setColor(ContextCompat.getColor(requireContext(), R.color.white))
                     }
@@ -669,7 +676,7 @@ class InAppNotificationFragment : Fragment() {
                 bindingRt.arrowCircleRt.text = getString(R.string.notification_right_arrow)
             }
             if (!mExtendedProps!!.getArrowColor().isNullOrEmpty()) {
-                bindingRt.arrowCircleRt.setTextColor(Color.parseColor(mExtendedProps!!.getArrowColor()))
+                bindingRt.arrowCircleRt.setTextColor(SafeColor.parse(mExtendedProps!!.getArrowColor(), ContextCompat.getColor(requireContext(), R.color.white)))
             } else {
                 bindingRt.arrowCircleRt.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
             }
@@ -690,9 +697,7 @@ class InAppNotificationFragment : Fragment() {
                     mExtendedProps!!.getMiniText()
                 if (!mExtendedProps!!.getMiniTextColor().isNullOrEmpty()) {
                     bindingRt.smallCircleTextRt.setTextColor(
-                        Color.parseColor(
-                            mExtendedProps!!.getMiniTextColor()
-                        )
+                        SafeColor.parse(mExtendedProps!!.getMiniTextColor(), ContextCompat.getColor(requireContext(), R.color.white))
                     )
                 } else {
                     bindingRt.smallCircleTextRt.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
@@ -728,7 +733,7 @@ class InAppNotificationFragment : Fragment() {
                 bindingRt.arrowSquareRt.text = getString(R.string.notification_right_arrow)
             }
             if (!mExtendedProps!!.getArrowColor().isNullOrEmpty()) {
-                bindingRt.arrowSquareRt.setTextColor(Color.parseColor(mExtendedProps!!.getArrowColor()))
+                bindingRt.arrowSquareRt.setTextColor(SafeColor.parse(mExtendedProps!!.getArrowColor(), ContextCompat.getColor(requireContext(), R.color.white)))
             } else {
                 bindingRt.arrowSquareRt.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
             }
@@ -754,9 +759,7 @@ class InAppNotificationFragment : Fragment() {
                     mExtendedProps!!.getMiniText()
                 if (!mExtendedProps!!.getMiniTextColor().isNullOrEmpty()) {
                     bindingRt.smallSquareTextRt.setTextColor(
-                        Color.parseColor(
-                            mExtendedProps!!.getMiniTextColor()
-                        )
+                        SafeColor.parse(mExtendedProps!!.getMiniTextColor(), ContextCompat.getColor(requireContext(), R.color.white))
                     )
                 } else {
                     bindingRt.smallSquareTextRt.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
@@ -789,7 +792,7 @@ class InAppNotificationFragment : Fragment() {
                 .into(bindingRt.bigBackgroundImageRt)
         } else {
             if (!mExtendedProps!!.getMaxiBackgroundColor().isNullOrEmpty()) {
-                bindingRt.bigContainerRt.setBackgroundColor(Color.parseColor(mExtendedProps!!.getMaxiBackgroundColor()))
+                bindingRt.bigContainerRt.setBackgroundColor(SafeColor.parse(mExtendedProps!!.getMaxiBackgroundColor(), ContextCompat.getColor(requireContext(), R.color.white)))
             } else {
                 bindingRt.bigContainerRt.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.white))
             }
@@ -832,7 +835,7 @@ class InAppNotificationFragment : Fragment() {
                 } else {
                     if (!mExtendedProps!!.getMiniBackgroundColor().isNullOrEmpty()) {
                         bindingRm.smallSquareContainerRm.setBackgroundColor(
-                            Color.parseColor(mExtendedProps!!.getMiniBackgroundColor())
+                            SafeColor.parse(mExtendedProps!!.getMiniBackgroundColor(), ContextCompat.getColor(requireContext(), R.color.white))
                         )
                     } else {
                         bindingRm.smallSquareContainerRm.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.white))
@@ -861,19 +864,19 @@ class InAppNotificationFragment : Fragment() {
                     bindingRm.smallSquareImageRm.setBackgroundResource(R.drawable.rounded_corners_left)
                     val gd = bindingRm.smallSquareContainerRm.background as GradientDrawable
                     if (!mExtendedProps!!.getMiniBackgroundColor().isNullOrEmpty()) {
-                        gd.setColor(Color.parseColor(mExtendedProps!!.getMiniBackgroundColor()))
+                        gd.setColor(SafeColor.parse(mExtendedProps!!.getMiniBackgroundColor(), ContextCompat.getColor(requireContext(), R.color.white)))
                     } else {
                         gd.setColor(ContextCompat.getColor(requireContext(), R.color.white))
                     }
                     val gdText = bindingRm.smallSquareTextRm.background as GradientDrawable
                     if (!mExtendedProps!!.getMiniBackgroundColor().isNullOrEmpty()) {
-                        gdText.setColor(Color.parseColor(mExtendedProps!!.getMiniBackgroundColor()))
+                        gdText.setColor(SafeColor.parse(mExtendedProps!!.getMiniBackgroundColor(), ContextCompat.getColor(requireContext(), R.color.white)))
                     } else {
                         gdText.setColor(ContextCompat.getColor(requireContext(), R.color.white))
                     }
                     val gdImage = bindingRm.smallSquareImageRm.background as GradientDrawable
                     if (!mExtendedProps!!.getMiniBackgroundColor().isNullOrEmpty()) {
-                        gdImage.setColor(Color.parseColor(mExtendedProps!!.getMiniBackgroundColor()))
+                        gdImage.setColor(SafeColor.parse(mExtendedProps!!.getMiniBackgroundColor(), ContextCompat.getColor(requireContext(), R.color.white)))
                     } else {
                         gdImage.setColor(ContextCompat.getColor(requireContext(), R.color.white))
                     }
@@ -901,19 +904,19 @@ class InAppNotificationFragment : Fragment() {
                     bindingRm.smallCircleImageRm.setBackgroundResource(R.drawable.left_half_circle)
                     val gdCircle = bindingRm.smallCircleContainerRm.background as GradientDrawable
                     if (!mExtendedProps!!.getMiniBackgroundColor().isNullOrEmpty()) {
-                        gdCircle.setColor(Color.parseColor(mExtendedProps!!.getMiniBackgroundColor()))
+                        gdCircle.setColor(SafeColor.parse(mExtendedProps!!.getMiniBackgroundColor(), ContextCompat.getColor(requireContext(), R.color.white)))
                     } else {
                         gdCircle.setColor(ContextCompat.getColor(requireContext(), R.color.white))
                     }
                     val gdCircleText = bindingRm.smallCircleTextRm.background as GradientDrawable
                     if (!mExtendedProps!!.getMiniBackgroundColor().isNullOrEmpty()) {
-                        gdCircleText.setColor(Color.parseColor(mExtendedProps!!.getMiniBackgroundColor()))
+                        gdCircleText.setColor(SafeColor.parse(mExtendedProps!!.getMiniBackgroundColor(), ContextCompat.getColor(requireContext(), R.color.white)))
                     } else {
                         gdCircleText.setColor(ContextCompat.getColor(requireContext(), R.color.white))
                     }
                     val gdCircleImage = bindingRm.smallCircleImageRm.background as GradientDrawable
                     if (!mExtendedProps!!.getMiniBackgroundColor().isNullOrEmpty()) {
-                        gdCircleImage.setColor(Color.parseColor(mExtendedProps!!.getMiniBackgroundColor()))
+                        gdCircleImage.setColor(SafeColor.parse(mExtendedProps!!.getMiniBackgroundColor(), ContextCompat.getColor(requireContext(), R.color.white)))
                     } else {
                         gdCircleImage.setColor(ContextCompat.getColor(requireContext(), R.color.white))
                     }
@@ -933,7 +936,7 @@ class InAppNotificationFragment : Fragment() {
                 bindingRm.arrowCircleRm.text = getString(R.string.notification_right_arrow)
             }
             if (!mExtendedProps!!.getArrowColor().isNullOrEmpty()) {
-                bindingRm.arrowCircleRm.setTextColor(Color.parseColor(mExtendedProps!!.getArrowColor()))
+                bindingRm.arrowCircleRm.setTextColor(SafeColor.parse(mExtendedProps!!.getArrowColor(), ContextCompat.getColor(requireContext(), R.color.white)))
             } else {
                 bindingRm.arrowCircleRm.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
             }
@@ -954,9 +957,7 @@ class InAppNotificationFragment : Fragment() {
                     mExtendedProps!!.getMiniText()
                 if (!mExtendedProps!!.getMiniTextColor().isNullOrEmpty()) {
                     bindingRm.smallCircleTextRm.setTextColor(
-                        Color.parseColor(
-                            mExtendedProps!!.getMiniTextColor()
-                        )
+                        SafeColor.parse(mExtendedProps!!.getMiniTextColor(), ContextCompat.getColor(requireContext(), R.color.white))
                     )
                 } else {
                     bindingRm.smallCircleTextRm.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
@@ -992,7 +993,7 @@ class InAppNotificationFragment : Fragment() {
                 bindingRm.arrowSquareRm.text = getString(R.string.notification_right_arrow)
             }
             if (!mExtendedProps!!.getArrowColor().isNullOrEmpty()) {
-                bindingRm.arrowSquareRm.setTextColor(Color.parseColor(mExtendedProps!!.getArrowColor()))
+                bindingRm.arrowSquareRm.setTextColor(SafeColor.parse(mExtendedProps!!.getArrowColor(), ContextCompat.getColor(requireContext(), R.color.white)))
             } else {
                 bindingRm.arrowSquareRm.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
             }
@@ -1018,9 +1019,7 @@ class InAppNotificationFragment : Fragment() {
                     mExtendedProps!!.getMiniText()
                 if (!mExtendedProps!!.getMiniTextColor().isNullOrEmpty()) {
                     bindingRm.smallSquareTextRm.setTextColor(
-                        Color.parseColor(
-                            mExtendedProps!!.getMiniTextColor()
-                        )
+                        SafeColor.parse(mExtendedProps!!.getMiniTextColor(), ContextCompat.getColor(requireContext(), R.color.white))
                     )
                 } else {
                     bindingRm.smallSquareTextRm.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
@@ -1053,7 +1052,7 @@ class InAppNotificationFragment : Fragment() {
                 .into(bindingRm.bigBackgroundImageRm)
         } else {
             if (!mExtendedProps!!.getMaxiBackgroundColor().isNullOrEmpty()) {
-                bindingRm.bigContainerRm.setBackgroundColor(Color.parseColor(mExtendedProps!!.getMaxiBackgroundColor()))
+                bindingRm.bigContainerRm.setBackgroundColor(SafeColor.parse(mExtendedProps!!.getMaxiBackgroundColor(), ContextCompat.getColor(requireContext(), R.color.white)))
             } else {
                 bindingRm.bigContainerRm.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.white))
             }
@@ -1095,7 +1094,7 @@ class InAppNotificationFragment : Fragment() {
                 } else {
                     if (!mExtendedProps!!.getMiniBackgroundColor().isNullOrEmpty()) {
                         bindingRb.smallSquareContainerRb.setBackgroundColor(
-                            Color.parseColor(mExtendedProps!!.getMiniBackgroundColor())
+                            SafeColor.parse(mExtendedProps!!.getMiniBackgroundColor(), ContextCompat.getColor(requireContext(), R.color.white))
                         )
                     } else {
                         bindingRb.smallSquareContainerRb.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.white))
@@ -1124,19 +1123,19 @@ class InAppNotificationFragment : Fragment() {
                     bindingRb.smallSquareImageRb.setBackgroundResource(R.drawable.rounded_corners_left)
                     val gd = bindingRb.smallSquareContainerRb.background as GradientDrawable
                     if (!mExtendedProps!!.getMiniBackgroundColor().isNullOrEmpty()) {
-                        gd.setColor(Color.parseColor(mExtendedProps!!.getMiniBackgroundColor()))
+                        gd.setColor(SafeColor.parse(mExtendedProps!!.getMiniBackgroundColor(), ContextCompat.getColor(requireContext(), R.color.white)))
                     } else {
                         gd.setColor(ContextCompat.getColor(requireContext(), R.color.white))
                     }
                     val gdText = bindingRb.smallSquareTextRb.background as GradientDrawable
                     if (!mExtendedProps!!.getMiniBackgroundColor().isNullOrEmpty()) {
-                        gdText.setColor(Color.parseColor(mExtendedProps!!.getMiniBackgroundColor()))
+                        gdText.setColor(SafeColor.parse(mExtendedProps!!.getMiniBackgroundColor(), ContextCompat.getColor(requireContext(), R.color.white)))
                     } else {
                         gdText.setColor(ContextCompat.getColor(requireContext(), R.color.white))
                     }
                     val gdImage = bindingRb.smallSquareImageRb.background as GradientDrawable
                     if (!mExtendedProps!!.getMiniBackgroundColor().isNullOrEmpty()) {
-                        gdImage.setColor(Color.parseColor(mExtendedProps!!.getMiniBackgroundColor()))
+                        gdImage.setColor(SafeColor.parse(mExtendedProps!!.getMiniBackgroundColor(), ContextCompat.getColor(requireContext(), R.color.white)))
                     } else {
                         gdImage.setColor(ContextCompat.getColor(requireContext(), R.color.white))
                     }
@@ -1164,19 +1163,19 @@ class InAppNotificationFragment : Fragment() {
                     bindingRb.smallCircleImageRb.setBackgroundResource(R.drawable.left_half_circle)
                     val gdCircle = bindingRb.smallCircleContainerRb.background as GradientDrawable
                     if (!mExtendedProps!!.getMiniBackgroundColor().isNullOrEmpty()) {
-                        gdCircle.setColor(Color.parseColor(mExtendedProps!!.getMiniBackgroundColor()))
+                        gdCircle.setColor(SafeColor.parse(mExtendedProps!!.getMiniBackgroundColor(), ContextCompat.getColor(requireContext(), R.color.white)))
                     } else {
                         gdCircle.setColor(ContextCompat.getColor(requireContext(), R.color.white))
                     }
                     val gdCircleText = bindingRb.smallCircleTextRb.background as GradientDrawable
                     if (!mExtendedProps!!.getMiniBackgroundColor().isNullOrEmpty()) {
-                        gdCircleText.setColor(Color.parseColor(mExtendedProps!!.getMiniBackgroundColor()))
+                        gdCircleText.setColor(SafeColor.parse(mExtendedProps!!.getMiniBackgroundColor(), ContextCompat.getColor(requireContext(), R.color.white)))
                     } else {
                         gdCircleText.setColor(ContextCompat.getColor(requireContext(), R.color.white))
                     }
                     val gdCircleImage = bindingRb.smallCircleImageRb.background as GradientDrawable
                     if (!mExtendedProps!!.getMiniBackgroundColor().isNullOrEmpty()) {
-                        gdCircleImage.setColor(Color.parseColor(mExtendedProps!!.getMiniBackgroundColor()))
+                        gdCircleImage.setColor(SafeColor.parse(mExtendedProps!!.getMiniBackgroundColor(), ContextCompat.getColor(requireContext(), R.color.white)))
                     } else {
                         gdCircleImage.setColor(ContextCompat.getColor(requireContext(), R.color.white))
                     }
@@ -1196,7 +1195,7 @@ class InAppNotificationFragment : Fragment() {
                 bindingRb.arrowCircleRb.text = getString(R.string.notification_right_arrow)
             }
             if (!mExtendedProps!!.getArrowColor().isNullOrEmpty()) {
-                bindingRb.arrowCircleRb.setTextColor(Color.parseColor(mExtendedProps!!.getArrowColor()))
+                bindingRb.arrowCircleRb.setTextColor(SafeColor.parse(mExtendedProps!!.getArrowColor(), ContextCompat.getColor(requireContext(), R.color.white)))
             } else {
                 bindingRb.arrowCircleRb.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
             }
@@ -1217,9 +1216,7 @@ class InAppNotificationFragment : Fragment() {
                     mExtendedProps!!.getMiniText()
                 if (!mExtendedProps!!.getMiniTextColor().isNullOrEmpty()) {
                     bindingRb.smallCircleTextRb.setTextColor(
-                        Color.parseColor(
-                            mExtendedProps!!.getMiniTextColor()
-                        )
+                        SafeColor.parse(mExtendedProps!!.getMiniTextColor(), ContextCompat.getColor(requireContext(), R.color.white))
                     )
                 } else {
                     bindingRb.smallCircleTextRb.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
@@ -1255,7 +1252,7 @@ class InAppNotificationFragment : Fragment() {
                 bindingRb.arrowSquareRb.text = getString(R.string.notification_right_arrow)
             }
             if (!mExtendedProps!!.getArrowColor().isNullOrEmpty()) {
-                bindingRb.arrowSquareRb.setTextColor(Color.parseColor(mExtendedProps!!.getArrowColor()))
+                bindingRb.arrowSquareRb.setTextColor(SafeColor.parse(mExtendedProps!!.getArrowColor(), ContextCompat.getColor(requireContext(), R.color.white)))
             } else {
                 bindingRb.arrowSquareRb.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
             }
@@ -1281,9 +1278,7 @@ class InAppNotificationFragment : Fragment() {
                     mExtendedProps!!.getMiniText()
                 if (!mExtendedProps!!.getMiniTextColor().isNullOrEmpty()) {
                     bindingRb.smallSquareTextRb.setTextColor(
-                        Color.parseColor(
-                            mExtendedProps!!.getMiniTextColor()
-                        )
+                        SafeColor.parse(mExtendedProps!!.getMiniTextColor(), ContextCompat.getColor(requireContext(), R.color.white))
                     )
                 } else {
                     bindingRb.smallSquareTextRb.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
@@ -1316,7 +1311,7 @@ class InAppNotificationFragment : Fragment() {
                 .into(bindingRb.bigBackgroundImageRb)
         } else {
             if (!mExtendedProps!!.getMaxiBackgroundColor().isNullOrEmpty()) {
-                bindingRb.bigContainerRb.setBackgroundColor(Color.parseColor(mExtendedProps!!.getMaxiBackgroundColor()))
+                bindingRb.bigContainerRb.setBackgroundColor(SafeColor.parse(mExtendedProps!!.getMaxiBackgroundColor(), ContextCompat.getColor(requireContext(), R.color.white)))
             } else {
                 bindingRb.bigContainerRb.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.white))
             }
@@ -1358,9 +1353,7 @@ class InAppNotificationFragment : Fragment() {
                 } else {
                     if (!mExtendedProps!!.getMiniBackgroundColor().isNullOrEmpty()) {
                         bindingLt.smallSquareContainerLt.setBackgroundColor(
-                            Color.parseColor(
-                                mExtendedProps!!.getMiniBackgroundColor()
-                            )
+                            SafeColor.parse(mExtendedProps!!.getMiniBackgroundColor(), ContextCompat.getColor(requireContext(), R.color.white))
                         )
                     } else {
                         bindingLt.smallSquareContainerLt.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.white))
@@ -1389,19 +1382,19 @@ class InAppNotificationFragment : Fragment() {
                     bindingLt.smallSquareImageLt.setBackgroundResource(R.drawable.rounded_corners_right)
                     val gd = bindingLt.smallSquareContainerLt.background as GradientDrawable
                     if (!mExtendedProps!!.getMiniBackgroundColor().isNullOrEmpty()) {
-                        gd.setColor(Color.parseColor(mExtendedProps!!.getMiniBackgroundColor()))
+                        gd.setColor(SafeColor.parse(mExtendedProps!!.getMiniBackgroundColor(), ContextCompat.getColor(requireContext(), R.color.white)))
                     } else {
                         gd.setColor(ContextCompat.getColor(requireContext(), R.color.white))
                     }
                     val gdText = bindingLt.smallSquareTextLt.background as GradientDrawable
                     if (!mExtendedProps!!.getMiniBackgroundColor().isNullOrEmpty()) {
-                        gdText.setColor(Color.parseColor(mExtendedProps!!.getMiniBackgroundColor()))
+                        gdText.setColor(SafeColor.parse(mExtendedProps!!.getMiniBackgroundColor(), ContextCompat.getColor(requireContext(), R.color.white)))
                     } else {
                         gdText.setColor(ContextCompat.getColor(requireContext(), R.color.white))
                     }
                     val gdImage = bindingLt.smallSquareImageLt.background as GradientDrawable
                     if (!mExtendedProps!!.getMiniBackgroundColor().isNullOrEmpty()) {
-                        gdImage.setColor(Color.parseColor(mExtendedProps!!.getMiniBackgroundColor()))
+                        gdImage.setColor(SafeColor.parse(mExtendedProps!!.getMiniBackgroundColor(), ContextCompat.getColor(requireContext(), R.color.white)))
                     } else {
                         gdImage.setColor(ContextCompat.getColor(requireContext(), R.color.white))
                     }
@@ -1429,19 +1422,19 @@ class InAppNotificationFragment : Fragment() {
                     bindingLt.smallCircleImageLt.setBackgroundResource(R.drawable.right_half_circle)
                     val gdCircle = bindingLt.smallCircleContainerLt.background as GradientDrawable
                     if (!mExtendedProps!!.getMiniBackgroundColor().isNullOrEmpty()) {
-                        gdCircle.setColor(Color.parseColor(mExtendedProps!!.getMiniBackgroundColor()))
+                        gdCircle.setColor(SafeColor.parse(mExtendedProps!!.getMiniBackgroundColor(), ContextCompat.getColor(requireContext(), R.color.white)))
                     } else {
                         gdCircle.setColor(ContextCompat.getColor(requireContext(), R.color.white))
                     }
                     val gdCircleText = bindingLt.smallCircleTextLt.background as GradientDrawable
                     if (!mExtendedProps!!.getMiniBackgroundColor().isNullOrEmpty()) {
-                        gdCircleText.setColor(Color.parseColor(mExtendedProps!!.getMiniBackgroundColor()))
+                        gdCircleText.setColor(SafeColor.parse(mExtendedProps!!.getMiniBackgroundColor(), ContextCompat.getColor(requireContext(), R.color.white)))
                     } else {
                         gdCircleText.setColor(ContextCompat.getColor(requireContext(), R.color.white))
                     }
                     val gdCircleImage = bindingLt.smallCircleImageLt.background as GradientDrawable
                     if (!mExtendedProps!!.getMiniBackgroundColor().isNullOrEmpty()) {
-                        gdCircleImage.setColor(Color.parseColor(mExtendedProps!!.getMiniBackgroundColor()))
+                        gdCircleImage.setColor(SafeColor.parse(mExtendedProps!!.getMiniBackgroundColor(), ContextCompat.getColor(requireContext(), R.color.white)))
                     } else {
                         gdCircleImage.setColor(ContextCompat.getColor(requireContext(), R.color.white))
                     }
@@ -1461,7 +1454,7 @@ class InAppNotificationFragment : Fragment() {
                 bindingLt.arrowCircleLt.text = getString(R.string.notification_left_arrow)
             }
             if (!mExtendedProps!!.getArrowColor().isNullOrEmpty()) {
-                bindingLt.arrowCircleLt.setTextColor(Color.parseColor(mExtendedProps!!.getArrowColor()))
+                bindingLt.arrowCircleLt.setTextColor(SafeColor.parse(mExtendedProps!!.getArrowColor(), ContextCompat.getColor(requireContext(), R.color.white)))
             } else {
                 bindingLt.arrowCircleLt.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
             }
@@ -1482,9 +1475,7 @@ class InAppNotificationFragment : Fragment() {
                     mExtendedProps!!.getMiniText()
                 if (!mExtendedProps!!.getMiniTextColor().isNullOrEmpty()) {
                     bindingLt.smallCircleTextLt.setTextColor(
-                        Color.parseColor(
-                            mExtendedProps!!.getMiniTextColor()
-                        )
+                        SafeColor.parse(mExtendedProps!!.getMiniTextColor(), ContextCompat.getColor(requireContext(), R.color.white))
                     )
                 } else {
                     bindingLt.smallCircleTextLt.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
@@ -1520,7 +1511,7 @@ class InAppNotificationFragment : Fragment() {
                 bindingLt.arrowSquareLt.text = getString(R.string.notification_left_arrow)
             }
             if (!mExtendedProps!!.getArrowColor().isNullOrEmpty()) {
-                bindingLt.arrowSquareLt.setTextColor(Color.parseColor(mExtendedProps!!.getArrowColor()))
+                bindingLt.arrowSquareLt.setTextColor(SafeColor.parse(mExtendedProps!!.getArrowColor(), ContextCompat.getColor(requireContext(), R.color.white)))
             } else {
                 bindingLt.arrowSquareLt.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
             }
@@ -1546,9 +1537,7 @@ class InAppNotificationFragment : Fragment() {
                     mExtendedProps!!.getMiniText()
                 if (!mExtendedProps!!.getMiniTextColor().isNullOrEmpty()) {
                     bindingLt.smallSquareTextLt.setTextColor(
-                        Color.parseColor(
-                            mExtendedProps!!.getMiniTextColor()
-                        )
+                        SafeColor.parse(mExtendedProps!!.getMiniTextColor(), ContextCompat.getColor(requireContext(), R.color.white))
                     )
                 } else {
                     bindingLt.smallSquareTextLt.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
@@ -1581,7 +1570,7 @@ class InAppNotificationFragment : Fragment() {
                 .into(bindingLt.bigBackgroundImageLt)
         } else {
             if (!mExtendedProps!!.getMaxiBackgroundColor().isNullOrEmpty()) {
-                bindingLt.bigContainerLt.setBackgroundColor(Color.parseColor(mExtendedProps!!.getMaxiBackgroundColor()))
+                bindingLt.bigContainerLt.setBackgroundColor(SafeColor.parse(mExtendedProps!!.getMaxiBackgroundColor(), ContextCompat.getColor(requireContext(), R.color.white)))
             } else {
                 bindingLt.bigContainerLt.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.white))
             }
@@ -1623,9 +1612,7 @@ class InAppNotificationFragment : Fragment() {
                 } else {
                     if (!mExtendedProps!!.getMiniBackgroundColor().isNullOrEmpty()) {
                         bindingLm.smallSquareContainerLm.setBackgroundColor(
-                            Color.parseColor(
-                                mExtendedProps!!.getMiniBackgroundColor()
-                            )
+                            SafeColor.parse(mExtendedProps!!.getMiniBackgroundColor(), ContextCompat.getColor(requireContext(), R.color.white))
                         )
                     } else {
                         bindingLm.smallSquareContainerLm.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.white))
@@ -1654,19 +1641,19 @@ class InAppNotificationFragment : Fragment() {
                     bindingLm.smallSquareImageLm.setBackgroundResource(R.drawable.rounded_corners_right)
                     val gd = bindingLm.smallSquareContainerLm.background as GradientDrawable
                     if (!mExtendedProps!!.getMiniBackgroundColor().isNullOrEmpty()) {
-                        gd.setColor(Color.parseColor(mExtendedProps!!.getMiniBackgroundColor()))
+                        gd.setColor(SafeColor.parse(mExtendedProps!!.getMiniBackgroundColor(), ContextCompat.getColor(requireContext(), R.color.white)))
                     } else {
                         gd.setColor(ContextCompat.getColor(requireContext(), R.color.white))
                     }
                     val gdText = bindingLm.smallSquareTextLm.background as GradientDrawable
                     if (!mExtendedProps!!.getMiniBackgroundColor().isNullOrEmpty()) {
-                        gdText.setColor(Color.parseColor(mExtendedProps!!.getMiniBackgroundColor()))
+                        gdText.setColor(SafeColor.parse(mExtendedProps!!.getMiniBackgroundColor(), ContextCompat.getColor(requireContext(), R.color.white)))
                     } else {
                         gdText.setColor(ContextCompat.getColor(requireContext(), R.color.white))
                     }
                     val gdImage = bindingLm.smallSquareImageLm.background as GradientDrawable
                     if (!mExtendedProps!!.getMiniBackgroundColor().isNullOrEmpty()) {
-                        gdImage.setColor(Color.parseColor(mExtendedProps!!.getMiniBackgroundColor()))
+                        gdImage.setColor(SafeColor.parse(mExtendedProps!!.getMiniBackgroundColor(), ContextCompat.getColor(requireContext(), R.color.white)))
                     } else {
                         gdImage.setColor(ContextCompat.getColor(requireContext(), R.color.white))
                     }
@@ -1694,19 +1681,19 @@ class InAppNotificationFragment : Fragment() {
                     bindingLm.smallCircleImageLm.setBackgroundResource(R.drawable.right_half_circle)
                     val gdCircle = bindingLm.smallCircleContainerLm.background as GradientDrawable
                     if (!mExtendedProps!!.getMiniBackgroundColor().isNullOrEmpty()) {
-                        gdCircle.setColor(Color.parseColor(mExtendedProps!!.getMiniBackgroundColor()))
+                        gdCircle.setColor(SafeColor.parse(mExtendedProps!!.getMiniBackgroundColor(), ContextCompat.getColor(requireContext(), R.color.white)))
                     } else {
                         gdCircle.setColor(ContextCompat.getColor(requireContext(), R.color.white))
                     }
                     val gdCircleText = bindingLm.smallCircleTextLm.background as GradientDrawable
                     if (!mExtendedProps!!.getMiniBackgroundColor().isNullOrEmpty()) {
-                        gdCircleText.setColor(Color.parseColor(mExtendedProps!!.getMiniBackgroundColor()))
+                        gdCircleText.setColor(SafeColor.parse(mExtendedProps!!.getMiniBackgroundColor(), ContextCompat.getColor(requireContext(), R.color.white)))
                     } else {
                         gdCircleText.setColor(ContextCompat.getColor(requireContext(), R.color.white))
                     }
                     val gdCircleImage = bindingLm.smallCircleImageLm.background as GradientDrawable
                     if (!mExtendedProps!!.getMiniBackgroundColor().isNullOrEmpty()) {
-                        gdCircleImage.setColor(Color.parseColor(mExtendedProps!!.getMiniBackgroundColor()))
+                        gdCircleImage.setColor(SafeColor.parse(mExtendedProps!!.getMiniBackgroundColor(), ContextCompat.getColor(requireContext(), R.color.white)))
                     } else {
                         gdCircleImage.setColor(ContextCompat.getColor(requireContext(), R.color.white))
                     }
@@ -1726,7 +1713,7 @@ class InAppNotificationFragment : Fragment() {
                 bindingLm.arrowCircleLm.text = getString(R.string.notification_left_arrow)
             }
             if (!mExtendedProps!!.getArrowColor().isNullOrEmpty()) {
-                bindingLm.arrowCircleLm.setTextColor(Color.parseColor(mExtendedProps!!.getArrowColor()))
+                bindingLm.arrowCircleLm.setTextColor(SafeColor.parse(mExtendedProps!!.getArrowColor(), ContextCompat.getColor(requireContext(), R.color.white)))
             } else {
                 bindingLm.arrowCircleLm.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
             }
@@ -1747,9 +1734,7 @@ class InAppNotificationFragment : Fragment() {
                     mExtendedProps!!.getMiniText()
                 if (!mExtendedProps!!.getMiniTextColor().isNullOrEmpty()) {
                     bindingLm.smallCircleTextLm.setTextColor(
-                        Color.parseColor(
-                            mExtendedProps!!.getMiniTextColor()
-                        )
+                        SafeColor.parse(mExtendedProps!!.getMiniTextColor(), ContextCompat.getColor(requireContext(), R.color.white))
                     )
                 } else {
                     bindingLm.smallCircleTextLm.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
@@ -1785,7 +1770,7 @@ class InAppNotificationFragment : Fragment() {
                 bindingLm.arrowSquareLm.text = getString(R.string.notification_left_arrow)
             }
             if (!mExtendedProps!!.getArrowColor().isNullOrEmpty()) {
-                bindingLm.arrowSquareLm.setTextColor(Color.parseColor(mExtendedProps!!.getArrowColor()))
+                bindingLm.arrowSquareLm.setTextColor(SafeColor.parse(mExtendedProps!!.getArrowColor(), ContextCompat.getColor(requireContext(), R.color.white)))
             } else {
                 bindingLm.arrowSquareLm.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
             }
@@ -1811,9 +1796,7 @@ class InAppNotificationFragment : Fragment() {
                     mExtendedProps!!.getMiniText()
                 if (!mExtendedProps!!.getMiniTextColor().isNullOrEmpty()) {
                     bindingLm.smallSquareTextLm.setTextColor(
-                        Color.parseColor(
-                            mExtendedProps!!.getMiniTextColor()
-                        )
+                        SafeColor.parse(mExtendedProps!!.getMiniTextColor(), ContextCompat.getColor(requireContext(), R.color.white))
                     )
                 } else {
                     bindingLm.smallSquareTextLm.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
@@ -1846,7 +1829,7 @@ class InAppNotificationFragment : Fragment() {
                 .into(bindingLm.bigBackgroundImageLm)
         } else {
             if (!mExtendedProps!!.getMaxiBackgroundColor().isNullOrEmpty()) {
-                bindingLm.bigContainerLm.setBackgroundColor(Color.parseColor(mExtendedProps!!.getMaxiBackgroundColor()))
+                bindingLm.bigContainerLm.setBackgroundColor(SafeColor.parse(mExtendedProps!!.getMaxiBackgroundColor(), ContextCompat.getColor(requireContext(), R.color.white)))
             } else {
                 bindingLm.bigContainerLm.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.white))
             }
@@ -1888,9 +1871,7 @@ class InAppNotificationFragment : Fragment() {
                 } else {
                     if (!mExtendedProps!!.getMiniBackgroundColor().isNullOrEmpty()) {
                         bindingLb.smallSquareContainerLb.setBackgroundColor(
-                            Color.parseColor(
-                                mExtendedProps!!.getMiniBackgroundColor()
-                            )
+                            SafeColor.parse(mExtendedProps!!.getMiniBackgroundColor(), ContextCompat.getColor(requireContext(), R.color.white))
                         )
                     } else {
                         bindingLb.smallSquareContainerLb.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.white))
@@ -1919,19 +1900,19 @@ class InAppNotificationFragment : Fragment() {
                     bindingLb.smallSquareImageLb.setBackgroundResource(R.drawable.rounded_corners_right)
                     val gd = bindingLb.smallSquareContainerLb.background as GradientDrawable
                     if (!mExtendedProps!!.getMiniBackgroundColor().isNullOrEmpty()) {
-                        gd.setColor(Color.parseColor(mExtendedProps!!.getMiniBackgroundColor()))
+                        gd.setColor(SafeColor.parse(mExtendedProps!!.getMiniBackgroundColor(), ContextCompat.getColor(requireContext(), R.color.white)))
                     } else {
                         gd.setColor(ContextCompat.getColor(requireContext(), R.color.white))
                     }
                     val gdText = bindingLb.smallSquareTextLb.background as GradientDrawable
                     if (!mExtendedProps!!.getMiniBackgroundColor().isNullOrEmpty()) {
-                        gdText.setColor(Color.parseColor(mExtendedProps!!.getMiniBackgroundColor()))
+                        gdText.setColor(SafeColor.parse(mExtendedProps!!.getMiniBackgroundColor(), ContextCompat.getColor(requireContext(), R.color.white)))
                     } else {
                         gdText.setColor(ContextCompat.getColor(requireContext(), R.color.white))
                     }
                     val gdImage = bindingLb.smallSquareImageLb.background as GradientDrawable
                     if (!mExtendedProps!!.getMiniBackgroundColor().isNullOrEmpty()) {
-                        gdImage.setColor(Color.parseColor(mExtendedProps!!.getMiniBackgroundColor()))
+                        gdImage.setColor(SafeColor.parse(mExtendedProps!!.getMiniBackgroundColor(), ContextCompat.getColor(requireContext(), R.color.white)))
                     } else {
                         gdImage.setColor(ContextCompat.getColor(requireContext(), R.color.white))
                     }
@@ -1959,19 +1940,19 @@ class InAppNotificationFragment : Fragment() {
                     bindingLb.smallCircleImageLb.setBackgroundResource(R.drawable.right_half_circle)
                     val gdCircle = bindingLb.smallCircleContainerLb.background as GradientDrawable
                     if (!mExtendedProps!!.getMiniBackgroundColor().isNullOrEmpty()) {
-                        gdCircle.setColor(Color.parseColor(mExtendedProps!!.getMiniBackgroundColor()))
+                        gdCircle.setColor(SafeColor.parse(mExtendedProps!!.getMiniBackgroundColor(), ContextCompat.getColor(requireContext(), R.color.white)))
                     } else {
                         gdCircle.setColor(ContextCompat.getColor(requireContext(), R.color.white))
                     }
                     val gdCircleText = bindingLb.smallCircleTextLb.background as GradientDrawable
                     if (!mExtendedProps!!.getMiniBackgroundColor().isNullOrEmpty()) {
-                        gdCircleText.setColor(Color.parseColor(mExtendedProps!!.getMiniBackgroundColor()))
+                        gdCircleText.setColor(SafeColor.parse(mExtendedProps!!.getMiniBackgroundColor(), ContextCompat.getColor(requireContext(), R.color.white)))
                     } else {
                         gdCircleText.setColor(ContextCompat.getColor(requireContext(), R.color.white))
                     }
                     val gdCircleImage = bindingLb.smallCircleImageLb.background as GradientDrawable
                     if (!mExtendedProps!!.getMiniBackgroundColor().isNullOrEmpty()) {
-                        gdCircleImage.setColor(Color.parseColor(mExtendedProps!!.getMiniBackgroundColor()))
+                        gdCircleImage.setColor(SafeColor.parse(mExtendedProps!!.getMiniBackgroundColor(), ContextCompat.getColor(requireContext(), R.color.white)))
                     } else {
                         gdCircleImage.setColor(ContextCompat.getColor(requireContext(), R.color.white))
                     }
@@ -1991,7 +1972,7 @@ class InAppNotificationFragment : Fragment() {
                 bindingLb.arrowCircleLb.text = getString(R.string.notification_left_arrow)
             }
             if (!mExtendedProps!!.getArrowColor().isNullOrEmpty()) {
-                bindingLb.arrowCircleLb.setTextColor(Color.parseColor(mExtendedProps!!.getArrowColor()))
+                bindingLb.arrowCircleLb.setTextColor(SafeColor.parse(mExtendedProps!!.getArrowColor(), ContextCompat.getColor(requireContext(), R.color.white)))
             } else {
                 bindingLb.arrowCircleLb.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
             }
@@ -2012,9 +1993,7 @@ class InAppNotificationFragment : Fragment() {
                     mExtendedProps!!.getMiniText()
                 if (!mExtendedProps!!.getMiniTextColor().isNullOrEmpty()) {
                     bindingLb.smallCircleTextLb.setTextColor(
-                        Color.parseColor(
-                            mExtendedProps!!.getMiniTextColor()
-                        )
+                        SafeColor.parse(mExtendedProps!!.getMiniTextColor(), ContextCompat.getColor(requireContext(), R.color.white))
                     )
                 } else {
                     bindingLb.smallCircleTextLb.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
@@ -2050,7 +2029,7 @@ class InAppNotificationFragment : Fragment() {
                 bindingLb.arrowSquareLb.text = getString(R.string.notification_left_arrow)
             }
             if (!mExtendedProps!!.getArrowColor().isNullOrEmpty()) {
-                bindingLb.arrowSquareLb.setTextColor(Color.parseColor(mExtendedProps!!.getArrowColor()))
+                bindingLb.arrowSquareLb.setTextColor(SafeColor.parse(mExtendedProps!!.getArrowColor(), ContextCompat.getColor(requireContext(), R.color.white)))
             } else {
                 bindingLb.arrowSquareLb.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
             }
@@ -2076,9 +2055,7 @@ class InAppNotificationFragment : Fragment() {
                     mExtendedProps!!.getMiniText()
                 if (!mExtendedProps!!.getMiniTextColor().isNullOrEmpty()) {
                     bindingLb.smallSquareTextLb.setTextColor(
-                        Color.parseColor(
-                            mExtendedProps!!.getMiniTextColor()
-                        )
+                        SafeColor.parse(mExtendedProps!!.getMiniTextColor(), ContextCompat.getColor(requireContext(), R.color.white))
                     )
                 } else {
                     bindingLb.smallSquareTextLb.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
@@ -2111,7 +2088,7 @@ class InAppNotificationFragment : Fragment() {
                 .into(bindingLb.bigBackgroundImageLb)
         } else {
             if (!mExtendedProps!!.getMaxiBackgroundColor().isNullOrEmpty()) {
-                bindingLb.bigContainerLb.setBackgroundColor(Color.parseColor(mExtendedProps!!.getMaxiBackgroundColor()))
+                bindingLb.bigContainerLb.setBackgroundColor(SafeColor.parse(mExtendedProps!!.getMaxiBackgroundColor(), ContextCompat.getColor(requireContext(), R.color.white)))
             } else {
                 bindingLb.bigContainerLb.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.white))
             }

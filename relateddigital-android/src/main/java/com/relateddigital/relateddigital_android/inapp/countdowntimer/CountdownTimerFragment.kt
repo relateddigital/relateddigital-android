@@ -314,7 +314,8 @@ class CountdownTimerFragment : Fragment() {
 
     private fun reAdjustTimerViews() {
         calculateTimeFields()
-        requireActivity().runOnUiThread {
+        activity?.runOnUiThread {
+            if (!isAdded || isDetached) return@runOnUiThread
             try {
                 if (mIsTop) {
                     if (binding.weekNumTop.visibility != View.GONE) {
@@ -395,7 +396,12 @@ class CountdownTimerFragment : Fragment() {
         if (mTimer != null) {
             mTimer!!.cancel()
         }
-        requireActivity().runOnUiThread { Toast.makeText(activity, getString(R.string.time_is_over), Toast.LENGTH_LONG).show() }
+        activity?.let { act ->
+            act.runOnUiThread {
+                if (!isAdded || isDetached) return@runOnUiThread
+                Toast.makeText(act, getString(R.string.time_is_over), Toast.LENGTH_LONG).show()
+            }
+        }
     }
 
     private fun endFragment() {
@@ -403,17 +409,16 @@ class CountdownTimerFragment : Fragment() {
             mTimer!!.cancel()
         }
 
+        val ctx = context ?: return
 
         if (mIsTop) {
-            val slideUpAnimation = AnimationUtils.loadAnimation(requireContext(), R.anim.slide_up)
+            val slideUpAnimation = AnimationUtils.loadAnimation(ctx, R.anim.slide_up)
             binding.root.startAnimation(slideUpAnimation)
             slideUpAnimation.setAnimationListener(object : Animation.AnimationListener {
                 override fun onAnimationStart(animation: Animation?) {}
 
                 override fun onAnimationEnd(animation: Animation?) {
-                    if (activity != null) {
-                        requireActivity().supportFragmentManager.beginTransaction().remove(this@CountdownTimerFragment).commit()
-                    }
+                    activity?.supportFragmentManager?.beginTransaction()?.remove(this@CountdownTimerFragment)?.commitAllowingStateLoss()
                 }
 
                 override fun onAnimationRepeat(animation: Animation?) {}
@@ -421,41 +426,38 @@ class CountdownTimerFragment : Fragment() {
         }
         else
         {
-            val slideUpAnimation = AnimationUtils.loadAnimation(requireContext(), R.anim.slide_up_bottom)
+            val slideUpAnimation = AnimationUtils.loadAnimation(ctx, R.anim.slide_up_bottom)
             binding.root.startAnimation(slideUpAnimation)
             slideUpAnimation.setAnimationListener(object : Animation.AnimationListener {
                 override fun onAnimationStart(animation: Animation?) {}
 
                 override fun onAnimationEnd(animation: Animation?) {
-                    if (activity != null) {
-                        requireActivity().supportFragmentManager.beginTransaction().remove(this@CountdownTimerFragment).commit()
-                    }
+                    activity?.supportFragmentManager?.beginTransaction()?.remove(this@CountdownTimerFragment)?.commitAllowingStateLoss()
                 }
 
                 override fun onAnimationRepeat(animation: Animation?) {}
-        })
+            })
         }
-
-
-
     }
 
     private fun hideStatusBar() {
-        val decorView = requireActivity().window.decorView
-        val uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN
-        decorView.systemUiVisibility = uiOptions
-        requireActivity().actionBar?.hide()
+        activity?.let { act ->
+            val decorView = act.window?.decorView ?: return@let
+            val uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN
+            decorView.systemUiVisibility = uiOptions
+            act.actionBar?.hide()
+        }
     }
 
     private fun showStatusBar() {
-        if (activity != null) {
-            ViewCompat.getWindowInsetsController(
-                requireActivity().window.decorView
-            )?.show(WindowInsetsCompat.Type.systemBars())
+        activity?.let { act ->
+            val decorView = act.window?.decorView ?: return@let
+            ViewCompat.getWindowInsetsController(decorView)?.show(WindowInsetsCompat.Type.systemBars())
         }
     }
 
     override fun onDestroyView() {
+        mTimer?.cancel()
         super.onDestroyView()
         showStatusBar()
     }

@@ -4,6 +4,8 @@ import androidx.fragment.app.Fragment
 import android.graphics.Color
 import android.graphics.Typeface
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.text.SpannableString
 import android.text.style.AbsoluteSizeSpan
 import android.text.style.ForegroundColorSpan
@@ -17,6 +19,10 @@ import com.google.gson.Gson
 import com.relateddigital.relateddigital_android.R
 import com.relateddigital.relateddigital_android.databinding.FragmentSocialProofBinding
 import com.relateddigital.relateddigital_android.inapp.FontFamily
+import com.relateddigital.relateddigital_android.inapp.SafeColor
+import com.relateddigital.relateddigital_android.inapp.toFloatOr
+import com.relateddigital.relateddigital_android.inapp.toIntOr
+import com.relateddigital.relateddigital_android.inapp.toLongOr
 import com.relateddigital.relateddigital_android.model.ProductStatNotifier
 import com.relateddigital.relateddigital_android.model.ProductStatNotifierExtendedProps
 import com.relateddigital.relateddigital_android.model.UtilResultModel
@@ -33,14 +39,15 @@ import java.util.*
 class SocialProofFragment : Fragment() {
     private var mModel: ProductStatNotifier? = null
     private var mIsTop = false
-    private var mTimer: Timer? = null
+    private val mHandler = Handler(Looper.getMainLooper())
+    private val mCloseRunnable = Runnable { endFragment() }
     private lateinit var binding: FragmentSocialProofBinding
     private var mExtendedProps: ProductStatNotifierExtendedProps? = null
     private var utilResultModel: UtilResultModel? = null
     private var mFontFamily = Typeface.DEFAULT
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mModel = requireArguments().getSerializable(ARG_PARAM1) as ProductStatNotifier
+        mModel = requireArguments().getSerializable(ARG_PARAM1) as? ProductStatNotifier
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -58,9 +65,7 @@ class SocialProofFragment : Fragment() {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        if (mTimer != null) {
-            mTimer!!.cancel()
-        }
+        mHandler.removeCallbacks(mCloseRunnable)
     }
 
     private fun setupInitialView() {
@@ -69,9 +74,15 @@ class SocialProofFragment : Fragment() {
         } catch (e: URISyntaxException) {
             e.printStackTrace()
             endFragment()
+            return
         } catch (e: Exception) {
             e.printStackTrace()
             endFragment()
+            return
+        }
+        if (mExtendedProps == null) {
+            endFragment()
+            return
         }
         fontFamily
         mIsTop = mModel!!.actiondata!!.pos.equals("top")
@@ -85,78 +96,69 @@ class SocialProofFragment : Fragment() {
     }
 
     private fun adjustTop() {
-        binding.socialProofContainerTop.setBackgroundColor(
-            Color.parseColor(
-                mModel!!.actiondata!!.bgcolor
-            )
-        )
+        SafeColor.parseOrNull(mModel!!.actiondata!!.bgcolor)?.let {
+            binding.socialProofContainerTop.setBackgroundColor(it)
+        }
         val text: String? = utilResultModel!!.message
         binding.textViewTop.typeface = mFontFamily
-        binding.textViewTop.textSize = mExtendedProps!!.content_text_size!!.toFloat() * 2 + 14
-        binding.textViewTop.setTextColor(Color.parseColor(mExtendedProps!!.content_text_color))
+        binding.textViewTop.textSize = mExtendedProps!!.content_text_size.toFloatOr(2f) * 2 + 14
+        SafeColor.parseOrNull(mExtendedProps!!.content_text_color)?.let { binding.textViewTop.setTextColor(it) }
         binding.socialProofContainerBot.visibility = View.GONE
         if (utilResultModel!!.isTag) {
             val spannableString = SpannableString(text)
             for (i in 0 until utilResultModel!!.numbers.size) {
                 spannableString.setSpan(
                     AbsoluteSizeSpan(
-                        mExtendedProps!!.contentcount_text_size!!.toInt() * 2 + 14,
+                        mExtendedProps!!.contentcount_text_size.toIntOr(2) * 2 + 14,
                         true
                     ),
                     utilResultModel!!.startIdxs[i], utilResultModel!!.endIdxs[i], 0
                 )
                 spannableString.setSpan(
-                    ForegroundColorSpan(Color.parseColor(mExtendedProps!!.contentcount_text_color)),
+                    ForegroundColorSpan(SafeColor.parse(mExtendedProps!!.contentcount_text_color, Color.BLACK)),
                     utilResultModel!!.startIdxs[i], utilResultModel!!.endIdxs[i], 0
                 )
             }
             binding.textViewTop.text = spannableString
         } else {
-            binding.textViewTop.text = text!!.replace("\\n", "\n")
+            binding.textViewTop.text = text.orEmpty().replace("\\n", "\n")
         }
     }
 
     private fun adjustBottom() {
-        binding.socialProofContainerBot.setBackgroundColor(
-            Color.parseColor(
-                mModel!!.actiondata!!.bgcolor
-            )
-        )
+        SafeColor.parseOrNull(mModel!!.actiondata!!.bgcolor)?.let {
+            binding.socialProofContainerBot.setBackgroundColor(it)
+        }
         val text: String? = utilResultModel!!.message
         binding.textViewBot.typeface = mFontFamily
-        binding.textViewBot.textSize = mExtendedProps!!.content_text_size!!.toFloat() * 2 + 14
-        binding.textViewBot.setTextColor(Color.parseColor(mExtendedProps!!.content_text_color))
+        binding.textViewBot.textSize = mExtendedProps!!.content_text_size.toFloatOr(2f) * 2 + 14
+        SafeColor.parseOrNull(mExtendedProps!!.content_text_color)?.let { binding.textViewBot.setTextColor(it) }
         binding.socialProofContainerTop.visibility = View.GONE
         if (utilResultModel!!.isTag) {
             val spannableString = SpannableString(text)
             for (i in 0 until utilResultModel!!.numbers.size) {
                 spannableString.setSpan(
                     AbsoluteSizeSpan(
-                        mExtendedProps!!.contentcount_text_size!!.toInt() * 2 + 14,
+                        mExtendedProps!!.contentcount_text_size.toIntOr(2) * 2 + 14,
                         true
                     ),
                     utilResultModel!!.startIdxs[i], utilResultModel!!.endIdxs[i], 0
                 )
                 spannableString.setSpan(
-                    ForegroundColorSpan(Color.parseColor(mExtendedProps!!.contentcount_text_color)),
+                    ForegroundColorSpan(SafeColor.parse(mExtendedProps!!.contentcount_text_color, Color.BLACK)),
                     utilResultModel!!.startIdxs[i], utilResultModel!!.endIdxs[i], 0
                 )
             }
             binding.textViewBot.text = spannableString
         } else {
-            binding.textViewBot.text = text!!.replace("\\n", "\n")
+            binding.textViewBot.text = text.orEmpty().replace("\\n", "\n")
         }
     }
 
     private fun setTimer() {
-        if (!mModel!!.actiondata!!.timeout.equals("0")) {
-            mTimer = Timer("SocialProofTimer", false)
-            val task: TimerTask = object : TimerTask() {
-                override fun run() {
-                    endFragment()
-                }
-            }
-            mTimer!!.schedule(task, mModel!!.actiondata!!.timeout!!.toInt().toLong())
+        val timeout = mModel!!.actiondata!!.timeout.toLongOr(0L)
+        if (timeout > 0) {
+            mHandler.postDelayed(mCloseRunnable, timeout)
         } else {
             if (mIsTop) {
                 binding.socialProofContainerTop.setOnClickListener { endFragment() }
@@ -167,7 +169,7 @@ class SocialProofFragment : Fragment() {
     }
 
     private fun setupCloseButton() {
-        if (mModel!!.actiondata!!.showclosebtn!!) {
+        if (mModel!!.actiondata!!.showclosebtn == true) {
             if (mIsTop) {
                 binding.closeButtonTop.setBackgroundResource(closeIcon)
                 binding.closeButtonTop.setOnClickListener { endFragment() }
@@ -183,7 +185,7 @@ class SocialProofFragment : Fragment() {
 
     private val closeIcon: Int
         get() {
-            when (mExtendedProps!!.close_button_color) {
+            when (mExtendedProps?.close_button_color) {
                 "white" -> return R.drawable.ic_close_white_24dp
                 "black" -> return R.drawable.ic_close_black_24dp
             }
@@ -191,8 +193,8 @@ class SocialProofFragment : Fragment() {
         }
 
     private fun checkNumber(): Boolean {
-        utilResultModel = AppUtils.getNumberFromText(mModel!!.actiondata!!.content)
-        return if (utilResultModel == null) {
+        utilResultModel = AppUtils.getNumberFromText(mModel?.actiondata?.content)
+        return if (utilResultModel == null || mModel?.actiondata == null) {
             Log.e(LOG_TAG, "Invalid Inputs!")
             endFragment()
             false
@@ -203,34 +205,24 @@ class SocialProofFragment : Fragment() {
 
     private val fontFamily: Unit
         get() {
-            if (FontFamily.Monospace.toString() == mExtendedProps!!.content_font_family!!.lowercase(
-                    Locale.ROOT
-                )) {
+            if (FontFamily.Monospace.toString() == mExtendedProps?.content_font_family?.lowercase(Locale.ROOT)) {
                 mFontFamily = Typeface.MONOSPACE
             }
-            if (FontFamily.SansSerif.toString() == mExtendedProps!!.content_font_family!!.lowercase(
-                    Locale.ROOT
-                )) {
+            if (FontFamily.SansSerif.toString() == mExtendedProps?.content_font_family?.lowercase(Locale.ROOT)) {
                 mFontFamily = Typeface.SANS_SERIF
             }
-            if (FontFamily.Serif.toString() == mExtendedProps!!.content_font_family!!.lowercase(
-                    Locale.ROOT
-                )) {
+            if (FontFamily.Serif.toString() == mExtendedProps?.content_font_family?.lowercase(Locale.ROOT)) {
                 mFontFamily = Typeface.SERIF
             }
-            if (FontFamily.Default.toString() == mExtendedProps!!.content_font_family!!.lowercase(
-                    Locale.ROOT
-                )) {
+            if (FontFamily.Default.toString() == mExtendedProps?.content_font_family?.lowercase(Locale.ROOT)) {
                 mFontFamily = Typeface.DEFAULT
             }
         }
 
     private fun endFragment() {
-        if (mTimer != null) {
-            mTimer!!.cancel()
-        }
-        if (activity != null) {
-            requireActivity().supportFragmentManager.beginTransaction().remove(this@SocialProofFragment).commit()
+        mHandler.removeCallbacks(mCloseRunnable)
+        if (isAdded) {
+            parentFragmentManager.beginTransaction().remove(this@SocialProofFragment).commitAllowingStateLoss()
         }
     }
 
@@ -250,6 +242,7 @@ class SocialProofFragment : Fragment() {
     }
 
     override fun onDestroyView() {
+        mHandler.removeCallbacks(mCloseRunnable)
         super.onDestroyView()
         showStatusBar()
     }

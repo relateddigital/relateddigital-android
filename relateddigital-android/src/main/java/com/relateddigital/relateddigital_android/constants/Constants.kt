@@ -32,6 +32,8 @@ class Constants {
         const val PVIV_REQUEST_KEY = "OM.pviv"
         const val TVC_REQUEST_KEY = "OM.tvc"
         const val LVT_REQUEST_KEY = "OM.lvt"
+        const val IS_FIRST_INSTALL_KEY = "OM.is_first_install"
+        const val IS_REINSTALL_KEY = "OM.is_reinstall"
         const val ADVERTISER_ID_REQUEST_KEY = "OM.m_adid"
         const val VISITOR_DATA_REQUEST_KEY = "OM.viscap"
         const val VISIT_DATA_REQUEST_KEY = "OM.vcap"

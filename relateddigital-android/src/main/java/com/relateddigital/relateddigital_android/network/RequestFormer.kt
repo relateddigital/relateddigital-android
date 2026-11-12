@@ -7,6 +7,7 @@ import com.relateddigital.relateddigital_android.model.RelatedDigitalModel
 import com.relateddigital.relateddigital_android.util.GoogleUtils
 import com.relateddigital.relateddigital_android.util.PersistentTargetManager
 import com.relateddigital.relateddigital_android.util.SharedPref
+import com.relateddigital.relateddigital_android.util.RelatedDigitalInstallTracker
 import java.text.DecimalFormat
 import java.text.ParseException
 import java.text.SimpleDateFormat
@@ -327,7 +328,7 @@ object RequestFormer {
         queryMap[Constants.SITE_ID_REQUEST_KEY] = model.getProfileId()
         queryMap[Constants.DATE_REQUEST_KEY] = timeOfEvent.toString()
         queryMap[Constants.URI_REQUEST_KEY] = pageName
-        queryMap[Constants.COOKIE_ID_REQUEST_KEY] = model.getCookieId()!!
+        queryMap[Constants.COOKIE_ID_REQUEST_KEY] = model.getCookieId().orEmpty()
         queryMap[Constants.CHANNEL_REQUEST_KEY] = model.getOsType()
         queryMap[Constants.MAPPL_REQUEST_KEY] = "true"
         queryMap[Constants.APP_VERSION_REQUEST_KEY] = model.getAppVersion()
@@ -339,11 +340,20 @@ object RequestFormer {
         queryMap[Constants.PVIV_REQUEST_KEY] = mPviv.toString()
         queryMap[Constants.TVC_REQUEST_KEY] = mTvc.toString()
         queryMap[Constants.LVT_REQUEST_KEY] = mLvt.toString()
-        queryMap[Constants.UTM_CAMPAIGN] = model.getUtmCampaign()!!
-        queryMap[Constants.UTM_MEDIUM] = model.getUtmMedium()!!
-        queryMap[Constants.UTM_SOURCE] = model.getUtmSource()!!
-        queryMap[Constants.UTM_TERM] = model.getUtmTerm()!!
-        queryMap[Constants.UTM_CONTENT] = model.getUtmContent()!!
+        val tracker = RelatedDigitalInstallTracker.getInstance(context)
+        if (tracker != null) {
+            if (!queryMap.containsKey(Constants.IS_FIRST_INSTALL_KEY)) {
+                queryMap[Constants.IS_FIRST_INSTALL_KEY] = tracker.isFirstInstallValue(mTvc)
+            }
+            if (!queryMap.containsKey(Constants.IS_REINSTALL_KEY)) {
+                queryMap[Constants.IS_REINSTALL_KEY] = tracker.isReinstallValue(mTvc)
+            }
+        }
+        queryMap[Constants.UTM_CAMPAIGN] = model.getUtmCampaign().orEmpty()
+        queryMap[Constants.UTM_MEDIUM] = model.getUtmMedium().orEmpty()
+        queryMap[Constants.UTM_SOURCE] = model.getUtmSource().orEmpty()
+        queryMap[Constants.UTM_TERM] = model.getUtmTerm().orEmpty()
+        queryMap[Constants.UTM_CONTENT] = model.getUtmContent().orEmpty()
 
 
         if (properties != null) {
@@ -363,24 +373,24 @@ object RequestFormer {
             queryMap[Constants.EXVISITOR_ID_REQUEST_KEY] = model.getExVisitorId()
         }
 
-        if (model.getUtmCampaign()!!.isNotEmpty()) {
-            queryMap[Constants.UTM_CAMPAIGN] = model.getUtmCampaign()!!
+        if (model.getUtmCampaign().orEmpty().isNotEmpty()) {
+            queryMap[Constants.UTM_CAMPAIGN] = model.getUtmCampaign().orEmpty()
         }
 
-        if (model.getUtmMedium()!!.isNotEmpty()) {
-            queryMap[Constants.UTM_MEDIUM] = model.getUtmMedium()!!
+        if (model.getUtmMedium().orEmpty().isNotEmpty()) {
+            queryMap[Constants.UTM_MEDIUM] = model.getUtmMedium().orEmpty()
         }
 
-        if (model.getUtmSource()!!.isNotEmpty()) {
-            queryMap[Constants.UTM_SOURCE] = model.getUtmSource()!!
+        if (model.getUtmSource().orEmpty().isNotEmpty()) {
+            queryMap[Constants.UTM_SOURCE] = model.getUtmSource().orEmpty()
         }
 
-        if (model.getUtmTerm()!!.isNotEmpty()) {
-            queryMap[Constants.UTM_TERM] = model.getUtmTerm()!!
+        if (model.getUtmTerm().orEmpty().isNotEmpty()) {
+            queryMap[Constants.UTM_TERM] = model.getUtmTerm().orEmpty()
         }
 
-        if (model.getUtmContent()!!.isNotEmpty()) {
-            queryMap[Constants.UTM_CONTENT] = model.getUtmContent()!!
+        if (model.getUtmContent().orEmpty().isNotEmpty()) {
+            queryMap[Constants.UTM_CONTENT] = model.getUtmContent().orEmpty()
         }
 
         if (model.getToken().isNotEmpty()) {
